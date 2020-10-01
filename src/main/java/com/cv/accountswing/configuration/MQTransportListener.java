@@ -17,18 +17,21 @@ import org.slf4j.LoggerFactory;
  * @author winswe
  */
 public class MQTransportListener implements TransportListener {
+
     private static final Logger logger = LoggerFactory.getLogger(MQTransportListener.class);
     private ReloadData rld;
-    
+
     @Override
     public void onCommand(Object obj) {
-        //logger.info("onCommand : " + obj.toString());
+        if (rld != null) {
+            rld.reload("ConnectionStatus", "Online");
+        }
     }
 
     @Override
     public void onException(IOException ex) {
         logger.error("onException : " + ex.getMessage());
-        if(rld != null){
+        if (rld != null) {
             rld.reload("ConnectionStatus", "Offline");
         }
     }
@@ -37,7 +40,7 @@ public class MQTransportListener implements TransportListener {
     public void transportInterupted() {
         logger.error("transportInterupted");
         Global.mqConStatus = false;
-        if(rld != null){
+        if (rld != null) {
             rld.reload("ConnectionStatus", "Offline");
         }
     }
@@ -46,7 +49,7 @@ public class MQTransportListener implements TransportListener {
     public void transportResumed() {
         logger.error("transportResumed");
         Global.mqConStatus = true;
-        if(rld != null){
+        if (rld != null) {
             rld.reload("ConnectionStatus", "Online");
         }
     }

@@ -721,7 +721,7 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
                 gl.setRemark(txtRemark.getText());
                 gl.setGlDate(txtRetOutDate.getDate());
                 gl.setCreatedDate(Util1.getTodayDate());
-                gl.setCurrency(currency.getKey().getCode());
+                gl.setFromCurId(currency.getKey().getCode());
                 gl.setCompId(Global.compId);
                 gl.setSplitId(5);
                 gl.setTranSource("ÄCCOUNT-RETIN");

@@ -55,7 +55,6 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
     private COAAutoCompleter coaAutoCompleter;
     private CurrencyAutoCompleter currencyAutoCompleter;
     private SelectionObserver selectionObserver;
-    private StockAutoCompleter stockAutoCompleter;
     @Autowired
     private TaskExecutor taskExecutor;
 
@@ -110,7 +109,6 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
             coaAutoCompleter.setSelectionObserver(selectionObserver);
             currencyAutoCompleter.setSelectionObserver(selectionObserver);
             txtDate.setText("Today");
-            stockAutoCompleter.setSelectionObserver(selectionObserver);
         });
 
     }

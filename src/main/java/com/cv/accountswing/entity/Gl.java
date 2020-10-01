@@ -56,7 +56,6 @@ public class Gl implements java.io.Serializable {
     private Double balance;
     private Double paid;
     private Double vouTotal;
-    private String currCode;
     private Integer locationId;
 
     @Id
@@ -370,14 +369,7 @@ public class Gl implements java.io.Serializable {
         this.vouTotal = vouTotal;
     }
 
-    @Column(name = "cur_code")
-    public String getCurrency() {
-        return currCode;
-    }
-
-    public void setCurrency(String currCode) {
-        this.currCode = currCode;
-    }
+    
 
     @Column(name = "location_id")
     public Integer getLocation() {

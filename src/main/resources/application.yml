@@ -1,5 +1,6 @@
 activemq:
-  broker-url: tcp://192.168.100.201:61616?daemon=true
+    broker-url: tcp://35.239.139.138:61616?daemon=true
+    #broker-url: tcp://192.168.100.201:61616?daemon=true
 
 destination:
   queue: cv.ac1

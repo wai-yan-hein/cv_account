@@ -7,6 +7,7 @@ package com.cv.accountswing.ui.cash;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
+import com.cv.accountswing.common.ReloadData;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.CompanyInfo;
 import com.cv.accountswing.entity.SystemProperty;
@@ -103,6 +104,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver {
     private TableRowSorter<TableModel> sorter;
     private SelectionObserver selectionObserver;
     private LoadingObserver loadingObserver;
+    private ReloadData reloadData;
     private String sourceAccId;
     private JPopupMenu popupmenu;
     private boolean isShown = false;
@@ -125,6 +127,11 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver {
         LOGGER.info("Source Id :" + sourceAccId);
 
     }
+
+    public void setReloadData(ReloadData reloadData) {
+        this.reloadData = reloadData;
+    }
+    
 
     public void setSelectionObserver(SelectionObserver selectionObserver) {
         this.selectionObserver = selectionObserver;
@@ -167,6 +174,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver {
             allCashTableModel.setColumnName(8, "Cash Out / Cr");
         }
         allCashTableModel.setSelectionObserver(this);
+        allCashTableModel.setReloadData(reloadData);
         tblCash.setModel(allCashTableModel);
         tblCash.getTableHeader().setFont(Global.tblHeaderFont);
         tblCash.getTableHeader().setPreferredSize(new Dimension(40, 40));

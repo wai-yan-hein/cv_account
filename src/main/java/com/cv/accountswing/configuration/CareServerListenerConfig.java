@@ -19,8 +19,8 @@ import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
  *
  * @author winswe
  */
-//@Configuration
-//@EnableJms
+@Configuration
+@EnableJms
 public class CareServerListenerConfig {
     @Value("${activemq.broker-url}")
     private String brokerUrl;

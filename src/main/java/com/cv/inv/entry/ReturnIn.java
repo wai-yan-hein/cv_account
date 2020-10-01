@@ -843,7 +843,7 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
             gl.setRemark(txtRemark.getText());
             gl.setGlDate(txtRetInDate.getDate());
             gl.setCreatedDate(Util1.getTodayDate());
-            gl.setCurrency(currency.getKey().getCode());
+            gl.setFromCurId(currency.getKey().getCode());
             gl.setCompId(Global.compId);
             gl.setSplitId(6);
             gl.setTranSource("ÄCCOUNT-RETOUT");
