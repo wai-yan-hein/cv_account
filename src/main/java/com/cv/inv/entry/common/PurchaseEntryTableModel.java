@@ -1,0 +1,336 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.cv.inv.entry.common;
+
+import com.cv.accountswing.common.Global;
+import com.cv.accountswing.util.Util1;
+import com.cv.inv.entity.Location;
+import com.cv.inv.entity.PurchaseDetail;
+import com.cv.inv.entity.RelationKey;
+import com.cv.inv.entity.Stock;
+import com.cv.inv.entity.StockUnit;
+import com.cv.inv.entity.UnitRelation;
+import com.cv.inv.entry.editor.LocationAutoCompleter;
+import com.cv.inv.service.RelationService;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JFormattedTextField;
+import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.table.AbstractTableModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+/**
+ *
+ * @author Mg Kyaw Thura Aung
+ */
+@Component
+public class PurchaseEntryTableModel extends AbstractTableModel {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(PurchaseEntryTableModel.class);
+    private String[] columnNames = {"Code", "Description", "Exp-Date",
+        "Qty", "Std-Wt", "Unit", "Avg-Wt", "Pur Price", "Amount", "Location"};
+    private JTable parent;
+    private List<PurchaseDetail> listPurDetail = new ArrayList();
+
+    private LocationAutoCompleter locationCompleter;
+    private JFormattedTextField txtTotalAmt;
+
+    public void setTxtTotalAmt(JFormattedTextField txtTotalAmt) {
+        this.txtTotalAmt = txtTotalAmt;
+    }
+
+    public LocationAutoCompleter getLocationCompleter() {
+        return locationCompleter;
+    }
+
+    public void setLocationCompleter(LocationAutoCompleter locationCompleter) {
+        this.locationCompleter = locationCompleter;
+    }
+
+    @Autowired
+    private RelationService relationService;
+
+    public void setParent(JTable parent) {
+        this.parent = parent;
+    }
+
+    @Override
+    public boolean isCellEditable(int rowIndex, int columnIndex) {
+        return columnIndex == 8 ? false : true; //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public int getRowCount() {
+        if (listPurDetail == null) {
+            return 0;
+        }
+        return listPurDetail.size();
+    }
+
+    @Override
+    public Class<?> getColumnClass(int columnIndex) {
+        switch (columnIndex) {
+            case 0:
+                return String.class;
+            case 1:
+                return String.class;
+            case 2:
+                return String.class;
+            case 3:
+                return Float.class;
+            case 4:
+                return Float.class;
+            case 5:
+                return String.class;
+            case 6:
+                return Float.class;
+            case 7:
+                return Float.class;
+            case 8:
+                return Float.class;
+            case 9:
+                return String.class;
+            default:
+                return Object.class;
+        }
+    }
+
+    @Override
+    public Object getValueAt(int rowIndex, int columnIndex) {
+        PurchaseDetail pur = listPurDetail.get(rowIndex);
+        switch (columnIndex) {
+            case 0:
+                if (pur.getStock() != null) {
+                    return pur.getStock().getStockCode();
+                }
+            case 1:
+                if (pur.getStock() != null) {
+                    return pur.getStock().getStockName();
+                }
+            case 3:
+                return pur.getQty();
+            case 4:
+                return pur.getStdWeight();
+            case 5:
+                return pur.getPurUnit();
+            case 6:
+                return pur.getAvgWeight();
+            case 7:
+                return pur.getPurPrice();
+            case 8:
+                return pur.getPurAmt();
+            case 9:
+                if (pur.getLocation() != null) {
+                    return pur.getLocation().getLocationName();
+                }
+            default:
+                return null;
+        }
+    }
+
+    @Override
+    public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+        try {
+            PurchaseDetail pur = listPurDetail.get(rowIndex);
+            switch (columnIndex) {
+                case 0://Stock
+                    if (aValue != null) {
+                        if (aValue instanceof Stock) {
+                            Stock stock = (Stock) aValue;
+                            pur.setStock(stock);
+                            pur.setQty(1.0f);
+                            pur.setPurPrice(stock.getPurPrice());
+                            pur.setStdWeight(stock.getPurPriceMeasure());
+                            pur.setPurUnit(stock.getPurPriceUnit());
+                            addNewRow();
+                            parent.setColumnSelectionInterval(3, 3);
+                        }
+                    }
+                    break;
+                /*case 2://Exp Date
+                if (aValue != null) {
+                pur.setExpDate(Util1.toDate(aValue));
+                parent.setColumnSelectionInterval(3, 3);
+                }
+                break;*/
+                case 3://Qty
+                    if (aValue != null) {
+                        pur.setQty(Util1.getFloat(aValue));
+                        if (pur.getQty() > 0) {
+                        }
+                    }
+                    break;
+                case 4://std wt
+                    if (aValue != null) {
+                        pur.setStdWeight(Util1.getFloat(aValue));
+                        //calculation with unit
+                        String toUnit = pur.getPurUnit().getItemUnitCode();
+                        Float calAmount = calPrice(pur, toUnit);
+                        pur.setPurPrice(calAmount);
+                        parent.setColumnSelectionInterval(5, 5);
+                    }
+                    break;
+                case 5:// unit
+                    if (aValue != null) {
+                        if (aValue instanceof StockUnit) {
+                            StockUnit st = (StockUnit) aValue;
+                            pur.setPurUnit(st);
+                            String toUnit = pur.getPurUnit().getItemUnitCode();
+                            Float calAmount = calPrice(pur, toUnit);
+                            pur.setPurPrice(calAmount);
+                            parent.setColumnSelectionInterval(6, 6);
+                        }
+                    }
+                    break;
+                case 6://avg-wt
+                    if (aValue != null) {
+                        Float avgWt = Util1.getFloat(aValue);
+                        Float stdWt = pur.getStdWeight();
+                        float purPrice = (avgWt / stdWt) * pur.getPurPrice();
+                        pur.setAvgWeight(avgWt);
+                        pur.setPurPrice(purPrice);
+                        parent.setColumnSelectionInterval(7, 7);
+                    }
+                    break;
+                case 7:
+                    if (aValue != null) {
+                        pur.setPurAmt(Util1.getFloat(aValue));
+                        parent.setColumnSelectionInterval(7, 7);
+                    }
+                    break;
+                case 9:
+                    if (aValue != null) {
+                        if (aValue instanceof Location) {
+                            Location loc = (Location) aValue;
+                            pur.setLocation(loc);
+                            parent.setRowSelectionInterval(rowIndex + 1, rowIndex + 1);
+                            parent.setColumnSelectionInterval(0, 0);
+                        }
+                    }
+                    break;
+            }
+            calTotalAmount(pur);
+            fireTableRowsUpdated(rowIndex, rowIndex);
+
+        } catch (Exception e) {
+            LOGGER.error("setValueAt :" + e.getStackTrace()[0].getLineNumber() + " - " + e.getMessage());
+        }
+    }
+
+    private void calTotalAmount(PurchaseDetail pur) {
+        if (pur.getStock() != null) {
+            //cal amt
+            pur.setPurAmt(Util1.getFloat(pur.getQty()) * pur.getPurPrice());
+            //cal smallest wt
+            pur.setSmallestWT(getSmallestUnit(pur.getStdWeight(), pur.getPurUnit().getItemUnitCode()));
+            //cal total amount
+            float ttlAmt = 0.0f;
+            for (PurchaseDetail pd : listPurDetail) {
+                ttlAmt += Util1.getFloat(pd.getPurAmt());
+            }
+            txtTotalAmt.setValue(ttlAmt);
+        }
+    }
+
+    private Float calPrice(PurchaseDetail pd, String toUnit) {
+        Stock stock = pd.getStock();
+        float purAmt = 0.0f;
+        float stdPurPrice = stock.getPurPrice();
+        float stdPrice = stock.getPurPrice();
+        float userWt = pd.getStdWeight();
+        float stdWt = stock.getPurMeasure();
+        String fromUnit = stock.getPurUnit().getItemUnitCode();
+
+        if (!fromUnit.equals(toUnit)) {
+            RelationKey key = new RelationKey(fromUnit, toUnit);
+            UnitRelation unitRelation = relationService.findByKey(key);
+            if (unitRelation != null) {
+                float factor = unitRelation.getFactor();
+                float convertWt = (userWt / factor); //unit change
+                purAmt = (convertWt / stdWt) * stdPrice; // cal price
+
+            } else {
+                key = new RelationKey(toUnit, fromUnit);
+                Float factor = Global.hmRelation.get(key);
+                if (factor != null) {
+                    float convertWt = userWt * factor; // unit change
+                    purAmt = (convertWt / stdWt) * stdPurPrice; // cal price
+                } else {
+                    JOptionPane.showMessageDialog(Global.parentForm, "Mapping units in Relation Setup.");
+                }
+            }
+        } else {
+            purAmt = (userWt / stdPrice) * stdPurPrice;
+        }
+        return purAmt;
+    }
+
+    private Float getSmallestUnit(Float weight, String unit) {
+        float sWt = 0.0f;
+        RelationKey key = new RelationKey(unit, "oz");
+        Float factor = Global.hmRelation.get(key);
+        if (factor != null) {
+            sWt = factor * weight;
+        } else {
+            JOptionPane.showMessageDialog(Global.parentForm, String.format("Need Relation  %s with Smallest Unit", unit));
+            listPurDetail.remove(parent.getSelectedRow());
+        }
+        LOGGER.info("Smallest Weight :" + sWt + "From >>>" + unit + "<<<");
+        return sWt;
+    }
+
+    public String getColumnName(int column) {
+        return columnNames[column];
+    }
+
+    @Override
+    public int getColumnCount() {
+        return columnNames.length;
+    }
+
+    public String[] getColumnNames() {
+        return columnNames;
+    }
+
+    public void setColumnNames(String[] columnNames) {
+        this.columnNames = columnNames;
+    }
+
+    public void addNewRow() {
+        if (listPurDetail != null) {
+            if (hasEmptyRow()) {
+                PurchaseDetail pd = new PurchaseDetail();
+                if (locationCompleter != null) {
+                    pd.setLocation(locationCompleter.getLocation());
+                }
+                listPurDetail.add(pd);
+                fireTableRowsInserted(listPurDetail.size() - 1, listPurDetail.size() - 1);
+            }
+        }
+    }
+
+    private boolean hasEmptyRow() {
+        boolean status = true;
+        if (listPurDetail.size() > 1) {
+            PurchaseDetail get = listPurDetail.get(listPurDetail.size() - 1);
+            if (get.getStock() == null) {
+                status = false;
+            }
+        }
+        return status;
+    }
+
+    public void clear() {
+        if (!listPurDetail.isEmpty()) {
+            listPurDetail.clear();
+        }
+    }
+
+}
