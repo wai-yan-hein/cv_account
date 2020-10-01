@@ -56,6 +56,8 @@ import com.cv.inv.service.SaleManService;
 import com.cv.inv.service.VouStatusService;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.MachineInfo;
+import com.cv.inv.entity.StockUnit;
+import com.cv.inv.entity.UnitRelation;
 import com.cv.inv.entry.StockReceiving;
 import com.cv.inv.service.MachineInfoService;
 import com.cv.inv.service.RelationService;
@@ -65,7 +67,6 @@ import com.cv.inv.setup.OtherSetup;
 import com.cv.inv.setup.StockSetup;
 import java.awt.Color;
 import java.awt.FlowLayout;
-import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -591,6 +592,10 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             Global.listVou = vouService.findAll();
             Global.listSaleMan = saleManService.findAll();
             Global.listStock = stockService.findAll();
+            Global.listRelation = relationService.findAll();
+            Global.listRelation.forEach(ur -> {
+                Global.hmRelation.put(ur.getUnitKey(), ur.getFactor());
+            });
             getMachinceInfo();
         });
 
