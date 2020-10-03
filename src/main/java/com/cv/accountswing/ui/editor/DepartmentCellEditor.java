@@ -34,35 +34,8 @@ public class DepartmentCellEditor extends AbstractCellEditor implements TableCel
     private DepartmentAutoCompleter completer;
     //private List<Medicine> listDepartment = new ArrayList();
 
-    public DepartmentCellEditor(final DepartmentService service) {
-        if (Global.listDepartment == null) {
-            Timer timer = new Timer(500, (ActionEvent e) -> {
-                Thread thread = new Thread() {
-                    @Override
-                    public void run() {
-                        if (Global.listDepartment == null) {
-                            LOGGER.info("start : " + new Date());
-                            Global.listDepartment = service.search("-", "-", "-", "-", "-");
-                            LOGGER.info("end : " + new Date());
-                        }
-                    }
-                };
-                thread.start();
-                /*try {
-                LOGGER.info("start : " + new Date());
-                if (dao.getRowCount("select count(*) from item_type_mapping where group_id ="+ Global.loginUser.getUserId()) > 0) {
-                Global.listDepartment = dao.findAll("Medicine", "active = true and medTypeId.itemTypeCode in (select a.key.itemType.itemTypeCode from ItemTypeMapping a)");
-                } else {
-                Global.listDepartment = dao.findAll("Medicine", "active = true");
-                }
-                LOGGER.info("end : " + new Date());
-                } catch (Exception ex) {
-                LOGGER.error("SaleTableCodeCellEditor : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
-                }*/
-            });
-            timer.setRepeats(false);
-            timer.start();
-        }
+    public DepartmentCellEditor() {
+
     }
 
     @Override
@@ -70,8 +43,8 @@ public class DepartmentCellEditor extends AbstractCellEditor implements TableCel
             boolean isSelected, int rowIndex, int vColIndex) {
         JTextField jtf = new JTextField();
         jtf.setFont(Global.textFont);
+        jtf.setHighlighter(null);
         //List<Medicine> listDepartment = dao.findAll("Medicine", "active = true");
-
         KeyListener keyListener = new KeyListener() {
             @Override
             public void keyPressed(KeyEvent keyEvent) {
@@ -101,7 +74,6 @@ public class DepartmentCellEditor extends AbstractCellEditor implements TableCel
         component = jtf;
         if (value != null) {
             jtf.setText(value.toString());
-            jtf.selectAll();
         }
         completer = new DepartmentAutoCompleter(jtf, Global.listDepartment, this);
 

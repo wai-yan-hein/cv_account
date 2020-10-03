@@ -9,11 +9,7 @@ import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.view.VGl;
-import com.cv.accountswing.service.COAService;
-import com.cv.accountswing.service.CurrencyService;
-import com.cv.accountswing.service.DepartmentService;
 import com.cv.accountswing.service.ReportService;
-import com.cv.accountswing.service.TraderService;
 import com.cv.accountswing.service.VGlService;
 import com.cv.accountswing.ui.editor.CurrencyEditor;
 import com.cv.accountswing.ui.editor.DepartmentCellEditor;
@@ -76,14 +72,6 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
     private TaskExecutor taskExecutor;
     @Autowired
     private SalePurchaseTableModel spTableModel;
-    @Autowired
-    private DepartmentService departmentService;
-    @Autowired
-    private COAService cOAService;
-    @Autowired
-    private TraderService traderService;
-    @Autowired
-    private CurrencyService currencyService;
     @Autowired
     private VoucherDialog voucherDialog;
     @Autowired
@@ -172,12 +160,12 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
         tblCash.getColumnModel().getColumn(6).setPreferredWidth(1);// Curr      
         tblCash.getColumnModel().getColumn(7).setPreferredWidth(70);// Dr-Amt   
         tblCash.getColumnModel().getColumn(0).setCellEditor(new AutoClearEditor());
-        tblCash.getColumnModel().getColumn(1).setCellEditor(new DepartmentCellEditor(departmentService));
+        tblCash.getColumnModel().getColumn(1).setCellEditor(new DepartmentCellEditor());
         tblCash.getColumnModel().getColumn(2).setCellEditor(new AutoClearEditor());
         tblCash.getColumnModel().getColumn(3).setCellEditor(new AutoClearEditor());
-        tblCash.getColumnModel().getColumn(4).setCellEditor(new TraderCellEditor(traderService));
-        tblCash.getColumnModel().getColumn(5).setCellEditor(new COACellEditor(cOAService));
-        tblCash.getColumnModel().getColumn(6).setCellEditor(new CurrencyEditor(currencyService));
+        tblCash.getColumnModel().getColumn(4).setCellEditor(new TraderCellEditor());
+        tblCash.getColumnModel().getColumn(5).setCellEditor(new COACellEditor());
+        tblCash.getColumnModel().getColumn(6).setCellEditor(new CurrencyEditor());
         tblCash.getColumnModel().getColumn(7).setCellEditor(new AutoClearEditor());
 
         tblCash.setDefaultRenderer(Double.class, new TableCellRender());
