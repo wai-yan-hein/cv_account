@@ -9,6 +9,7 @@ import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.ChartOfAccount;
 import com.cv.accountswing.ui.cash.common.COATableModel;
+import com.cv.accountswing.ui.cash.common.TableCellRender;
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -76,6 +77,8 @@ public class COAAutoCompleter implements KeyListener {
         table.getTableHeader().setFont(Global.lableFont);
         table.setFont(Global.textFont); // NOI18N
         table.setRowHeight(Global.tblRowHeight);
+        table.setDefaultRenderer(Object.class, new TableCellRender());
+
         sorter = new TableRowSorter(table.getModel());
         table.setRowSorter(sorter);
         JScrollPane scroll = new JScrollPane(table);

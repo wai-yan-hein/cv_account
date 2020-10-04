@@ -49,7 +49,7 @@ public class RetInServiceImpl implements RetInService {
                     detailHis.setInCompoundKey(new RetInCompoundKey(retInDetailId,gl.getGlId(), gl.getVouNo()));
                     retInDao.save(detailHis);
                     count += 1;
-                    retInDetailHis = detailHis;
+                    //retInDetailHis = detailHis;
                 }
 
             }

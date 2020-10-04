@@ -70,9 +70,7 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
     private CurrencyAutoCompleter currencyAutoCompleter;
     private Gl gl;
     private GenVouNoImpl vouEngine = null;
-    private String cusId;
-    private String currCode;
-    private String locId;
+  
 
     public void setLoadingObserver(LoadingObserver loadingObserver) {
         this.loadingObserver = loadingObserver;
@@ -847,7 +845,7 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
             gl.setCompId(Global.compId);
             gl.setSplitId(6);
             gl.setTranSource("ÄCCOUNT-RETOUT");
-            gl.setLocation(location.getLocationId());
+            gl.setLocationId(location.getLocationId());
             gl.setCreatedBy(Global.loginUser.getUserId().toString());
             gl.setVouTotal(NumberUtil.getDouble(txtVouTotal.getText()));
             gl.setPaid(NumberUtil.getDouble(txtVouPaid.getText()));

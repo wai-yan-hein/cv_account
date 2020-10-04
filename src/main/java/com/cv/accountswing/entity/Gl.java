@@ -22,45 +22,98 @@ import javax.persistence.TemporalType;
 @Table(name = "gl")
 public class Gl implements java.io.Serializable {
 
-    private Long glId;
-    private Date glDate;
-    private String description;
-    private String sourceAcId;
-    private String accountId;
-    private String toCurId;
-    private String fromCurId;
-    private Double exRate;
-    private Double drAmt;
-    private Double crAmt;
-    private String reference;
-    private String deptId;
-    private String vouNo;
-    private Long traderId;
-    private String chequeNo;
-    private Integer compId;
-    private Double gst;
-    private Date createdDate;
-    private Date modifyDate;
-    private String modifyBy;
-    private String createdBy;
-    private String tranSource;
-    private String bankCode;
-    private String glVouNo; //For general voucher system id
-    private Integer splitId;
-    private String intgUpdStatus; //For integration update status
-    private String remark;
-    private String fromDesp;
-    private String toDesp;
-    private String naration;
-    private Long projectId;
-    private Double balance;
-    private Double paid;
-    private Double vouTotal;
-    private Integer locationId;
-
     @Id
     @GeneratedValue(strategy = IDENTITY)
     @Column(name = "gl_id", unique = true, nullable = false)
+    private Long glId;
+    @Temporal(TemporalType.DATE)
+    @Column(name = "gl_date")
+    private Date glDate;
+    @Column(name = "description", length = 255)
+    private String description;
+    @Column(name = "source_ac_id")
+    private String sourceAcId;
+    @Column(name = "account_id")
+    private String accountId;
+    @Column(name = "to_cur_id")
+    private String toCurId;
+    @Column(name = "from_cur_id")
+    private String fromCurId;
+    @Column(name = "ex_rate")
+    private Double exRate;
+    @Column(name = "dr_amt")
+    private Double drAmt;
+    @Column(name = "cr_amt")
+    private Double crAmt;
+    @Column(name = "reference", length = 50)
+    private String reference;
+    @Column(name = "dept_id")
+    private String deptId;
+    @Column(name = "voucher_no", length = 15)
+    private String vouNo;
+    @Column(name = "cv_id")
+    private Long traderId;
+    @Column(name = "cheque_no", length = 20)
+    private String chequeNo;
+    @Column(name = "comp_id")
+    private Integer compId;
+    @Column(name = "gst")
+    private Double gst;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "created_date")
+    private Date createdDate;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "modify_date")
+    private Date modifyDate;
+    @Column(name = "modify_by", length = 15)
+    private String modifyBy;
+    @Column(name = "user_id", length = 15)
+    private String createdBy;
+    @Column(name = "tran_source", length = 25)
+    private String tranSource;
+    @Column(name = "bank_code")
+    private String bankCode;
+    @Column(name = "gl_vou_no", length = 25)
+    private String glVouNo; //For general voucher system id
+    @Column(name = "split_id")
+    private Integer splitId;
+    @Column(name = "intg_upd_status", length = 5)
+    private String intgUpdStatus; //For integration update status
+    @Column(name = "remark", length = 500)
+    private String remark;
+    @Column(name = "from_desp", length = 500)
+    private String fromDesp;
+    @Column(name = "to_desp", length = 500)
+    private String toDesp;
+    @Column(name = "naration", length = 500)
+    private String naration;
+    @Column(name = "project_id")
+    private Long projectId;
+
+    //inventory
+    @Column(name = "balance")
+    private Double balance;
+    @Column(name = "paid")
+    private Double paid;
+    @Column(name = "vou_total")
+    private Double vouTotal;
+    @Column(name = "location_id")
+    private Integer locationId;
+    @Temporal(TemporalType.DATE)
+    @Column(name = "due_date")
+    private Date dueDate;
+    @Column(name = "vou_status_id", length = 15)
+    private Integer vouStatusId;
+    @Column(name = "ref_no", length = 15)
+    private String refernceNo;
+    @Temporal(TemporalType.DATE)
+    @Column(name = "pur_date")
+    private Date purDate;
+    @Column(name = "tax_amt")
+    private Double taxAmt;
+    @Column(name = "session_id")
+    private Integer sessionId;
+
     public Long getGlId() {
         return glId;
     }
@@ -69,8 +122,6 @@ public class Gl implements java.io.Serializable {
         this.glId = glId;
     }
 
-    @Temporal(TemporalType.DATE)
-    @Column(name = "gl_date")
     public Date getGlDate() {
         return glDate;
     }
@@ -79,7 +130,6 @@ public class Gl implements java.io.Serializable {
         this.glDate = glDate;
     }
 
-    @Column(name = "description", length = 255)
     public String getDescription() {
         return description;
     }
@@ -88,7 +138,6 @@ public class Gl implements java.io.Serializable {
         this.description = description;
     }
 
-    @Column(name = "source_ac_id")
     public String getSourceAcId() {
         return sourceAcId;
     }
@@ -97,7 +146,6 @@ public class Gl implements java.io.Serializable {
         this.sourceAcId = sourceAcId;
     }
 
-    @Column(name = "account_id")
     public String getAccountId() {
         return accountId;
     }
@@ -106,7 +154,6 @@ public class Gl implements java.io.Serializable {
         this.accountId = accountId;
     }
 
-    @Column(name = "to_cur_id")
     public String getToCurId() {
         return toCurId;
     }
@@ -115,7 +162,6 @@ public class Gl implements java.io.Serializable {
         this.toCurId = toCurId;
     }
 
-    @Column(name = "from_cur_id")
     public String getFromCurId() {
         return fromCurId;
     }
@@ -124,7 +170,6 @@ public class Gl implements java.io.Serializable {
         this.fromCurId = fromCurId;
     }
 
-    @Column(name = "ex_rate")
     public Double getExRate() {
         return exRate;
     }
@@ -133,7 +178,6 @@ public class Gl implements java.io.Serializable {
         this.exRate = exRate;
     }
 
-    @Column(name = "dr_amt")
     public Double getDrAmt() {
         return drAmt;
     }
@@ -142,7 +186,6 @@ public class Gl implements java.io.Serializable {
         this.drAmt = drAmt;
     }
 
-    @Column(name = "cr_amt")
     public Double getCrAmt() {
         return crAmt;
     }
@@ -151,7 +194,6 @@ public class Gl implements java.io.Serializable {
         this.crAmt = crAmt;
     }
 
-    @Column(name = "reference", length = 50)
     public String getReference() {
         return reference;
     }
@@ -160,7 +202,6 @@ public class Gl implements java.io.Serializable {
         this.reference = reference;
     }
 
-    @Column(name = "dept_id")
     public String getDeptId() {
         return deptId;
     }
@@ -169,7 +210,6 @@ public class Gl implements java.io.Serializable {
         this.deptId = deptId;
     }
 
-    @Column(name = "voucher_no", length = 15)
     public String getVouNo() {
         return vouNo;
     }
@@ -178,7 +218,6 @@ public class Gl implements java.io.Serializable {
         this.vouNo = vouNo;
     }
 
-    @Column(name = "cv_id")
     public Long getTraderId() {
         return traderId;
     }
@@ -187,7 +226,6 @@ public class Gl implements java.io.Serializable {
         this.traderId = traderId;
     }
 
-    @Column(name = "cheque_no", length = 20)
     public String getChequeNo() {
         return chequeNo;
     }
@@ -196,7 +234,6 @@ public class Gl implements java.io.Serializable {
         this.chequeNo = chequeNo;
     }
 
-    @Column(name = "comp_id")
     public Integer getCompId() {
         return compId;
     }
@@ -205,8 +242,6 @@ public class Gl implements java.io.Serializable {
         this.compId = compId;
     }
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "created_date")
     public Date getCreatedDate() {
         return createdDate;
     }
@@ -215,8 +250,6 @@ public class Gl implements java.io.Serializable {
         this.createdDate = createdDate;
     }
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "modify_date")
     public Date getModifyDate() {
         return modifyDate;
     }
@@ -225,7 +258,6 @@ public class Gl implements java.io.Serializable {
         this.modifyDate = modifyDate;
     }
 
-    @Column(name = "modify_by", length = 15)
     public String getModifyBy() {
         return modifyBy;
     }
@@ -234,7 +266,6 @@ public class Gl implements java.io.Serializable {
         this.modifyBy = modifyBy;
     }
 
-    @Column(name = "user_id", length = 15)
     public String getCreatedBy() {
         return createdBy;
     }
@@ -243,7 +274,6 @@ public class Gl implements java.io.Serializable {
         this.createdBy = createdBy;
     }
 
-    @Column(name = "gst")
     public Double getGst() {
         return gst;
     }
@@ -252,7 +282,6 @@ public class Gl implements java.io.Serializable {
         this.gst = gst;
     }
 
-    @Column(name = "tran_source", length = 25)
     public String getTranSource() {
         return tranSource;
     }
@@ -261,7 +290,6 @@ public class Gl implements java.io.Serializable {
         this.tranSource = tranSource;
     }
 
-    @Column(name = "bank_code")
     public String getBankCode() {
         return bankCode;
     }
@@ -270,7 +298,6 @@ public class Gl implements java.io.Serializable {
         this.bankCode = bankCode;
     }
 
-    @Column(name = "gl_vou_no", length = 25)
     public String getGlVouNo() {
         return glVouNo;
     }
@@ -279,7 +306,6 @@ public class Gl implements java.io.Serializable {
         this.glVouNo = glVouNo;
     }
 
-    @Column(name = "split_id")
     public Integer getSplitId() {
         return splitId;
     }
@@ -288,7 +314,6 @@ public class Gl implements java.io.Serializable {
         this.splitId = splitId;
     }
 
-    @Column(name = "intg_upd_status", length = 5)
     public String getIntgUpdStatus() {
         return intgUpdStatus;
     }
@@ -297,7 +322,6 @@ public class Gl implements java.io.Serializable {
         this.intgUpdStatus = intgUpdStatus;
     }
 
-    @Column(name = "remark", length = 500)
     public String getRemark() {
         return remark;
     }
@@ -306,7 +330,6 @@ public class Gl implements java.io.Serializable {
         this.remark = remark;
     }
 
-    @Column(name = "from_desp", length = 500)
     public String getFromDesp() {
         return fromDesp;
     }
@@ -315,7 +338,6 @@ public class Gl implements java.io.Serializable {
         this.fromDesp = fromDesp;
     }
 
-    @Column(name = "to_desp", length = 500)
     public String getToDesp() {
         return toDesp;
     }
@@ -324,7 +346,6 @@ public class Gl implements java.io.Serializable {
         this.toDesp = toDesp;
     }
 
-    @Column(name = "naration", length = 500)
     public String getNaration() {
         return naration;
     }
@@ -333,7 +354,6 @@ public class Gl implements java.io.Serializable {
         this.naration = naration;
     }
 
-    @Column(name = "project_id")
     public Long getProjectId() {
         return projectId;
     }
@@ -342,7 +362,6 @@ public class Gl implements java.io.Serializable {
         this.projectId = projectId;
     }
 
-    @Column(name = "balance")
     public Double getBalance() {
         return balance;
     }
@@ -351,7 +370,6 @@ public class Gl implements java.io.Serializable {
         this.balance = balance;
     }
 
-    @Column(name = "paid")
     public Double getPaid() {
         return paid;
     }
@@ -360,7 +378,6 @@ public class Gl implements java.io.Serializable {
         this.paid = paid;
     }
 
-    @Column(name = "vou_total")
     public Double getVouTotal() {
         return vouTotal;
     }
@@ -369,17 +386,60 @@ public class Gl implements java.io.Serializable {
         this.vouTotal = vouTotal;
     }
 
-    
-
-    @Column(name = "location_id")
-    public Integer getLocation() {
+    public Integer getLocationId() {
         return locationId;
     }
 
-    public void setLocation(Integer location) {
-        this.locationId = location;
+    public void setLocationId(Integer locationId) {
+        this.locationId = locationId;
     }
-    
-    
+
+    public Date getDueDate() {
+        return dueDate;
+    }
+
+    public void setDueDate(Date dueDate) {
+        this.dueDate = dueDate;
+    }
+
+    public Integer getVouStatusId() {
+        return vouStatusId;
+    }
+
+    public void setVouStatusId(Integer vouStatusId) {
+        this.vouStatusId = vouStatusId;
+    }
+
+    public String getRefernceNo() {
+        return refernceNo;
+    }
+
+    public void setRefernceNo(String refernceNo) {
+        this.refernceNo = refernceNo;
+    }
+
+    public Date getPurDate() {
+        return purDate;
+    }
+
+    public void setPurDate(Date purDate) {
+        this.purDate = purDate;
+    }
+
+    public Double getTaxAmt() {
+        return taxAmt;
+    }
+
+    public void setTaxAmt(Double taxAmt) {
+        this.taxAmt = taxAmt;
+    }
+
+    public Integer getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(Integer sessionId) {
+        this.sessionId = sessionId;
+    }
 
 }

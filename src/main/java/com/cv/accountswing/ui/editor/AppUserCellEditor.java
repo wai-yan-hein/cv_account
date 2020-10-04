@@ -7,18 +7,14 @@ package com.cv.accountswing.ui.editor;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.entity.AppUser;
-import com.cv.accountswing.service.UserService;
-import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
-import java.util.Date;
 import java.util.EventObject;
 import javax.swing.AbstractCellEditor;
 import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.Timer;
 import javax.swing.table.TableCellEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
