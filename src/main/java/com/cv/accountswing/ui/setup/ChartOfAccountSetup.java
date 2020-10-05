@@ -106,14 +106,17 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements MouseList
 
     private void save() {
         String parentCode;
+        String option;
         DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) selectedNode.getParent();
         if (parentNode != null) {
             Object userObject = parentNode.getUserObject();
             if (userObject.toString().equals(parentRootName)) {
                 parentCode = "#";
+                option = "SYS";
             } else {
                 ChartOfAccount pCoa = (ChartOfAccount) parentNode.getUserObject();
                 parentCode = pCoa.getCode();
+                option = "USR";
             }
             int level = selectedNode.getLevel();
             ChartOfAccount coa = new ChartOfAccount();
@@ -125,7 +128,7 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements MouseList
             coa.setLevel(level);
             coa.setCreatedBy(Global.loginUser.getUserId().toString());
             coa.setCreatedDate(Util1.getTodayDate());
-            coa.setOption("USR");
+            coa.setOption(option);
             coa.setActive(chkActive.isSelected());
             ChartOfAccount coaSave = coaServcie.save(coa);
             if (coaSave != null) {
@@ -206,6 +209,7 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements MouseList
         txtName.setText(null);
         txtUsrCode.setText(null);
         chkActive.setSelected(false);
+        treeCOA.requestFocus();
     }
 
     private void initKeyListener() {
