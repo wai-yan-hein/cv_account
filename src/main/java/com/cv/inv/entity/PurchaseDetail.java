@@ -44,6 +44,8 @@ public class PurchaseDetail implements Serializable {
     private StockUnit purUnit;
     @Column(name = "avg_wt")
     private Float avgWeight;
+    @Column(name = "avg_price")
+    private Float avgPrice;
     @Column(name = "pur_price", nullable = false)
     private Float purPrice;
     @Column(name = "pur_amt", nullable = false)
@@ -171,6 +173,13 @@ public class PurchaseDetail implements Serializable {
     public void setSmallestUnit(String smallestUnit) {
         this.smallestUnit = smallestUnit;
     }
-    
+
+    public Float getAvgPrice() {
+        return avgPrice;
+    }
+
+    public void setAvgPrice(Float avgPrice) {
+        this.avgPrice = avgPrice;
+    }
 
 }

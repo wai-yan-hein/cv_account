@@ -21,13 +21,11 @@ import java.util.List;
 import javax.swing.JFormattedTextField;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
-import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.NumberUtils;
 
 /**
  *
@@ -150,6 +148,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                             pur.setStock(stock);
                             pur.setQty(1.0f);
                             pur.setPurPrice(stock.getPurPrice());
+                            pur.setAvgPrice(stock.getPurPrice());
                             pur.setStdWeight(stock.getPurPriceMeasure());
                             pur.setPurUnit(stock.getPurPriceUnit());
                             addNewRow();
@@ -213,9 +212,9 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                             if (NumberUtil.isPositive(aValue)) {
                                 Float avgWt = Util1.getFloat(aValue);
                                 Float stdWt = pur.getStdWeight();
-                                float purPrice = (avgWt / stdWt) * pur.getPurPrice();
+                                float avgPrice = (avgWt / stdWt) * pur.getPurPrice();
                                 pur.setAvgWeight(avgWt);
-                                pur.setPurPrice(purPrice);
+                                pur.setAvgPrice(avgPrice);
                                 parent.setColumnSelectionInterval(7, 7);
                             } else {
                                 showMessageBox("Input value must be positive");
@@ -266,7 +265,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
     private void calTotalAmount(PurchaseDetail pur) {
         if (pur.getStock() != null) {
             //cal amt
-            pur.setPurAmt(Util1.getFloat(pur.getQty()) * pur.getPurPrice());
+            pur.setPurAmt(Util1.getFloat(pur.getQty()) * pur.getAvgPrice());
             //cal smallest wt
             pur.setSmallestWT(getSmallestUnit(pur.getStdWeight(), pur.getPurUnit().getItemUnitCode()));
             pur.setSmallestUnit("oz");

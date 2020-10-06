@@ -45,6 +45,7 @@ import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
 
 /**
@@ -73,6 +74,8 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
     private PurchaseDetailService purchaseDetailService;
     @Autowired
     private VouIdService vouIdService;
+    @Autowired
+    private TaskExecutor taskExecutor;
     private boolean isShown = false;
     private LocationAutoCompleter locCompleter;
     private VouStatusAutoCompleter vouCompleter;
@@ -94,6 +97,9 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
 
     public PurchaseEntry() {
         initComponents();
+        initKeyListener();
+        initTextBoxValue();
+        initTextBoxFormat();
     }
 
     private void initMain() {
@@ -101,10 +107,6 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
         initCombo();
         assignDefalutValue();
         initPurTable();
-        initKeyListener();
-        initTextBoxValue();
-        initTextBoxFormat();
-        genVouNo();
         loadingObserver.load(this.getName(), "Stop");
         isShown = true;
     }
@@ -198,27 +200,30 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
     }
 
     private void assignDefalutValue() {
-        try {
-            txtPurDate.setDate(Util1.getTodayDate());
-            String depId = Global.sysProperties.get("system.default.department");
-            Department dep = departmentService.findById(depId);
-            departmentAutoCompleter.setDepartment(dep);
-            String cuId = Global.sysProperties.get("system.default.currency");
-            CurrencyKey key = new CurrencyKey();
-            key.setCode(cuId);
-            key.setCompCode(Global.compId);
-            Currency currency = currencyService.findById(key);
-            currAutoCompleter.setCurrency(currency);
-            String locId = Global.sysProperties.get("system.default.location");
-            Location location = locationService.findById(locId);
-            locCompleter.setLocation(location);
-            String vouStausId = Global.sysProperties.get("system.default.vou.status");
-            VouStatus vouStaus = vouStatusService.findById(vouStausId);
-            vouCompleter.setVouStatus(vouStaus);
-        } catch (Exception e) {
-            LOGGER.info("Assign Default Value :" + e.getMessage());
-            JOptionPane.showMessageDialog(Global.parentForm, "Defalut Values are missing in System Property.");
-        }
+        taskExecutor.execute(() -> {
+            try {
+                txtPurDate.setDate(Util1.getTodayDate());
+                String depId = Global.sysProperties.get("system.default.department");
+                Department dep = departmentService.findById(depId);
+                departmentAutoCompleter.setDepartment(dep);
+                String cuId = Global.sysProperties.get("system.default.currency");
+                CurrencyKey key = new CurrencyKey();
+                key.setCode(cuId);
+                key.setCompCode(Global.compId);
+                Currency currency = currencyService.findById(key);
+                currAutoCompleter.setCurrency(currency);
+                String locId = Global.sysProperties.get("system.default.location");
+                Location location = locationService.findById(locId);
+                locCompleter.setLocation(location);
+                String vouStausId = Global.sysProperties.get("system.default.vou.status");
+                VouStatus vouStaus = vouStatusService.findById(vouStausId);
+                vouCompleter.setVouStatus(vouStaus);
+                genVouNo();
+            } catch (Exception e) {
+                LOGGER.info("Assign Default Value :" + e.getMessage());
+                JOptionPane.showMessageDialog(Global.parentForm, "Defalut Values are missing in System Property.");
+            }
+        });
 
     }
 

@@ -9,6 +9,7 @@ import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.entity.ChartOfAccount;
 import com.cv.accountswing.service.COAService;
+import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.setup.common.COAGroupChildTableModel;
 import com.cv.accountswing.ui.setup.common.COAGroupTableModel;
@@ -17,6 +18,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.List;
 import javax.swing.JTable;
+import javax.swing.KeyStroke;
 import javax.swing.event.ListSelectionEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
@@ -81,7 +83,11 @@ public class COASetup extends javax.swing.JPanel implements KeyListener {
         });
         tblCoaHead.getColumnModel().getColumn(0).setPreferredWidth(20);// Code
         tblCoaHead.getColumnModel().getColumn(1).setPreferredWidth(400);// Name
+        tblCoaHead.getColumnModel().getColumn(0).setCellEditor(new AutoClearEditor());
+        tblCoaHead.getColumnModel().getColumn(1).setCellEditor(new AutoClearEditor());
         tblCoaHead.setDefaultRenderer(Object.class, new TableCellRender());
+        tblCoaHead.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+                .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
         List<ChartOfAccount> listCOA = coaService.getParent(Global.compId.toString());
         coaHeadTableModel.setlistCoaHead(listCOA);
 
@@ -105,8 +111,13 @@ public class COASetup extends javax.swing.JPanel implements KeyListener {
         tblCoaGroup.getColumnModel().getColumn(1).setPreferredWidth(20);// Usr Code
         tblCoaGroup.getColumnModel().getColumn(2).setPreferredWidth(400);// Name
         tblCoaGroup.getColumnModel().getColumn(3).setPreferredWidth(10);// Active
+        tblCoaGroup.getColumnModel().getColumn(1).setCellEditor(new AutoClearEditor());
+        tblCoaGroup.getColumnModel().getColumn(2).setCellEditor(new AutoClearEditor());
+
         tblCoaGroup.setDefaultRenderer(Boolean.class, new TableCellRender());
         tblCoaGroup.setDefaultRenderer(Object.class, new TableCellRender());
+        tblCoaGroup.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+                .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
 
     }
 
@@ -120,33 +131,43 @@ public class COASetup extends javax.swing.JPanel implements KeyListener {
         tblCOAGroupChild.getColumnModel().getColumn(1).setPreferredWidth(20);// Usr Code
         tblCOAGroupChild.getColumnModel().getColumn(2).setPreferredWidth(400);// Name
         tblCOAGroupChild.getColumnModel().getColumn(3).setPreferredWidth(10);// Active
+        tblCOAGroupChild.getColumnModel().getColumn(0).setCellEditor(new AutoClearEditor());
+        tblCOAGroupChild.getColumnModel().getColumn(1).setCellEditor(new AutoClearEditor());
+        tblCOAGroupChild.getColumnModel().getColumn(2).setCellEditor(new AutoClearEditor());
+
         tblCOAGroupChild.setDefaultRenderer(Boolean.class, new TableCellRender());
         tblCOAGroupChild.setDefaultRenderer(Object.class, new TableCellRender());
+        tblCOAGroupChild.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+                .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
 
     }
 
     private void getCOAGroup(int row) {
         ChartOfAccount c = coaHeadTableModel.getChartOfAccount(row);
-        List<ChartOfAccount> listCoaGroup = coaService.search("-", "-", Global.compId.toString(), "-", c.getCode(), "-", "-");
-        coaGroupTableModel.setCoaHeadCode(c.getCode());
-        coaGroupTableModel.setListCOA(listCoaGroup);
-        coaGroupTableModel.addEmptyRow();
-        lblCoaGroup.setText(c.getCoaNameEng());
-        tblCoaGroup.setColumnSelectionInterval(1, 1);
-        tblCoaGroup.setRowSelectionInterval(listCoaGroup.size() - 1, listCoaGroup.size() - 1);
-        tblCoaGroup.requestFocus();
+        if (c.getCode() != null) {
+            List<ChartOfAccount> listCoaGroup = coaService.search("-", "-", Global.compId.toString(), "-", c.getCode(), "-", "-");
+            coaGroupTableModel.setCoaHeadCode(c.getCode());
+            coaGroupTableModel.setListCOA(listCoaGroup);
+            coaGroupTableModel.addEmptyRow();
+            lblCoaGroup.setText(c.getCoaNameEng());
+            tblCoaGroup.setColumnSelectionInterval(1, 1);
+            tblCoaGroup.setRowSelectionInterval(listCoaGroup.size() - 1, listCoaGroup.size() - 1);
+            tblCoaGroup.requestFocus();
+        }
     }
 
     private void getCOAGroupChild(int row) {
         ChartOfAccount coa = coaGroupTableModel.getChartOfAccount(row);
-        List<ChartOfAccount> listCoaChild = coaService.search("-", "-", Global.compId.toString(), "-", coa.getCode(), "-", "-");
-        cOAGroupChildTableModel.setListCOA(listCoaChild);
-        cOAGroupChildTableModel.setCoaGroupCode(coa.getCode());
-        cOAGroupChildTableModel.addEmptyRow();
-        lblCoaChild.setText(coa.getCoaNameEng());
-        tblCOAGroupChild.setColumnSelectionInterval(1, 1);
-        tblCOAGroupChild.setRowSelectionInterval(listCoaChild.size() - 1, listCoaChild.size() - 1);
-        tblCOAGroupChild.requestFocus();
+        if (coa.getCode() != null) {
+            List<ChartOfAccount> listCoaChild = coaService.search("-", "-", Global.compId.toString(), "-", coa.getCode(), "-", "-");
+            cOAGroupChildTableModel.setListCOA(listCoaChild);
+            cOAGroupChildTableModel.setCoaGroupCode(coa.getCode());
+            cOAGroupChildTableModel.addEmptyRow();
+            lblCoaChild.setText(coa.getCoaNameEng());
+            tblCOAGroupChild.setColumnSelectionInterval(1, 1);
+            tblCOAGroupChild.setRowSelectionInterval(listCoaChild.size() - 1, listCoaChild.size() - 1);
+            tblCOAGroupChild.requestFocus();
+        }
     }
 
     /**
@@ -232,13 +253,13 @@ public class COASetup extends javax.swing.JPanel implements KeyListener {
         tblCOAGroupChild.setRowHeight(Global.tblRowHeight);
         jScrollPane3.setViewportView(tblCOAGroupChild);
 
-        jLabel1.setFont(Global.lableFont);
+        jLabel1.setFont(Global.textFont);
         jLabel1.setText("Account Head");
 
-        lblCoaChild.setFont(Global.lableFont);
+        lblCoaChild.setFont(Global.textFont);
         lblCoaChild.setText("...");
 
-        lblCoaGroup.setFont(Global.lableFont);
+        lblCoaGroup.setFont(Global.textFont);
         lblCoaGroup.setText("...");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -268,14 +289,17 @@ public class COASetup extends javax.swing.JPanel implements KeyListener {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 216, Short.MAX_VALUE)
-                        .addGap(2, 2, 2)
-                        .addComponent(lblCoaChild)
-                        .addGap(2, 2, 2)
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 207, Short.MAX_VALUE))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 443, Short.MAX_VALUE))
-                .addContainerGap())
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 202, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(lblCoaChild, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 202, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane1))
+                .addGap(10, 10, 10))
         );
+
+        layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jLabel1, lblCoaChild, lblCoaGroup});
+
     }// </editor-fold>//GEN-END:initComponents
 
     private void tblCoaGroupKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tblCoaGroupKeyPressed

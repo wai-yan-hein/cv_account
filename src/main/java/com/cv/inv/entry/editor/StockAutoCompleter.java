@@ -76,7 +76,7 @@ public class StockAutoCompleter implements KeyListener {
         table.setModel(stockTableModel);
         table.setSize(50, 50);
         table.getTableHeader().setFont(Global.textFont);
-        table.setFont(Global.lableFont); // NOI18N
+        table.setFont(Global.textFont); // NOI18N
         table.setRowHeight(Global.tblRowHeight);
         table.setDefaultRenderer(Object.class, new TableCellRender());
         sorter = new TableRowSorter(table.getModel());

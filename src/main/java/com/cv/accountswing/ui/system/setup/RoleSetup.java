@@ -18,6 +18,7 @@ import com.cv.accountswing.ui.system.setup.common.UserRoleTableModel;
 import com.cv.accountswing.util.Util1;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -85,11 +86,9 @@ public class RoleSetup extends javax.swing.JPanel implements KeyListener {
     }
 
     private void initTree() {
-        /*treeModel = new MenuSystemModel();
+        treeModel = new MenuSystemModel();
         treeTable = new JTreeTable(treeModel);
-        privilegeList = new ArrayList();*/
-        JTreeTable treeTable = new JTreeTable(roleTreeTableModel);
-        scrollPane.setViewportView(treeTable);
+        privilegeList = new ArrayList<>();
 
     }
 

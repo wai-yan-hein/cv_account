@@ -253,8 +253,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private StockUnitService stockUnitService;
     @Autowired
     private RelationService relationService;
-    @Autowired
-    private StockUnitService unitService;
 
     //@Autowired
     //private TaskExecutor threadPoolTaskExecutor;
@@ -1181,6 +1179,12 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                 switch (type) {
                     case save:
                         purchaseEntry.save();
+                        break;
+                    case clear:
+                        purchaseEntry.clear();
+                        break;
+                    case close:
+                        purchaseEntry.setIsShown(false);
                         break;
 
                 }
