@@ -8,6 +8,7 @@ package com.cv.accountswing.ui.editor;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.Trader;
+import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.cash.common.TraderTableModel;
 import java.awt.Color;
 import java.awt.Rectangle;
@@ -75,6 +76,7 @@ public class TraderAutoCompleter implements KeyListener {
         table.getTableHeader().setFont(Global.textFont);
         table.setFont(Global.textFont); // NOI18N
         table.setRowHeight(Global.tblRowHeight);
+        table.setDefaultRenderer(Object.class, new TableCellRender());
         sorter = new TableRowSorter(table.getModel());
         table.setRowSorter(sorter);
         JScrollPane scroll = new JScrollPane(table);
@@ -318,6 +320,12 @@ public class TraderAutoCompleter implements KeyListener {
 
     public Trader getTrader() {
         return trader;
+    }
+
+    public void setTrader(Trader trader) {
+        this.trader = trader;
+        this.textComp.setText(trader.getTraderName());
+
     }
 
     /*

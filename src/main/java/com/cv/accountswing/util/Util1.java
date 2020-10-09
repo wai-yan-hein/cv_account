@@ -423,6 +423,14 @@ public class Util1 {
         return Double.parseDouble(value);
     }
 
+    public static boolean getNullTo(Boolean value) {
+        if (value == null) {
+            return false;
+        } else {
+            return value;
+        }
+    }
+
     public static String getPeriod(String strDate, String format) {
         SimpleDateFormat formatter = new SimpleDateFormat("MMyyyy");
         String strPeriod = null;
@@ -624,5 +632,7 @@ public class Util1 {
 
         return iPAddress;
     }
+
+   
 
 }

@@ -7,6 +7,7 @@ package com.cv.inv.entry.editor;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.SelectionObserver;
+import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.inv.entity.SaleMan;
 import com.cv.inv.entry.common.SaleManCompleterTableModel;
 import java.awt.Color;
@@ -76,6 +77,7 @@ public class SaleManAutoCompleter implements KeyListener, SelectionObserver {
         table.setTableHeader(null);
         table.setFont(Global.textFont); // NOI18N
         table.setRowHeight(Global.tblRowHeight);
+        table.setDefaultRenderer(Object.class, new TableCellRender());
         sorter = new TableRowSorter(table.getModel());
         table.setRowSorter(sorter);
         JScrollPane scroll = new JScrollPane(table);

@@ -9,6 +9,7 @@ import com.cv.accountswing.entity.Department;
 import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -22,14 +23,12 @@ import lombok.Data;
  *
  * @author Lenovo
  */
-@Data
 @Entity
 @Table(name = "pur_detail")
 public class PurchaseDetail implements Serializable {
 
-    @Id
-    @Column(name = "pur_detail_code", unique = true, nullable = false)
-    private String purDetailCode;
+    @EmbeddedId
+    private PurDetailKey purDetailKey;
     @ManyToOne
     @JoinColumn(name = "stock_code", nullable = false)
     private Stock stock;
@@ -45,6 +44,8 @@ public class PurchaseDetail implements Serializable {
     private StockUnit purUnit;
     @Column(name = "avg_wt")
     private Float avgWeight;
+    @Column(name = "avg_price")
+    private Float avgPrice;
     @Column(name = "pur_price", nullable = false)
     private Float purPrice;
     @Column(name = "pur_amt", nullable = false)
@@ -60,4 +61,125 @@ public class PurchaseDetail implements Serializable {
     private Float smallestWT;
     @Column(name = "small_unit", nullable = false)
     private String smallestUnit;
+
+    public PurDetailKey getPurDetailKey() {
+        return purDetailKey;
+    }
+
+    public void setPurDetailKey(PurDetailKey purDetailKey) {
+        this.purDetailKey = purDetailKey;
+    }
+
+    public Stock getStock() {
+        return stock;
+    }
+
+    public void setStock(Stock stock) {
+        this.stock = stock;
+    }
+
+    public Date getExpDate() {
+        return expDate;
+    }
+
+    public void setExpDate(Date expDate) {
+        this.expDate = expDate;
+    }
+
+    public Float getQty() {
+        return qty;
+    }
+
+    public void setQty(Float qty) {
+        this.qty = qty;
+    }
+
+    public Float getStdWeight() {
+        return stdWeight;
+    }
+
+    public void setStdWeight(Float stdWeight) {
+        this.stdWeight = stdWeight;
+    }
+
+    public StockUnit getPurUnit() {
+        return purUnit;
+    }
+
+    public void setPurUnit(StockUnit purUnit) {
+        this.purUnit = purUnit;
+    }
+
+    public Float getAvgWeight() {
+        return avgWeight;
+    }
+
+    public void setAvgWeight(Float avgWeight) {
+        this.avgWeight = avgWeight;
+    }
+
+    public Float getPurPrice() {
+        return purPrice;
+    }
+
+    public void setPurPrice(Float purPrice) {
+        this.purPrice = purPrice;
+    }
+
+    public Float getPurAmt() {
+        return purAmt;
+    }
+
+    public void setPurAmt(Float purAmt) {
+        this.purAmt = purAmt;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+
+    public Integer getUniqueId() {
+        return uniqueId;
+    }
+
+    public void setUniqueId(Integer uniqueId) {
+        this.uniqueId = uniqueId;
+    }
+
+    public Long getGlId() {
+        return glId;
+    }
+
+    public void setGlId(Long glId) {
+        this.glId = glId;
+    }
+
+    public Float getSmallestWT() {
+        return smallestWT;
+    }
+
+    public void setSmallestWT(Float smallestWT) {
+        this.smallestWT = smallestWT;
+    }
+
+    public String getSmallestUnit() {
+        return smallestUnit;
+    }
+
+    public void setSmallestUnit(String smallestUnit) {
+        this.smallestUnit = smallestUnit;
+    }
+
+    public Float getAvgPrice() {
+        return avgPrice;
+    }
+
+    public void setAvgPrice(Float avgPrice) {
+        this.avgPrice = avgPrice;
+    }
+
 }

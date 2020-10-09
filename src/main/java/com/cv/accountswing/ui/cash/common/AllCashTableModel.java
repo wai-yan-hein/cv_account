@@ -5,6 +5,7 @@
 package com.cv.accountswing.ui.cash.common;
 
 import com.cv.accountswing.common.Global;
+import com.cv.accountswing.common.ReloadData;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.ChartOfAccount;
 import com.cv.accountswing.entity.Currency;
@@ -14,6 +15,8 @@ import com.cv.accountswing.entity.Trader;
 import com.cv.accountswing.entity.view.VGl;
 import com.cv.accountswing.service.COAService;
 import com.cv.accountswing.service.GlService;
+import com.cv.accountswing.service.MessagingService;
+import com.cv.accountswing.service.TraderService;
 import com.cv.accountswing.util.Util1;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -26,6 +29,7 @@ import javax.swing.table.AbstractTableModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
 
 /**
@@ -43,9 +47,21 @@ public class AllCashTableModel extends AbstractTableModel {
     private COAService cOAService;
     @Autowired
     private GlService glService;
+    @Autowired
+    private TraderService traderService;
+    @Autowired
+    private MessagingService messagingService;
+    @Autowired
+    private TaskExecutor taskExecutor;
     private String sourceAccId;
     private JTable parent;
     private SelectionObserver selectionObserver;
+    private Trader trader;
+    private ReloadData reloadData;
+
+    public void setReloadData(ReloadData reloadData) {
+        this.reloadData = reloadData;
+    }
 
     public void setSelectionObserver(SelectionObserver selectionObserver) {
         this.selectionObserver = selectionObserver;
@@ -171,7 +187,7 @@ public class AllCashTableModel extends AbstractTableModel {
             case 4:
                 if (value != null) {
                     if (value instanceof Trader) {
-                        Trader trader = (Trader) value;
+                        trader = (Trader) value;
                         vgl.setTraderId(Util1.getLong(trader.getId()));
                         vgl.setTraderName(trader.getTraderName());
                         String coaCode = trader.getAccountCode();
@@ -210,13 +226,16 @@ public class AllCashTableModel extends AbstractTableModel {
             case 7:
                 if (value != null) {
                     vgl.setDrAmt(Util1.getDouble(value));
-
+                    parent.setRowSelectionInterval(row + 1, row + 1);
+                    parent.setColumnSelectionInterval(1, 1);
                 }
                 break;
             case 8:
                 if (value != null) {
                     vgl.setCrAmt(Util1.getDouble(value));
                 }
+                parent.setRowSelectionInterval(row + 1, row + 1);
+                parent.setColumnSelectionInterval(1, 1);
                 break;
         }
         save(vgl, row);
@@ -225,19 +244,19 @@ public class AllCashTableModel extends AbstractTableModel {
     }
 
     private void save(VGl vgl, int row) {
-        boolean save = false;
-        if (vgl.getGlId() != null) {
-            int yes_no = JOptionPane.showConfirmDialog(Global.parentForm, "Are you sure to edit ?",
-                    "Edit ", JOptionPane.YES_NO_OPTION);
-            if (yes_no == 0) {
-                save = true;
-            } else {
-                save = false;
-            }
-
+        boolean save = true;
+        /*if (vgl.getGlId() != null) {
+        int yes_no = JOptionPane.showConfirmDialog(Global.parentForm, "Are you sure to edit ?",
+        "Edit ", JOptionPane.YES_NO_OPTION);
+        if (yes_no == 0) {
+        save = true;
         } else {
-            save = true;
+        save = false;
         }
+        
+        } else {
+        save = true;
+        }*/
         if (save) {
             vgl.setSourceAcId(sourceAccId);
             vgl.setCompId(Global.compId);
@@ -251,14 +270,47 @@ public class AllCashTableModel extends AbstractTableModel {
                     VGl saveVGl = listVGl.get(row);
                     saveVGl.setGlId(glSave.getGlId());
                     addNewRow();
-                    parent.setRowSelectionInterval(row + 1, row + 1);
-                    parent.setColumnSelectionInterval(1, 1);
+                    //parent.setRowSelectionInterval(row + 1, row + 1);
+                    //parent.setColumnSelectionInterval(1, 1);
                     selectionObserver.selected("CAL-TOTAL", "-");
+                    //send to inventory
+                    sendPaymentToInv(glSave);
                 }
             } catch (Exception ex) {
                 LOGGER.error("Save Gl :" + ex.getMessage());
             }
         }
+
+    }
+
+    private void sendPaymentToInv(Gl gl) {
+        taskExecutor.execute(() -> {
+            try {
+                if (Global.useActiveMQ) {
+                    if (gl.getTraderId() != null) {
+                        Trader trader = traderService.findById(gl.getTraderId().intValue());
+                        if (trader != null) {
+
+                            if (trader.getAppShortName() != null) {
+                                if (trader.getAppShortName().equals("INVENTORY")) {
+                                    //Need to sent to inventory
+                                    messagingService.sendPaymentToInv(gl, trader);
+                                    if (reloadData != null) {
+                                        reloadData.reload("SENT-INV", "Suceesfully Sent to Inventory");
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                if (reloadData != null) {
+                    reloadData.reload("SENT-INV", "Unsent to Invenorty, Chenck Your Internet Connection...");
+                }
+                LOGGER.error("sendPaymentToInv :" + e.getMessage());
+            }
+        });
 
     }
 
@@ -304,6 +356,7 @@ public class AllCashTableModel extends AbstractTableModel {
                 int delete = glService.delete(vgl.getGlId());
                 if (delete == 1) {
                     listVGl.remove(row);
+                    sendDeletePaymentToInv(trader, vgl.getGlId());
                     fireTableRowsDeleted(0, listVGl.size());
                 }
             } catch (Exception ex) {
@@ -312,6 +365,16 @@ public class AllCashTableModel extends AbstractTableModel {
 
         }
 
+    }
+
+    private void sendDeletePaymentToInv(Trader trader, long glId) {
+        if (trader != null) {
+            if (trader.getAppShortName() != null) {
+                if (trader.getAppShortName().equals("INVENTORY")) {
+                    messagingService.sendDeletePaymentToInv(glId);
+                }
+            }
+        }
     }
 
     public void addVGl(VGl vgi) {

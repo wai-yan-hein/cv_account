@@ -37,5 +37,5 @@ public class RetInDetailHis implements java.io.Serializable {
     @Column(name = "unique_id")
     private Integer uniqueId;
     @Column(name = "ret_in_std_weight")
-    private Float stdWt;;
+    private Float stdWt;
 }

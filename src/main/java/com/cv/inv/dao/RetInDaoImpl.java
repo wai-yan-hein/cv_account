@@ -7,7 +7,6 @@ package com.cv.inv.dao;
 
 import com.cv.accountswing.dao.AbstractDao;
 import com.cv.inv.entity.RetInDetailHis;
-import com.cv.accountswing.util.Util1;
 import java.util.List;
 import org.springframework.stereotype.Repository;
 
@@ -25,97 +24,59 @@ public class RetInDaoImpl extends AbstractDao<String, RetInDetailHis> implements
     }
 
     @Override
-    public void delete(String retInId) {
-    }
-
-    @Override
-    public List search(String fDate, String tDate, String cusId, String locId, String vouNo, String stockCodes, String splitId, String tranSource, String compCode) {
-        String strSql = "select distinct o from RetInDetailHis";
+    public void delete(String retInId, String glId) {
+        String strSql = "delete from RetInDetailHis o";
         String strFilter = "";
 
-        /*if (!fDate.equals("-") && !fDate.equals("-")) {
+        if (!retInId.equals("-")) {
             if (strFilter.isEmpty()) {
-                strFilter = "o.glDate between '" + Util1.toDateStrMYSQL(fDate, "dd/MM/yyyy")
-                        + "' and '" + Util1.toDateStrMYSQL(tDate, "dd/MM/yyyy") + "'";
+                strFilter = "o.inCompoundKey.retInDetailId in (" + retInId + ")";
             } else {
-                strFilter = strFilter + " and o.glDate between '"
-                        + Util1.toDateStrMYSQL(fDate, "dd/MM/yyyy") + "' and '" +  Util1.toDateStrMYSQL(tDate, "dd/MM/yyyy") + "'";
-            }
-        } else if (!fDate.endsWith("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "o.glDate >= '" + Util1.toDateStrMYSQL(fDate, "dd/MM/yyyy") + "'";
-            } else {
-                strFilter = strFilter + " and o.glDate >= '" + Util1.toDateStrMYSQL(fDate) + "'";
-            }
-        } else if (!tDate.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "o.glDate <= '" + Util1.toDateStrMYSQL(tDate) + "'";
-            } else {
-                strFilter = strFilter + " and o.glDate <= '" +  Util1.toDateStrMYSQL(tDate, "dd/MM/yyyy") + "'";
+                strFilter = strFilter + " and o.inCompoundKey.retInDetailId in (" + retInId + ")";
             }
         }
 
-        if (!cusId.equals("-")) {
+        if (!glId.equals("-")) {
             if (strFilter.isEmpty()) {
-                strFilter = "o.traderId = '" + cusId + "'";
+                strFilter = "o.inCompoundKey.glId = '" + glId + "'";
             } else {
-                strFilter = strFilter + " and o.traderId = '" + cusId + "'";
-            }
-        }
-        if (!locId.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "o.locationId = '" + locId + "'";
-            } else {
-                strFilter = strFilter + " and o.traderId = '" + locId + "'";
-            }
-        }
-
-        if (!vouNo.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "o.vouNo like '%" + vouNo + "%'";
-            } else {
-                strFilter = strFilter + " and o.vouNo like '%" + vouNo + "%'";
-            }
-        }
-        if (!compCode.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "o.compId = " + compCode;
-            } else {
-                strFilter = strFilter + " and o.compId = " + compCode;
-            }
-        }
-
-        if (!tranSource.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "o.tranSource = '" + tranSource + "'";
-            } else {
-                strFilter = strFilter + " and o.tranSource = '" + tranSource + "'";
-            }
-        }
-
-        if (!splitId.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "o.splitId = '" + splitId + "'";
-            } else {
-                strFilter = strFilter + " and o.splitId = '" + splitId + "'";
-            }
-        }
-
-        if (!stockCodes.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "h.stock.stockCode  in (" + stockCodes + ")";
-            } else {
-                strFilter = strFilter + " and h.stock.stockCode  in (" + stockCodes + ")";
+                strFilter = strFilter + " and o.inCompoundKey.glId = '" + glId + "'";
             }
         }
 
         if (!strFilter.isEmpty()) {
             strSql = strSql + " where " + strFilter;
-        }*/
-        strSql = strSql + " order by o.glId desc";
+        }
+        execUpdateOrDelete(strSql);
+    }
 
-        List listDetail = findHSQL(strSql);
-        return listDetail;
+    @Override
+    public List<RetInDetailHis> search(String glId, String vouNo) {
+        String strSql = "select o from RetInDetailHis o";
+        String strFilter = "";
+
+        if (!glId.equals("-")) {
+            if (strFilter.isEmpty()) {
+                strFilter = "o.inCompoundKey.glId = '" + glId + "'";
+            } else {
+                strFilter = strFilter + " and o.inCompoundKey.glId = '" + glId + "'";
+            }
+        }
+
+        if (!vouNo.equals("-")) {
+            if (strFilter.isEmpty()) {
+                strFilter = "o.inCompoundKey.vouNo = '" + vouNo + "'";
+            } else {
+                strFilter = strFilter + " and o.inCompoundKey.vouNo = '" + vouNo + "'";
+            }
+        }
+        if (!strFilter.isEmpty()) {
+            strSql = strSql + " where " + strFilter;
+        }
+        strSql = strSql + " order by o.uniqueId";
+        List<RetInDetailHis> list = findHSQL(strSql);
+        return list;
+
     }
 
 }

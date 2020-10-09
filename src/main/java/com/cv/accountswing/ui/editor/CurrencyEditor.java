@@ -35,35 +35,7 @@ public class CurrencyEditor extends AbstractCellEditor implements TableCellEdito
     private CurrencyAutoCompleter completer;
     //private List<Medicine> listTrader = new ArrayList();
 
-    public CurrencyEditor(final CurrencyService service) {
-        if (Global.listAppUser == null) {
-            Timer timer = new Timer(500, (ActionEvent e) -> {
-                Thread thread = new Thread() {
-                    @Override
-                    public void run() {
-                        if (Global.listCurrency == null) {
-                            LOGGER.info("start : " + new Date());
-                            Global.listCurrency = service.search("-", "-", "-");
-                            LOGGER.info("end : " + new Date());
-                        }
-                    }
-                };
-                thread.start();
-                /*try {
-                LOGGER.info("start : " + new Date());
-                if (dao.getRowCount("select count(*) from item_type_mapping where group_id ="+ Global.loginUser.getUserId()) > 0) {
-                Global.listTrader = dao.findAll("Medicine", "active = true and medTypeId.itemTypeCode in (select a.key.itemType.itemTypeCode from ItemTypeMapping a)");
-                } else {
-                Global.listTrader = dao.findAll("Medicine", "active = true");
-                }
-                LOGGER.info("end : " + new Date());
-                } catch (Exception ex) {
-                LOGGER.error("SaleTableCodeCellEditor : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
-                }*/
-            });
-            timer.setRepeats(false);
-            timer.start();
-        }
+    public CurrencyEditor() {
     }
 
     @Override
@@ -71,8 +43,8 @@ public class CurrencyEditor extends AbstractCellEditor implements TableCellEdito
             boolean isSelected, int rowIndex, int vColIndex) {
         JTextField jtf = new JTextField();
         jtf.setFont(Global.textFont);
+        jtf.setHighlighter(null);
         //List<Medicine> listTrader = dao.findAll("Medicine", "active = true");
-
         KeyListener keyListener = new KeyListener() {
             @Override
             public void keyPressed(KeyEvent keyEvent) {
@@ -102,7 +74,6 @@ public class CurrencyEditor extends AbstractCellEditor implements TableCellEdito
         component = jtf;
         if (value != null) {
             jtf.setText(value.toString());
-            jtf.selectAll();
         }
         completer = new CurrencyAutoCompleter(jtf, Global.listCurrency, this);
 

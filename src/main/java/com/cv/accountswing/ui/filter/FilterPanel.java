@@ -20,7 +20,6 @@ import com.cv.accountswing.ui.editor.TraderAutoCompleter;
 import com.cv.accountswing.ui.cash.AllCash;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entry.editor.StockAutoCompleter;
-import com.cv.inv.entry.editor.SaleTableCodeCellEditor;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -55,7 +54,6 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
     private COAAutoCompleter coaAutoCompleter;
     private CurrencyAutoCompleter currencyAutoCompleter;
     private SelectionObserver selectionObserver;
-    private StockAutoCompleter stockAutoCompleter;
     @Autowired
     private TaskExecutor taskExecutor;
 
@@ -110,7 +108,6 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
             coaAutoCompleter.setSelectionObserver(selectionObserver);
             currencyAutoCompleter.setSelectionObserver(selectionObserver);
             txtDate.setText("Today");
-            stockAutoCompleter.setSelectionObserver(selectionObserver);
         });
 
     }

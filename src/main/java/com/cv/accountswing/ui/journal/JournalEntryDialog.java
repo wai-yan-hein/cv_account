@@ -10,7 +10,6 @@ import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.Gl;
 import com.cv.accountswing.entity.view.VGl;
 import com.cv.accountswing.service.COAService;
-import com.cv.accountswing.service.CurrencyService;
 import com.cv.accountswing.service.DepartmentService;
 import com.cv.accountswing.service.GlService;
 import com.cv.accountswing.service.SeqTableService;
@@ -20,7 +19,6 @@ import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.editor.COACellEditor;
 import com.cv.accountswing.ui.editor.CurrencyAutoCompleter;
-import com.cv.accountswing.ui.editor.CurrencyEditor;
 import com.cv.accountswing.ui.editor.DepartmentCellEditor;
 import com.cv.accountswing.ui.editor.TraderCellEditor;
 import com.cv.accountswing.ui.journal.common.JournalEntryTableModel;
@@ -29,13 +27,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.toedter.calendar.JTextFieldDateEditor;
-import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.text.DateFormat;
 import java.util.List;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
@@ -45,7 +40,6 @@ import javax.swing.ListSelectionModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
 
 /**
@@ -71,8 +65,7 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
     private GlService glService;
     @Autowired
     private VGlService vGlService;
-    @Autowired
-    private TaskExecutor taskExecutor;
+
     private String glVouId = null;
     private String currencyId;
 
@@ -102,7 +95,7 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
     private void initCombo() {
         CurrencyAutoCompleter autoCompleter = new CurrencyAutoCompleter(txtCurrency, Global.listCurrency, null);
         autoCompleter.setSelectionObserver(this);
-        
+
     }
 
     private void initTable() {
@@ -115,10 +108,10 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
         tblJournal.getTableHeader().setFont(Global.lableFont);
         tblJournal.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        tblJournal.getColumnModel().getColumn(0).setCellEditor(new DepartmentCellEditor(departmentService));
+        tblJournal.getColumnModel().getColumn(0).setCellEditor(new DepartmentCellEditor());
         tblJournal.getColumnModel().getColumn(1).setCellEditor(new AutoClearEditor());
-        tblJournal.getColumnModel().getColumn(2).setCellEditor(new TraderCellEditor(traderService));
-        tblJournal.getColumnModel().getColumn(3).setCellEditor(new COACellEditor(cOAService));
+        tblJournal.getColumnModel().getColumn(2).setCellEditor(new TraderCellEditor());
+        tblJournal.getColumnModel().getColumn(3).setCellEditor(new COACellEditor());
         tblJournal.getColumnModel().getColumn(4).setCellEditor(new AutoClearEditor());
         tblJournal.getColumnModel().getColumn(5).setCellEditor(new AutoClearEditor());
         tblJournal.getColumnModel().getColumn(0).setPreferredWidth(10);//dep

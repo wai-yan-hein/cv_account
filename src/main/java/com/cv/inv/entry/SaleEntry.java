@@ -34,8 +34,12 @@ import com.cv.inv.entry.common.SaleEntryTableModel;
 import com.cv.inv.entry.common.StockInfo;
 import com.cv.inv.entry.editor.LocationAutoCompleter;
 import com.cv.inv.entry.editor.SaleManAutoCompleter;
+<<<<<<< HEAD
 import com.cv.inv.entry.editor.SaleTableCodeCellEditor;
 import com.cv.inv.entry.editor.StockUnitEditor;
+=======
+import com.cv.inv.entry.editor.StockCellEditor;
+>>>>>>> 34d504f7fdd00e4a0f3674ed65ef12c9214955e6
 import com.cv.inv.entry.editor.VouStatusAutoCompleter;
 import com.cv.inv.service.LocationService;
 import com.cv.inv.service.StockService;
@@ -161,7 +165,11 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
         tblSale.getColumnModel().getColumn(9).setPreferredWidth(40);//Amount
         tblSale.getColumnModel().getColumn(10).setPreferredWidth(90);//Location
 
+<<<<<<< HEAD
         tblSale.getColumnModel().getColumn(0).setCellEditor(new SaleTableCodeCellEditor());
+=======
+        tblSale.getColumnModel().getColumn(0).setCellEditor(new StockCellEditor());
+>>>>>>> 34d504f7fdd00e4a0f3674ed65ef12c9214955e6
         tblSale.getColumnModel().getColumn(2).setCellEditor(new AutoClearEditor());
         tblSale.getColumnModel().getColumn(3).setCellEditor(new AutoClearEditor());
         tblSale.getColumnModel().getColumn(4).setCellEditor(new AutoClearEditor());

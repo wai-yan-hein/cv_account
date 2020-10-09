@@ -13,10 +13,11 @@ import java.util.List;
  * @author lenovo
  */
 public interface RetInDao {
+
     public RetInDetailHis save(RetInDetailHis retInDetailHis);
-    public void delete (String retInId);
-    public List search(String fDate,String tDate,String cusId,String locId,
-            String vouNo,String stockCodes,String splitId,String tranSource,String compCode);
-    
-    
+
+    public List<RetInDetailHis> search(String glId, String vouNo);
+
+    public void delete(String retInId, String glId);
+
 }

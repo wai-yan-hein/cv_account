@@ -6,7 +6,6 @@
 package com.cv.accountswing.ui.cash.common;
 
 import com.cv.accountswing.util.Util1;
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.text.DecimalFormat;

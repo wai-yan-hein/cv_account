@@ -10,6 +10,7 @@ import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.DateModel;
 import com.cv.accountswing.ui.dailog.DatePickerDialog;
 import com.cv.accountswing.ui.cash.common.DateTableModel;
+import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.util.Util1;
 import java.awt.Color;
 import java.awt.Image;
@@ -88,6 +89,7 @@ public class DateAutoCompleter implements KeyListener, SelectionObserver {
         table.setTableHeader(null);
         table.setFont(Global.textFont); // NOI18N
         table.setRowHeight(Global.tblRowHeight);
+        table.setDefaultRenderer(Object.class, new TableCellRender());
         JScrollPane scroll = new JScrollPane(table);
 
         scroll.setBorder(null);

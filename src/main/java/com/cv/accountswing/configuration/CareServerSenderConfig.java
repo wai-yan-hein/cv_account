@@ -19,7 +19,7 @@ import org.springframework.jms.core.JmsTemplate;
  *
  * @author winswe
  */
-//@Configuration
+@Configuration
 public class CareServerSenderConfig {
 
     @Value("${activemq.broker-url}")
@@ -34,6 +34,7 @@ public class CareServerSenderConfig {
         activeMQConnectionFactory.setBrokerURL(brokerUrl);
         activeMQConnectionFactory.setTransportListener(new MQTransportListener());
         LOGGER.info("senderActiveMQConnectionFactory : " + brokerUrl);
+
         return activeMQConnectionFactory;
     }
 

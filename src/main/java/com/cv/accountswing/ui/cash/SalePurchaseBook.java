@@ -9,11 +9,7 @@ import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.view.VGl;
-import com.cv.accountswing.service.COAService;
-import com.cv.accountswing.service.CurrencyService;
-import com.cv.accountswing.service.DepartmentService;
 import com.cv.accountswing.service.ReportService;
-import com.cv.accountswing.service.TraderService;
 import com.cv.accountswing.service.VGlService;
 import com.cv.accountswing.ui.editor.CurrencyEditor;
 import com.cv.accountswing.ui.editor.DepartmentCellEditor;
@@ -21,7 +17,6 @@ import com.cv.accountswing.ui.editor.TraderCellEditor;
 import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.SalePurchaseTableModel;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
-import com.cv.accountswing.ui.dailog.VoucherDialog;
 import com.cv.accountswing.ui.editor.COACellEditor;
 import com.cv.accountswing.ui.filter.FilterPanel;
 import com.cv.accountswing.util.Util1;
@@ -77,6 +72,7 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
     @Autowired
     private SalePurchaseTableModel spTableModel;
     @Autowired
+<<<<<<< HEAD
     private DepartmentService departmentService;
     @Autowired
     private COAService cOAService;
@@ -84,8 +80,10 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
     private TraderService traderService;
     @Autowired
     private CurrencyService currencyService;
-    @Autowired
+    
+=======
     private VoucherDialog voucherDialog;
+>>>>>>> 2645f0594b7ed96750a08ea9446f2c4710390d82
     @Autowired
     ReportService rService;
     private TableRowSorter<TableModel> sorter;
@@ -172,12 +170,12 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
         tblCash.getColumnModel().getColumn(6).setPreferredWidth(1);// Curr      
         tblCash.getColumnModel().getColumn(7).setPreferredWidth(70);// Dr-Amt   
         tblCash.getColumnModel().getColumn(0).setCellEditor(new AutoClearEditor());
-        tblCash.getColumnModel().getColumn(1).setCellEditor(new DepartmentCellEditor(departmentService));
+        tblCash.getColumnModel().getColumn(1).setCellEditor(new DepartmentCellEditor());
         tblCash.getColumnModel().getColumn(2).setCellEditor(new AutoClearEditor());
         tblCash.getColumnModel().getColumn(3).setCellEditor(new AutoClearEditor());
-        tblCash.getColumnModel().getColumn(4).setCellEditor(new TraderCellEditor(traderService));
-        tblCash.getColumnModel().getColumn(5).setCellEditor(new COACellEditor(cOAService));
-        tblCash.getColumnModel().getColumn(6).setCellEditor(new CurrencyEditor(currencyService));
+        tblCash.getColumnModel().getColumn(4).setCellEditor(new TraderCellEditor());
+        tblCash.getColumnModel().getColumn(5).setCellEditor(new COACellEditor());
+        tblCash.getColumnModel().getColumn(6).setCellEditor(new CurrencyEditor());
         tblCash.getColumnModel().getColumn(7).setCellEditor(new AutoClearEditor());
 
         tblCash.setDefaultRenderer(Double.class, new TableCellRender());
@@ -219,11 +217,6 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
             public void mouseClicked(MouseEvent e) {
                 if (SwingUtilities.isRightMouseButton(e)) {
                     popupmenu.show(tblCash, e.getX(), e.getY());
-                } else if (e.getClickCount() == 2) {
-                    voucherDialog.setTitle(panelName + " Voucher");
-                    voucherDialog.setSize(Global.width / 2, Global.height / 2);
-                    voucherDialog.setLocationRelativeTo(null);
-                    voucherDialog.setVisible(true);
                 }
             }
 

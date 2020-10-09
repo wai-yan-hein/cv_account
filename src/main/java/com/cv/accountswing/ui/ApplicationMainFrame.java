@@ -56,8 +56,6 @@ import com.cv.inv.service.SaleManService;
 import com.cv.inv.service.VouStatusService;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.MachineInfo;
-import com.cv.inv.entity.StockUnit;
-import com.cv.inv.entity.UnitRelation;
 import com.cv.inv.entry.StockReceiving;
 import com.cv.inv.service.MachineInfoService;
 import com.cv.inv.service.RelationService;
@@ -65,8 +63,11 @@ import com.cv.inv.service.StockUnitService;
 import com.cv.inv.service.StockService;
 import com.cv.inv.setup.OtherSetup;
 import com.cv.inv.setup.StockSetup;
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -74,6 +75,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -113,6 +115,8 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private final String save = "Save";
     private final String delete = "Delete";
     private final String history = "History";
+    ImageIcon online = null;
+    ImageIcon offline = null;
 
     private final ActionListener menuListener = (java.awt.event.ActionEvent evt) -> {
         JMenuItem actionMenu = (JMenuItem) evt.getSource();
@@ -249,9 +253,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private StockUnitService stockUnitService;
     @Autowired
     private RelationService relationService;
-    @Autowired
-    private StockUnitService unitService;
-    private LoginDialog loginDialog;
 
     //@Autowired
     //private TaskExecutor threadPoolTaskExecutor;
@@ -312,31 +313,37 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             case "Daily Cash":
                 dailyCash.setName(panelName);
                 dailyCash.setLoadingObserver(this);
+                dailyCash.setReloadData(this);
                 dailyCash.setSourceAccId(Global.sysProperties.get("system.cashbook"));
                 return dailyCash;
             case "Patty Cash":
                 pettyCash.setName(panelName);
                 pettyCash.setLoadingObserver(this);
+                pettyCash.setReloadData(this);
                 pettyCash.setSourceAccId(Global.sysProperties.get("system.pattycash"));
                 return pettyCash;
             case "Adj Cash":
                 adjCash.setName(panelName);
                 adjCash.setLoadingObserver(this);
+                adjCash.setReloadData(this);
                 adjCash.setSourceAccId(Global.sysProperties.get("system.adjcash"));
                 return adjCash;
             case "Petty Cash Zay":
                 pettyCashZay.setName(panelName);
                 pettyCashZay.setLoadingObserver(this);
+                pettyCashZay.setReloadData(this);
                 pettyCashZay.setSourceAccId(Global.sysProperties.get("system.pattycash.zay"));
                 return pettyCashZay;
             case "Bank - Saving":
                 bankSaving.setName(panelName);
                 bankSaving.setLoadingObserver(this);
+                bankSaving.setReloadData(this);
                 bankSaving.setSourceAccId(Global.sysProperties.get("system.bankbook"));
                 return bankSaving;
             case "Home Safe":
                 homeSafe.setName(panelName);
                 homeSafe.setLoadingObserver(this);
+                homeSafe.setReloadData(this);
                 homeSafe.setSourceAccId(Global.sysProperties.get("system.bank.homesave"));
                 return homeSafe;
             case "Purchase":
@@ -575,6 +582,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     }
 
     private void initializeData() {
+
         this.setTitle(this.getTitle() + "(" + Global.loginUser.getUserName() + ")");
         taskExecutor.execute(() -> {
             List listCI = usrCompRoleService.getAssignCompany(Global.loginUser.getUserId().toString());
@@ -592,12 +600,17 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             Global.listLocation = locationService.findAll();
             Global.listVou = vouService.findAll();
             Global.listSaleMan = saleManService.findAll();
+<<<<<<< HEAD
             Global.listStock = stockService.findActiveStock();
+=======
+            Global.listStock = stockService.findAll();
+>>>>>>> 34d504f7fdd00e4a0f3674ed65ef12c9214955e6
             Global.listStockUnit = stockUnitService.findAll();
             Global.listRelation = relationService.findAll();
             Global.listRelation.forEach(ur -> {
                 Global.hmRelation.put(ur.getUnitKey(), ur.getFactor());
             });
+            
             getMachinceInfo();
         });
 
@@ -686,6 +699,14 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     @Override
     public void reload(String msg, Object data) {
         LOGGER.info("MainFrame reload : " + msg);
+        switch (msg) {
+            case "SENT-INV":
+                lblLog.setText(data.toString());
+                break;
+            default:
+                break;
+
+        }
         /*threadPoolTaskExecutor.execute(() -> {
             try {
                 LOGGER.info("msg : " + msg);
@@ -852,6 +873,38 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         }
         revalidate();
         repaint();
+    }
+
+    private void online(boolean status) {
+        if (online == null || offline == null) {
+            ImageIcon onlineIcon = new ImageIcon(this.getClass().getResource("/images/online-status.png"));
+            ImageIcon offlineIcon = new ImageIcon(this.getClass().getResource("/images/offline-status.png"));
+            BufferedImage on = resizeImage(onlineIcon.getImage(), 30, 30, false);
+            BufferedImage off = resizeImage(offlineIcon.getImage(), 30, 30, false);
+            online = new ImageIcon(on);
+            offline = new ImageIcon(off);
+            lblLog.setText(null);
+        }
+
+        if (status) {
+            lblLog.setIcon(online);
+        } else {
+            lblLog.setIcon(offline);
+        }
+    }
+
+    BufferedImage resizeImage(Image originalImage,
+            int scaledWidth, int scaledHeight,
+            boolean preserveAlpha) {
+        int imageType = preserveAlpha ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB;
+        BufferedImage scaledBI = new BufferedImage(scaledWidth, scaledHeight, imageType);
+        Graphics2D g = scaledBI.createGraphics();
+        if (preserveAlpha) {
+            g.setComposite(AlphaComposite.Src);
+        }
+        g.drawImage(originalImage, 0, 0, scaledWidth, scaledHeight, null);
+        g.dispose();
+        return scaledBI;
     }
 
     private void toolBar(String menuName, String type) {
@@ -1126,6 +1179,57 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                         aPARReport.printApar();
                         break;
                 }
+                break;
+<<<<<<< HEAD
+            case "Return In":
+                switch (type) {
+                    case clear:
+                        retIn.clear();
+                        break;
+                    case save:
+                        retIn.save();
+                        break;
+                    case history:
+                        retIn.history();
+                        break;
+                    case delete:
+                        retIn.delete();
+                        break;
+                }
+
+                break;
+            case "Return Out":
+                switch (type) {
+                    case clear:
+                        retOut.clear();
+                        break;
+                    case save:
+                        retOut.save();
+                        break;
+                    case history:
+                        retOut.history();
+                        break;
+                    case delete:
+                        retOut.delete();
+                        break;
+                }
+
+=======
+            case "Purchase Entry":
+                switch (type) {
+                    case save:
+                        purchaseEntry.save();
+                        break;
+                    case clear:
+                        purchaseEntry.clear();
+                        break;
+                    case close:
+                        purchaseEntry.setIsShown(false);
+                        break;
+
+                }
+>>>>>>> 2645f0594b7ed96750a08ea9446f2c4710390d82
+                break;
 
             default:
                 break;
@@ -1137,6 +1241,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPanel2 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         btnPrint = new javax.swing.JButton();
         btnDelete = new javax.swing.JButton();
@@ -1144,8 +1249,20 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         btnLogout = new javax.swing.JButton();
         btnHistory = new javax.swing.JButton();
         btnSave = new javax.swing.JButton();
+        lblLog = new javax.swing.JLabel();
         tabMain = new javax.swing.JTabbedPane();
         menuBar = new javax.swing.JMenuBar();
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 100, Short.MAX_VALUE)
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 100, Short.MAX_VALUE)
+        );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Core Account\n");
@@ -1224,12 +1341,17 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             }
         });
 
+        lblLog.setFont(Global.textFont);
+        lblLog.setText("Welcome");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap()
+                .addComponent(lblLog, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnHistory)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnSave)
@@ -1247,14 +1369,16 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(btnPrint, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnHistory, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnSave))
-                    .addComponent(btnDelete, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnClear, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnLogout, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblLog, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnPrint, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnHistory, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnSave))
+                        .addComponent(btnDelete, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnClear, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnLogout, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -1274,7 +1398,9 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(tabMain, javax.swing.GroupLayout.DEFAULT_SIZE, 625, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addComponent(tabMain)
+                .addContainerGap())
             .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
@@ -1327,6 +1453,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
 
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
         // TODO add your handling code here:
+        toolBar(getCurrentPanelName(), delete);
     }//GEN-LAST:event_btnDeleteActionPerformed
 
     private void btnPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintActionPerformed
@@ -1366,6 +1493,8 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private javax.swing.JButton btnPrint;
     private javax.swing.JButton btnSave;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JLabel lblLog;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JTabbedPane tabMain;
     // End of variables declaration//GEN-END:variables

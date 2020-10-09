@@ -4,23 +4,26 @@
  */
 package com.cv.inv.entry.common;
 
-import com.cv.accountswing.entity.Gl;
 import com.cv.accountswing.util.Util1;
+import com.cv.inv.entity.view.VRetIn;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import org.apache.log4j.Logger;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @lenovo
  */
+@Component
 public class RetInVouSearchTableModel extends AbstractTableModel {
 
     static Logger log = Logger.getLogger(RetInVouSearchTableModel.class.getName());
-    private List<Gl> listGl = new ArrayList();
+    private List<VRetIn> listVRetIns = new ArrayList();
     private final String[] columnNames = {"Date", "Vou No", "Customer", "User", "V-Total"};
+    private JTable parent;
 
     @Override
     public String getColumnName(int column) {
@@ -36,7 +39,7 @@ public class RetInVouSearchTableModel extends AbstractTableModel {
     public Class getColumnClass(int column) {
         switch (column) {
             case 0: //Date
-                return Date.class;
+                return String.class;
             case 1: //Vou No
                 return String.class;
             case 2: //Customer
@@ -52,30 +55,30 @@ public class RetInVouSearchTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int row, int column) {
-        if (listGl == null) {
+        if (listVRetIns == null) {
             return null;
         }
 
-        if (listGl.isEmpty()) {
+        if (listVRetIns.isEmpty()) {
             return null;
         }
 
         try {
-            Gl gl = listGl.get(row);
+            VRetIn vRetIn = listVRetIns.get(row);
 
             switch (column) {
                 case 0: //Date
-                    return gl.getGlDate();
+                    return Util1.toDateStr(vRetIn.getGlDate(), "dd/MM/yyyy");
                 case 1: //Vou No
 
-                    return gl.getVouNo();
+                    return vRetIn.getKey().getVouNo();
 
                 case 2: //Customer
-                    return gl.getTraderId();
+                    return vRetIn.getTraderName();
                 case 3: //User
-                    return gl.getCreatedBy();
+                    return vRetIn.getUserName();
                 case 4: //V-Total
-                    return gl.getVouTotal();
+                    return vRetIn.getVouTotal();
                 default:
                     return null;
             }
@@ -88,14 +91,47 @@ public class RetInVouSearchTableModel extends AbstractTableModel {
 
     @Override
     public void setValueAt(Object value, int row, int column) {
+        if (listVRetIns == null) {
+            return;
+        }
+
+        if (listVRetIns.isEmpty()) {
+            return;
+        }
+
+        VRetIn record = listVRetIns.get(row);
+        VRetIn vRetIn = (VRetIn) value;
+        switch (column) {
+
+            case 0: //Date
+                if (value != null) {
+
+                    record.setGlDate(vRetIn.getGlDate());
+
+                }
+                break;
+            case 1: //VouNo
+                record.setKey(vRetIn.getKey());
+                break;
+            case 2://CusName
+                record.setTraderName(vRetIn.getTraderName());
+            case 3:
+                record.setUserName(vRetIn.getUserName());
+            case 4:
+                record.setVouTotal(vRetIn.getVouTotal());
+            default:
+                System.out.println("invalid index");
+        }
+        fireTableRowsUpdated(row, row);
+        parent.requestFocusInWindow();
     }
 
     @Override
     public int getRowCount() {
-        if (listGl == null) {
+        if (listVRetIns == null) {
             return 0;
         }
-        return listGl.size();
+        return listVRetIns.size();
     }
 
     @Override
@@ -103,21 +139,30 @@ public class RetInVouSearchTableModel extends AbstractTableModel {
         return columnNames.length;
     }
 
-    public List<Gl> getListGl() {
-        return listGl;
+    public List<VRetIn> getListVRetIns() {
+        return listVRetIns;
     }
 
-    public void setListGl(List<Gl> listGl) {
-        this.listGl = listGl;
+    public void setListGl(List<VRetIn> listVRetIns) {
+        this.listVRetIns = listVRetIns;
         fireTableDataChanged();
     }
 
-    public Gl getSelectVou(int row) {
-        if (listGl != null) {
-            if (!listGl.isEmpty()) {
-                return listGl.get(row);
+    public VRetIn getSelectVou(int row) {
+        if (listVRetIns != null) {
+            if (!listVRetIns.isEmpty()) {
+                return listVRetIns.get(row);
             }
         }
         return null;
+    }
+
+    public void setParent(JTable parent) {
+        this.parent = parent;
+    }
+
+    public void clearList() {
+        this.listVRetIns.clear();
+        fireTableDataChanged();
     }
 }

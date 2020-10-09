@@ -13,6 +13,8 @@ import com.cv.accountswing.entity.Currency;
 import com.cv.accountswing.entity.CurrencyKey;
 import com.cv.accountswing.entity.Trader;
 import com.cv.accountswing.service.CurrencyService;
+import com.cv.accountswing.service.GlService;
+import com.cv.accountswing.service.TraderService;
 import com.cv.inv.service.RetInService;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.editor.CurrencyAutoCompleter;
@@ -21,10 +23,11 @@ import com.cv.accountswing.util.NumberUtil;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.Location;
 import com.cv.inv.entity.RetInDetailHis;
+import com.cv.inv.entity.view.VRetIn;
 import com.cv.inv.entry.common.ReturnInTableModel;
 import com.cv.inv.entry.editor.LocationAutoCompleter;
 import com.cv.inv.entry.editor.StockCellEditor;
-import com.cv.inv.entry.editor.StockUnitCellEditor;
+import com.cv.inv.entry.editor.StockUnitEditor;
 import com.cv.inv.service.LocationService;
 import com.cv.inv.service.VouIdService;
 import com.cv.inv.ui.commom.VouFormatFactory;
@@ -68,11 +71,16 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
     private TraderAutoCompleter traderAutoCompleter;
     private LocationAutoCompleter locationAutoCompleter;
     private CurrencyAutoCompleter currencyAutoCompleter;
-    private Gl gl;
+    private Gl gl = new Gl();
     private GenVouNoImpl vouEngine = null;
+<<<<<<< HEAD
+    private Long glId;
     private String cusId;
     private String currCode;
     private String locId;
+=======
+  
+>>>>>>> 2645f0594b7ed96750a08ea9446f2c4710390d82
 
     public void setLoadingObserver(LoadingObserver loadingObserver) {
         this.loadingObserver = loadingObserver;
@@ -90,9 +98,14 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
     private CurrencyService currencyService;
 
     @Autowired
+    private GlService glService;
+
+    @Autowired
     private VouIdService voudIdService;
     @Autowired
     private RetInVouSearch retInVouSearch;
+    @Autowired
+    private TraderService traderService;
 
     public ReturnIn() {
         initComponents();
@@ -108,6 +121,7 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
         initTextBoxAlign();
         initTextBoxValue();
         genVouNo();
+        calculateTotalAmount();
     }
 
     private void initTable() {
@@ -129,7 +143,7 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
         returnInTableModel.addNewRow();
         addRetInTableModelListener();
         tblReturnIn.getColumnModel().getColumn(0).setCellEditor(new StockCellEditor());
-        tblReturnIn.getColumnModel().getColumn(5).setCellEditor(new StockUnitCellEditor());
+        tblReturnIn.getColumnModel().getColumn(5).setCellEditor(new StockUnitEditor());
         tblReturnIn.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                 .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
 
@@ -201,7 +215,6 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
 
                 //if (column >= 0) {
                 //Need to add action for updating table
-                listDetail = returnInTableModel.getRetInDetailHis();
                 calculateTotalAmount();
                 //}
             }
@@ -211,6 +224,7 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
     // <editor-fold defaultstate="collapsed" desc="calculateTotalAmount">
     private void calculateTotalAmount() {
         Double totalAmount = new Double(0);
+        listDetail = returnInTableModel.getRetInDetailHis();
 
         try {
             for (RetInDetailHis sdh : listDetail) {
@@ -557,6 +571,42 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
 
     @Override
     public void selected(Object source, Object selectObj) {
+        switch (source.toString()) {
+            case "RetInVouList":
+                try {
+                VRetIn vRetIn = (VRetIn) selectObj;
+                gl = glService.findById(vRetIn.getKey().getGlId());
+                glId = gl.getGlId();
+
+                if (Util1.getNullTo(gl.getDeleted())) {
+                    lblStatus.setText("DELETED");
+                } else {
+                    lblStatus.setText("EDIT");
+                }
+
+                txtVouNo.setText(gl.getVouNo());
+                txtVouTotal.setText(gl.getVouTotal().toString());
+                txtVouPaid.setText(gl.getPaid().toString());
+                txtVouBalance.setText(gl.getBalance().toString());
+                txtRemark.setText(gl.getRemark());
+                txtRetInDate.setDate(gl.getGlDate());
+                Trader trader = traderService.findById(Integer.parseInt(gl.getTraderId().toString()));
+                traderAutoCompleter.setTrader(trader);
+                Location location = locationService.findById(gl.getLocation().toString());
+                locationAutoCompleter.setLocation(location);
+                Currency currency = currencyService.findById(new CurrencyKey(gl.getFromCurId(), Global.compId));
+                currencyAutoCompleter.setCurrency(currency);
+
+                List<RetInDetailHis> listRetIn = retInService.search(gl.getGlId().toString(), gl.getVouNo());
+                returnInTableModel.setRetInDetailList(listRetIn);
+
+            } catch (Exception ex) {
+                LOGGER.error("selected : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.toString());
+
+            }
+
+            break;
+        }
 
     }
 
@@ -727,21 +777,29 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
         @Override
         public void actionPerformed(ActionEvent e) {
             RetInDetailHis retdh;
+            int yes_no = -1;
 
             if (tblReturnIn.getSelectedRow() >= 0) {
                 retdh = listDetail.get(tblReturnIn.getSelectedRow());
 
-                int n = JOptionPane.showConfirmDialog(Global.parentForm, "Are you sure to delete?",
-                        "Sale item delete", JOptionPane.YES_NO_OPTION);
+                if (retdh.getStock() != null) {
+                    if (retdh.getStock().getStockCode() != null) {
+                        try {
+                            yes_no = JOptionPane.showConfirmDialog(Global.parentForm, "Are you sure to delete?",
+                                    "Sale item delete", JOptionPane.YES_NO_OPTION);
 
-                if (retdh.getStock() != null && n == 0) {
-                    try {
-                        listDetail.remove(tblReturnIn.getSelectedRow());
-                        calculateTotalAmount();
-                    } catch (Exception ex) {
-                        LOGGER.error("actionItemDelete : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.toString());
+                        } catch (Exception ex) {
+                            LOGGER.error("actionItemDelete : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.toString());
+                        }
+
+                        if (yes_no == 0) {
+                            returnInTableModel.delete(tblReturnIn.getSelectedRow());
+                            calculateTotalAmount();
+                        }
                     }
 
+                } else {
+                    JOptionPane.showMessageDialog(Global.parentForm, "Can't delete empty record");
                 }
             }
         }
@@ -769,6 +827,7 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
         genVouNo();
         assignDefaultValue();
         returnInTableModel.clearRetInTable();
+        deleteRetInDetail();
     }
 
     public void newForm() {
@@ -776,7 +835,7 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
     }
 
     public void save() {
-        if (isValidEntry() && returnInTableModel.isValidEntry()) {
+        if (isValidEntry()) {
             try {
                 retInService.save(gl, listDetail);
                 if (lblStatus.getText().equals("NEW")) {
@@ -791,8 +850,26 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
 
     }
 
+    public void delete() {
+        if (Util1.getNullTo(gl.getDeleted())) {
+            JOptionPane.showConfirmDialog(Global.parentForm, "Voucher already deleted.",
+                    "Return In voucher delete", JOptionPane.ERROR);
+        } else {
+            int yes_no = JOptionPane.showConfirmDialog(Global.parentForm, "Are you sure to delete?",
+                    "Return In voucher delete", JOptionPane.YES_NO_OPTION);
+
+            if (yes_no == 0) {
+                gl.setDeleted(true);
+                save();
+            }
+        }
+
+    }
+
     public void history() {
+        retInVouSearch.setPanelName(this.getName());
         retInVouSearch.initMain();
+        retInVouSearch.setTitle("Return In Voucher Search");
         retInVouSearch.setSize(Global.width - 400, Global.height - 200);
         retInVouSearch.setResizable(false);
         //retInVouSearch.setLocation(Global.width/2, Global.height/2);
@@ -808,14 +885,60 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
         Trader trader = null;
         try {
             if (locationAutoCompleter.getLocation() != null) {
-            location = locationAutoCompleter.getLocation();
-        }
-        if (currencyAutoCompleter.getCurrency() != null) {
-            currency = currencyAutoCompleter.getCurrency();
-        }
-        if (traderAutoCompleter.getTrader() != null) {
-            trader = traderAutoCompleter.getTrader();
+                location = locationAutoCompleter.getLocation();
+            }
+            if (currencyAutoCompleter.getCurrency() != null) {
+                currency = currencyAutoCompleter.getCurrency();
+            }
+            if (traderAutoCompleter.getTrader() != null) {
+                trader = traderAutoCompleter.getTrader();
 
+<<<<<<< HEAD
+            }
+            if (txtVouNo.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(Global.parentForm, "Invalid voucher no.",
+                        "Invalid Voucher ID", JOptionPane.ERROR_MESSAGE);
+                status = false;
+            } else if (txtCus.getText() == null) {
+                JOptionPane.showMessageDialog(Global.parentForm, "Customer cannot be blank.",
+                        "No customer.", JOptionPane.ERROR_MESSAGE);
+                status = false;
+                txtCus.requestFocusInWindow();
+            } else if (location.getLocationId() == null) {
+                JOptionPane.showMessageDialog(Global.parentForm, "Location cannot be blank.",
+                        "Select Location.", JOptionPane.ERROR_MESSAGE);
+                status = false;
+                txtLocation.requestFocusInWindow();
+            } else if (currency.getKey().getCode() == null) {
+                JOptionPane.showMessageDialog(Global.parentForm, "Currency cannot be blank.",
+                        "Select Currency", JOptionPane.ERROR_MESSAGE);
+                status = false;
+                txtCurrency.requestFocusInWindow();
+            } else if (listDetail.size() == 1) {
+                JOptionPane.showMessageDialog(Global.parentForm, "No Sale record.",
+                        "No data.", JOptionPane.ERROR_MESSAGE);
+                status = false;
+            } else {
+
+                if (glId != null) {
+                    gl.setGlId(glId);
+                }
+                gl.setVouNo(txtVouNo.getText());
+                gl.setTraderId(NumberUtil.NZeroL(trader.getId()));
+                gl.setRemark(txtRemark.getText());
+                gl.setGlDate(txtRetInDate.getDate());
+                gl.setCreatedDate(Util1.getTodayDate());
+                gl.setFromCurId(currency.getKey().getCode());
+                gl.setCompId(Global.compId);
+                gl.setSplitId(6);
+                gl.setTranSource("ÄCCOUNT-RETIN");
+                gl.setLocation(location.getLocationId());
+                gl.setVouTotal(NumberUtil.getDouble(txtVouTotal.getText()));
+                gl.setPaid(NumberUtil.getDouble(txtVouPaid.getText()));
+                gl.setBalance(NumberUtil.getDouble(txtVouBalance.getText()));
+                gl.setCreatedBy(Global.loginUser.getUserId().toString());
+                gl.setDeleted(Util1.getNullTo(gl.getDeleted()));
+=======
         }
         if (txtVouNo.getText().isEmpty()) {
             JOptionPane.showMessageDialog(Global.parentForm, "Invalid voucher no.",
@@ -843,28 +966,42 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
             gl.setRemark(txtRemark.getText());
             gl.setGlDate(txtRetInDate.getDate());
             gl.setCreatedDate(Util1.getTodayDate());
-            gl.setCurrency(currency.getKey().getCode());
+            gl.setFromCurId(currency.getKey().getCode());
             gl.setCompId(Global.compId);
             gl.setSplitId(6);
             gl.setTranSource("ÄCCOUNT-RETOUT");
-            gl.setLocation(location.getLocationId());
+            gl.setLocationId(location.getLocationId());
             gl.setCreatedBy(Global.loginUser.getUserId().toString());
             gl.setVouTotal(NumberUtil.getDouble(txtVouTotal.getText()));
             gl.setPaid(NumberUtil.getDouble(txtVouPaid.getText()));
             gl.setBalance(NumberUtil.getDouble(txtVouBalance.getText()));
+>>>>>>> 2645f0594b7ed96750a08ea9446f2c4710390d82
 
-        }
+            }
         } catch (Exception ex) {
             LOGGER.error("isValidEntry : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
-            
+
         }
-        
+
         return status;
     }
 
     private void genVouNo() {
         vouEngine = new GenVouNoImpl(voudIdService, "RetIn", Util1.getPeriod(txtRetInDate.getDate()));
         txtVouNo.setText(vouEngine.genVouNo());
+    }
+
+    private void deleteRetInDetail() {
+        String retInIds = returnInTableModel.getDeleteListStr();
+        if (retInIds != null && glId != null) {
+            try {
+                retInService.delete(retInIds, glId.toString());
+            } catch (Exception ex) {
+                LOGGER.error("deleteRetInDetail : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
+
+            }
+
+        }
     }
 
 }
