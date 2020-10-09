@@ -16,6 +16,8 @@ import java.util.List;
 public interface RetOutService {
     public RetOutDetailHis save(Gl saveGl,List<RetOutDetailHis> listRetOut);
 
-    public void delete(String retOutId);
+    public List<RetOutDetailHis> search(String glId, String vouNo);
+
+    public void delete(String retOutId, String glId);
     
 }

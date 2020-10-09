@@ -57,6 +57,7 @@ public class Gl implements java.io.Serializable {
     private Double paid;
     private Double vouTotal;
     private Integer locationId;
+    private Boolean deleted;
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -369,8 +370,6 @@ public class Gl implements java.io.Serializable {
         this.vouTotal = vouTotal;
     }
 
-    
-
     @Column(name = "location_id")
     public Integer getLocation() {
         return locationId;
@@ -379,7 +378,14 @@ public class Gl implements java.io.Serializable {
     public void setLocation(Integer location) {
         this.locationId = location;
     }
-    
-    
+
+    @Column(name = "deleted")
+    public Boolean getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        this.deleted = deleted;
+    }
 
 }

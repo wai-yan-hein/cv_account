@@ -6,6 +6,7 @@
 package com.cv.inv.dao;
 
 import com.cv.inv.entity.RetOutDetailHis;
+import java.util.List;
 
 /**
  *
@@ -15,6 +16,8 @@ public interface RetOutDao {
 
     public RetOutDetailHis save(RetOutDetailHis retOutDetailHis);
 
-    public void delete(String retOutId);
+    public List<RetOutDetailHis> search(String glId, String vouNo);
+
+    public void delete(String retOutId, String glId);
 
 }

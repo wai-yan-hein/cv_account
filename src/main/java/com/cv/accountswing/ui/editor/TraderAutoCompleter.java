@@ -102,7 +102,7 @@ public class TraderAutoCompleter implements KeyListener {
         popup.add(scroll);
 
         if (textComp instanceof JTextField) {
-            textComp.registerKeyboardAction(showAction, KeyStroke.getKeyStroke(KeyEvent.VK_DOWN,0),
+            textComp.registerKeyboardAction(showAction, KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0),
                     JComponent.WHEN_FOCUSED);
             textComp.addMouseListener(new MouseAdapter() {
                 @Override
@@ -318,6 +318,12 @@ public class TraderAutoCompleter implements KeyListener {
 
     public Trader getTrader() {
         return trader;
+    }
+
+    public void setTrader(Trader trader) {
+        this.trader = trader;
+        this.textComp.setText(trader.getTraderName());
+
     }
 
     /*

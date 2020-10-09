@@ -20,7 +20,7 @@ public class StockTableModel extends AbstractTableModel {
 
     private static final Logger log = LoggerFactory.getLogger(StockTableModel.class);
     private List<Stock> listStock = new ArrayList<>();
-    private final String[] columnNames = {"Code", "Description", "Barcode"};
+    private String[] columnNames = {"Code", "Description", "Barcode"};
 
     public StockTableModel(List<Stock> listStock) {
         this.listStock = listStock;
@@ -63,13 +63,40 @@ public class StockTableModel extends AbstractTableModel {
     }
 
     @Override
+    public void setValueAt(Object value, int row, int column) {
+        if (listStock == null || listStock.isEmpty()) {
+            return;
+        }
+
+        Stock record = listStock.get(row);
+
+        switch (column) {
+            case 0: //Code
+                if (value != null) {
+                    if (value instanceof Stock) {
+                        record.setStockCode(((Stock) value).getStockCode());
+                        record.setStockName(((Stock) value).getStockName());
+                    }
+                }
+                break;
+            case 1: //Desp
+                //record.setMedName(value.toString());
+                break;
+            default:
+                System.out.println("invalid index");
+        }
+
+        fireTableCellUpdated(row, column);
+    }
+
+    @Override
     public Class getColumnClass(int column) {
         return String.class;
     }
 
     @Override
     public boolean isCellEditable(int row, int column) {
-        return false;
+        return column == 1;
     }
 
     @Override

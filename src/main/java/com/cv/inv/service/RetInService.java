@@ -14,9 +14,11 @@ import java.util.List;
  * @author lenovo
  */
 public interface RetInService {
-    public RetInDetailHis save(Gl gl,List<RetInDetailHis> listRetIn);
-    public void delete (String retInId);
-    public List search(String fDate,String tDate,String cusId,String locId,
-            String vouNo,String stockCodes,String splitId,String tranSource,String compCode);
-    
+
+    public RetInDetailHis save(Gl gl, List<RetInDetailHis> listRetIn);
+
+    public void delete(String retInId,String glId);
+
+    public List<RetInDetailHis> search(String glId, String vouNo);
+
 }

@@ -5,19 +5,15 @@
  */
 package com.cv.inv.dao;
 
-import com.cv.inv.entity.RetInDetailHis;
+import com.cv.inv.entity.view.VRetOut;
 import java.util.List;
 
 /**
  *
  * @author lenovo
  */
-public interface RetInDao {
-
-    public RetInDetailHis save(RetInDetailHis retInDetailHis);
-
-    public List<RetInDetailHis> search(String glId, String vouNo);
-
-    public void delete(String retInId, String glId);
-
+public interface VRetOutDao {
+     public List<VRetOut> search(String fDate,String tDate,String cusId,String locId,
+            String vouNo,String stockCodes,String compCode);
+    
 }

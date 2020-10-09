@@ -13,6 +13,8 @@ import com.cv.accountswing.entity.CurrencyKey;
 import com.cv.accountswing.entity.Gl;
 import com.cv.accountswing.entity.Trader;
 import com.cv.accountswing.service.CurrencyService;
+import com.cv.accountswing.service.GlService;
+import com.cv.accountswing.service.TraderService;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.editor.CurrencyAutoCompleter;
 import com.cv.accountswing.ui.editor.TraderAutoCompleter;
@@ -20,21 +22,26 @@ import com.cv.accountswing.util.NumberUtil;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.Location;
 import com.cv.inv.entity.RetOutDetailHis;
-import com.cv.inv.entity.Stock;
+import com.cv.inv.entity.view.VRetOut;
 import com.cv.inv.entry.common.ReturnOutTableModel;
 import com.cv.inv.entry.editor.LocationAutoCompleter;
 import com.cv.inv.entry.editor.StockCellEditor;
 import com.cv.inv.entry.editor.StockUnitCellEditor;
+import com.cv.inv.entry.editor.StockUnitEditor;
 import com.cv.inv.service.LocationService;
 import com.cv.inv.service.RetOutService;
 import com.cv.inv.service.VouIdService;
 import com.cv.inv.ui.commom.VouFormatFactory;
+import com.cv.inv.ui.util.RetInVouSearch;
 import com.cv.inv.util.GenVouNoImpl;
 import com.toedter.calendar.JTextFieldDateEditor;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JFormattedTextField;
 import javax.swing.JOptionPane;
@@ -67,7 +74,8 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
     private LocationAutoCompleter locationAutoCompleter;
     private CurrencyAutoCompleter currencyAutoCompleter;
     private GenVouNoImpl vouEngine = null;
-    private Gl gl;
+    private Long glId;
+    private Gl gl = new Gl();
     @Autowired
     private ReturnOutTableModel retOutTableModel;
 
@@ -81,6 +89,14 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
     private VouIdService vouIdService;
     @Autowired
     private RetOutService outService;
+    @Autowired
+    private RetInVouSearch retInVouSearch;
+    @Autowired
+    private GlService glService;
+    @Autowired
+    private TraderService traderService;
+    @Autowired
+    private RetOutService retOutService;
 
     public void setLoadingObserver(LoadingObserver loadingObserver) {
         this.loadingObserver = loadingObserver;
@@ -93,6 +109,7 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
     private void initMain() {
         try {
             initTable();
+            actionMapping();
             initKeyListener();
             setTodayDate();
             initCombo();
@@ -100,6 +117,7 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
             initTextBoxAlign();
             initTextBoxValue();
             genVouNo();
+            calculateTotalAmount();
 
         } catch (Exception ex) {
             LOGGER.error("ReturnOut : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.toString());
@@ -126,7 +144,7 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
         tblRetOut.setDefaultRenderer(Object.class, new TableCellRender());
         tblRetOut.setDefaultRenderer(Float.class, new TableCellRender());
         tblRetOut.getColumnModel().getColumn(0).setCellEditor(new StockCellEditor());
-        tblRetOut.getColumnModel().getColumn(5).setCellEditor(new StockUnitCellEditor());
+        tblRetOut.getColumnModel().getColumn(5).setCellEditor(new StockUnitEditor());
         addRetOutTableModelListener();
         tblRetOut.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                 .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
@@ -162,7 +180,6 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
 
                 //if (column >= 0) {
                 //Need to add action for updating table
-                listDetail = retOutTableModel.getRetOutDetailHis();
                 calculateTotalAmount();
                 //}
             }
@@ -172,6 +189,7 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
     // <editor-fold defaultstate="collapsed" desc="calculateTotalAmount">
     private void calculateTotalAmount() {
         Double totalAmount = new Double(0);
+        listDetail = retOutTableModel.getRetOutDetailHis();
 
         try {
             for (RetOutDetailHis sdh : listDetail) {
@@ -233,6 +251,48 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
         txtVouBalance.setValue(0.0);
 
     }
+
+    private void actionMapping() {
+        //Enter event on tblSale
+        //tblReturnIn.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "ENTER-Action");
+        //tblReturnIn.getActionMap().put("ENTER-Action", actionTblRetInEnterKey);
+
+        //F8 event on tblRetIn
+        tblRetOut.getInputMap().put(KeyStroke.getKeyStroke("F8"), "F8-Action");
+        tblRetOut.getActionMap().put("F8-Action", actionItemDelete);
+    }
+    
+    private Action actionItemDelete = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            RetOutDetailHis retdh;
+            int yes_no = -1;
+
+            if (tblRetOut.getSelectedRow() >= 0) {
+                retdh = listDetail.get(tblRetOut.getSelectedRow());
+
+                if (retdh.getStock() != null) {
+                    if (retdh.getStock().getStockCode() != null) {
+                        try {
+                            yes_no = JOptionPane.showConfirmDialog(Global.parentForm, "Are you sure to delete?",
+                                    "Purchase item delete", JOptionPane.YES_NO_OPTION);
+
+                        } catch (Exception ex) {
+                            LOGGER.error("actionItemDelete : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.toString());
+                        }
+
+                        if (yes_no == 0) {
+                            retOutTableModel.delete(tblRetOut.getSelectedRow());
+                            calculateTotalAmount();
+                        }
+                    }
+
+                } else {
+                    JOptionPane.showMessageDialog(Global.parentForm, "Can't delete empty record");
+                }
+            }
+        }
+    };
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -540,6 +600,42 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
 
     @Override
     public void selected(Object source, Object selectObj) {
+        switch (source.toString()) {
+            case "RetOutVouList":
+                try {
+                VRetOut vRetOut = (VRetOut) selectObj;
+                gl = glService.findById(vRetOut.getKey().getGlId());
+                glId = gl.getGlId();
+
+                if (Util1.getNullTo(gl.getDeleted())) {
+                    lblStatus.setText("DELETED");
+                } else {
+                    lblStatus.setText("EDIT");
+                }
+
+                txtVouNo.setText(gl.getVouNo());
+                txtVouTotal.setText(gl.getVouTotal().toString());
+                txtVouPaid.setText(gl.getPaid().toString());
+                txtVouBalance.setText(gl.getBalance().toString());
+                txtRemark.setText(gl.getRemark());
+                txtRetOutDate.setDate(gl.getGlDate());
+                Trader trader = traderService.findById(Integer.parseInt(gl.getTraderId().toString()));
+                traderAutoCompleter.setTrader(trader);
+                Location location = locationService.findById(gl.getLocation().toString());
+                locationAutoCompleter.setLocation(location);
+                Currency currency = currencyService.findById(new CurrencyKey(gl.getFromCurId(), Global.compId));
+                currencyAutoCompleter.setCurrency(currency);
+
+                List<RetOutDetailHis> listRetOut = retOutService.search(gl.getGlId().toString(), gl.getVouNo());
+                retOutTableModel.setRetOutDetailList(listRetOut);
+
+            } catch (Exception ex) {
+                LOGGER.error("selected : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.toString());
+
+            }
+
+            break;
+        }
 
     }
 
@@ -664,7 +760,7 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
     }
 
     public void save() {
-        if (isValidEntry() && retOutTableModel.isValidEntry()) {
+        if (isValidEntry()) {
             try {
                 outService.save(gl, listDetail);
                 if (lblStatus.getText().equals("NEW")) {
@@ -714,8 +810,12 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
                         "Select Currency", JOptionPane.ERROR_MESSAGE);
                 status = false;
                 txtCurrency.requestFocusInWindow();
+            } else if (listDetail.size() == 1) {
+                JOptionPane.showMessageDialog(Global.parentForm, "No Purchase record.",
+                        "No data.", JOptionPane.ERROR_MESSAGE);
+                status = false;
             } else {
-                gl = new Gl();
+
                 gl.setVouNo(txtVouNo.getText());
                 gl.setTraderId(NumberUtil.NZeroL(trader.getId()));
                 gl.setRemark(txtRemark.getText());
@@ -724,12 +824,13 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
                 gl.setFromCurId(currency.getKey().getCode());
                 gl.setCompId(Global.compId);
                 gl.setSplitId(5);
-                gl.setTranSource("ÄCCOUNT-RETIN");
+                gl.setTranSource("ÄCCOUNT-RETOut");
                 gl.setLocation(location.getLocationId());
                 gl.setCreatedBy(Global.loginUser.getUserId().toString());
                 gl.setVouTotal(NumberUtil.getDouble(txtVouTotal.getText()));
                 gl.setPaid(NumberUtil.getDouble(txtVouPaid.getText()));
                 gl.setBalance(NumberUtil.getDouble(txtVouBalance.getText()));
+                gl.setDeleted(Util1.getNullTo(gl.getDeleted()));
 
             }
 
@@ -753,10 +854,52 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
         genVouNo();
         assignDefaultValue();
         retOutTableModel.clearRetOutTable();
+        deleteRetOutDetail();
     }
 
     private void newForm() {
         clear();
+    }
+
+    public void history() {
+        retInVouSearch.setPanelName(this.getName());
+        retInVouSearch.initMain();
+        retInVouSearch.setTitle("Return Out Voucher Search");
+        retInVouSearch.setSize(Global.width - 400, Global.height - 200);
+        retInVouSearch.setResizable(false);
+        //retInVouSearch.setLocation(Global.width/2, Global.height/2);
+        retInVouSearch.setLocationRelativeTo(this);
+        retInVouSearch.setSelectionObserver(this);
+        retInVouSearch.setVisible(true);
+    }
+
+    public void delete() {
+        if (Util1.getNullTo(gl.getDeleted())) {
+            JOptionPane.showConfirmDialog(Global.parentForm, "Voucher already deleted.",
+                    "Return Out voucher delete", JOptionPane.ERROR);
+        } else {
+            int yes_no = JOptionPane.showConfirmDialog(Global.parentForm, "Are you sure to delete?",
+                    "Return Out voucher delete", JOptionPane.YES_NO_OPTION);
+
+            if (yes_no == 0) {
+                gl.setDeleted(true);
+                save();
+            }
+        }
+
+    }
+    
+     private void deleteRetOutDetail() {
+        String retOutIds = retOutTableModel.getDeleteListStr();
+        if (retOutIds != null && glId != null) {
+            try {
+                retOutService.delete(retOutIds, glId.toString());
+            } catch (Exception ex) {
+                LOGGER.error("deleteRetOutDetail : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
+
+            }
+
+        }
     }
 
 }

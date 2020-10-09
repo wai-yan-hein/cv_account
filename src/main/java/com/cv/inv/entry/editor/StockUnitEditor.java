@@ -38,6 +38,7 @@ public class StockUnitEditor extends AbstractCellEditor implements TableCellEdit
             boolean isSelected, int rowIndex, int vColIndex) {
         JTextField jtf = new JTextField();
         jtf.setFont(Global.textFont);
+        jtf.setHighlighter(null);
         //List<Medicine> listDepartment = dao.findAll("Medicine", "active = true");
 
         KeyListener keyListener = new KeyListener() {

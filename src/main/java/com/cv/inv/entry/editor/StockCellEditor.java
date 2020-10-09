@@ -73,7 +73,7 @@ public class StockCellEditor extends AbstractCellEditor implements TableCellEdit
             //jtf.selectAll();
         }
         completer = new StockAutoCompleter(jtf, Global.listStock, this);
-
+       
         return component;
     }
 

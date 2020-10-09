@@ -34,18 +34,25 @@ public class RetOutServiceImpl implements RetOutService {
 
     @Override
     public RetOutDetailHis save(Gl saveGl, List<RetOutDetailHis> listRetOut) {
-        int count = 1;
+
         String retOutDetailId;
+        RetOutCompoundKey key;
 
         try {
             Gl gl = glDao.save(saveGl);
 
             for (RetOutDetailHis detailHis : listRetOut) {
                 if (detailHis.getStock() != null) {
-                    retOutDetailId = gl.getVouNo() + detailHis.getStock().getStockCode() + '-' + count;
-                    detailHis.setOutCompoundKey(new RetOutCompoundKey(retOutDetailId, gl.getGlId(), gl.getVouNo()));
+                    if (detailHis.getOutCompoundKey() == null) {
+                        retOutDetailId = gl.getVouNo() + '-' + detailHis.getUniqueId();
+                        key = new RetOutCompoundKey(retOutDetailId, gl.getGlId(), gl.getVouNo());
+                    } else {
+                        retOutDetailId = detailHis.getOutCompoundKey().getRetOutDetailId();
+                        key = new RetOutCompoundKey(retOutDetailId, gl.getGlId(), gl.getVouNo());
+
+                    }
+                    detailHis.setOutCompoundKey(key);
                     retOutDao.save(detailHis);
-                    count += 1;
                     retOutDetailHis = detailHis;
                 }
 
@@ -60,7 +67,15 @@ public class RetOutServiceImpl implements RetOutService {
     }
 
     @Override
-    public void delete(String retOutId) {
+    public List<RetOutDetailHis> search(String glId, String vouNo) {
+        return  retOutDao.search(glId, vouNo);
     }
+
+    @Override
+    public void delete(String retOutId, String glId) {
+        retOutDao.delete(retOutId, glId);
+    }
+
+   
 
 }

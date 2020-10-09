@@ -7,16 +7,20 @@ package com.cv.inv.entry.common;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.util.NumberUtil;
+import com.cv.accountswing.util.Util1;
+import com.cv.inv.entity.RelationKey;
 import com.cv.inv.entity.RetOutDetailHis;
 import com.cv.inv.entity.Stock;
 import com.cv.inv.entity.StockUnit;
-import com.cv.inv.entry.editor.UnitAutoCompleter;
+import com.cv.inv.entity.UnitRelation;
+import com.cv.inv.service.RelationService;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -31,6 +35,10 @@ public class ReturnOutTableModel extends AbstractTableModel {
         "Qty", "Std-W", "Unit", "Price", "Amount"};
     private JTable parent;
     private List<RetOutDetailHis> listDetail;
+    private String deletedList;
+
+    @Autowired
+    private RelationService relationService;
 
     public ReturnOutTableModel(List<RetOutDetailHis> listDetail) {
         this.listDetail = listDetail;
@@ -56,6 +64,31 @@ public class ReturnOutTableModel extends AbstractTableModel {
 
     public String getColumnName(int column) {
         return columnNames[column];
+    }
+
+    @Override
+    public Class getColumnClass(int column) {
+        switch (column) {
+            case 0: //Code
+                return String.class;
+            case 1: //Description
+                return String.class;
+            case 2: //Expire-Date
+                return String.class;
+            case 3: //Qty
+                return Float.class;
+            case 4: //Std-Wt
+                return Float.class;
+            case 5: //Unit
+                return Object.class;
+            case 6: //Price
+                return Double.class;
+            case 7: //Amt
+                return Double.class;
+            default:
+                return Object.class;
+        }
+
     }
 
     @Override
@@ -155,11 +188,18 @@ public class ReturnOutTableModel extends AbstractTableModel {
             switch (column) {
                 case 0://code
                     if (value != null) {
-                        record.setStock((Stock) value);
-                        //record.setStockUnit(((Stock) value).getSaleUnit());
+                        if (value instanceof Stock) {
+                            Stock stock = (Stock) value;
+                            record.setStock(stock);
+                            record.setQty(1.0f);
+                            record.setPrice(Util1.getDouble(stock.getPurPrice()));
+                            record.setStdWt(stock.getPurMeasure());
+                            record.setStockUnit(stock.getPurUnit());
+                            addNewRow();
+                            parent.setColumnSelectionInterval(3, 3);
+                        }
                     }
-                    parent.setColumnSelectionInterval(3, 3);
-                    addEmptyRow();
+
                     break;
                 case 1://Description
                     if (value != null) {
@@ -174,63 +214,69 @@ public class ReturnOutTableModel extends AbstractTableModel {
                     break;
                 case 3://Qty
                     if (value != null) {
-                        float qty = NumberUtil.NZeroFloat(value);
-                        record.setQty(qty);
-                        int x = Global.x + (Global.width / 2);
-                        int y = Global.y + (Global.height / 2) - 200;
-                        //Need to change
-                        /*if (Global.listStUnit != null && Global.listStUnit.size() > 1) {
-                            UnitAutoCompleter unitPopup = new UnitAutoCompleter(x, y,
-                                    Global.listStUnit, Global.parentForm);
+                        Float qty = NumberUtil.NZeroFloat(value);
+                        if (qty <= 0) {
+                            JOptionPane.showMessageDialog(Global.parentForm, "Qty must be positive value.",
+                                    "Minus or zero qty.", JOptionPane.ERROR_MESSAGE);
 
-                            if (unitPopup.isSelected()) {
-                                record.setStockUnit(unitPopup.getSelUnit());
-                            }
                         } else {
-                            record.setStockUnit(Global.listStUnit.get(0));
-                        }*/
-                        if (record.getQty() != null && record.getPrice() != null) {
-                            record.setAmount(calAmt(record));
+                            record.setQty(qty);
+                            parent.setColumnSelectionInterval(4, 4);
                         }
                     }
-                    if ((row + 1) <= listDetail.size()) {
-                        parent.setRowSelectionInterval(row + 1, row + 1);
-                    }
-                    parent.setColumnSelectionInterval(0, 0); //Move to Code
                     break;
                 case 4://Std-w
                     if (value != null) {
-                        float stdW = NumberUtil.NZeroFloat(value);
-                        record.setStdWt(stdW);
+                        record.setStdWt(Util1.getFloat(value));
+                        //calculation with unit
+                        String toUnit = record.getStockUnit().getItemUnitCode();
+                        Float calAmount = calPrice(record, toUnit);
+                        record.setPrice(Util1.getDouble(calAmount));
+                        parent.setColumnSelectionInterval(5, 5);
                     }
-                    parent.setColumnSelectionInterval(5, 5);
                     break;
                 case 5://Unit
                     if (value != null) {
-                        record.setStockUnit(((StockUnit) value));
-                    } else {
-                        record.setStockUnit(null);
+                        if (value instanceof StockUnit) {
+                            StockUnit st = (StockUnit) value;
+                            record.setStockUnit(st);
+                            String toUnit = record.getStockUnit().getItemUnitCode();
+                            Float calAmount = calPrice(record, toUnit);
+                            record.setPrice(Util1.getDouble(calAmount));
+                            parent.setColumnSelectionInterval(6, 6);
+                        }
                     }
-                    parent.setColumnSelectionInterval(6, 6);
                     break;
                 case 6://Price
 
                     if (value != null) {
                         Double price = NumberUtil.NZero(value);
-                        record.setPrice(price);
-                        if (record.getQty() != null && record.getPrice() != null) {
-                            record.setAmount(calAmt(record));
+                        if (price <= 0) {
+                            JOptionPane.showMessageDialog(Global.parentForm, "Price must be positive value.",
+                                    "Minus or zero qty.", JOptionPane.ERROR_MESSAGE);
+                            parent.requestFocusInWindow();
+                            parent.setColumnSelectionInterval(6, 6);
+
+                        } else {
+                            record.setPrice(price);
+                            parent.setColumnSelectionInterval(7, 7);
                         }
                     }
-                    parent.setColumnSelectionInterval(7, 7);
+
                     break;
                 case 7://Amount
                     if (value != null) {
                         record.setAmount(NumberUtil.NZero(value));
+                        if ((row + 1) <= listDetail.size()) {
+                            parent.setRowSelectionInterval(row + 1, row + 1);
+                        }
+                        parent.setColumnSelectionInterval(0, 0); //Move to Code
+
                     }
                     break;
 
             }
+            calAmt(record);
             //parent.requestFocusInWindow();
             fireTableCellUpdated(row, column);
         } catch (Exception ex) {
@@ -240,10 +286,9 @@ public class ReturnOutTableModel extends AbstractTableModel {
 
     }
 
-    private Double calAmt(RetOutDetailHis retInDetail) {
-        Double amt;
-        amt = retInDetail.getQty() * retInDetail.getPrice();
-        return amt;
+    private void calAmt(RetOutDetailHis retOutDetailHis) {
+        Double amt = retOutDetailHis.getQty() * retOutDetailHis.getPrice();
+        retOutDetailHis.setAmount(amt);
     }
 
     public boolean hasEmptyRow() {
@@ -263,6 +308,7 @@ public class ReturnOutTableModel extends AbstractTableModel {
     public void addEmptyRow() {
         if (listDetail != null) {
             RetOutDetailHis record = new RetOutDetailHis();
+            record.setUniqueId(listDetail.size() + 1);
             listDetail.add(record);
             fireTableRowsInserted(listDetail.size() - 1, listDetail.size() - 1);
             parent.scrollRectToVisible(parent.getCellRect(parent.getRowCount() - 1, 0, true));
@@ -272,56 +318,102 @@ public class ReturnOutTableModel extends AbstractTableModel {
     public void addNewRow() {
         if (hasEmptyRow()) {
             RetOutDetailHis detailHis = new RetOutDetailHis();
+            detailHis.setUniqueId(listDetail.size() + 1);
             listDetail.add(detailHis);
             fireTableRowsInserted(listDetail.size() - 1, listDetail.size() - 1);
         }
 
     }
 
-    public boolean isValidEntry() {
-        boolean status = true;
-        int row = 0;
-
-        if (listDetail != null) {
-            for (RetOutDetailHis record : listDetail) {
-                if (row < listDetail.size() - 1) {
-                    if (record.getStock().getStockCode() != null) {
-                        if (NumberUtil.NZero(record.getQty()) <= 0) {
-                            JOptionPane.showMessageDialog(Global.parentForm, "Qty must be positive value.",
-                                    "Minus or zero qty.", JOptionPane.ERROR_MESSAGE);
-                            status = false;
-                        } else if (NumberUtil.NZero(record.getPrice()) <= 0) {
-                            JOptionPane.showMessageDialog(Global.parentForm, "Price must be positive value.",
-                                    "Minus or zero qty.", JOptionPane.ERROR_MESSAGE);
-                            status = false;
-                        } else {
-                            record.setUniqueId(row + 1);
-                        }
-
-                        row++;
-                    }
-                }
-            }
-        }
-
-        if (row == 0) {
-            JOptionPane.showMessageDialog(Global.parentForm,
-                    "No purchase record.",
-                    "No data.", JOptionPane.ERROR_MESSAGE);
-            status = false;
-        }
-
-        parent.setRowSelectionInterval(row, row);
-        return status;
-    }
-
     public void clearRetOutTable() {
         this.listDetail.clear();
         addEmptyRow();
     }
-     public List<RetOutDetailHis> getRetOutDetailHis() {
+
+    public List<RetOutDetailHis> getRetOutDetailHis() {
         return this.listDetail;
-     }
+    }
+
+    private Float calPrice(RetOutDetailHis pd, String toUnit) {
+        Stock stock = pd.getStock();
+        float purAmt = 0.0f;
+        float stdPurPrice = stock.getPurPrice();
+        float stdPrice = stock.getPurPrice();
+        float userWt = pd.getStdWt();
+        float stdWt = stock.getSaleMeasure();
+        String fromUnit = stock.getPurUnit().getItemUnitCode();
+
+        if (!fromUnit.equals(toUnit)) {
+            RelationKey key = new RelationKey(fromUnit, toUnit);
+            UnitRelation unitRelation = relationService.findByKey(key);
+            if (unitRelation != null) {
+                float factor = unitRelation.getFactor();
+                float convertWt = (userWt / factor); //unit change
+                purAmt = (convertWt / stdWt) * stdPrice; // cal price
+
+            } else {
+                key = new RelationKey(toUnit, fromUnit);
+                Float factor = Global.hmRelation.get(key);
+                if (factor != null) {
+                    float convertWt = userWt * factor; // unit change
+                    purAmt = (convertWt / stdWt) * stdPurPrice; // cal price
+                } else {
+                    JOptionPane.showMessageDialog(Global.parentForm, "Mapping units in Relation Setup.");
+                }
+            }
+        } else {
+            purAmt = (userWt / stdPrice) * stdPurPrice;
+        }
+        return purAmt;
+    }
+
+    public void setRetOutDetailList(List<RetOutDetailHis> listDetail) {
+        this.listDetail = listDetail;
+
+        if (hasEmptyRow()) {
+            addEmptyRow();
+        }
+        fireTableCellUpdated(listDetail.size() - 1, listDetail.size() - 1);
+        fireTableDataChanged();
+    }
+
+    public void delete(int row) {
+        if (listDetail == null) {
+            return;
+        }
+        if (listDetail.isEmpty()) {
+            return;
+        }
+
+        RetOutDetailHis record = listDetail.get(row);
+
+        if (record != null) {
+            if (record.getOutCompoundKey() != null) {
+                if (deletedList == null) {
+                    deletedList = "'" + record.getOutCompoundKey().getRetOutDetailId() + "'";
+                } else {
+                    deletedList = deletedList + "," + "'" + record.getOutCompoundKey().getRetOutDetailId() + "'";
+                }
+            }
+        }
+
+        listDetail.remove(row);
+
+        if (hasEmptyRow()) {
+            addEmptyRow();
+        }
+
+        fireTableRowsDeleted(row, row);
+    }
     
+     public String getDeleteListStr() {
+        String deletedListStr;
+        if (deletedList == null || deletedList.isEmpty()) {
+            return null;
+        } else {
+            deletedListStr = deletedList;
+        }
+        return deletedListStr;
+    }
 
 }

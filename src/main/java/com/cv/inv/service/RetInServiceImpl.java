@@ -36,19 +36,25 @@ public class RetInServiceImpl implements RetInService {
 
     @Override
     public RetInDetailHis save(Gl saveGl, List<RetInDetailHis> listRetIn) {
-        int count = 1;
+
         String retInDetailId;
-        
-        
+        RetInCompoundKey key;
+
         try {
             Gl gl = glDao.save(saveGl);
 
             for (RetInDetailHis detailHis : listRetIn) {
                 if (detailHis.getStock() != null) {
-                    retInDetailId = gl.getVouNo() + detailHis.getStock().getStockCode() + '-' + count;
-                    detailHis.setInCompoundKey(new RetInCompoundKey(retInDetailId,gl.getGlId(), gl.getVouNo()));
+                    if (detailHis.getInCompoundKey() == null) {
+                        retInDetailId = gl.getVouNo() + '-' + detailHis.getUniqueId();
+                        key = new RetInCompoundKey(retInDetailId, gl.getGlId(), gl.getVouNo());
+                    } else {
+                        retInDetailId = detailHis.getInCompoundKey().getRetInDetailId();
+                        key = new RetInCompoundKey(retInDetailId, gl.getGlId(), gl.getVouNo());
+                    }
+
+                    detailHis.setInCompoundKey(key);
                     retInDao.save(detailHis);
-                    count += 1;
                     retInDetailHis = detailHis;
                 }
 
@@ -63,14 +69,13 @@ public class RetInServiceImpl implements RetInService {
     }
 
     @Override
-    public void delete(String retInId) {
-        }
-
-    @Override
-    public List search(String fDate, String tDate, String cusId, String locId, String vouNo, String stockCodes, String splitId, String tranSource, String compCode) {
-        return retInDao.search(fDate, tDate, cusId, locId, vouNo, stockCodes, splitId, tranSource, compCode);
+    public void delete(String retInId,String glId) {
+        retInDao.delete(retInId, glId);
     }
 
-   
+    @Override
+    public List<RetInDetailHis> search(String glId, String vouNo) {
+        return retInDao.search(glId, vouNo);
+    }
 
 }

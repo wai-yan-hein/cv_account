@@ -22,7 +22,7 @@ public class RetOutCompoundKey implements Serializable {
     private String retOutDetailId;
     @Column(name = "gl_id", unique = true, nullable = false)
     private Long glId;
-    @Column(name = "vou_no")
+    @Column(name = "voucher_no")
     private String vouNo;
 
     public RetOutCompoundKey() {

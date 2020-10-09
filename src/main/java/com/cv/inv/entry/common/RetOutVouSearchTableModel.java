@@ -1,11 +1,12 @@
 /*
- * To change this template, choose Tools | Templates
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
 package com.cv.inv.entry.common;
 
 import com.cv.accountswing.util.Util1;
-import com.cv.inv.entity.view.VRetIn;
+import com.cv.inv.entity.view.VRetOut;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JTable;
@@ -15,13 +16,13 @@ import org.springframework.stereotype.Component;
 
 /**
  *
- * @lenovo
+ * @author lenovo
  */
 @Component
-public class RetInVouSearchTableModel extends AbstractTableModel {
+public class RetOutVouSearchTableModel extends AbstractTableModel {
 
     static Logger log = Logger.getLogger(RetInVouSearchTableModel.class.getName());
-    private List<VRetIn> listVRetIns = new ArrayList();
+    private List<VRetOut> listVRetOut = new ArrayList();
     private final String[] columnNames = {"Date", "Vou No", "Customer", "User", "V-Total"};
     private JTable parent;
 
@@ -55,30 +56,30 @@ public class RetInVouSearchTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int row, int column) {
-        if (listVRetIns == null) {
+        if (listVRetOut == null) {
             return null;
         }
 
-        if (listVRetIns.isEmpty()) {
+        if (listVRetOut.isEmpty()) {
             return null;
         }
 
         try {
-            VRetIn vRetIn = listVRetIns.get(row);
+            VRetOut vRetOut = listVRetOut.get(row);
 
             switch (column) {
                 case 0: //Date
-                    return Util1.toDateStr(vRetIn.getGlDate(), "dd/MM/yyyy");
+                    return Util1.toDateStr(vRetOut.getGlDate(), "dd/MM/yyyy");
                 case 1: //Vou No
 
-                    return vRetIn.getKey().getVouNo();
+                    return vRetOut.getKey().getVouNo();
 
                 case 2: //Customer
-                    return vRetIn.getTraderName();
+                    return vRetOut.getTraderName();
                 case 3: //User
-                    return vRetIn.getUserName();
+                    return vRetOut.getUserName();
                 case 4: //V-Total
-                    return vRetIn.getVouTotal();
+                    return vRetOut.getVouTotal();
                 default:
                     return null;
             }
@@ -91,34 +92,34 @@ public class RetInVouSearchTableModel extends AbstractTableModel {
 
     @Override
     public void setValueAt(Object value, int row, int column) {
-        if (listVRetIns == null) {
+        if (listVRetOut == null) {
             return;
         }
 
-        if (listVRetIns.isEmpty()) {
+        if (listVRetOut.isEmpty()) {
             return;
         }
 
-        VRetIn record = listVRetIns.get(row);
-        VRetIn vRetIn = (VRetIn) value;
+        VRetOut record = listVRetOut.get(row);
+        VRetOut vRetOut = (VRetOut) value;
         switch (column) {
 
             case 0: //Date
                 if (value != null) {
 
-                    record.setGlDate(vRetIn.getGlDate());
+                    record.setGlDate(vRetOut.getGlDate());
 
                 }
                 break;
             case 1: //VouNo
-                record.setKey(vRetIn.getKey());
+                record.setKey(vRetOut.getKey());
                 break;
             case 2://CusName
-                record.setTraderName(vRetIn.getTraderName());
+                record.setTraderName(vRetOut.getTraderName());
             case 3:
-                record.setUserName(vRetIn.getUserName());
+                record.setUserName(vRetOut.getUserName());
             case 4:
-                record.setVouTotal(vRetIn.getVouTotal());
+                record.setVouTotal(vRetOut.getVouTotal());
             default:
                 System.out.println("invalid index");
         }
@@ -128,10 +129,10 @@ public class RetInVouSearchTableModel extends AbstractTableModel {
 
     @Override
     public int getRowCount() {
-        if (listVRetIns == null) {
+        if (listVRetOut == null) {
             return 0;
         }
-        return listVRetIns.size();
+        return listVRetOut.size();
     }
 
     @Override
@@ -139,19 +140,19 @@ public class RetInVouSearchTableModel extends AbstractTableModel {
         return columnNames.length;
     }
 
-    public List<VRetIn> getListVRetIns() {
-        return listVRetIns;
+    public List<VRetOut> getListVRetOuts() {
+        return listVRetOut;
     }
 
-    public void setListGl(List<VRetIn> listVRetIns) {
-        this.listVRetIns = listVRetIns;
+    public void setListGl(List<VRetOut> listVRetIns) {
+        this.listVRetOut = listVRetIns;
         fireTableDataChanged();
     }
 
-    public VRetIn getSelectVou(int row) {
-        if (listVRetIns != null) {
-            if (!listVRetIns.isEmpty()) {
-                return listVRetIns.get(row);
+    public VRetOut getSelectVou(int row) {
+        if (listVRetOut != null) {
+            if (!listVRetOut.isEmpty()) {
+                return listVRetOut.get(row);
             }
         }
         return null;
@@ -162,7 +163,8 @@ public class RetInVouSearchTableModel extends AbstractTableModel {
     }
 
     public void clearList() {
-        this.listVRetIns.clear();
+        this.listVRetOut.clear();
         fireTableDataChanged();
     }
+
 }

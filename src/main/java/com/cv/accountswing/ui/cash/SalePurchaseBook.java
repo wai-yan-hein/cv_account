@@ -21,7 +21,6 @@ import com.cv.accountswing.ui.editor.TraderCellEditor;
 import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.SalePurchaseTableModel;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
-import com.cv.accountswing.ui.dailog.VoucherDialog;
 import com.cv.accountswing.ui.editor.COACellEditor;
 import com.cv.accountswing.ui.filter.FilterPanel;
 import com.cv.accountswing.util.Util1;
@@ -84,8 +83,7 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
     private TraderService traderService;
     @Autowired
     private CurrencyService currencyService;
-    @Autowired
-    private VoucherDialog voucherDialog;
+    
     @Autowired
     ReportService rService;
     private TableRowSorter<TableModel> sorter;
@@ -219,11 +217,6 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
             public void mouseClicked(MouseEvent e) {
                 if (SwingUtilities.isRightMouseButton(e)) {
                     popupmenu.show(tblCash, e.getX(), e.getY());
-                } else if (e.getClickCount() == 2) {
-                    voucherDialog.setTitle(panelName + " Voucher");
-                    voucherDialog.setSize(Global.width / 2, Global.height / 2);
-                    voucherDialog.setLocationRelativeTo(null);
-                    voucherDialog.setVisible(true);
                 }
             }
 
