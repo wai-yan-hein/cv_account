@@ -18,5 +18,5 @@ public interface PurchaseDetailDao {
     public PurchaseDetail save(PurchaseDetail pd);
 
     public List<PurchaseDetail> search(String glId);
-    
+
 }

@@ -5,6 +5,7 @@
  */
 package com.cv.inv.service;
 
+import com.cv.accountswing.entity.Gl;
 import com.cv.inv.entity.PurchaseDetail;
 import java.util.List;
 
@@ -17,5 +18,7 @@ public interface PurchaseDetailService {
     public PurchaseDetail save(PurchaseDetail pd);
 
     public List<PurchaseDetail> search(String glId);
-    
+
+    public void save(Gl gl, List<PurchaseDetail> pd);
+
 }

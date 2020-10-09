@@ -166,8 +166,8 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements SelectionOb
         tblCredit.getTableHeader().setFont(Global.lableFont);
         tblCredit.setCellSelectionEnabled(true);
         tblCredit.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        tblCredit.getColumnModel().getColumn(0).setCellEditor(new TraderCellEditor(traderService));
-        tblCredit.getColumnModel().getColumn(1).setCellEditor(new COACellEditor(cOAService));
+        tblCredit.getColumnModel().getColumn(0).setCellEditor(new TraderCellEditor());
+        tblCredit.getColumnModel().getColumn(1).setCellEditor(new COACellEditor());
         tblCredit.getColumnModel().getColumn(0).setPreferredWidth(150);
         tblCredit.getColumnModel().getColumn(1).setPreferredWidth(150);
         tblCredit.getColumnModel().getColumn(2).setPreferredWidth(130);

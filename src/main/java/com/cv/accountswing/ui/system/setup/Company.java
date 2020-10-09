@@ -6,6 +6,7 @@
 package com.cv.accountswing.ui.system.setup;
 
 import com.cv.accountswing.common.Global;
+import com.cv.accountswing.entity.BusinessType;
 import com.cv.accountswing.entity.CompanyInfo;
 import com.cv.accountswing.service.BusinessTypeService;
 import com.cv.accountswing.service.CompanyInfoService;
@@ -22,6 +23,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
@@ -32,6 +34,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class Company extends javax.swing.JPanel implements KeyListener {
+
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(Company.class);
 
     private int selectRow = -1;
     private CompanyInfo companyInfo;
@@ -97,8 +101,21 @@ public class Company extends javax.swing.JPanel implements KeyListener {
 
     private void save() {
         if (isValidEntry()) {
-            //BusinessType businessType = (BusinessType) cboBusiness.
-            //compInfoService.save(companyInfo, TOOL_TIP_TEXT_KEY, TOOL_TIP_TEXT_KEY, TOOL_TIP_TEXT_KEY);
+            try {
+                String status = lblStatus.getText();
+                String userId = Global.loginUser.getUserId().toString();
+                CompanyInfo saveCom = compInfoService.save(companyInfo, status, userId, "-");
+                JOptionPane.showMessageDialog(Global.parentForm, "Saved");
+                if (status.equals("NEW")) {
+                    companyTableModel.addCompany(saveCom);
+                } else {
+                    companyTableModel.setCompany(selectRow, saveCom);
+                }
+                clear();
+            } catch (Exception e) {
+                log.error("Save Company :" + e.getMessage());
+                JOptionPane.showMessageDialog(Global.parentForm, "Could'nt saved.");
+            }
         }
     }
 
@@ -109,6 +126,7 @@ public class Company extends javax.swing.JPanel implements KeyListener {
             txtName.requestFocus();
             status = false;
         } else {
+            companyInfo = new CompanyInfo();
             companyInfo.setCompCode(txtShortCode.getText());
             companyInfo.setName(txtName.getText());
             companyInfo.setPhone(txtPhone.getText());
@@ -118,6 +136,8 @@ public class Company extends javax.swing.JPanel implements KeyListener {
             companyInfo.setFinicialPeriodFrom(Util1.toDate(txtFromDate.getText(), "dd-MM-yyyy"));
             companyInfo.setFinicialPeriodTo(Util1.toDate(txtToDate.getText(), "dd-MM-yyyy"));
             companyInfo.setActive(chkActive.isSelected());
+            BusinessType businessType = (BusinessType) cboBusiness.getSelectedItem();
+            companyInfo.setBusinessType(businessType.getId());
             status = true;
         }
         return status;

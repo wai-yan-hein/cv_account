@@ -131,7 +131,6 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver {
     public void setReloadData(ReloadData reloadData) {
         this.reloadData = reloadData;
     }
-    
 
     public void setSelectionObserver(SelectionObserver selectionObserver) {
         this.selectionObserver = selectionObserver;
@@ -196,12 +195,12 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver {
         tblCash.getColumnModel().getColumn(7).setPreferredWidth(70);// Dr-Amt   
         tblCash.getColumnModel().getColumn(8).setPreferredWidth(70);// Cr-Amt  
         tblCash.getColumnModel().getColumn(0).setCellEditor(new AutoClearEditor());
-        tblCash.getColumnModel().getColumn(1).setCellEditor(new DepartmentCellEditor(departmentService));
+        tblCash.getColumnModel().getColumn(1).setCellEditor(new DepartmentCellEditor());
         tblCash.getColumnModel().getColumn(2).setCellEditor(new AutoClearEditor());
         tblCash.getColumnModel().getColumn(3).setCellEditor(new AutoClearEditor());
-        tblCash.getColumnModel().getColumn(4).setCellEditor(new TraderCellEditor(traderService));
-        tblCash.getColumnModel().getColumn(5).setCellEditor(new COACellEditor(cOAService));
-        tblCash.getColumnModel().getColumn(6).setCellEditor(new CurrencyEditor(currencyService));
+        tblCash.getColumnModel().getColumn(4).setCellEditor(new TraderCellEditor());
+        tblCash.getColumnModel().getColumn(5).setCellEditor(new COACellEditor());
+        tblCash.getColumnModel().getColumn(6).setCellEditor(new CurrencyEditor());
         tblCash.getColumnModel().getColumn(7).setCellEditor(new AutoClearEditor());
         tblCash.getColumnModel().getColumn(8).setCellEditor(new AutoClearEditor());
 

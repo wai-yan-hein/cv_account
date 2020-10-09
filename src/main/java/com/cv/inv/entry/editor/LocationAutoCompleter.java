@@ -7,6 +7,7 @@ package com.cv.inv.entry.editor;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.SelectionObserver;
+import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.inv.entity.Location;
 import com.cv.inv.entry.common.LocationCompleterTableModel;
 import java.awt.Color;
@@ -76,6 +77,7 @@ public class LocationAutoCompleter implements KeyListener, SelectionObserver {
         table.setTableHeader(null);
         table.setFont(Global.lableFont); // NOI18N
         table.setRowHeight(Global.tblRowHeight);
+        table.setDefaultRenderer(Object.class, new TableCellRender());
         sorter = new TableRowSorter(table.getModel());
         table.setRowSorter(sorter);
         JScrollPane scroll = new JScrollPane(table);
@@ -363,7 +365,6 @@ public class LocationAutoCompleter implements KeyListener, SelectionObserver {
         this.location = location;
         this.textComp.setText(location.getLocationName());
     }
-    
 
     private final RowFilter<Object, Object> startsWithFilter = new RowFilter<Object, Object>() {
         @Override
@@ -395,5 +396,4 @@ public class LocationAutoCompleter implements KeyListener, SelectionObserver {
         }
     };
 
- 
 }

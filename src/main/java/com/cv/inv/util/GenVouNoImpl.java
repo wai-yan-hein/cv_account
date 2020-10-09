@@ -28,7 +28,6 @@ public class GenVouNoImpl implements GenVouNo {
     private int vouTotalDigit = 5;
     private int machineTtlDigit = 2;
     private boolean isError = false;
-    @Autowired
     private VouIdService vouIdService;
 
     public GenVouNoImpl(VouIdService vouIdService, String vouType, String period) {

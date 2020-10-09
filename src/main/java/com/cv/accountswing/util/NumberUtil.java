@@ -16,7 +16,7 @@ import javax.swing.text.NumberFormatter;
  */
 public class NumberUtil {
 
-    public static Long NZeroL(Object number){
+    public static Long NZeroL(Object number) {
         try {
             if (number == null) {
                 return new Long(0);
@@ -28,7 +28,7 @@ public class NumberUtil {
             return new Long(0);
         }
     }
-    
+
     public static Double NZero(Object number) {
         try {
             if (number == null) {
@@ -41,7 +41,7 @@ public class NumberUtil {
             return new Double(0);
         }
     }
-    
+
     public static Float FloatZero(Object number) {
         try {
             if (number == null) {
@@ -61,61 +61,74 @@ public class NumberUtil {
 
     public static Integer NZeroInt(Object number) {
         Integer value = new Integer(0);
-        
-        try{
+
+        try {
             value = Integer.parseInt(number.toString());
-        }catch(Exception ex){
+        } catch (Exception ex) {
         }
-        
+
         return value;
     }
-    
+
     public static Float NZeroFloat(Object number) {
         Float value = new Float(0);
-        
-        try{
+
+        try {
             value = Float.parseFloat(number.toString());
-        }catch(Exception ex){
+        } catch (Exception ex) {
         }
-        
+
         return value;
     }
 
-    public static Double getDouble(Object obj){
+    public static Double getDouble(Object obj) {
         Double value;
-        
-        if(obj != null){
+
+        if (obj != null) {
             value = getDouble(obj.toString());
-        }else{
+        } else {
             value = null;
         }
-        
+
         return value;
     }
-    
+
     public static Double getDouble(String number) {
         double value = 0.0;
-        
-        try{
+
+        try {
             value = Double.parseDouble(number.replace(",", ""));
-        }catch(Exception ex){
-            
+        } catch (Exception ex) {
+
         }
         return value;
     }
 
-    public static boolean isNumber(Object obj){
+    public static boolean isNumber(Object obj) {
         boolean status;
-        
-        if(obj == null){
+
+        if (obj == null) {
             status = true;
-        }else{
+        } else {
             status = isNumber(obj.toString());
         }
-        
+
         return status;
     }
-    
+
+    public static boolean isPositive(Object obj) {
+        boolean status = false;
+
+        if (obj != null) {
+            int parseInt = Integer.parseInt(obj.toString());
+            if (parseInt > 0) {
+                status = true;
+            }
+        }
+
+        return status;
+    }
+
     public static boolean isNumber(String number) {
         boolean status = false;
 
@@ -152,36 +165,36 @@ public class NumberUtil {
 
         return tmpInt;
     }
-    
-    public static Double roundTo(Double value, int scale){
+
+    public static Double roundTo(Double value, int scale) {
         BigDecimal bd = new BigDecimal(value);
-        
+
         return bd.setScale(scale, RoundingMode.HALF_UP).doubleValue();
     }
-    
-    public static Float roundToF(Double value, int scale){
+
+    public static Float roundToF(Double value, int scale) {
         BigDecimal bd = new BigDecimal(value);
-        
+
         return bd.setScale(scale, RoundingMode.HALF_UP).floatValue();
     }
-    
-    public static Object toDataType(Object value, Class toDataType){
-      if(value != null){
-        if(!value.getClass().equals(toDataType)){
-          value = toDataType.cast(value);
+
+    public static Object toDataType(Object value, Class toDataType) {
+        if (value != null) {
+            if (!value.getClass().equals(toDataType)) {
+                value = toDataType.cast(value);
+            }
         }
-      }
-      
-      return value;
+
+        return value;
     }
-    
-    public static String toChar(Object value){
+
+    public static String toChar(Object value) {
         String tmpStr = null;
-        
-        if(value != null){
+
+        if (value != null) {
             tmpStr = value.toString();
         }
-        
+
         return tmpStr;
     }
 }

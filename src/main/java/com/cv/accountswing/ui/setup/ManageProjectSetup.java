@@ -12,7 +12,6 @@ import com.cv.accountswing.entity.Project;
 import com.cv.accountswing.entity.view.VProjectCOAMapping;
 import com.cv.accountswing.entity.view.VProjectTraderMapping;
 import com.cv.accountswing.entity.view.VProjectUserMapping;
-import com.cv.accountswing.service.COAService;
 import com.cv.accountswing.service.DepartmentService;
 import com.cv.accountswing.service.ProjectCOAMappingService;
 import com.cv.accountswing.service.ProjectService;
@@ -47,7 +46,6 @@ import javax.swing.event.ListSelectionEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
 
 /**
@@ -72,8 +70,6 @@ public class ManageProjectSetup extends javax.swing.JPanel implements KeyListene
     @Autowired
     private DepartmentService departmentService;
     @Autowired
-    private COAService cOAService;
-    @Autowired
     private ProjectCOAMappingService pcoamService;
     @Autowired
     private ChartOfAmountTabelModel cOATableModel;
@@ -85,8 +81,7 @@ public class ManageProjectSetup extends javax.swing.JPanel implements KeyListene
     private ProjectUserTableModel projectUserTableModel;
     @Autowired
     private ProjectTraderTableModel projectTraderTableModel;
-    @Autowired
-    private TaskExecutor taskExecutor;
+
     private LoadingObserver loadingObserver;
     private boolean isShown = false;
 
@@ -127,7 +122,7 @@ public class ManageProjectSetup extends javax.swing.JPanel implements KeyListene
         tblUser.getTableHeader().setFont(Global.textFont);
         tblUser.getColumnModel().getColumn(0).setPreferredWidth(15);// Code
         tblUser.getColumnModel().getColumn(1).setPreferredWidth(450);// Name
-        tblUser.getColumnModel().getColumn(0).setCellEditor(new AppUserCellEditor(userService));
+        tblUser.getColumnModel().getColumn(0).setCellEditor(new AppUserCellEditor());
         tblUser.setDefaultRenderer(Object.class, new TableCellRender());
 
     }
@@ -138,7 +133,7 @@ public class ManageProjectSetup extends javax.swing.JPanel implements KeyListene
         tblCOA.getColumnModel().getColumn(0).setPreferredWidth(15);// Code
         tblCOA.getColumnModel().getColumn(1).setPreferredWidth(450);// Name
         tblCOA.getColumnModel().getColumn(2).setPreferredWidth(15);// Active    
-        tblCOA.getColumnModel().getColumn(0).setCellEditor(new COACellEditor(cOAService));
+        tblCOA.getColumnModel().getColumn(0).setCellEditor(new COACellEditor());
         tblCOA.setDefaultRenderer(Boolean.class, new TableCellRender());
         tblCOA.setDefaultRenderer(Object.class, new TableCellRender());
 
@@ -149,7 +144,7 @@ public class ManageProjectSetup extends javax.swing.JPanel implements KeyListene
         tblTrader.getTableHeader().setFont(Global.textFont);
         tblTrader.getColumnModel().getColumn(0).setPreferredWidth(15);// Code
         tblTrader.getColumnModel().getColumn(1).setPreferredWidth(450);// Name
-        tblTrader.getColumnModel().getColumn(0).setCellEditor(new TraderCellEditor(traderService));
+        tblTrader.getColumnModel().getColumn(0).setCellEditor(new TraderCellEditor());
         tblTrader.setDefaultRenderer(Object.class, new TableCellRender());
 
     }

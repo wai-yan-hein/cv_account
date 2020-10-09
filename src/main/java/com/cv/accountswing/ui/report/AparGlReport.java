@@ -199,6 +199,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                 calGLTotlaAmount(listVTB);
                 loadingObserver.load(this.getName(), "Stop");
             } catch (Exception ex) {
+                loadingObserver.load(this.getName(), "Stop");
                 LOGGER.error("searchGLListing -----" + ex.getMessage());
             }
         });

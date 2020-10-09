@@ -8,6 +8,7 @@ package com.cv.accountswing.ui.editor;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.entity.AppUser;
 import com.cv.accountswing.ui.cash.common.DepartmentTableModel;
+import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.cash.common.TraderTableModel;
 import com.cv.accountswing.ui.setup.common.UserTableModel;
 import java.awt.Color;
@@ -69,6 +70,7 @@ public class AppUserAutoCompleter implements KeyListener {
         table.getTableHeader().setFont(Global.textFont);
         table.setFont(Global.textFont); // NOI18N
         table.setRowHeight(Global.tblRowHeight);
+        table.setDefaultRenderer(Object.class, new TableCellRender());
         sorter = new TableRowSorter(table.getModel());
         table.setRowSorter(sorter);
         JScrollPane scroll = new JScrollPane(table);

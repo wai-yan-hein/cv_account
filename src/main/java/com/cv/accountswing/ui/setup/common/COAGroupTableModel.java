@@ -119,7 +119,6 @@ public class COAGroupTableModel extends AbstractTableModel {
                 case 2:
                     if (value != null) {
                         coa.setCoaNameEng(value.toString());
-                        save(coa, row);
                     }
                     break;
                 case 3:
@@ -129,13 +128,13 @@ public class COAGroupTableModel extends AbstractTableModel {
                     } else {
                         coa.setActive(Boolean.TRUE);
                     }
-                    save(coa, row);
 
                     break;
                 default:
                     break;
 
             }
+            save(coa, row);
             parent.requestFocus();
         } catch (Exception ex) {
             LOGGER.error("setValueAt : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
@@ -263,12 +262,24 @@ public class COAGroupTableModel extends AbstractTableModel {
         return isTrue;
     }
 
+    private boolean hasEmptyRow() {
+        boolean status = false;
+        if (!listCOA.isEmpty()) {
+            ChartOfAccount coa = listCOA.get(listCOA.size() - 1);
+            if (coa.getCode() != null) {
+                status = true;
+            }
+        }
+        return status;
+    }
+
     public void addEmptyRow() {
         if (listCOA != null) {
-            ChartOfAccount coa = new ChartOfAccount();
-            listCOA.add(coa);
-            fireTableRowsInserted(listCOA.size() - 1, listCOA.size() - 1);
-            parent.scrollRectToVisible(parent.getCellRect(parent.getRowCount() - 1, 0, true));
+            if (hasEmptyRow()) {
+                ChartOfAccount coa = new ChartOfAccount();
+                listCOA.add(coa);
+                fireTableRowsInserted(listCOA.size() - 1, listCOA.size() - 1);
+            }
 
         }
 

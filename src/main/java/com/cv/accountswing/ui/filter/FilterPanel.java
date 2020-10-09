@@ -20,7 +20,6 @@ import com.cv.accountswing.ui.editor.TraderAutoCompleter;
 import com.cv.accountswing.ui.cash.AllCash;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entry.editor.StockAutoCompleter;
-import com.cv.inv.entry.editor.SaleTableCodeCellEditor;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;

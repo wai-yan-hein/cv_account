@@ -253,9 +253,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private StockUnitService stockUnitService;
     @Autowired
     private RelationService relationService;
-    @Autowired
-    private StockUnitService unitService;
-    private LoginDialog loginDialog;
 
     //@Autowired
     //private TaskExecutor threadPoolTaskExecutor;
@@ -585,6 +582,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     }
 
     private void initializeData() {
+
         this.setTitle(this.getTitle() + "(" + Global.loginUser.getUserName() + ")");
         taskExecutor.execute(() -> {
             List listCI = usrCompRoleService.getAssignCompany(Global.loginUser.getUserId().toString());
@@ -894,7 +892,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     BufferedImage resizeImage(Image originalImage,
             int scaledWidth, int scaledHeight,
             boolean preserveAlpha) {
-        System.out.println("resizing...");
         int imageType = preserveAlpha ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB;
         BufferedImage scaledBI = new BufferedImage(scaledWidth, scaledHeight, imageType);
         Graphics2D g = scaledBI.createGraphics();
@@ -1179,6 +1176,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                         break;
                 }
                 break;
+<<<<<<< HEAD
             case "Return In":
                 switch (type) {
                     case clear:
@@ -1212,6 +1210,21 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                         break;
                 }
 
+=======
+            case "Purchase Entry":
+                switch (type) {
+                    case save:
+                        purchaseEntry.save();
+                        break;
+                    case clear:
+                        purchaseEntry.clear();
+                        break;
+                    case close:
+                        purchaseEntry.setIsShown(false);
+                        break;
+
+                }
+>>>>>>> 2645f0594b7ed96750a08ea9446f2c4710390d82
                 break;
 
             default:
@@ -1333,7 +1346,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblLog, javax.swing.GroupLayout.DEFAULT_SIZE, 106, Short.MAX_VALUE)
+                .addComponent(lblLog, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnHistory)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)

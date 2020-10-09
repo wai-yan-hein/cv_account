@@ -8,7 +8,6 @@ import com.cv.accountswing.entity.Menu;
 import com.cv.accountswing.service.MenuService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  *
@@ -16,8 +15,6 @@ import org.springframework.stereotype.Component;
  */
 public class MenuSystemModel extends AbstractTreeTableModel implements TreeTableModel {
 
-    @Autowired
-    static MenuService menuService;
     // Names of the columns.
     static protected String[] cNames = {"Name", "Type", "Allow"};
     static protected MenuNode root = new MenuNode(new Menu(1, "BEST-System", "System"));
