@@ -45,10 +45,7 @@ public class TraderServiceImpl implements TraderService {
 
     @Override
     public Trader saveTrader(Trader trader) {
-       
+
         return dao.saveTrader(trader);
     }
-
-   
-
 }

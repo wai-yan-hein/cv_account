@@ -22,12 +22,12 @@
           <Group type="102" attributes="0">
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
                       <Component id="jPanel2" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="40" max="32767" attributes="0"/>
+                      <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
                       <Component id="jPanel4" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jPanel3" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="jPanel3" max="32767" attributes="0"/>
                   </Group>
                   <Component id="jScrollPane1" alignment="0" max="32767" attributes="0"/>
                   <Component id="jPanel1" alignment="0" max="32767" attributes="0"/>
@@ -68,16 +68,16 @@
                       <Component id="jLabel3" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="txtCus" max="32767" attributes="0"/>
-                      <Component id="txtSaleman" alignment="0" max="32767" attributes="0"/>
-                      <Group type="102" alignment="0" attributes="0">
+                  <Group type="103" groupAlignment="1" attributes="0">
+                      <Component id="txtCus" alignment="0" max="32767" attributes="0"/>
+                      <Group type="102" attributes="0">
                           <Component id="txtVouNo" max="32767" attributes="0"/>
                           <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel1" min="-2" pref="31" max="-2" attributes="0"/>
                           <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
                           <Component id="txtDept" max="32767" attributes="0"/>
                       </Group>
+                      <Component id="txtSaleman" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
@@ -87,21 +87,21 @@
                   </Group>
                   <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="txtCurrency" max="32767" attributes="0"/>
-                      <Component id="txtDueDate" max="32767" attributes="0"/>
                       <Component id="txtSaleDate" max="32767" attributes="0"/>
+                      <Component id="txtDueDate" alignment="0" max="32767" attributes="0"/>
+                      <Component id="txtCurrency" alignment="0" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="jLabel20" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="jLabel9" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="jLabel21" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="jLabel9" min="-2" max="-2" attributes="0"/>
+                      <Component id="jLabel21" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="txtVouStatus" max="32767" attributes="0"/>
                       <Component id="txtLocation" max="32767" attributes="0"/>
-                      <Component id="txtRemark" max="32767" attributes="0"/>
+                      <Component id="txtRemark" alignment="0" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace min="-2" max="-2" attributes="0"/>
               </Group>
@@ -112,50 +112,49 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="1" attributes="0">
-                      <Component id="txtSaleDate" min="-2" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="jLabel17" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="txtVouNo" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="txtDept" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLabel4" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Group type="102" attributes="0">
+                          <Group type="103" groupAlignment="1" attributes="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="103" groupAlignment="3" attributes="0">
+                                      <Component id="jLabel17" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="txtDept" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="txtVouNo" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="jLabel4" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <Component id="txtSaleDate" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="jLabel9" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="txtLocation" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="txtCus" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLabel5" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <Component id="txtDueDate" min="-2" max="-2" attributes="0"/>
+                          </Group>
                       </Group>
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="jLabel9" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="txtLocation" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel20" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="txtVouStatus" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" attributes="0">
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="txtCus" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="jLabel5" alignment="3" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="txtSaleman" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="jLabel6" alignment="3" min="-2" max="-2" attributes="0"/>
-                          </Group>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="txtSaleman" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel6" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <Group type="102" attributes="0">
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="txtDueDate" min="-2" max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="3" attributes="0">
-                                  <Component id="jLabel20" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="txtVouStatus" alignment="3" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="103" groupAlignment="3" attributes="0">
-                                  <Component id="txtCurrency" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="jLabel21" alignment="3" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <Component id="txtRemark" alignment="0" min="-2" max="-2" attributes="0"/>
-                          </Group>
+                      <Group type="103" alignment="0" groupAlignment="3" attributes="0">
+                          <Component id="txtCurrency" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel21" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="txtRemark" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                   <EmptySpace max="32767" attributes="0"/>
@@ -170,14 +169,6 @@
               <Connection code="Global.lableFont" type="code"/>
             </Property>
             <Property name="text" type="java.lang.String" value="Vou No"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JTextField" name="txtVouNo">
-          <Properties>
-            <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="Global.textFont" type="code"/>
-            </Property>
-            <Property name="name" type="java.lang.String" value="txtVouNo" noResource="true"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel1">
@@ -211,6 +202,9 @@
             </Property>
             <Property name="name" type="java.lang.String" value="txtCus" noResource="true"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtCusActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel3">
           <Properties>
@@ -228,6 +222,15 @@
             <Property name="name" type="java.lang.String" value="txtSaleman" noResource="true"/>
           </Properties>
         </Component>
+        <Component class="javax.swing.JFormattedTextField" name="txtVouNo">
+          <Properties>
+            <Property name="editable" type="boolean" value="false"/>
+            <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="Global.textFont" type="code"/>
+            </Property>
+            <Property name="name" type="java.lang.String" value="txtVouNo" noResource="true"/>
+          </Properties>
+        </Component>
         <Component class="javax.swing.JLabel" name="jLabel4">
           <Properties>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
@@ -236,22 +239,20 @@
             <Property name="text" type="java.lang.String" value="Sale Date"/>
           </Properties>
         </Component>
-        <Component class="com.toedter.calendar.JDateChooser" name="txtSaleDate">
-          <Properties>
-            <Property name="dateFormatString" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="&quot;dd/MM/yyyy&quot;" type="code"/>
-            </Property>
-            <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="Global.textFont" type="code"/>
-            </Property>
-          </Properties>
-        </Component>
         <Component class="javax.swing.JLabel" name="jLabel5">
           <Properties>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="Global.lableFont" type="code"/>
             </Property>
             <Property name="text" type="java.lang.String" value="Credit Term"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="jLabel6">
+          <Properties>
+            <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="Global.lableFont" type="code"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="Currency"/>
           </Properties>
         </Component>
         <Component class="com.toedter.calendar.JDateChooser" name="txtDueDate">
@@ -264,12 +265,14 @@
             </Property>
           </Properties>
         </Component>
-        <Component class="javax.swing.JLabel" name="jLabel6">
+        <Component class="com.toedter.calendar.JDateChooser" name="txtSaleDate">
           <Properties>
-            <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="Global.lableFont" type="code"/>
+            <Property name="dateFormatString" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="&quot;dd/MM/yyyy&quot;" type="code"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="Currency"/>
+            <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="Global.textFont" type="code"/>
+            </Property>
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="txtCurrency">
@@ -288,20 +291,20 @@
             <Property name="text" type="java.lang.String" value="Location"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JTextField" name="txtLocation">
-          <Properties>
-            <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="Global.textFont" type="code"/>
-            </Property>
-            <Property name="name" type="java.lang.String" value="txtLocation" noResource="true"/>
-          </Properties>
-        </Component>
         <Component class="javax.swing.JLabel" name="jLabel20">
           <Properties>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="Global.lableFont" type="code"/>
             </Property>
             <Property name="text" type="java.lang.String" value="Vou Status"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="jLabel21">
+          <Properties>
+            <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="Global.lableFont" type="code"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="Remark"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="txtVouStatus">
@@ -312,12 +315,12 @@
             <Property name="name" type="java.lang.String" value="txtVouStatus" noResource="true"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JLabel" name="jLabel21">
+        <Component class="javax.swing.JTextField" name="txtLocation">
           <Properties>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="Global.lableFont" type="code"/>
+              <Connection code="Global.textFont" type="code"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="Remark"/>
+            <Property name="name" type="java.lang.String" value="txtLocation" noResource="true"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="txtRemark">
@@ -337,20 +340,25 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" attributes="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jLabel10" alignment="0" min="-2" pref="82" max="-2" attributes="0"/>
                       <Group type="102" alignment="0" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="chkPrintOption" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkVouComp" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="103" groupAlignment="1" attributes="0">
                               <Component id="jLabel12" min="-2" max="-2" attributes="0"/>
                               <Component id="jLabel11" min="-2" max="-2" attributes="0"/>
                           </Group>
+                          <EmptySpace type="separate" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="txtTotalItem" min="-2" pref="41" max="-2" attributes="0"/>
+                              <Component id="txtRecNo" min="-2" pref="41" max="-2" attributes="0"/>
+                          </Group>
                       </Group>
+                      <Component id="lblStatus" min="-2" pref="82" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace min="0" pref="26" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="8" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -358,16 +366,18 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jLabel10" pref="0" max="32767" attributes="0"/>
+                  <Component id="lblStatus" pref="0" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="chkPrintOption" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jLabel11" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="txtRecNo" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jLabel12" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="chkVouComp" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="txtTotalItem" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
               </Group>
@@ -375,7 +385,7 @@
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Component class="javax.swing.JLabel" name="jLabel10">
+        <Component class="javax.swing.JLabel" name="lblStatus">
           <Properties>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
               <Font name="Tahoma" size="30" style="0"/>
@@ -415,6 +425,24 @@
             <Property name="text" type="java.lang.String" value="Total Item:"/>
           </Properties>
         </Component>
+        <Component class="javax.swing.JTextField" name="txtRecNo">
+          <Properties>
+            <Property name="editable" type="boolean" value="false"/>
+            <Property name="horizontalAlignment" type="int" value="4"/>
+            <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+              <Border info="null"/>
+            </Property>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JTextField" name="txtTotalItem">
+          <Properties>
+            <Property name="editable" type="boolean" value="false"/>
+            <Property name="horizontalAlignment" type="int" value="4"/>
+            <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+              <Border info="null"/>
+            </Property>
+          </Properties>
+        </Component>
       </SubComponents>
     </Container>
     <Container class="javax.swing.JPanel" name="jPanel3">
@@ -431,7 +459,7 @@
                   </Group>
                   <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="txtGrandTotal" alignment="1" pref="182" max="32767" attributes="0"/>
+                      <Component id="txtGrandTotal" alignment="1" pref="207" max="32767" attributes="0"/>
                       <Component id="txtVouPaid" alignment="0" max="32767" attributes="0"/>
                       <Component id="txtVouBalance" alignment="0" max="32767" attributes="0"/>
                   </Group>
@@ -456,9 +484,10 @@
                           </Group>
                           <EmptySpace min="-2" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="txtVouDiscount" min="-2" pref="104" max="-2" attributes="0"/>
-                              <Component id="txtTax" min="-2" pref="104" max="-2" attributes="0"/>
+                              <Component id="txtVouDiscount" pref="128" max="32767" attributes="0"/>
+                              <Component id="txtTax" max="32767" attributes="0"/>
                           </Group>
+                          <EmptySpace min="-2" pref="1" max="-2" attributes="0"/>
                       </Group>
                   </Group>
               </Group>
@@ -552,6 +581,7 @@
         </Component>
         <Component class="javax.swing.JFormattedTextField" name="txtVouTotal">
           <Properties>
+            <Property name="editable" type="boolean" value="false"/>
             <Property name="horizontalAlignment" type="int" value="4"/>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="Global.amtFont" type="code"/>
@@ -588,6 +618,7 @@
         </Component>
         <Component class="javax.swing.JFormattedTextField" name="txtGrandTotal">
           <Properties>
+            <Property name="editable" type="boolean" value="false"/>
             <Property name="horizontalAlignment" type="int" value="4"/>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="Global.amtFont" type="code"/>
@@ -604,6 +635,7 @@
         </Component>
         <Component class="javax.swing.JFormattedTextField" name="txtVouBalance">
           <Properties>
+            <Property name="editable" type="boolean" value="false"/>
             <Property name="horizontalAlignment" type="int" value="4"/>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="Global.amtFont" type="code"/>
@@ -637,12 +669,12 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" attributes="0">
-                  <EmptySpace max="-2" attributes="0"/>
+              <Group type="102" alignment="1" attributes="0">
+                  <EmptySpace pref="40" max="32767" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="jButton6" min="-2" max="-2" attributes="0"/>
                       <Group type="102" alignment="0" attributes="0">
-                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                          <Component id="jButton2" min="-2" max="-2" attributes="0"/>
+                          <Component id="btnNew" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="jButton3" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
@@ -650,11 +682,8 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="jButton5" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <Group type="102" alignment="0" attributes="0">
-                          <Component id="jButton6" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                      </Group>
                   </Group>
+                  <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -663,7 +692,7 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="jButton2" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="btnNew" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jButton3" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jButton4" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jButton5" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -676,13 +705,16 @@
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Component class="javax.swing.JButton" name="jButton2">
+        <Component class="javax.swing.JButton" name="btnNew">
           <Properties>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="Global.lableFont" type="code"/>
             </Property>
             <Property name="text" type="java.lang.String" value="New"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnNewActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="jButton3">
           <Properties>

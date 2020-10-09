@@ -7,17 +7,19 @@ package com.cv.inv.entry.common;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.SelectionObserver;
-import com.cv.accountswing.util.NumberUtil;
 import com.cv.accountswing.util.StockUP;
-import com.cv.accountswing.util.UnitAutoCompleter;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.Location;
+import com.cv.inv.entity.RelationKey;
 import com.cv.inv.entity.SaleDetailHis;
 import com.cv.inv.entity.Stock;
 import com.cv.inv.entity.StockUnit;
+import com.cv.inv.entity.UnitRelation;
+import com.cv.inv.service.RelationService;
 import com.cv.inv.service.StockUnitService;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JFormattedTextField;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
@@ -46,14 +48,20 @@ public class SaleEntryTableModel extends AbstractTableModel {
     private String sourceAccId;
     private StockInfo stockInfo;
     private String cusType;
-
+    private JFormattedTextField txtTotalAmount;
     @Autowired
     private StockUnitService unitService;
+    @Autowired
+    private RelationService relationService;
 
     public SaleEntryTableModel(List<SaleDetailHis> listDetail, StockInfo stockInfo, StockUP stockUp) {
         this.listDetail = listDetail;
         this.stockInfo = stockInfo;
         this.stockUp = stockUp;
+    }
+
+    public void setTxtTotalAmount(JFormattedTextField txtTotalAmount) {
+        this.txtTotalAmount = txtTotalAmount;
     }
 
     public void setSourceName(String sourceName) {
@@ -150,7 +158,9 @@ public class SaleEntryTableModel extends AbstractTableModel {
             case 4://Std-Wt
                 return true;
             case 5://Unit
-                return false;
+                return true;
+            case 7://Disc
+                return true;
             case 10://Loc
                 return record.getStockCode().getStockCode() != null;
             default:
@@ -176,7 +186,11 @@ public class SaleEntryTableModel extends AbstractTableModel {
                         return record.getStockCode().getStockName();
                     }
                 case 2://exp-date
-                    return Util1.toDateStr(record.getExpDate(), "dd/MM/yyyy");
+                    if (record.getExpDate() == null) {
+                        return null;
+                    } else {
+                        return Util1.toDateStr(record.getExpDate(), "dd/MM/yyyy");
+                    }
                 case 3://qty
                     return record.getQuantity();
                 case 4://Std-Wt
@@ -188,7 +202,11 @@ public class SaleEntryTableModel extends AbstractTableModel {
                 case 6://price
                     return record.getPrice();
                 case 7://disc
-                    return record.getDiscount();
+                    if (record.getDiscount() == null) {
+                        return null;
+                    } else {
+                        return record.getDiscount();
+                    }
                 case 8://disc type
                     return record.getDiscType();
                 case 9://amount
@@ -221,8 +239,13 @@ public class SaleEntryTableModel extends AbstractTableModel {
                     if (!((String) value).isEmpty()) {
                         String[] strList = value.toString().split("@");
                         stockInfo.getStockInfo(strList[0]);
-                        parent.setColumnSelectionInterval(3, 3);
+                        if (listDetail.get(parent.getSelectedRow()).getStockCode() != null) {
+                            String stockId = listDetail.get(parent.getSelectedRow()).getStockCode().getStockCode();
+                            float qty = record.getQuantity();
+                            record.setPrice(stockUp.getPrice(stockId, getCusType(), qty));
+                        }
                     }
+                    parent.setColumnSelectionInterval(3, 3);
                     break;
                 case 2://Exp Date
                     if (value != null) {
@@ -243,55 +266,50 @@ public class SaleEntryTableModel extends AbstractTableModel {
                 case 3://Qty
                     float qty = Util1.getFloat(value);
                     record.setQuantity(qty);
-                    if (listDetail.get(parent.getSelectedRow()).getStockCode() != null) {
-                        String stockId = listDetail.get(parent.getSelectedRow()).getStockCode().getStockCode();
-                        int x = Global.x + (Global.width / 2);
-                        int y = Global.x + (Global.height / 2) - 200;
-                        if (Global.listStockUnit != null && Global.listStockUnit.size() > 1) {
-                            UnitAutoCompleter unitPopup = new UnitAutoCompleter(x, y, Global.listStockUnit,
-                                    Global.parentForm);
-                            if (unitPopup.isSelected()) {
-                                record.setItemUnit(unitPopup.getSelUnit());
-                                if (record.getItemUnit() != null) {
-                                    String key = stockId;
-                                    record.setPrice(stockUp.getPrice(key, getCusType(), qty));
-                                   
-                                }
-                            }
-                        } else {
-                            record.setItemUnit(Global.listStockUnit.get(0));
-                        }
-
-                    }
-                    parent.setColumnSelectionInterval(6, 6);
+                    parent.setColumnSelectionInterval(4, 4);
                     break;
-
                 case 4://Std-Wt
                     if (value != null) {
                         record.setStdWeight(Util1.getFloat(value));
+                        String toUnit = record.getItemUnit().getItemUnitCode();
+                        Double calAmount = calPrice(record, toUnit);
+                        record.setPrice(calAmount);
                     }
-                    parent.setColumnSelectionInterval(6, 6);
+                    parent.setColumnSelectionInterval(5, 5);
                     break;
 
                 case 5://Unit
                     if (value != null) {
                         record.setItemUnit((StockUnit) value);
+                        String toUnit = record.getItemUnit().getItemUnitCode();
+                        Double calAmount = calPrice(record, toUnit);
+                        record.setPrice(calAmount);
                     } else {
                         record.setItemUnit(null);
                     }
+                    parent.setColumnSelectionInterval(6, 6);
                     break;
-                case 6://Discount
-                    record.setDiscount(NumberUtil.NZero(value));
+                case 6://Sale Price
+                    //record.setPrice(Util1.getDouble(value));
+                    parent.setColumnSelectionInterval(7, 7);
+                    break;
+                case 7://Discount
+                    if (value != null) {
+                        record.setDiscount(Util1.getDouble(value));
+                    }
+                    parent.setColumnSelectionInterval(8, 8);
+                    break;
+                case 8://Disc Type
+                    if (value != null) {
+                        record.setDiscType(value.toString());
+                    }
+                    parent.setColumnSelectionInterval(9, 9);
+                    break;
                 case 9: //Amount
                     if (value != null) {
-                        if (NumberUtil.NZeroInt(record.getQuantity()) != 0) {
-                            double amount = NumberUtil.FloatZero(value);
-                            record.setPrice(amount / NumberUtil.NZeroInt(record.getQuantity()));
-                            record.setDiscount(null);
-                            record.setAmount(amount);
-                            isAmount = true;
-                            fireTableCellUpdated(row, 6);
-                        }
+                        record.setAmount(Util1.getDouble(value));
+                        isAmount = true;
+                        //fireTableCellUpdated(row, 6);
                     }
                     break;
                 case 10://Loc
@@ -302,11 +320,13 @@ public class SaleEntryTableModel extends AbstractTableModel {
                     }
                     break;
             }
+            if (!isAmount) {
+                calculateAmount(record);
+                fireTableCellUpdated(row, 9);
+            }
         } catch (Exception ex) {
             LOGGER.error("setValueAt : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
         }
-        parent.requestFocusInWindow();
-
         fireTableCellUpdated(row, column);
     }
 
@@ -357,7 +377,9 @@ public class SaleEntryTableModel extends AbstractTableModel {
         }
         SaleDetailHis record = listDetail.get(pos);
         record.setStockCode(stock);
+        record.setQuantity(1.0f);
         record.setStdWeight(stock.getSaleMeasure());
+        record.setItemUnit(stock.getSaleUnit());
         //record.setPrice(stock.getSalePriceN());
         if (Util1.getPropValue("system.sale.detail.location").equals("Y")) {
             record.setLocation(location);
@@ -387,4 +409,77 @@ public class SaleEntryTableModel extends AbstractTableModel {
         return cusType;
     }
 
+    public void setCusType(String type) {
+        cusType = type;
+    }
+
+    public List<SaleDetailHis> getCurrentRow() {
+        return this.listDetail;
+    }
+
+    public void removeListDetail() {
+        this.listDetail.clear();
+        addEmptyRow();
+    }
+
+    private void calculateAmount(SaleDetailHis sale) {
+        if (sale.getStockCode() != null) {
+            float saleQty = sale.getQuantity();
+            double salePrice = sale.getPrice();
+            double discount = Util1.getDouble(sale.getDiscount());
+
+            String discType = Util1.getPropValue("system.app.sale.discount.calculation");
+            switch (discType) {
+                case "Percent":
+                    discount = ((saleQty * salePrice) * (discount / 100));
+                    break;
+                case "Value":
+                    break;
+                case "Each":
+                    discount = discount * saleQty;
+                    break;
+            }
+            double amount = (saleQty * salePrice) - discount;
+            sale.setAmount(amount);
+
+            float ttlAmt = 0.0f;
+            for (SaleDetailHis sdh : listDetail) {
+                ttlAmt += Util1.getDouble(sdh.getAmount());
+            }
+            txtTotalAmount.setValue(ttlAmt);
+        }
+    }
+
+    private Double calPrice(SaleDetailHis sdh, String toUnit) {
+        Stock stock = sdh.getStockCode();
+        double saleAmount = 0.0;
+        double stdSalePrice = sdh.getPrice();
+        double stdPrice = sdh.getPrice();
+        float userWt = sdh.getStdWeight();
+        float stdWt = stock.getSaleMeasure();
+        String fromUnit = stock.getSaleUnit().getItemUnitCode();
+
+        if (!fromUnit.equals(toUnit)) {
+            RelationKey key = new RelationKey(fromUnit, toUnit);
+            UnitRelation unitRelation = relationService.findByKey(key);
+            if (unitRelation != null) {
+                float factor = unitRelation.getFactor();
+                float convertWt = (userWt / factor); //unit change
+                saleAmount = (convertWt / stdWt) * stdPrice; // cal price
+
+            } else {
+                key = new RelationKey(toUnit, fromUnit);
+                Float factor = Global.hmRelation.get(key);
+                if (factor != null) {
+                    float convertWt = userWt * factor; // unit change
+                    saleAmount = (convertWt / stdWt) * stdSalePrice; // cal price
+                } else {
+                    JOptionPane.showMessageDialog(Global.parentForm, "Mapping units in Relation Setup.");
+                }
+            }
+        } else {
+            saleAmount = (userWt / stdWt) * stdSalePrice;
+        }
+        return saleAmount;
+    }
 }

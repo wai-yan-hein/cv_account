@@ -2,3 +2,14 @@
 30 Sep 2020 18:40:02,264 ERROR: com.cv.accountswing.util.StockUP - java.lang.NullPointerException
 01 Oct 2020 03:35:11,753 ERROR: com.cv.accountswing.util.StockUP - java.lang.NullPointerException
 01 Oct 2020 06:48:30,385 ERROR: com.cv.inv.util.GenVouNoImpl - getLastVouNo : 63 - org.hibernate.exception.SQLGrammarException: could not extract ResultSet
+01 Oct 2020 07:14:19,191 ERROR: com.cv.accountswing.util.StockUP - java.lang.NullPointerException
+06 Oct 2020 06:45:30,135 ERROR: com.cv.accountswing.util.StockUP - java.lang.NullPointerException
+06 Oct 2020 06:45:36,792 ERROR: com.cv.accountswing.util.StockUP - java.lang.NullPointerException
+06 Oct 2020 09:00:26,739 ERROR: com.cv.accountswing.util.StockUP - java.lang.NullPointerException
+07 Oct 2020 04:17:37,280 ERROR: com.cv.accountswing.util.StockUP - java.lang.NullPointerException
+07 Oct 2020 04:21:54,465 ERROR: com.cv.accountswing.util.StockUP - java.lang.NullPointerException
+07 Oct 2020 04:27:20,082 ERROR: com.cv.accountswing.util.StockUP - java.lang.NullPointerException
+07 Oct 2020 04:32:51,743 ERROR: com.cv.accountswing.util.StockUP - java.lang.NullPointerException
+07 Oct 2020 04:41:03,504 ERROR: com.cv.accountswing.util.StockUP - java.lang.NullPointerException
+07 Oct 2020 05:30:06,686 ERROR: com.cv.inv.util.GenVouNoImpl - getLastVouNo : 63 - org.hibernate.exception.SQLGrammarException: could not extract ResultSet
+07 Oct 2020 16:26:14,533 ERROR: com.cv.inv.util.GenVouNoImpl - getLastVouNo : 63 - org.hibernate.exception.SQLGrammarException: could not extract ResultSet

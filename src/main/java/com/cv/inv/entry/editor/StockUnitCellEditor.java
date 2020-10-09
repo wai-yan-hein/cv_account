@@ -8,8 +8,6 @@ package com.cv.inv.entry.editor;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.util.BindingUtil;
 import java.awt.Component;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import javax.swing.AbstractCellEditor;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;

@@ -29,6 +29,7 @@ import com.cv.inv.entity.StockType;
 import com.cv.inv.entity.StockUnit;
 import com.cv.inv.entity.UnitRelation;
 import com.cv.inv.entity.VouStatus;
+import com.cv.inv.entry.common.StockPriceList;
 import java.awt.Color;
 import java.util.ArrayList;
 
@@ -87,6 +88,8 @@ public class Global {
     public static HashMap<String, String> sysProperties;
     public static HashMap<String, String> hmCashFilter = new HashMap<>();
     public static HashMap<RelationKey, Float> hmRelation = new HashMap<>();
+    public static HashMap<String, List<StockPriceList>> hasPrice = new HashMap<>();
+    public static HashMap<String, List<StockUnit>> hasUnit = new HashMap<>();
     public static String sourceAcId;
     public static String finicialPeriodFrom;
     public static String finicialPeriodTo;

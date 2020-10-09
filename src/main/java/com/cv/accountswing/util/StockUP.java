@@ -8,12 +8,11 @@ package com.cv.accountswing.util;
 import com.cv.inv.entity.Stock;
 import com.cv.inv.entity.StockUnit;
 import com.cv.inv.entry.common.StockPriceList;
-import com.cv.inv.service.StockService;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import com.cv.accountswing.common.Global;
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -24,25 +23,12 @@ import org.springframework.stereotype.Component;
 public class StockUP {
 
     static Logger log = Logger.getLogger(StockUP.class.getName());
-    private final HashMap<String, List<StockUnit>> hasUnit;
-    private final HashMap<String, List<StockPriceList>> hasPrice;
-   
-    @SuppressWarnings("UseOfObsoleteCollectionType")
-    public StockUP() {
-        hasUnit = new HashMap();
-        hasPrice = new HashMap();
-    }
 
-    public List<StockUnit> getUnitList(String key) {
-        if (hasUnit.containsKey(key)) {
-            return hasUnit.get(key);
-        } else {
-            return null;
-        }
+    public StockUP() {
     }
 
     public void add(Stock stock) {
-        if (!hasUnit.containsKey(stock.getStockCode())) {
+        if (!Global.hasUnit.containsKey(stock.getStockCode())) {
             String key = stock.getStockCode();
 
             List<StockPriceList> listPrice = new ArrayList();
@@ -52,13 +38,13 @@ public class StockUP {
             listPrice.add(new StockPriceList("C", stock.getSalePriceC()));
             listPrice.add(new StockPriceList("D", stock.getSalePriceD()));
 
-            hasPrice.put(key, listPrice);
+            Global.hasPrice.put(key, listPrice);
         }
     }
 
     public List<StockPriceList> getPriceList(String key) {
-        if (hasPrice.containsKey(key)) {
-            return hasPrice.get(key);
+        if (Global.hasPrice.containsKey(key)) {
+            return Global.hasPrice.get(key);
         } else {
             return null;
         }

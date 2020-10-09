@@ -245,6 +245,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private StockService stockService;
     @Autowired
     private MachineInfoService machineInfoService;
+    @Autowired
     private StockUnitService stockUnitService;
     @Autowired
     private RelationService relationService;
@@ -591,7 +592,8 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             Global.listLocation = locationService.findAll();
             Global.listVou = vouService.findAll();
             Global.listSaleMan = saleManService.findAll();
-            Global.listStock = stockService.findAll();
+            Global.listStock = stockService.findActiveStock();
+            Global.listStockUnit = stockUnitService.findAll();
             Global.listRelation = relationService.findAll();
             Global.listRelation.forEach(ur -> {
                 Global.hmRelation.put(ur.getUnitKey(), ur.getFactor());

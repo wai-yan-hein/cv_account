@@ -58,6 +58,14 @@ public class Gl implements java.io.Serializable {
     private Double vouTotal;
     private String currCode;
     private Integer locationId;
+    private Integer vouStatus;
+    private String saleManId;
+    private Date saleDate;
+    private Date creditTerm;
+    private Double discount;
+    private Double discP;
+    private Double taxAmt;
+    private Double taxP;
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -387,7 +395,79 @@ public class Gl implements java.io.Serializable {
     public void setLocation(Integer location) {
         this.locationId = location;
     }
-    
-    
+
+    @Column(name = "vou_status_id")
+    public Integer getVouStatus() {
+        return vouStatus;
+    }
+
+    public void setVouStatus(Integer vouStatus) {
+        this.vouStatus = vouStatus;
+    }
+
+    @Column(name = "saleman_id")
+    public String getSaleManId() {
+        return saleManId;
+    }
+
+    public void setSaleManId(String saleManId) {
+        this.saleManId = saleManId;
+    }
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "sale_date")
+    public Date getSaleDate() {
+        return saleDate;
+    }
+
+    public void setSaleDate(Date saleDate) {
+        this.saleDate = saleDate;
+    }
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "cerdit_term")
+    public Date getCreditTerm() {
+        return creditTerm;
+    }
+
+    public void setCreditTerm(Date creditTerm) {
+        this.creditTerm = creditTerm;
+    }
+
+    @Column(name = "discount")
+    public Double getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(Double discount) {
+        this.discount = discount;
+    }
+
+    @Column(name = "disc_p")
+    public Double getDiscP() {
+        return discP;
+    }
+
+    public void setDiscP(Double discP) {
+        this.discP = discP;
+    }
+
+    @Column(name = "tax_amt")
+    public Double getTaxAmt() {
+        return taxAmt;
+    }
+
+    public void setTaxAmt(Double taxAmt) {
+        this.taxAmt = taxAmt;
+    }
+
+    @Column(name = "tax_p")
+    public Double getTaxP() {
+        return taxP;
+    }
+
+    public void setTaxP(Double taxP) {
+        this.taxP = taxP;
+    }
 
 }

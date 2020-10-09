@@ -7,19 +7,15 @@ package com.cv.inv.entry.editor;
 
 import com.cv.accountswing.common.Global;
 import com.cv.inv.entity.Stock;
-import com.cv.inv.service.StockService;
 import java.awt.Component;
-import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
-import java.util.Date;
 import java.util.EventObject;
 import javax.swing.AbstractCellEditor;
 import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.Timer;
 import javax.swing.table.TableCellEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,37 +29,8 @@ public class SaleTableCodeCellEditor extends AbstractCellEditor implements Table
     private static final Logger LOGGER = LoggerFactory.getLogger(SaleTableCodeCellEditor.class);
     private JComponent component = null;
     private StockAutoCompleter completer;
-    private StockService service;
 
-    public SaleTableCodeCellEditor(final StockService service) {
-        if (Global.listStock == null) {
-            Timer timer = new Timer(500, (ActionEvent e) -> {
-                Thread thread = new Thread() {
-                    @Override
-                    public void run() {
-                        if (Global.listStock == null) {
-                            LOGGER.info("start : " + new Date());
-                            Global.listStock = service.findActiveStock();
-                            LOGGER.info("end : " + new Date());
-                        }
-                    }
-                };
-                thread.start();
-                /*try {
-                LOGGER.info("start : " + new Date());
-                if (dao.getRowCount("select count(*) from item_type_mapping where group_id ="+ Global.loginUser.getUserId()) > 0) {
-                Global.listDepartment = dao.findAll("Medicine", "active = true and medTypeId.itemTypeCode in (select a.key.itemType.itemTypeCode from ItemTypeMapping a)");
-                } else {
-                Global.listDepartment = dao.findAll("Medicine", "active = true");
-                }
-                LOGGER.info("end : " + new Date());
-                } catch (Exception ex) {
-                LOGGER.error("SaleTableCodeCellEditor : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
-                }*/
-            });
-            timer.setRepeats(false);
-            timer.start();
-        }
+    public SaleTableCodeCellEditor() {
     }
 
     @Override

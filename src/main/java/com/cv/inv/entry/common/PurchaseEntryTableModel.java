@@ -229,7 +229,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
             //cal amt
             pur.setPurAmt(Util1.getFloat(pur.getQty()) * pur.getPurPrice());
             //cal smallest wt
-            pur.setSmallestWT(getSmallestUnit(pur.getStdWeight(), pur.getPurUnit().getItemUnitCode()));
+            //pur.setSmallestWT(getSmallestUnit(pur.getStdWeight(), pur.getPurUnit().getItemUnitCode()));
             //cal total amount
             float ttlAmt = 0.0f;
             for (PurchaseDetail pd : listPurDetail) {
