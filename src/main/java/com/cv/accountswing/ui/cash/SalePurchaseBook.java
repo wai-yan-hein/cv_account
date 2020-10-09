@@ -9,7 +9,11 @@ import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.view.VGl;
+import com.cv.accountswing.service.COAService;
+import com.cv.accountswing.service.CurrencyService;
+import com.cv.accountswing.service.DepartmentService;
 import com.cv.accountswing.service.ReportService;
+import com.cv.accountswing.service.TraderService;
 import com.cv.accountswing.service.VGlService;
 import com.cv.accountswing.ui.editor.CurrencyEditor;
 import com.cv.accountswing.ui.editor.DepartmentCellEditor;
@@ -72,7 +76,6 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
     @Autowired
     private SalePurchaseTableModel spTableModel;
     @Autowired
-<<<<<<< HEAD
     private DepartmentService departmentService;
     @Autowired
     private COAService cOAService;
@@ -80,10 +83,6 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
     private TraderService traderService;
     @Autowired
     private CurrencyService currencyService;
-    
-=======
-    private VoucherDialog voucherDialog;
->>>>>>> 2645f0594b7ed96750a08ea9446f2c4710390d82
     @Autowired
     ReportService rService;
     private TableRowSorter<TableModel> sorter;

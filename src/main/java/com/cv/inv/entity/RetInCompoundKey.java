@@ -14,7 +14,6 @@ import lombok.Data;
  *
  * @author lenovo
  */
-@Data
 @Embeddable
 public class RetInCompoundKey implements Serializable {
 
@@ -33,6 +32,29 @@ public class RetInCompoundKey implements Serializable {
         this.glId = glId;
         this.vouNo = vouNo;
     }
-    
+
+    public String getRetInDetailId() {
+        return retInDetailId;
+    }
+
+    public void setRetInDetailId(String retInDetailId) {
+        this.retInDetailId = retInDetailId;
+    }
+
+    public Long getGlId() {
+        return glId;
+    }
+
+    public void setGlId(Long glId) {
+        this.glId = glId;
+    }
+
+    public String getVouNo() {
+        return vouNo;
+    }
+
+    public void setVouNo(String vouNo) {
+        this.vouNo = vouNo;
+    }
 
 }

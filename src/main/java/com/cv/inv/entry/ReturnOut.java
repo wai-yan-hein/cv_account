@@ -26,7 +26,6 @@ import com.cv.inv.entity.view.VRetOut;
 import com.cv.inv.entry.common.ReturnOutTableModel;
 import com.cv.inv.entry.editor.LocationAutoCompleter;
 import com.cv.inv.entry.editor.StockCellEditor;
-import com.cv.inv.entry.editor.StockUnitCellEditor;
 import com.cv.inv.entry.editor.StockUnitEditor;
 import com.cv.inv.service.LocationService;
 import com.cv.inv.service.RetOutService;
@@ -261,7 +260,7 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
         tblRetOut.getInputMap().put(KeyStroke.getKeyStroke("F8"), "F8-Action");
         tblRetOut.getActionMap().put("F8-Action", actionItemDelete);
     }
-    
+
     private Action actionItemDelete = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -621,7 +620,7 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
                 txtRetOutDate.setDate(gl.getGlDate());
                 Trader trader = traderService.findById(Integer.parseInt(gl.getTraderId().toString()));
                 traderAutoCompleter.setTrader(trader);
-                Location location = locationService.findById(gl.getLocation().toString());
+                Location location = locationService.findById(gl.getLocationId().toString());
                 locationAutoCompleter.setLocation(location);
                 Currency currency = currencyService.findById(new CurrencyKey(gl.getFromCurId(), Global.compId));
                 currencyAutoCompleter.setCurrency(currency);
@@ -824,13 +823,10 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
                 gl.setFromCurId(currency.getKey().getCode());
                 gl.setCompId(Global.compId);
                 gl.setSplitId(5);
-<<<<<<< HEAD
                 gl.setTranSource("ÄCCOUNT-RETOut");
-                gl.setLocation(location.getLocationId());
-=======
+                gl.setLocationId(location.getLocationId());
                 gl.setTranSource("ÄCCOUNT-RETIN");
                 gl.setLocationId(location.getLocationId());
->>>>>>> 2645f0594b7ed96750a08ea9446f2c4710390d82
                 gl.setCreatedBy(Global.loginUser.getUserId().toString());
                 gl.setVouTotal(NumberUtil.getDouble(txtVouTotal.getText()));
                 gl.setPaid(NumberUtil.getDouble(txtVouPaid.getText()));
@@ -893,8 +889,8 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
         }
 
     }
-    
-     private void deleteRetOutDetail() {
+
+    private void deleteRetOutDetail() {
         String retOutIds = retOutTableModel.getDeleteListStr();
         if (retOutIds != null && glId != null) {
             try {

@@ -73,14 +73,8 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
     private CurrencyAutoCompleter currencyAutoCompleter;
     private Gl gl = new Gl();
     private GenVouNoImpl vouEngine = null;
-<<<<<<< HEAD
+
     private Long glId;
-    private String cusId;
-    private String currCode;
-    private String locId;
-=======
-  
->>>>>>> 2645f0594b7ed96750a08ea9446f2c4710390d82
 
     public void setLoadingObserver(LoadingObserver loadingObserver) {
         this.loadingObserver = loadingObserver;
@@ -592,7 +586,7 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
                 txtRetInDate.setDate(gl.getGlDate());
                 Trader trader = traderService.findById(Integer.parseInt(gl.getTraderId().toString()));
                 traderAutoCompleter.setTrader(trader);
-                Location location = locationService.findById(gl.getLocation().toString());
+                Location location = locationService.findById(gl.getLocationId().toString());
                 locationAutoCompleter.setLocation(location);
                 Currency currency = currencyService.findById(new CurrencyKey(gl.getFromCurId(), Global.compId));
                 currencyAutoCompleter.setCurrency(currency);
@@ -892,8 +886,6 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
             }
             if (traderAutoCompleter.getTrader() != null) {
                 trader = traderAutoCompleter.getTrader();
-
-<<<<<<< HEAD
             }
             if (txtVouNo.getText().isEmpty()) {
                 JOptionPane.showMessageDialog(Global.parentForm, "Invalid voucher no.",
@@ -932,50 +924,48 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
                 gl.setCompId(Global.compId);
                 gl.setSplitId(6);
                 gl.setTranSource("ÄCCOUNT-RETIN");
-                gl.setLocation(location.getLocationId());
+                gl.setLocationId(location.getLocationId());
                 gl.setVouTotal(NumberUtil.getDouble(txtVouTotal.getText()));
                 gl.setPaid(NumberUtil.getDouble(txtVouPaid.getText()));
                 gl.setBalance(NumberUtil.getDouble(txtVouBalance.getText()));
                 gl.setCreatedBy(Global.loginUser.getUserId().toString());
                 gl.setDeleted(Util1.getNullTo(gl.getDeleted()));
-=======
-        }
-        if (txtVouNo.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(Global.parentForm, "Invalid voucher no.",
-                    "Invalid Voucher ID", JOptionPane.ERROR_MESSAGE);
-            status = false;
-        } else if (txtCus.getText() == null) {
-            JOptionPane.showMessageDialog(Global.parentForm, "Customer cannot be blank.",
-                    "No customer.", JOptionPane.ERROR_MESSAGE);
-            status = false;
-            txtCus.requestFocusInWindow();
-        } else if (location.getLocationId() == null) {
-            JOptionPane.showMessageDialog(Global.parentForm, "Location cannot be blank.",
-                    "Select Location.", JOptionPane.ERROR_MESSAGE);
-            status = false;
-            txtLocation.requestFocusInWindow();
-        } else if (currency.getKey().getCode() == null) {
-            JOptionPane.showMessageDialog(Global.parentForm, "Currency cannot be blank.",
-                    "Select Currency", JOptionPane.ERROR_MESSAGE);
-            status = false;
-            txtCurrency.requestFocusInWindow();
-        } else {
-            gl = new Gl();
-            gl.setVouNo(txtVouNo.getText());
-            gl.setTraderId(NumberUtil.NZeroL(trader.getId()));
-            gl.setRemark(txtRemark.getText());
-            gl.setGlDate(txtRetInDate.getDate());
-            gl.setCreatedDate(Util1.getTodayDate());
-            gl.setFromCurId(currency.getKey().getCode());
-            gl.setCompId(Global.compId);
-            gl.setSplitId(6);
-            gl.setTranSource("ÄCCOUNT-RETOUT");
-            gl.setLocationId(location.getLocationId());
-            gl.setCreatedBy(Global.loginUser.getUserId().toString());
-            gl.setVouTotal(NumberUtil.getDouble(txtVouTotal.getText()));
-            gl.setPaid(NumberUtil.getDouble(txtVouPaid.getText()));
-            gl.setBalance(NumberUtil.getDouble(txtVouBalance.getText()));
->>>>>>> 2645f0594b7ed96750a08ea9446f2c4710390d82
+            }
+            if (txtVouNo.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(Global.parentForm, "Invalid voucher no.",
+                        "Invalid Voucher ID", JOptionPane.ERROR_MESSAGE);
+                status = false;
+            } else if (txtCus.getText() == null) {
+                JOptionPane.showMessageDialog(Global.parentForm, "Customer cannot be blank.",
+                        "No customer.", JOptionPane.ERROR_MESSAGE);
+                status = false;
+                txtCus.requestFocusInWindow();
+            } else if (location.getLocationId() == null) {
+                JOptionPane.showMessageDialog(Global.parentForm, "Location cannot be blank.",
+                        "Select Location.", JOptionPane.ERROR_MESSAGE);
+                status = false;
+                txtLocation.requestFocusInWindow();
+            } else if (currency.getKey().getCode() == null) {
+                JOptionPane.showMessageDialog(Global.parentForm, "Currency cannot be blank.",
+                        "Select Currency", JOptionPane.ERROR_MESSAGE);
+                status = false;
+                txtCurrency.requestFocusInWindow();
+            } else {
+                gl = new Gl();
+                gl.setVouNo(txtVouNo.getText());
+                gl.setTraderId(NumberUtil.NZeroL(trader.getId()));
+                gl.setRemark(txtRemark.getText());
+                gl.setGlDate(txtRetInDate.getDate());
+                gl.setCreatedDate(Util1.getTodayDate());
+                gl.setFromCurId(currency.getKey().getCode());
+                gl.setCompId(Global.compId);
+                gl.setSplitId(6);
+                gl.setTranSource("ÄCCOUNT-RETOUT");
+                gl.setLocationId(location.getLocationId());
+                gl.setCreatedBy(Global.loginUser.getUserId().toString());
+                gl.setVouTotal(NumberUtil.getDouble(txtVouTotal.getText()));
+                gl.setPaid(NumberUtil.getDouble(txtVouPaid.getText()));
+                gl.setBalance(NumberUtil.getDouble(txtVouBalance.getText()));
 
             }
         } catch (Exception ex) {

@@ -55,12 +55,8 @@ public class RetInServiceImpl implements RetInService {
 
                     detailHis.setInCompoundKey(key);
                     retInDao.save(detailHis);
-<<<<<<< HEAD
                     retInDetailHis = detailHis;
-=======
-                    count += 1;
                     //retInDetailHis = detailHis;
->>>>>>> 2645f0594b7ed96750a08ea9446f2c4710390d82
                 }
 
             }

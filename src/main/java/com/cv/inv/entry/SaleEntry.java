@@ -34,12 +34,9 @@ import com.cv.inv.entry.common.SaleEntryTableModel;
 import com.cv.inv.entry.common.StockInfo;
 import com.cv.inv.entry.editor.LocationAutoCompleter;
 import com.cv.inv.entry.editor.SaleManAutoCompleter;
-<<<<<<< HEAD
 import com.cv.inv.entry.editor.SaleTableCodeCellEditor;
 import com.cv.inv.entry.editor.StockUnitEditor;
-=======
 import com.cv.inv.entry.editor.StockCellEditor;
->>>>>>> 34d504f7fdd00e4a0f3674ed65ef12c9214955e6
 import com.cv.inv.entry.editor.VouStatusAutoCompleter;
 import com.cv.inv.service.LocationService;
 import com.cv.inv.service.StockService;
@@ -165,11 +162,8 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
         tblSale.getColumnModel().getColumn(9).setPreferredWidth(40);//Amount
         tblSale.getColumnModel().getColumn(10).setPreferredWidth(90);//Location
 
-<<<<<<< HEAD
-        tblSale.getColumnModel().getColumn(0).setCellEditor(new SaleTableCodeCellEditor());
-=======
         tblSale.getColumnModel().getColumn(0).setCellEditor(new StockCellEditor());
->>>>>>> 34d504f7fdd00e4a0f3674ed65ef12c9214955e6
+        tblSale.getColumnModel().getColumn(0).setCellEditor(new StockCellEditor());
         tblSale.getColumnModel().getColumn(2).setCellEditor(new AutoClearEditor());
         tblSale.getColumnModel().getColumn(3).setCellEditor(new AutoClearEditor());
         tblSale.getColumnModel().getColumn(4).setCellEditor(new AutoClearEditor());
@@ -922,24 +916,24 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
         switch (source.toString()) {
             case "CustomerList":
                 try {
-                    Trader cus = (Trader) selectObj;
+                Trader cus = (Trader) selectObj;
 
-                    if (cus != null) {
-                        txtCus.setText(cus.getTraderName());
+                if (cus != null) {
+                    txtCus.setText(cus.getTraderName());
 
-                        if (cus.getTraderType() != null) {
-                            saleTableModel.setCusType(cus.getTraderType().getDescription());
-                        } else {
-                            saleTableModel.setCusType("N");
-                        }
-                        //calculateTotalAmount();
+                    if (cus.getTraderType() != null) {
+                        saleTableModel.setCusType(cus.getTraderType().getDescription());
                     } else {
-                        txtCus.setText(null);
+                        saleTableModel.setCusType("N");
                     }
-                } catch (Exception ex) {
-                    LOGGER.error("selected CustomerList : " + selectObj.toString() + " - " + ex.getMessage());
+                    //calculateTotalAmount();
+                } else {
+                    txtCus.setText(null);
                 }
-                break;
+            } catch (Exception ex) {
+                LOGGER.error("selected CustomerList : " + selectObj.toString() + " - " + ex.getMessage());
+            }
+            break;
             case "StockList":
                 Stock stock = (Stock) selectObj;
                 int selectRow = tblSale.getSelectedRow();

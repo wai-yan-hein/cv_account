@@ -600,17 +600,14 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             Global.listLocation = locationService.findAll();
             Global.listVou = vouService.findAll();
             Global.listSaleMan = saleManService.findAll();
-<<<<<<< HEAD
             Global.listStock = stockService.findActiveStock();
-=======
             Global.listStock = stockService.findAll();
->>>>>>> 34d504f7fdd00e4a0f3674ed65ef12c9214955e6
             Global.listStockUnit = stockUnitService.findAll();
             Global.listRelation = relationService.findAll();
             Global.listRelation.forEach(ur -> {
                 Global.hmRelation.put(ur.getUnitKey(), ur.getFactor());
             });
-            
+
             getMachinceInfo();
         });
 
@@ -1180,7 +1177,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                         break;
                 }
                 break;
-<<<<<<< HEAD
             case "Return In":
                 switch (type) {
                     case clear:
@@ -1214,7 +1210,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                         break;
                 }
 
-=======
             case "Purchase Entry":
                 switch (type) {
                     case save:
@@ -1228,7 +1223,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                         break;
 
                 }
->>>>>>> 2645f0594b7ed96750a08ea9446f2c4710390d82
+
                 break;
 
             default:

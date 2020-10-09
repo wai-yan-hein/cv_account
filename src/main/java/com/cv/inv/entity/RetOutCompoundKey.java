@@ -8,13 +8,11 @@ package com.cv.inv.entity;
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import lombok.Data;
 
 /**
  *
  * @author lenovo
  */
-@Data
 @Embeddable
 public class RetOutCompoundKey implements Serializable {
 
@@ -31,6 +29,30 @@ public class RetOutCompoundKey implements Serializable {
     public RetOutCompoundKey(String retOutDetailId, Long glId, String vouNo) {
         this.retOutDetailId = retOutDetailId;
         this.glId = glId;
+        this.vouNo = vouNo;
+    }
+
+    public String getRetOutDetailId() {
+        return retOutDetailId;
+    }
+
+    public void setRetOutDetailId(String retOutDetailId) {
+        this.retOutDetailId = retOutDetailId;
+    }
+
+    public Long getGlId() {
+        return glId;
+    }
+
+    public void setGlId(Long glId) {
+        this.glId = glId;
+    }
+
+    public String getVouNo() {
+        return vouNo;
+    }
+
+    public void setVouNo(String vouNo) {
         this.vouNo = vouNo;
     }
 

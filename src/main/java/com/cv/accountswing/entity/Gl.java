@@ -99,19 +99,25 @@ public class Gl implements java.io.Serializable {
     private Double vouTotal;
     @Column(name = "location_id")
     private Integer locationId;
-<<<<<<< HEAD
-    private Integer vouStatus;
+    @Column(name = "saleman_id")
     private String saleManId;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "sale_date")
     private Date saleDate;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "cerdit_term")
     private Date creditTerm;
+    @Column(name = "discount")
     private Double discount;
+    @Column(name = "disc_p")
     private Double discP;
+    @Column(name = "tax_amt")
     private Double taxAmt;
+    @Column(name = "tax_p")
     private Double taxP;
-=======
-<<<<<<< HEAD
+    @Column(name = "deleted")
     private Boolean deleted;
-=======
     @Temporal(TemporalType.DATE)
     @Column(name = "due_date")
     private Date dueDate;
@@ -122,12 +128,8 @@ public class Gl implements java.io.Serializable {
     @Temporal(TemporalType.DATE)
     @Column(name = "pur_date")
     private Date purDate;
-    @Column(name = "tax_amt")
-    private Double taxAmt;
     @Column(name = "session_id")
     private Integer sessionId;
->>>>>>> 2645f0594b7ed96750a08ea9446f2c4710390d82
->>>>>>> 34d504f7fdd00e4a0f3674ed65ef12c9214955e6
 
     public Long getGlId() {
         return glId;
@@ -401,19 +403,6 @@ public class Gl implements java.io.Serializable {
         this.vouTotal = vouTotal;
     }
 
-<<<<<<< HEAD
-    @Column(name = "location_id")
-    public Integer getLocation() {
-=======
-    public Integer getLocationId() {
->>>>>>> 2645f0594b7ed96750a08ea9446f2c4710390d82
-        return locationId;
-    }
-
-    public void setLocationId(Integer locationId) {
-        this.locationId = locationId;
-    }
-
     public Date getDueDate() {
         return dueDate;
     }
@@ -461,9 +450,7 @@ public class Gl implements java.io.Serializable {
     public void setSessionId(Integer sessionId) {
         this.sessionId = sessionId;
     }
-<<<<<<< HEAD
 
-    @Column(name = "deleted")
     public Boolean getDeleted() {
         return deleted;
     }
@@ -471,18 +458,7 @@ public class Gl implements java.io.Serializable {
     public void setDeleted(Boolean deleted) {
         this.deleted = deleted;
     }
-<<<<<<< HEAD
 
-    @Column(name = "vou_status_id")
-    public Integer getVouStatus() {
-        return vouStatus;
-    }
-
-    public void setVouStatus(Integer vouStatus) {
-        this.vouStatus = vouStatus;
-    }
-
-    @Column(name = "saleman_id")
     public String getSaleManId() {
         return saleManId;
     }
@@ -491,8 +467,6 @@ public class Gl implements java.io.Serializable {
         this.saleManId = saleManId;
     }
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "sale_date")
     public Date getSaleDate() {
         return saleDate;
     }
@@ -501,8 +475,6 @@ public class Gl implements java.io.Serializable {
         this.saleDate = saleDate;
     }
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "cerdit_term")
     public Date getCreditTerm() {
         return creditTerm;
     }
@@ -511,7 +483,6 @@ public class Gl implements java.io.Serializable {
         this.creditTerm = creditTerm;
     }
 
-    @Column(name = "discount")
     public Double getDiscount() {
         return discount;
     }
@@ -520,7 +491,6 @@ public class Gl implements java.io.Serializable {
         this.discount = discount;
     }
 
-    @Column(name = "disc_p")
     public Double getDiscP() {
         return discP;
     }
@@ -529,16 +499,6 @@ public class Gl implements java.io.Serializable {
         this.discP = discP;
     }
 
-    @Column(name = "tax_amt")
-    public Double getTaxAmt() {
-        return taxAmt;
-    }
-
-    public void setTaxAmt(Double taxAmt) {
-        this.taxAmt = taxAmt;
-    }
-
-    @Column(name = "tax_p")
     public Double getTaxP() {
         return taxP;
     }
@@ -546,9 +506,13 @@ public class Gl implements java.io.Serializable {
     public void setTaxP(Double taxP) {
         this.taxP = taxP;
     }
-=======
-=======
->>>>>>> 2645f0594b7ed96750a08ea9446f2c4710390d82
->>>>>>> 34d504f7fdd00e4a0f3674ed65ef12c9214955e6
+
+    public Integer getLocationId() {
+        return locationId;
+    }
+
+    public void setLocationId(Integer locationId) {
+        this.locationId = locationId;
+    }
 
 }

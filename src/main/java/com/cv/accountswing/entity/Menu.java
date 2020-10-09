@@ -29,6 +29,7 @@ public class Menu implements java.io.Serializable {
     private String menuUrl;
     private String menuType;
     private String orderBy;
+    private String soureAccCode;
     private List<Menu> child;
 
     public Menu() {
@@ -118,6 +119,15 @@ public class Menu implements java.io.Serializable {
 
     public void setOrderBy(String orderBy) {
         this.orderBy = orderBy;
+    }
+
+    @Column(name = "source_acc_code")
+    public String getSoureAccCode() {
+        return soureAccCode;
+    }
+
+    public void setSoureAccCode(String soureAccCode) {
+        this.soureAccCode = soureAccCode;
     }
 
 }
