@@ -238,7 +238,7 @@ public class DepartmentSetup extends javax.swing.JPanel implements TreeSelection
         department.setDeptName(txtName.getText());
         department.setUsrCode(txtUserCode.getText());
         department.setActive(chkActive.isSelected());
-        department.setUsrCode(parentRootName);
+        department.setCompCode(Global.compId);
 
         if (isValidDepartment(department, Global.loginUser.getUserId().toString(), Global.compId)) {
             Department dep = deptService.save(department);
@@ -265,16 +265,17 @@ public class DepartmentSetup extends javax.swing.JPanel implements TreeSelection
 
             if (dept.getDeptCode().isEmpty()) {
                 //dept.setDeptCode(getDeptCode(compCode));
-                dept.setCompCode(compCode);
                 dept.setCreatedBy(userId);
                 dept.setCreatedDt(Util1.getTodayDate());
             } else {
-                List<Department> listDept = deptService.search(dept.getDeptCode(),
-                        "-", compCode.toString(), "-", "-");
-                if (listDept != null) {
-                    if (listDept.size() > 0) {
-                        status = false;
-                        JOptionPane.showMessageDialog(Global.parentForm, "Duplicate department code.");
+                if (labelStatus.getText().equals("NEW")) {
+                    List<Department> listDept = deptService.search(dept.getDeptCode(),
+                            "-", compCode.toString(), "-", "-");
+                    if (listDept != null) {
+                        if (listDept.size() > 0) {
+                            status = false;
+                            JOptionPane.showMessageDialog(Global.parentForm, "Duplicate department code.");
+                        }
                     }
                 }
             }

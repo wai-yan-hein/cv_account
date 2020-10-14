@@ -132,7 +132,9 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
         Category cat = categoryTableModel.getCategory(selectRow);
         int delete = categoryService.delete(cat.getCatId().toString());
         if (delete == 1) {
+            Global.listCategory.remove(selectRow);
             JOptionPane.showMessageDialog(Global.parentForm, "Deleted");
+            clear();
         }
     }
 
@@ -146,6 +148,9 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
             txtName.requestFocusInWindow();
         } else {
             category = new Category();
+            if (lblStatus.getText().equals("EDIT")) {
+                category.setCatId(categoryTableModel.getCategory(selectRow).getCatId());
+            }
             category.setCatName(txtName.getText());
         }
 

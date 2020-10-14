@@ -114,6 +114,7 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener {
         initCombo();
         initTable();
         searchStock();
+        clear();
         isShown = true;
 
     }
