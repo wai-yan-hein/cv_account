@@ -8,9 +8,14 @@ package com.cv.accountswing.ui.setup;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.entity.ChartOfAccount;
+import com.cv.accountswing.entity.Menu;
 import com.cv.accountswing.service.COAService;
+import com.cv.accountswing.service.MenuService;
+import com.cv.accountswing.util.BindingUtil;
 import com.cv.accountswing.util.Util1;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -50,6 +55,8 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements MouseList
     COAService coaServcie;
     @Autowired
     private TaskExecutor taskExecutor;
+    @Autowired
+    private MenuService menuService;
     JPopupMenu popupmenu;
     private LoadingObserver loadingObserver;
     private boolean isShown = false;
@@ -90,7 +97,20 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements MouseList
 
     private void initMain() {
         initTree();
+        initCombo();
         isShown = true;
+    }
+
+    private void initCombo() {
+        BindingUtil.BindCombo(cboMenu, menuService.getParentChildMenu(), null, false);
+        cboMenu.setSelectedItem(null);
+        cboMenu.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                saveMenu();
+
+            }
+        });
     }
 
     private void newCOA() {
@@ -201,7 +221,10 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements MouseList
         boolean aBoolean = Util1.getBoolean(coa.isActive());
         chkActive.setSelected(aBoolean);
         lblStatus.setText("EDIT");
-
+        if (coa.getCode() != null) {
+            /*Menu menu = menuService.search("-", "-", "-");
+            cboMenu.setSelectedItem(menu);*/
+        }
     }
 
     public void clear() {
@@ -222,6 +245,7 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements MouseList
         btnClear.addKeyListener(this);
         treeCOA.addMouseListener(this);
         treeCOA.addTreeSelectionListener(this);
+
     }
 
     private void setEnabledControl(boolean status) {
@@ -230,6 +254,27 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements MouseList
         btnSave.setEnabled(status);
         btnClear.setEnabled(status);
         chkActive.setEnabled(status);
+        cboMenu.setEditable(status);
+
+    }
+
+    private void saveMenu() {
+        LOGGER.info("Save Menu Method Start...");
+        try {
+            if (cboMenu.getSelectedItem() instanceof Menu) {
+                ChartOfAccount coa = (ChartOfAccount) selectedNode.getUserObject();
+                Menu selectMenu = (Menu) cboMenu.getSelectedItem();
+                Menu menu = new Menu();
+                menu.setMenuName(coa.getCoaNameEng());
+                menu.setMenuClass(selectMenu.getMenuClass());
+                menu.setParent(selectMenu.getId().toString());
+                menu.setSoureAccCode(coa.getCode());
+                menuService.saveMenu(menu);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(Global.parentForm, e.getMessage());
+            LOGGER.info("Save Menu :" + e.getMessage());
+        }
     }
 
     /**
@@ -255,6 +300,7 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements MouseList
         lblStatus = new javax.swing.JLabel();
         btnClear = new javax.swing.JButton();
         panelMenu = new javax.swing.JPanel();
+        cboMenu = new javax.swing.JComboBox<>();
 
         addContainerListener(new java.awt.event.ContainerAdapter() {
             public void componentRemoved(java.awt.event.ContainerEvent evt) {
@@ -341,15 +387,36 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements MouseList
             }
         });
 
+        panelMenu.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Menu Group Mapping", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, Global.lableFont));
+
+        cboMenu.setEditable(true);
+        cboMenu.setFont(Global.textFont);
+        cboMenu.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                cboMenuItemStateChanged(evt);
+            }
+        });
+        cboMenu.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cboMenuActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout panelMenuLayout = new javax.swing.GroupLayout(panelMenu);
         panelMenu.setLayout(panelMenuLayout);
         panelMenuLayout.setHorizontalGroup(
             panelMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGroup(panelMenuLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(cboMenu, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         panelMenuLayout.setVerticalGroup(
             panelMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
+            .addGroup(panelMenuLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(cboMenu, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -371,7 +438,7 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements MouseList
                             .addComponent(txtName)
                             .addComponent(txtUsrCode)
                             .addComponent(txtSysCode)
-                            .addComponent(chkActive, javax.swing.GroupLayout.DEFAULT_SIZE, 204, Short.MAX_VALUE)))
+                            .addComponent(chkActive, javax.swing.GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE)))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(btnSave)
@@ -413,7 +480,7 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements MouseList
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 236, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 235, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
@@ -474,10 +541,19 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements MouseList
         txtName.selectAll();
     }//GEN-LAST:event_txtNameFocusGained
 
+    private void cboMenuItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cboMenuItemStateChanged
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cboMenuItemStateChanged
+
+    private void cboMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboMenuActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cboMenuActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClear;
     private javax.swing.JButton btnSave;
+    private javax.swing.JComboBox<String> cboMenu;
     private javax.swing.JCheckBox chkActive;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

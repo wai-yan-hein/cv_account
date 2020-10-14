@@ -32,12 +32,16 @@ import com.cv.accountswing.ui.editor.TraderAutoCompleter;
 import com.cv.accountswing.ui.report.common.APARTableModel;
 import com.cv.accountswing.ui.report.common.GLListingTableModel;
 import com.cv.accountswing.util.Util1;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
@@ -86,6 +90,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
     private TrialBalanceDetailDialog trialBalanceDetailDialog;
     private boolean isShown = false;
     private LoadingObserver loadingObserver;
+    JPopupMenu popup;
     private String stDate;
     private String enDate;
     private String cvId;
@@ -106,6 +111,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
 
     public AparGlReport() {
         initComponents();
+        initPopup();
     }
 
     private void initMain() {
@@ -113,6 +119,18 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         initCombo();
         initTable();
         isShown = true;
+    }
+
+    private void initPopup() {
+        popup = new JPopupMenu();
+        JMenuItem print = new JMenuItem("Print");
+        popup.add(print);
+        print.addActionListener((ActionEvent e) -> {
+            if (panelName.equals("AP/AR")) {
+                printApar();
+            } else if (panelName.equals("G/L Listing")) {
+            }
+        });
     }
 
     private void initTable() {
@@ -138,6 +156,9 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         tblAPAR.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    popup.show(tblAPAR, e.getX(), e.getY());
+                }
                 if (e.getClickCount() == 2) {
                     if (tblAPAR.getSelectedRow() >= 0) {
                         selectRow = tblAPAR.convertRowIndexToModel(tblAPAR.getSelectedRow());
@@ -163,6 +184,18 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
 
         });
 
+    }
+
+    private String getTarget() {
+        String targetId = "-";
+        if (panelName.equals("AP/AR")) {
+            VApar apar = aPARTableModel.getAPAR(selectRow);
+            targetId = apar.getTraderId();
+        } else if (panelName.equals("G/L Listing")) {
+            VTriBalance tbal = glListingTableModel.getTBAL(selectRow);
+            targetId = tbal.getKey().getCoaId();
+        }
+        return targetId;
     }
 
     private void searchAPAR() {
@@ -212,7 +245,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                 Util1.isNull(enDate, "-"), coaId, currency, dept,
                 cvId, Global.compId.toString(),
                 "DR");
-        sweapDrCrAmt(listVGL, "-");
+        sweapDrCrAmt(listVGL, getTarget());
         LOGGER.info("TRIBALANCE LIST :::" + listVGL.size());
         openTBDDialog(listVGL, desp, netChange);
     }
@@ -220,6 +253,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
     private void openTBDDialog(List<VGl> listVGl, String traderName, Double netChange) {
         trialBalanceDetailDialog.setDesp(traderName);
         trialBalanceDetailDialog.setNetChange(netChange);
+        
         trialBalanceDetailDialog.setListVGl(listVGl);
         trialBalanceDetailDialog.setSize(Global.width - 200, Global.height - 200);
         trialBalanceDetailDialog.setLocationRelativeTo(null);
@@ -619,7 +653,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
             switch (name) {
 
                 case "Date":
-                    String[] split = selectObj.toString().split("-");
+                    String[] split = selectObj.toString().split("to");
                     stDate = split[0];
                     enDate = split[1];
 
@@ -634,7 +668,12 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                     cvId = selectObj.toString();
                     break;
             }
-            searchAPAR();
+            if (panelName.equals("AP/AR")) {
+                searchAPAR();
+            } else if (panelName.equals("G/L Listing")) {
+                tblAPAR.setModel(glListingTableModel);
+                searchGLListing();
+            }
 
         }
     }

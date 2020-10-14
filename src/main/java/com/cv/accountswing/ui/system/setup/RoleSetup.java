@@ -6,27 +6,29 @@
 package com.cv.accountswing.ui.system.setup;
 
 import com.cv.accountswing.common.Global;
-import com.cv.accountswing.entity.Privilege;
 import com.cv.accountswing.entity.UserRole;
+import com.cv.accountswing.entity.view.VRoleMenu;
+import com.cv.accountswing.service.MenuService;
 import com.cv.accountswing.service.PrivilegeService;
 import com.cv.accountswing.service.UserRoleService;
-import com.cv.accountswing.ui.system.setup.common.JTreeTable;
-import com.cv.accountswing.ui.system.setup.common.MenuNode;
-import com.cv.accountswing.ui.system.setup.common.MenuSystemModel;
-import com.cv.accountswing.ui.system.setup.common.RoleTreeTableModel;
+import com.cv.accountswing.ui.cash.common.AutoClearEditor;
+import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.system.setup.common.UserRoleTableModel;
+import com.cv.accountswing.ui.system.setup.treetable.MyAbstractTreeTableModel;
+import com.cv.accountswing.ui.system.setup.treetable.MyDataModel;
+import com.cv.accountswing.ui.system.setup.treetable.MyTreeTable;
 import com.cv.accountswing.util.Util1;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JDialog;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
-import javax.swing.table.AbstractTableModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
 
 /**
@@ -43,17 +45,21 @@ public class RoleSetup extends javax.swing.JPanel implements KeyListener {
     @Autowired
     private UserRoleService userRoleService;
     @Autowired
+    private MenuService menuService;
+    @Autowired
     private PrivilegeService privilegeService;
     @Autowired
-    private RoleTreeTableModel roleTreeTableModel;
-    private MenuSystemModel treeModel;
-    private JTreeTable treeTable;
-    private List<Privilege> privilegeList;
-    private int selectRow = -1;
-    private boolean isShonw = false;
+    private TaskExecutor taskExecutor;
 
-    public void setIsShonw(boolean isShonw) {
-        this.isShonw = isShonw;
+    private int selectRow = -1;
+    private boolean isShown = false;
+
+    public boolean isIsShown() {
+        return isShown;
+    }
+
+    public void setIsShown(boolean isShown) {
+        this.isShown = isShown;
     }
 
     /**
@@ -74,6 +80,8 @@ public class RoleSetup extends javax.swing.JPanel implements KeyListener {
         tblRole.setModel(userRoleTableModel);
         tblRole.getTableHeader().setFont(Global.lableFont);
         tblRole.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tblRole.setDefaultRenderer(Object.class, new TableCellRender());
+        tblRole.getColumnModel().getColumn(0).setCellEditor(new AutoClearEditor());
         tblRole.getSelectionModel().addListSelectionListener((ListSelectionEvent e) -> {
             if (e.getValueIsAdjusting()) {
                 if (tblRole.getSelectedRow() >= 0) {
@@ -86,75 +94,35 @@ public class RoleSetup extends javax.swing.JPanel implements KeyListener {
     }
 
     private void initTree() {
-        treeModel = new MenuSystemModel();
-        treeTable = new JTreeTable(treeModel);
-        privilegeList = new ArrayList<>();
+        //createTree(Global.roleId.toString());
+    }
 
+    private void createTree(String roleId) {
+        JDialog loading = Util1.getLoading(Global.parentForm);
+        taskExecutor.execute(() -> {
+            List<VRoleMenu> listVRM = menuService.getParentChildMenu(roleId);
+            VRoleMenu vRoleMenu = new VRoleMenu("Best-System", "System", false, listVRM);
+            MyAbstractTreeTableModel treeTableModel = new MyDataModel(vRoleMenu, privilegeService);
+            MyTreeTable treeTable = new MyTreeTable(treeTableModel);
+            scrollPane.getViewport().add(treeTable);
+            loading.setVisible(false);
+        });
+        loading.setVisible(true);
     }
 
     private void searchAllUsers() {
         List<UserRole> listUserRole = userRoleService.search("-", Global.compId.toString());
         userRoleTableModel.setListRole(listUserRole);
+        userRoleTableModel.addEmptyRow();
     }
 
     public void setCurrUserRole(UserRole currUserRole) {
-        clearPrivilegeStatus(treeModel.getTreeRoot());
-
-        try {
-            //this.currUserRole = (UserRole) dao.find(UserRole.class, currUserRole.getRoleId());
-            privilegeList = privilegeService.search(currUserRole.getRoleId().toString(), "-");
-            updateStauts(treeModel.getTreeRoot());
-
-        } catch (Exception ex) {
-            LOGGER.error("setCurrUserRole : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.toString());
-        }
-
-        AbstractTableModel model = (AbstractTableModel) treeTable.getModel();
-        model.fireTableDataChanged();
-    }
-
-    private void clearPrivilegeStatus(MenuNode root) {
-        Object[] menuNodes = (Object[]) root.getChildren();
-        if (menuNodes != null) {
-            for (int i = 0; i < menuNodes.length; i++) {
-                MenuNode menuNode = (MenuNode) menuNodes[i];
-                menuNode.setAllow(false);
-
-                clearPrivilegeStatus(menuNode);
-            }
+        txtRoleName.setText(currUserRole.getRoleName());
+        if (currUserRole.getRoleId() != null) {
+            createTree(currUserRole.getRoleId().toString());
         }
     }
 
-    private void updateStauts(MenuNode root) {
-        //RoleDaoImpl roleDao = new RoleDaoImpl();
-        Object[] menuNodes = (Object[]) root.getChildren();
-        if (menuNodes != null) {
-            for (int i = 0; i < menuNodes.length; i++) {
-                MenuNode menuNode = (MenuNode) menuNodes[i];
-                menuNode.setAllow(Util1.getBoolean(menuNode.getAllow()));
-                updateStauts(menuNode);
-            }
-        }
-    }
-
-    /*private boolean getStatus(Integer id) {
-    List<Privilege> privilegeListL = privilegeService.search(id.toString(), "-");
-    boolean allow = false;
-    
-    for (int i = 0; i < privilegeListL.size(); i++) {
-    if (privilegeListL.get(i).getKey().getMenuId()== id) {
-    allow = privilegeListL.get(i).getAllow();
-    i = privilegeListL.size();
-    }
-    }
-    
-    return allow;
-    }*/
-    /**
-     * This method is called from within the constructor to initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is always
-     * regenerated by the Form Editor.
-     */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -163,7 +131,7 @@ public class RoleSetup extends javax.swing.JPanel implements KeyListener {
         tblRole = new javax.swing.JTable();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
+        txtRoleName = new javax.swing.JTextField();
         scrollPane = new javax.swing.JScrollPane();
 
         addComponentListener(new java.awt.event.ComponentAdapter() {
@@ -172,6 +140,8 @@ public class RoleSetup extends javax.swing.JPanel implements KeyListener {
             }
         });
 
+        tblRole.setAutoCreateRowSorter(true);
+        tblRole.setFont(Global.textFont);
         tblRole.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -183,10 +153,18 @@ public class RoleSetup extends javax.swing.JPanel implements KeyListener {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tblRole.setInheritsPopupMenu(true);
         tblRole.setName("tblRole"); // NOI18N
+        tblRole.setRowHeight(Global.tblRowHeight);
         jScrollPane1.setViewportView(tblRole);
 
+        jLabel1.setFont(Global.lableFont);
         jLabel1.setText("Role Name");
+
+        txtRoleName.setEditable(false);
+        txtRoleName.setFont(Global.lableFont);
+
+        scrollPane.setFont(Global.textFont);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -199,7 +177,7 @@ public class RoleSetup extends javax.swing.JPanel implements KeyListener {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addGap(18, 18, 18)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 461, Short.MAX_VALUE)))
+                        .addComponent(txtRoleName, javax.swing.GroupLayout.DEFAULT_SIZE, 336, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -208,7 +186,7 @@ public class RoleSetup extends javax.swing.JPanel implements KeyListener {
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtRoleName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(scrollPane))
         );
@@ -219,7 +197,7 @@ public class RoleSetup extends javax.swing.JPanel implements KeyListener {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 88, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 213, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
@@ -239,7 +217,7 @@ public class RoleSetup extends javax.swing.JPanel implements KeyListener {
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
-        if (!isShonw) {
+        if (!isShown) {
             initMain();
         }
     }//GEN-LAST:event_formComponentShown
@@ -249,9 +227,9 @@ public class RoleSetup extends javax.swing.JPanel implements KeyListener {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextField jTextField1;
     private javax.swing.JScrollPane scrollPane;
     private javax.swing.JTable tblRole;
+    private javax.swing.JTextField txtRoleName;
     // End of variables declaration//GEN-END:variables
 
     @Override

@@ -176,10 +176,9 @@ public class SalePurchaseTableModel extends AbstractTableModel {
                         Trader trader = (Trader) value;
                         vgl.setTraderId(Util1.getLong(trader.getId()));
                         vgl.setTraderName(trader.getTraderName());
-                        String coaCode = trader.getAccountCode();
-                        ChartOfAccount account = cOAService.findById(coaCode);
+                        ChartOfAccount account = trader.getAccount();
                         if (account != null) {
-                            vgl.setAccountId(coaCode);
+                            vgl.setAccountId(account.getCode());
                             vgl.setAccName(account.getCoaNameEng());
                             parent.setColumnSelectionInterval(7, 7);
                         } else {

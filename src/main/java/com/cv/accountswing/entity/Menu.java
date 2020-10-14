@@ -28,8 +28,10 @@ public class Menu implements java.io.Serializable {
     private String menuNameMM;
     private String menuUrl;
     private String menuType;
-    private String orderBy;
+    private Integer orderBy;
     private String soureAccCode;
+    private String menuClass;
+
     private List<Menu> child;
 
     public Menu() {
@@ -113,11 +115,11 @@ public class Menu implements java.io.Serializable {
     }
 
     @Column(name = "order_by")
-    public String getOrderBy() {
+    public Integer getOrderBy() {
         return orderBy;
     }
 
-    public void setOrderBy(String orderBy) {
+    public void setOrderBy(Integer orderBy) {
         this.orderBy = orderBy;
     }
 
@@ -128,6 +130,16 @@ public class Menu implements java.io.Serializable {
 
     public void setSoureAccCode(String soureAccCode) {
         this.soureAccCode = soureAccCode;
+    }
+
+    @Column(name = "menu_class")
+
+    public String getMenuClass() {
+        return menuClass;
+    }
+
+    public void setMenuClass(String menuClass) {
+        this.menuClass = menuClass;
     }
 
 }

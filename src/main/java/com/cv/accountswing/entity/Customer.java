@@ -8,19 +8,21 @@ import javax.persistence.*;
 
 /**
  *
- * Customer class. Sharing "trader" table with Supplier, Patient and Trader class.
- * Database table name is trader.
+ * Customer class. Sharing "trader" table with Supplier, Patient and Trader
+ * class. Database table name is trader.
  */
 @Entity
 //@Table(name="trader")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(discriminatorType = DiscriminatorType.STRING)
 @DiscriminatorValue("C")
-public class Customer extends Trader implements java.io.Serializable{
+public class Customer extends Trader implements java.io.Serializable {
+
     private Integer creditLimit;
     private Integer creditDays;
-    
-    public Customer(){
+    private String contactPerson;
+
+    public Customer() {
         super();
     }
 
@@ -41,4 +43,14 @@ public class Customer extends Trader implements java.io.Serializable{
     public void setCreditLimit(Integer creditLimit) {
         this.creditLimit = creditLimit;
     }
+
+    @Column(name = "contact_person")
+    public String getContactPerson() {
+        return contactPerson;
+    }
+
+    public void setContactPerson(String contactPerson) {
+        this.contactPerson = contactPerson;
+    }
+
 }

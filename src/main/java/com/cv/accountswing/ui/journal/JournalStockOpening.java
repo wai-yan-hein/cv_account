@@ -38,6 +38,7 @@ import java.util.Date;
 import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
@@ -158,8 +159,26 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
 
     }
 
+    private boolean isValidEntry() {
+        boolean status = true;
+        if (depId == null) {
+            JOptionPane.showMessageDialog(Global.parentForm, "Select Department.");
+            txtDepartment.requestFocus();
+            status = false;
+        } else if (currency == null) {
+            JOptionPane.showMessageDialog(Global.parentForm, "Select Department.");
+            txtCurrency.requestFocus();
+            status = false;
+        } else if (stDate == null) {
+            JOptionPane.showMessageDialog(Global.parentForm, "Select Date.");
+            txtDate.requestFocus();
+            status = false;
+        }
+        return status;
+    }
+
     private void getNewStockOpValue() {
-        if (!depId.isEmpty() && !currency.isEmpty() && !stDate.isEmpty()) {
+        if (isValidEntry()) {
             String userId = Global.loginUser.getUserId().toString();
             SystemPropertyKey key = new SystemPropertyKey();
             key.setCompCode(Global.compId);

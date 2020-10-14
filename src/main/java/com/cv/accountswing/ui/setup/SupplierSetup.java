@@ -10,8 +10,6 @@ import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.StartWithRowFilter;
 import com.cv.accountswing.entity.ChartOfAccount;
 import com.cv.accountswing.entity.Region;
-import com.cv.accountswing.entity.SystemProperty;
-import com.cv.accountswing.entity.SystemPropertyKey;
 import com.cv.accountswing.entity.Supplier;
 import com.cv.accountswing.entity.TraderType;
 import com.cv.accountswing.service.COAService;
@@ -23,7 +21,6 @@ import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.setup.common.SupplierTabelModel;
 import com.cv.accountswing.util.BindingUtil;
 import com.cv.accountswing.util.Util1;
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.List;
@@ -39,6 +36,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import javax.swing.text.JTextComponent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
@@ -50,6 +49,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SupplierSetup extends javax.swing.JPanel implements KeyListener {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(Supplier.class);
     private int selectRow = -1;
     private TableRowSorter<TableModel> sorter;
     private StartWithRowFilter swrf;
@@ -58,8 +58,6 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener {
     private SupplierTabelModel supplierTabelModel;
     @Autowired
     private SupplierService supplierService;
-    @Autowired
-    private SystemPropertyService spService;
     @Autowired
     private COAService coaService;
     @Autowired
@@ -88,18 +86,14 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener {
     }
 
     private void initMain() {
-        loadingObserver.load(this.getName(), "Start");
         initCombo();
         initTable();
+        clear();
         isShown = true;
     }
 
     private void initCombo() {
-        String propKey = "system.cus.acc";
-        SystemPropertyKey spk = new SystemPropertyKey(propKey, Global.compId);
-        SystemProperty sp = spService.findById(spk);
-        String parent = sp.getPropValue();
-        List<ChartOfAccount> listCOA = coaService.getAllChild(parent, String.valueOf(Global.compId));
+        List<ChartOfAccount> listCOA = coaService.search("-", "-", Global.compId.toString(), "3", "-", "-", "-");
         BindingUtil.BindComboFilter(cboAccount, listCOA, null, true, false);
         BindingUtil.BindComboFilter(cboPriceType, traderTypeService.findAll(), null, true, false);
         BindingUtil.BindComboFilter(cboRegion, regionService.search("-", "-", Global.compId.toString(), "-"), null, true, false);
@@ -107,6 +101,7 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener {
     }
 
     private void initTable() {
+        loadingObserver.load(this.getName(), "Start");
         taskExecutor.execute(() -> {
             tblCustomer.setModel(supplierTabelModel);
             tblCustomer.getTableHeader().setFont(Global.textFont);
@@ -144,6 +139,7 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener {
         cboPriceType.setSelectedItem(cus.getTraderType());
         txtCusAddress.setText(cus.getAddress());
         chkActive.setSelected(cus.getActive());
+        cboAccount.setSelectedItem(cus.getAccount());
         //txtCreditLimit.setText(Util1.getString(cus.getCreditLimit()));
         lblStatus.setText("EDIT");
 
@@ -160,7 +156,6 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener {
                 Supplier cus = supplierTabelModel.getCustomer(selectRow);
                 customer.setId(cus.getId());
             }
-            ChartOfAccount coa = (ChartOfAccount) cboAccount.getSelectedItem();
             customer.setTraderId(txtCusCode.getText());
             customer.setTraderName(txtCusName.getText());
             customer.setPhone(txtCusPhone.getText());
@@ -169,7 +164,7 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener {
             customer.setRegion((Region) cboRegion.getSelectedItem());
             customer.setTraderType((TraderType) cboPriceType.getSelectedItem());
             customer.setActive(chkActive.isSelected());
-            customer.setAccountCode(coa.getCode());
+            customer.setAccount((ChartOfAccount) cboAccount.getSelectedItem());
             customer.setCompCode(Global.compId);
             customer.setUpdatedDate(Util1.getTodayDate());
             //customer.setCreditLimit(Util1.getInteger(txtCreditLimit.getText()));
@@ -191,7 +186,7 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener {
                 } else {
                     supplierTabelModel.setCustomer(selectRow, customer);
                 }
-
+                clear();
             }
         }
     }
@@ -209,6 +204,7 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener {
         lblStatus.setText("NEW");
         txtCusName.requestFocus();
         txtCusFilter.setText(null);
+        cboAccount.setSelectedItem(null);
     }
 
     private void initKeyListener() {
@@ -339,6 +335,7 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener {
         });
 
         cboAccount.setFont(Global.textFont);
+        cboAccount.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         cboAccount.setName("cboAccount"); // NOI18N
 
         jLabel9.setFont(Global.lableFont);
@@ -352,10 +349,15 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener {
         lblStatus.setFont(Global.lableFont);
         lblStatus.setText("NEW");
 
+        cboRegion.setFont(Global.textFont);
+        cboRegion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cboRegion.setToolTipText("");
+
         jLabel7.setFont(Global.lableFont);
         jLabel7.setText("Price Type");
 
         cboPriceType.setFont(Global.textFont);
+        cboPriceType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         cboPriceType.setName("cboAccount"); // NOI18N
 
         javax.swing.GroupLayout panelEntryLayout = new javax.swing.GroupLayout(panelEntry);
@@ -377,10 +379,11 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener {
                     .addComponent(jLabel7, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGroup(panelEntryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelEntryLayout.createSequentialGroup()
-                        .addGap(132, 133, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btnSave)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnClear))
+                        .addComponent(btnClear)
+                        .addContainerGap())
                     .addGroup(panelEntryLayout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(panelEntryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -437,14 +440,14 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener {
                 .addGroup(panelEntryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel8)
                     .addComponent(txtRemark, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(38, 38, 38)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(chkActive)
-                .addGap(2, 2, 2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(panelEntryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnClear)
                     .addComponent(btnSave)
                     .addComponent(lblStatus))
-                .addContainerGap(139, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         panelEntryLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {txtCusAddress, txtCusCode, txtCusEmail, txtCusName, txtCusPhone, txtRemark});
@@ -506,7 +509,12 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener {
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         // TODO add your handling code here:
-        saveCustomer();
+        try {
+            saveCustomer();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(Global.parentForm, e.getMessage());
+            LOGGER.error("Save Customer :" + e.getMessage());
+        }
     }//GEN-LAST:event_btnSaveActionPerformed
 
     private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed

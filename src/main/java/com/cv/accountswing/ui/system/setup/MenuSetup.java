@@ -12,6 +12,7 @@ import com.cv.accountswing.entity.view.VRoleMenu;
 import com.cv.accountswing.entity.view.VRoleMenuKey;
 import com.cv.accountswing.service.COAService;
 import com.cv.accountswing.service.MenuService;
+import com.cv.accountswing.util.Util1;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.awt.event.ActionListener;
@@ -212,8 +213,8 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
             if (userObject.toString().equals(parentRootName)) {
                 parentCode = "1";
             } else {
-                Menu menu = (Menu) parentNode.getUserObject();
-                parentCode = menu.getParent();
+                VRoleMenu menu = (VRoleMenu) parentNode.getUserObject();
+                parentCode = menu.getKey().getMenuId().toString();
             }
         }
         String menuName = txtMenuName.getText();
@@ -224,7 +225,9 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
             menu.setMenuName(menuName);
             menu.setParent(parentCode);
             menu.setMenuUrl(txtMenuUrl.getText());
-            menu.setOrderBy(txtOrder.getText());
+            if (txtOrder.getValue() != null) {
+                menu.setOrderBy(Util1.getInteger(txtOrder.getText()));
+            }
             Menu saveMenu = menuService.saveMenu(menu);
             if (saveMenu != null) {
                 JOptionPane.showMessageDialog(Global.parentForm, "Saved");
@@ -235,6 +238,7 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
                 rMenu.setKey(key);
                 rMenu.setMenuName(saveMenu.getMenuName());
                 rMenu.setParent(saveMenu.getParent());
+                rMenu.setOrderBy(saveMenu.getOrderBy());
                 selectedNode.setUserObject(rMenu);
                 treeModel.reload();
                 clear();
@@ -254,7 +258,7 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
     private void setMenu(VRoleMenu menu) {
         txtMenuName.setText(menu.getMenuName());
         txtMenuUrl.setText(menu.getMenuUrl());
-        txtOrder.setText(menu.getOrderBy());
+        txtOrder.setText(menu.getOrderBy().toString());
     }
 
     private void clear() {
@@ -281,7 +285,7 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
         txtMenuUrl = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
-        txtOrder = new javax.swing.JTextField();
+        txtOrder = new javax.swing.JFormattedTextField();
 
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentShown(java.awt.event.ComponentEvent evt) {
@@ -320,7 +324,7 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
         jLabel3.setFont(Global.textFont);
         jLabel3.setText("Order");
 
-        txtOrder.setFont(Global.textFont);
+        txtOrder.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0"))));
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -336,9 +340,9 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
                             .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtMenuUrl, javax.swing.GroupLayout.DEFAULT_SIZE, 207, Short.MAX_VALUE)
+                            .addComponent(txtMenuUrl, javax.swing.GroupLayout.DEFAULT_SIZE, 208, Short.MAX_VALUE)
                             .addComponent(txtMenuName)
-                            .addComponent(txtOrder, javax.swing.GroupLayout.DEFAULT_SIZE, 207, Short.MAX_VALUE)))
+                            .addComponent(txtOrder)))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(jButton1)))
@@ -356,12 +360,12 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
                     .addComponent(jLabel2)
                     .addComponent(txtMenuUrl, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel3)
                     .addComponent(txtOrder, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton1)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(240, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -370,7 +374,7 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 240, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 239, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
@@ -414,7 +418,7 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
     private javax.swing.JTree treeCOA;
     private javax.swing.JTextField txtMenuName;
     private javax.swing.JTextField txtMenuUrl;
-    private javax.swing.JTextField txtOrder;
+    private javax.swing.JFormattedTextField txtOrder;
     // End of variables declaration//GEN-END:variables
 
     @Override

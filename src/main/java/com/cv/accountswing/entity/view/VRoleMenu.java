@@ -5,6 +5,7 @@
  */
 package com.cv.accountswing.entity.view;
 
+import java.util.Collections;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
@@ -27,8 +28,23 @@ public class VRoleMenu implements java.io.Serializable {
     private String menuUrl;
     private String parent;
     private String menuFunction;
-    private String orderBy;
+    private Integer orderBy;
+    private String soureAccCode;
+    private Boolean isAllow;
     private List<VRoleMenu> child;
+
+    public VRoleMenu() {
+    }
+
+    public VRoleMenu(String menuClass, String menuName, Boolean isAllow, List<VRoleMenu> child) {
+        this.menuClass = menuClass;
+        this.menuName = menuName;
+        this.isAllow = isAllow;
+        this.child = child;
+        if (this.child == null) {
+            this.child = Collections.emptyList();
+        }
+    }
 
     @EmbeddedId
     public VRoleMenuKey getKey() {
@@ -103,17 +119,35 @@ public class VRoleMenu implements java.io.Serializable {
     }
 
     @Column(name = "order_by")
-    public String getOrderBy() {
+    public Integer getOrderBy() {
         return orderBy;
     }
 
-    public void setOrderBy(String orderBy) {
+    public void setOrderBy(Integer orderBy) {
         this.orderBy = orderBy;
     }
 
     @Override
     public String toString() {
         return menuName;
+    }
+
+    @Column(name = "source_acc_code")
+    public String getSoureAccCode() {
+        return soureAccCode;
+    }
+
+    public void setSoureAccCode(String soureAccCode) {
+        this.soureAccCode = soureAccCode;
+    }
+
+    @Transient
+    public Boolean getIsAllow() {
+        return isAllow;
+    }
+
+    public void setIsAllow(Boolean isAllow) {
+        this.isAllow = isAllow;
     }
 
 }

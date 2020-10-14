@@ -30,10 +30,9 @@ public class ComBoBoxAutoComplete extends PlainDocument {
     boolean hitBackspace = false;
     boolean hitBackspaceOnSelection;
 
-    
     public ComBoBoxAutoComplete(final JComboBox comboBox, KeyPropagate keyPropagate) {
         this(comboBox);
-        this.keyPropagate = keyPropagate;   
+        this.keyPropagate = keyPropagate;
     }
 
     public ComBoBoxAutoComplete(final JComboBox comboBox) {
@@ -66,7 +65,7 @@ public class ComBoBoxAutoComplete extends PlainDocument {
                     // determine if the pressed key is backspace (needed by the remove method)
                     case KeyEvent.VK_BACK_SPACE:
                         hitBackspace = true;
-                        hitBackspaceOnSelection = editor.getSelectionStart() 
+                        hitBackspaceOnSelection = editor.getSelectionStart()
                                 != editor.getSelectionEnd();
                         break;
                     // ignore delete key
@@ -158,8 +157,11 @@ public class ComBoBoxAutoComplete extends PlainDocument {
             // provide feedback to the user that his input has been received but can not be accepted
             comboBox.getToolkit().beep(); // when available use: UIManager.getLookAndFeel().provideErrorFeedback(comboBox);
         }
+        if (item != null) {
+            setText(item.toString());
 
-        setText(item.toString());
+        }
+
         // select the completed part
         highlightCompletedText(offs + str.length());
     }
@@ -190,7 +192,7 @@ public class ComBoBoxAutoComplete extends PlainDocument {
 
     private Object lookupItem(String pattern) {
         Object selectedItem = model.getSelectedItem();
-        
+
         // only search for a different item if the currently selected does not match
         if (selectedItem != null && startsWithIgnoreCase(selectedItem.toString(), pattern)) {
             return selectedItem;

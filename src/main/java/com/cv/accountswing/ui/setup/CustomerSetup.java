@@ -9,8 +9,6 @@ import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.StartWithRowFilter;
 import com.cv.accountswing.entity.ChartOfAccount;
-import com.cv.accountswing.entity.SystemProperty;
-import com.cv.accountswing.entity.SystemPropertyKey;
 import com.cv.accountswing.entity.Customer;
 import com.cv.accountswing.entity.Region;
 import com.cv.accountswing.entity.TraderType;
@@ -23,7 +21,6 @@ import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.setup.common.CustomerTabelModel;
 import com.cv.accountswing.util.BindingUtil;
 import com.cv.accountswing.util.Util1;
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.List;
@@ -97,11 +94,8 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener {
     }
 
     private void initCombo() {
-        String propKey = "system.cus.acc";
-        SystemPropertyKey spk = new SystemPropertyKey(propKey, Global.compId);
-        SystemProperty sp = spService.findById(spk);
-        String parent = sp.getPropValue();
-        List<ChartOfAccount> listCOA = coaService.getAllChild(parent, String.valueOf(Global.compId));
+
+        List<ChartOfAccount> listCOA = coaService.search("-", "-", Global.compId.toString(), "3", "-", "-", "-");
         BindingUtil.BindComboFilter(cboAccount, listCOA, null, true, false);
         BindingUtil.BindComboFilter(cboPriceType, traderTypeService.findAll(), null, true, false);
         BindingUtil.BindComboFilter(cboRegion, regionService.search("-", "-", Global.compId.toString(), "-"), null, true, false);
@@ -138,11 +132,13 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener {
 
     private void setCustomer(Customer cus) {
         txtCusCode.setText(cus.getTraderId());
+        txtConPerson.setText(cus.getContactPerson());
         txtCusName.setText(cus.getTraderName());
         txtCusEmail.setText(cus.getEmail());
         txtCusPhone.setText(cus.getPhone());
         cboRegion.setSelectedItem(cus.getRegion());
         cboPriceType.setSelectedItem(cus.getTraderType());
+        cboAccount.setSelectedItem(cus.getAccount());
         txtCusAddress.setText(cus.getAddress());
         chkActive.setSelected(cus.getActive());
         txtCreditLimit.setText(Util1.getString(cus.getCreditLimit()));
@@ -161,19 +157,20 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener {
                 Customer cus = customerTabelModel.getCustomer(selectRow);
                 customer.setId(cus.getId());
             }
-            ChartOfAccount coa = (ChartOfAccount) cboAccount.getSelectedItem();
             customer.setTraderId(txtCusCode.getText());
             customer.setTraderName(txtCusName.getText());
+            customer.setContactPerson(txtConPerson.getText());
             customer.setPhone(txtCusPhone.getText());
             customer.setEmail(txtCusEmail.getText());
             customer.setAddress(txtCusAddress.getText());
             customer.setRegion((Region) cboRegion.getSelectedItem());
             customer.setTraderType((TraderType) cboPriceType.getSelectedItem());
             customer.setActive(chkActive.isSelected());
-            customer.setAccountCode(coa.getCode());
+            customer.setAccount((ChartOfAccount) cboAccount.getSelectedItem());
             customer.setCompCode(Global.compId);
             customer.setUpdatedDate(Util1.getTodayDate());
             customer.setCreditLimit(Util1.getInteger(txtCreditLimit.getText()));
+            customer.setCreditDays(Util1.getInteger(txtCreditTerm.getText()));
             //customer.setAppShortName(TOOL_TIP_TEXT_KEY);
             //customer.setAppTraderCode(TOOL_TIP_TEXT_KEY);
 
@@ -192,7 +189,7 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener {
                 } else {
                     customerTabelModel.setCustomer(selectRow, customer);
                 }
-
+                clear();
             }
         }
     }
@@ -211,6 +208,8 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener {
         lblStatus.setText("NEW");
         txtCusName.requestFocus();
         txtCusFilter.setText(null);
+        txtConPerson.setText(null);
+        txtCreditTerm.setText(null);
     }
 
     /**
@@ -339,8 +338,17 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener {
         lblStatus.setFont(Global.lableFont);
         lblStatus.setText("NEW");
 
+        cboAccount.setFont(Global.textFont);
+        cboAccount.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        cboRegion.setFont(Global.textFont);
+        cboRegion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
         jLabel10.setFont(Global.lableFont);
         jLabel10.setText("Price Type");
+
+        cboPriceType.setFont(Global.textFont);
+        cboPriceType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         jLabel11.setFont(Global.lableFont);
         jLabel11.setText("Credit Term");
@@ -508,7 +516,13 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener {
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         // TODO add your handling code here:
-        saveCustomer();
+        try {
+            saveCustomer();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(Global.parentForm, e.getMessage());
+            LOGGER.error("Save Customer :" + e.getMessage());
+
+        }
     }//GEN-LAST:event_btnSaveActionPerformed
 
     private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed
@@ -692,9 +706,10 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener {
                     case KeyEvent.VK_ENTER:
                         txtCusAddress.requestFocus();
                         break;
-                    case KeyEvent.VK_UP:
+                    /*case KeyEvent.VK_UP:
                         txtCusEmail.requestFocus();
                         break;
+                     */
                     case KeyEvent.VK_RIGHT:
                         txtCusAddress.requestFocus();
                         break;
@@ -721,9 +736,10 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener {
                     case KeyEvent.VK_ENTER:
                         cboPriceType.requestFocus();
                         break;
-                    case KeyEvent.VK_UP:
+                    /*case KeyEvent.VK_UP:
                         txtCusAddress.requestFocus();
                         break;
+                     */
                     case KeyEvent.VK_RIGHT:
                         cboPriceType.requestFocus();
                         break;
@@ -739,9 +755,10 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener {
                     case KeyEvent.VK_ENTER:
                         txtCreditLimit.requestFocus();
                         break;
-                    case KeyEvent.VK_UP:
+                    /*case KeyEvent.VK_UP:
                         cboAccount.requestFocus();
                         break;
+                     */
                     case KeyEvent.VK_RIGHT:
                         txtCreditLimit.requestFocus();
                         break;

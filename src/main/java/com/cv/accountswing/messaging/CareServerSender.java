@@ -5,7 +5,6 @@
  */
 package com.cv.accountswing.messaging;
 
-
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.gson.DateDeSerializer;
 import com.cv.accountswing.gson.DateSerializer;
@@ -36,10 +35,10 @@ public class CareServerSender {
     private final Gson gson = new GsonBuilder().
             registerTypeAdapter(Date.class, new DateSerializer()).
             registerTypeAdapter(Date.class, new DateDeSerializer()).create();
-
     @Value("${server.queue}")
     private String topicStringDestination;
     @Value("${destination.queue}")
+
     private String replyQueue;
 
     @Autowired
@@ -50,7 +49,7 @@ public class CareServerSender {
 
     public void sendMapMessage(MessageCreator mc) {
         jmsTemplate.send(topicStringDestination, mc);
-        
+
     }
 
     public void sendNewInitializeMessage() {

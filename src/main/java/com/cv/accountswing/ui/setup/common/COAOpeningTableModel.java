@@ -5,6 +5,7 @@
 package com.cv.accountswing.ui.setup.common;
 
 import com.cv.accountswing.common.Global;
+import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.Gl;
 import com.cv.accountswing.entity.view.VGl;
 import com.cv.accountswing.service.GlService;
@@ -36,6 +37,11 @@ public class COAOpeningTableModel extends AbstractTableModel {
     Gson gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
     @Autowired
     private GlService glService;
+    private SelectionObserver selectionObserver;
+
+    public void setSelectionObserver(SelectionObserver selectionObserver) {
+        this.selectionObserver = selectionObserver;
+    }
 
     public void setParent(JTable parent) {
         this.parent = parent;
@@ -104,15 +110,13 @@ public class COAOpeningTableModel extends AbstractTableModel {
         switch (column) {
             case 6:
                 if (value != null) {
-                    Double drAmt = (Double) value;
-                    vgl.setDrAmt(drAmt);
+                    vgl.setDrAmt(Util1.getDouble(value));
                     save(vgl, row);
                 }
                 break;
             case 7:
                 if (value != null) {
-                    Double crAmt = (Double) value;
-                    vgl.setCrAmt(crAmt);
+                    vgl.setCrAmt(Util1.getDouble(value));
                     save(vgl, row);
                 }
                 break;
@@ -136,6 +140,7 @@ public class COAOpeningTableModel extends AbstractTableModel {
                 parent.setRowSelectionInterval(row + 1, row + 1);
                 parent.setColumnSelectionInterval(6, 6);
                 JOptionPane.showMessageDialog(Global.parentForm, "Saved");
+                selectionObserver.selected("CAL-TOTAL", "-");
             }
         } catch (Exception ex) {
             LOGGER.error("Save Gl :" + ex.getMessage());

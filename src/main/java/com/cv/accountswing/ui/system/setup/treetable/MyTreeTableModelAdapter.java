@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.cv.accountswing.ui.system.setup.common;
+package com.cv.accountswing.ui.system.setup.treetable;
 
 import javax.swing.JTree;
 import javax.swing.event.TreeExpansionEvent;
@@ -15,18 +15,16 @@ import javax.swing.tree.TreePath;
  *
  * @author Lenovo
  */
-public class TreeTableModelAdapter extends AbstractTableModel {
+public class MyTreeTableModelAdapter extends AbstractTableModel {
 
     JTree tree;
-    TreeTableModel treeTableModel;
+    MyAbstractTreeTableModel treeTableModel;
 
-    public TreeTableModelAdapter(TreeTableModel treeTableModel, JTree tree) {
+    public MyTreeTableModelAdapter(MyAbstractTreeTableModel treeTableModel, JTree tree) {
         this.tree = tree;
         this.treeTableModel = treeTableModel;
 
         tree.addTreeExpansionListener(new TreeExpansionListener() {
-            // Don't use fireTableRowsInserted() here;
-            // the selection model would get  updated twice.
             @Override
             public void treeExpanded(TreeExpansionEvent event) {
                 fireTableDataChanged();
@@ -39,7 +37,6 @@ public class TreeTableModelAdapter extends AbstractTableModel {
         });
     }
 
-    // Wrappers, implementing TableModel interface. 
     @Override
     public int getColumnCount() {
         return treeTableModel.getColumnCount();
@@ -51,7 +48,7 @@ public class TreeTableModelAdapter extends AbstractTableModel {
     }
 
     @Override
-    public Class getColumnClass(int column) {
+    public Class<?> getColumnClass(int column) {
         return treeTableModel.getColumnClass(column);
     }
 

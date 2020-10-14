@@ -55,8 +55,6 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
         initComponents();
     }
 
-    
-
     public void initMain() {
         swrf = new StartWithRowFilter(txtFilter);
         initTable();
@@ -134,8 +132,6 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
         int delete = categoryService.delete(cat.getCatId().toString());
         if (delete == 1) {
             JOptionPane.showMessageDialog(Global.parentForm, "Deleted");
-        } else {
-            JOptionPane.showMessageDialog(Global.parentForm, "Error in server.");
         }
     }
 
@@ -328,12 +324,22 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         // TODO add your handling code here:
-        save();
+        try {
+            save();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Save Category", JOptionPane.ERROR_MESSAGE);
+            LOGGER.error("Save Categor :" + e.getMessage());
+        }
     }//GEN-LAST:event_btnSaveActionPerformed
 
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
         // TODO add your handling code here:
-        delete();
+        try {
+            delete();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Delete Category", JOptionPane.ERROR_MESSAGE);
+            LOGGER.error("Delete Category :" + e.getMessage());
+        }
     }//GEN-LAST:event_btnDeleteActionPerformed
 
     private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed

@@ -54,7 +54,7 @@ public class PrivilegeServiceImpl implements PrivilegeService{
         
             Privilege privilege = new Privilege();
             privilege.setKey(key);
-            
+            privilege.setIsAllow(Boolean.FALSE);
             dao.save(privilege);
             
             if(menu.getChild() != null){

@@ -129,7 +129,7 @@ public class JournalEntryTableModel extends AbstractTableModel {
                         Trader trader = (Trader) value;
                         gv.setTraderId(Util1.getLong(trader.getId()));
                         gv.setTraderName(trader.getTraderName());
-                        String coaCode = trader.getAccountCode();
+                        String coaCode = trader.getAccount().getCode();
                         ChartOfAccount account = cOAService.findById(coaCode);
                         if (account != null) {
                             gv.setAccountId(coaCode);

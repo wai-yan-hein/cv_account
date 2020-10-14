@@ -33,7 +33,6 @@ public class TableCellRender extends DefaultTableCellRenderer {
         }*/
         if (isSelected) {
             c.setBackground(new Color(38, 117, 191));
-
         }
 
         String s = "";
@@ -44,6 +43,7 @@ public class TableCellRender extends DefaultTableCellRenderer {
             c = getTableCellRendererComponent(table, s,
                     isSelected, hasFocus, row, column);
             ((JLabel) c).setHorizontalAlignment(SwingConstants.RIGHT);
+
         }
         if (value instanceof Float) {
             DecimalFormat dFormat = new DecimalFormat("#,##0.###");

@@ -5,6 +5,7 @@
  */
 package com.cv.accountswing.entity;
 
+import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -14,9 +15,11 @@ import javax.persistence.Table;
  * @author winswe
  */
 @Entity
-@Table(name="privilege")
-public class Privilege implements java.io.Serializable{
+@Table(name = "privilege")
+public class Privilege implements java.io.Serializable {
+
     private PrivilegeKey key;
+    private Boolean isAllow;
 
     @EmbeddedId
     public PrivilegeKey getKey() {
@@ -26,4 +29,14 @@ public class Privilege implements java.io.Serializable{
     public void setKey(PrivilegeKey key) {
         this.key = key;
     }
+
+    @Column(name = "allow")
+    public Boolean getIsAllow() {
+        return isAllow;
+    }
+
+    public void setIsAllow(Boolean isAllow) {
+        this.isAllow = isAllow;
+    }
+
 }

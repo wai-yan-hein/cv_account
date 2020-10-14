@@ -93,4 +93,7 @@ public class StockUnitTableModel extends AbstractTableModel {
         }
     }
 
+    public void refresh() {
+        fireTableDataChanged();
+    }
 }

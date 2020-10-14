@@ -210,6 +210,7 @@ public class StockTypeSetupDialog extends javax.swing.JDialog implements KeyList
         setTitle("Stock Type Setup");
         setModalityType(java.awt.Dialog.ModalityType.DOCUMENT_MODAL);
 
+        tblItemType.setFont(Global.textFont);
         tblItemType.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},

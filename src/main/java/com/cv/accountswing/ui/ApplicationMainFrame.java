@@ -56,7 +56,6 @@ import com.cv.inv.service.SaleManService;
 import com.cv.inv.service.VouStatusService;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.MachineInfo;
-import com.cv.inv.entry.StockReceiving;
 import com.cv.inv.service.MachineInfoService;
 import com.cv.inv.service.RelationService;
 import com.cv.inv.service.StockUnitService;
@@ -106,7 +105,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
 
     private final ConfigurableApplicationContext context;
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationMainFrame.class);
-    private final HashMap<String, Integer> hmTabIndex = new HashMap();
     private final HashMap<String, JLabel> hmTabLoading = new HashMap();
     JPopupMenu popupmenu;
     private final String clear = "Clear";
@@ -120,9 +118,10 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
 
     private final ActionListener menuListener = (java.awt.event.ActionEvent evt) -> {
         JMenuItem actionMenu = (JMenuItem) evt.getSource();
+        String className = actionMenu.getName();
         String menuName = actionMenu.getText();
         LOGGER.info("Selected Menu : " + menuName);
-        JPanel panel = getPanel(menuName);
+        JPanel panel = getPanel(className, menuName);
         addTabMain(panel, menuName);
     };
 
@@ -151,21 +150,12 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     @Autowired
     private COASetup coaSetup;
     @Autowired
-    private AllCash dailyCash;
-    @Autowired
-    private AllCash pettyCash;
-    @Autowired
-    private AllCash adjCash;
-    @Autowired
-    private AllCash pettyCashZay;
+    private AllCash allCash;
     @Autowired
     private Journal journal;
     @Autowired
     private MenuSetup menuSetup;
-    @Autowired
-    private AllCash bankSaving;
-    @Autowired
-    private AllCash homeSafe;
+
     @Autowired
     private SalePurchaseBook saleBook;
     @Autowired
@@ -210,8 +200,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private COAOpeningSetup cOAOpeningSetup;
     @Autowired
     private OtherSetup otherSetup;
-    @Autowired
-    private StockReceiving stockReceiving;
+
     @Autowired
     private ReturnIn retIn;
     @Autowired
@@ -271,195 +260,210 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
 
     }
 
-    private JPanel getPanel(String panelName) {
+    private JPanel getPanel(String className, String panelName) {
+        String[] split = className.split(",");
+        String cName = split[0]; // group name
+        String sourceId = split[1];
         //  LOGGER.info("getPanel : " + panelName);
-        switch (panelName) {
-            case "Customer":
-                customerSetup.setName(panelName);
-                customerSetup.setLoadingObserver(this);
-                return customerSetup;
-            case "Currency":
-                currencySetup.setName(panelName);
-                currencySetup.setLoadingObserver(this);
-                return currencySetup;
-            case "Supplier":
-                supplierSetup.setName(panelName);
-                supplierSetup.setLoadingObserver(this);
-                return supplierSetup;
-            case "Role Assign":
-                roleAssignSetup.setName(panelName);
-                roleAssignSetup.setLoadingObserver(this);
-                return roleAssignSetup;
-            case "Department":
-                departmentSetup.setName(panelName);
-                departmentSetup.setLoadingObserver(this);
-                return departmentSetup;
-            case "Region":
-                regionSetup.setName(panelName);
-                regionSetup.setLoadingObserver(this);
-                return regionSetup;
-            case "Chart of Account":
-                chartOfAccountSetup.setName(panelName);
-                chartOfAccountSetup.setLoadingObserver(this);
-                return chartOfAccountSetup;
-            case "Manage Project":
-                manageProjectSetup.setName(panelName);
-                manageProjectSetup.setLoadingObserver(this);
-                return manageProjectSetup;
-            case "COA Setup":
-                coaSetup.setName(panelName);
-                coaSetup.setLoadingObserver(this);
-                return coaSetup;
-            case "Daily Cash":
-                dailyCash.setName(panelName);
-                dailyCash.setLoadingObserver(this);
-                dailyCash.setReloadData(this);
-                dailyCash.setSourceAccId(Global.sysProperties.get("system.cashbook"));
-                return dailyCash;
-            case "Patty Cash":
-                pettyCash.setName(panelName);
-                pettyCash.setLoadingObserver(this);
-                pettyCash.setReloadData(this);
-                pettyCash.setSourceAccId(Global.sysProperties.get("system.pattycash"));
-                return pettyCash;
-            case "Adj Cash":
-                adjCash.setName(panelName);
-                adjCash.setLoadingObserver(this);
-                adjCash.setReloadData(this);
-                adjCash.setSourceAccId(Global.sysProperties.get("system.adjcash"));
-                return adjCash;
-            case "Petty Cash Zay":
-                pettyCashZay.setName(panelName);
-                pettyCashZay.setLoadingObserver(this);
-                pettyCashZay.setReloadData(this);
-                pettyCashZay.setSourceAccId(Global.sysProperties.get("system.pattycash.zay"));
-                return pettyCashZay;
-            case "Bank - Saving":
-                bankSaving.setName(panelName);
-                bankSaving.setLoadingObserver(this);
-                bankSaving.setReloadData(this);
-                bankSaving.setSourceAccId(Global.sysProperties.get("system.bankbook"));
-                return bankSaving;
-            case "Home Safe":
-                homeSafe.setName(panelName);
-                homeSafe.setLoadingObserver(this);
-                homeSafe.setReloadData(this);
-                homeSafe.setSourceAccId(Global.sysProperties.get("system.bank.homesave"));
-                return homeSafe;
-            case "Purchase":
-                purchaseBook.setName(panelName);
-                purchaseBook.setLoadingObserver(this);
-                purchaseBook.setSourceAccId(Global.sysProperties.get("system.purchasebook"));
-                return purchaseBook;
-            case "Sale":
-                saleBook.setName(panelName);
-                saleBook.setLoadingObserver(this);
-                saleBook.setSourceAccId(Global.sysProperties.get("system.salebook"));
-                return saleBook;
+        switch (cName) {
+            case "Setup":
+                switch (panelName) {
+                    case "Account Group":
+                        chartOfAccountSetup.setName(panelName);
+                        chartOfAccountSetup.setLoadingObserver(this);
+                        return chartOfAccountSetup;
+                    case "Department":
+                        departmentSetup.setName(panelName);
+                        departmentSetup.setLoadingObserver(this);
+                        return departmentSetup;
+                    case "Region":
+                        regionSetup.setName(panelName);
+                        regionSetup.setLoadingObserver(this);
+                        return regionSetup;
+                    case "Customer":
+                        customerSetup.setName(panelName);
+                        customerSetup.setLoadingObserver(this);
+                        return customerSetup;
+                    case "Currency":
+                        currencySetup.setName(panelName);
+                        currencySetup.setLoadingObserver(this);
+                        return currencySetup;
+                    case "Supplier":
+                        supplierSetup.setName(panelName);
+                        supplierSetup.setLoadingObserver(this);
+                        return supplierSetup;
+                    case "Role Assign":
+                        roleAssignSetup.setName(panelName);
+                        roleAssignSetup.setLoadingObserver(this);
+                        return roleAssignSetup;
+                    case "COA":
+                        coaSetup.setName(panelName);
+                        coaSetup.setLoadingObserver(this);
+                        return coaSetup;
+                    case "Opening Balance":
+                        cOAOpeningSetup.setName(panelName);
+                        cOAOpeningSetup.setLoadingObserver(this);
+                        return cOAOpeningSetup;
+                    //Inventory Menu
+                    case "Stock":
+                        stockSetup.setName(panelName);
+                        stockSetup.setLoadingObserver(this);
+                        return stockSetup;
+                    case "Other":
+                        otherSetup.setName(panelName);
+                        otherSetup.setLoadingObserver(this);
+                        return otherSetup;
+                    default:
+                        return null;
+                }
+            case "Bank":
+                //dynamic bank
+                AllCash bank = allCash.newInstance();
+                bank.setName(panelName);
+                bank.setLoadingObserver(this);
+                bank.setReloadData(this);
+                bank.setSourceAccId(sourceId);
+                return bank;
+            case "AllCash":
+                //dynamic cash
+                AllCash cash = allCash.newInstance();
+                cash.setName(panelName);
+                cash.setLoadingObserver(this);
+                cash.setReloadData(this);
+                cash.setSourceAccId(sourceId);
+
+                return cash;
+            case "DayBook":
+                switch (panelName) {
+                    case "Purchase":
+                        purchaseBook.setName(panelName);
+                        purchaseBook.setLoadingObserver(this);
+                        return purchaseBook;
+                    case "Sale":
+                        saleBook.setName(panelName);
+                        saleBook.setLoadingObserver(this);
+                        return saleBook;
+                    default:
+                        return null;
+                }
             case "Journal":
-                journal.setName(panelName);
-                journal.setLoadingObserver(this);
-                return journal;
-            case "Journal Stock Opening":
-                journalStockOpening.setName(panelName);
-                journalStockOpening.setLoadingObserver(this);
-                //journalStockOpening.initTable();
-                return journalStockOpening;
-            case "Credit Voucher":
-                crdrVoucher.setSplitId("8");
-                crdrVoucher.setSourceAcId(Global.sysProperties.get("system.creditvoucher"));
-                crdrVoucher.setName(panelName);
-                crdrVoucher.setLoadingObserver(this);
-                return crdrVoucher;
-            case "Debit Voucher":
-                debitVoucher.setSplitId("9");
-                debitVoucher.setSourceAcId(Global.sysProperties.get("system.creditvoucher"));
-                debitVoucher.setName(panelName);
-                debitVoucher.setLoadingObserver(this);
-                return debitVoucher;
-            case "AP/AR":
-                aPARReport.setName(panelName);
-                aPARReport.setLoadingObserver(this);
-                return aPARReport;
-            case "G/L Listing":
-                glListingReport.setName(panelName);
-                glListingReport.setLoadingObserver(this);
-                return glListingReport;
-            case "Profit & Lost":
-                profitAndLost.setName(panelName);
-                profitAndLost.setLoadingObserver(this);
-                return profitAndLost;
-            case "Balance Sheet":
-                balanceSheet.setName(panelName);
-                balanceSheet.setLoadingObserver(this);
-                return balanceSheet;
-            case "Menu":
-                menuSetup.setName(panelName);
-                menuSetup.setLoadingObserver(this);
-                return menuSetup;
-            case "System Property":
-                systemPropertySetup.setName(panelName);
-                systemPropertySetup.setLoadingObserver(this);
-                return systemPropertySetup;
-            case "Company":
-                company.initTable();
-                return company;
-            case "User Setup":
-                user.setName(panelName);
-                user.setLoadingObserver(this);
-                return user;
-            case "Role Setup":
-                roleSetup.setName(panelName);
-                return roleSetup;
-            case "C.O.A Opening":
-                cOAOpeningSetup.setName(panelName);
-                cOAOpeningSetup.setLoadingObserver(this);
-                return cOAOpeningSetup;
-            //Inventory Menu
-            case "Stock Setup":
-                stockSetup.setName(panelName);
-                stockSetup.setLoadingObserver(this);
-                return stockSetup;
-            case "Stock Other Setup":
-                otherSetup.setName(panelName);
-                otherSetup.setLoadingObserver(this);
-                return otherSetup;
-            case "Sale Entry":
-                saleEntry.setName(panelName);
-                saleEntry.setLoadingObserver(this);
-                return saleEntry;
-            case "Purchase Entry":
-                purchaseEntry.setName(panelName);
-                purchaseEntry.setLoadingObserver(this);
-                return purchaseEntry;
-            case "Return In":
-                returnIn.setName(panelName);
-                returnIn.setLoadingObserver(this);
-                return returnIn;
-            case "Return Out":
-                returnOut.setName(panelName);
-                returnOut.setLoadingObserver(this);
-                return returnOut;
-            case "Damage":
-                damage.setName(panelName);
-                damage.setLoadingObserver(this);
-                return damage;
-            case "Transfer":
-                transfer.setName(panelName);
-                transfer.setLoadingObserver(this);
-                return transfer;
-            case "Adjustment":
-                adjustment.setName(panelName);
-                adjustment.setLoadingObserver(this);
-                return adjustment;
-            case "Issue":
-                issue.setName(panelName);
-                issue.setLoadingObserver(this);
-                return issue;
-            case "Receive":
-                stockReceive.setName(panelName);
-                stockReceive.setLoadingObserver(this);
-                return stockReceive;
+                switch (panelName) {
+                    case "Journal":
+                        journal.setName(panelName);
+                        journal.setLoadingObserver(this);
+                        return journal;
+                    case "Journal Stock Opening":
+                        journalStockOpening.setName(panelName);
+                        journalStockOpening.setLoadingObserver(this);
+                        //journalStockOpening.initTable();
+                        return journalStockOpening;
+                    case "Credit Voucher":
+                        crdrVoucher.setSplitId("8");
+                        crdrVoucher.setSourceAcId(Global.sysProperties.get("system.creditvoucher"));
+                        crdrVoucher.setName(panelName);
+                        crdrVoucher.setLoadingObserver(this);
+                        return crdrVoucher;
+                    case "Debit Voucher":
+                        debitVoucher.setSplitId("9");
+                        debitVoucher.setSourceAcId(Global.sysProperties.get("system.creditvoucher"));
+                        debitVoucher.setName(panelName);
+                        debitVoucher.setLoadingObserver(this);
+                        return debitVoucher;
+                    default:
+                        return null;
+                }
+            case "Inventory":
+                switch (panelName) {
+                    case "Sale Entry":
+                        saleEntry.setName(panelName);
+                        saleEntry.setLoadingObserver(this);
+                        return saleEntry;
+                    case "Purchase Entry":
+                        purchaseEntry.setName(panelName);
+                        purchaseEntry.setLoadingObserver(this);
+                        return purchaseEntry;
+                    case "Return In":
+                        returnIn.setName(panelName);
+                        returnIn.setLoadingObserver(this);
+                        return returnIn;
+                    case "Return Out":
+                        returnOut.setName(panelName);
+                        returnOut.setLoadingObserver(this);
+                        return returnOut;
+                    case "Damage":
+                        damage.setName(panelName);
+                        damage.setLoadingObserver(this);
+                        return damage;
+                    case "Transfer":
+                        transfer.setName(panelName);
+                        transfer.setLoadingObserver(this);
+                        return transfer;
+                    case "Adjustment":
+                        adjustment.setName(panelName);
+                        adjustment.setLoadingObserver(this);
+                        return adjustment;
+                    case "Issue":
+                        issue.setName(panelName);
+                        issue.setLoadingObserver(this);
+                        return issue;
+                    case "Receive":
+                        stockReceive.setName(panelName);
+                        stockReceive.setLoadingObserver(this);
+                        return stockReceive;
+                    case "Manage Project":
+                        manageProjectSetup.setName(panelName);
+                        manageProjectSetup.setLoadingObserver(this);
+                        return manageProjectSetup;
+                        
+                    default:
+                        return null;
+                }
+            case "System":
+                switch (panelName) {
+                    case "Menu":
+                        menuSetup.setName(panelName);
+                        menuSetup.setLoadingObserver(this);
+                        return menuSetup;
+                    case "System Property":
+                        systemPropertySetup.setName(panelName);
+                        systemPropertySetup.setLoadingObserver(this);
+                        return systemPropertySetup;
+                    case "Company":
+                        company.initTable();
+                        return company;
+                    case "User Setup":
+                        user.setName(panelName);
+                        user.setLoadingObserver(this);
+                        return user;
+                    case "Role Setup":
+                        roleSetup.setName(panelName);
+                        return roleSetup;
+                    default:
+                        return null;
+
+                }
+            case "Report":
+                switch (panelName) {
+                    case "AP/AR":
+                        aPARReport.setName(panelName);
+                        aPARReport.setLoadingObserver(this);
+                        return aPARReport;
+                    case "G/L Listing":
+                        glListingReport.setName(panelName);
+                        glListingReport.setLoadingObserver(this);
+                        return glListingReport;
+                    case "Profit & Lost":
+                        profitAndLost.setName(panelName);
+                        profitAndLost.setLoadingObserver(this);
+                        return profitAndLost;
+                    case "Balance Sheet":
+                        balanceSheet.setName(panelName);
+                        balanceSheet.setLoadingObserver(this);
+                        return balanceSheet;
+                    default:
+                        return null;
+                }
+
             default:
                 return null;
         }
@@ -621,6 +625,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                 if (menu.getChild() != null) {
                     if (!menu.getChild().isEmpty()) {
                         JMenu parent = new JMenu();
+                        parent.setName(menu.getMenuClass() + "," + menu.getSoureAccCode());
                         parent.setText(menu.getMenuName());
                         parent.setFont(Global.menuFont);
 
@@ -630,6 +635,8 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                         addChildMenu(parent, menu.getChild());
                     } else {  //No Child
                         JMenu jmenu = new JMenu();
+                        jmenu.setName(menu.getMenuClass() + "," + menu.getSoureAccCode());
+
                         jmenu.setText(menu.getMenuName());
                         jmenu.setFont(Global.menuFont);
 
@@ -639,9 +646,10 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                     }
                 } else {  //No Child
                     JMenu jmenu = new JMenu();
+
                     jmenu.setText(menu.getMenuName());
                     jmenu.setFont(Global.menuFont);
-
+                    jmenu.setName(menu.getMenuClass() + "," + menu.getSoureAccCode());
                     //Need to add action listener
                     //====================================
                     menuBar.add(jmenu);
@@ -659,6 +667,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                     JMenu menu = new JMenu();
                     menu.setText(vrMenu.getMenuName());
                     menu.setFont(Global.menuFont);
+                    menu.setName(vrMenu.getMenuClass() + "," + vrMenu.getSoureAccCode());
 
                     //Need to add action listener
                     //====================================
@@ -670,6 +679,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                     //Need to add action listener
                     menuItem.addActionListener(menuListener);
                     menuItem.setFont(Global.menuFont);
+                    menuItem.setName(vrMenu.getMenuClass() + "," + vrMenu.getSoureAccCode());
 
                     //====================================
                     parent.add(menuItem);
@@ -677,6 +687,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             } else {  //No Child
                 JMenuItem menuItem = new JMenuItem();
                 menuItem.setText(vrMenu.getMenuName());
+                menuItem.setName(vrMenu.getMenuClass() + "," + vrMenu.getSoureAccCode());
                 //Need to add action listener
                 menuItem.addActionListener(menuListener);
                 menuItem.setFont(Global.menuFont);
@@ -691,6 +702,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         Global.y = this.getY();
         Global.height = this.getHeight();
         Global.width = this.getWidth();
+        lblCompanyName.setText(Global.companyName);
     }
 
     @Override
@@ -698,7 +710,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         LOGGER.info("MainFrame reload : " + msg);
         switch (msg) {
             case "SENT-INV":
-                lblLog.setText(data.toString());
+                lblCompanyName.setText(data.toString());
                 break;
             default:
                 break;
@@ -880,13 +892,13 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             BufferedImage off = resizeImage(offlineIcon.getImage(), 30, 30, false);
             online = new ImageIcon(on);
             offline = new ImageIcon(off);
-            lblLog.setText(null);
+            lblCompanyName.setText(null);
         }
 
         if (status) {
-            lblLog.setIcon(online);
+            lblCompanyName.setIcon(online);
         } else {
-            lblLog.setIcon(offline);
+            lblCompanyName.setIcon(offline);
         }
     }
 
@@ -1000,78 +1012,78 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             case "Daily Cash":
                 switch (type) {
                     case clear:
-                        dailyCash.clearFilter();
+                        allCash.clearFilter();
                         break;
                     case close:
-                        dailyCash.setIsShown(false);
+                        allCash.setIsShown(false);
                         break;
                     case print:
-                        dailyCash.print();
+                        allCash.print();
                         break;
                 }
                 break;
             case "Patty Cash":
                 switch (type) {
                     case clear:
-                        pettyCash.clearFilter();
+                        allCash.clearFilter();
                         break;
                     case close:
-                        pettyCash.setIsShown(false);
+                        allCash.setIsShown(false);
                         break;
                     case print:
-                        pettyCash.print();
+                        allCash.print();
                         break;
                 }
                 break;
             case "Adj Cash":
                 switch (type) {
                     case clear:
-                        adjCash.clearFilter();
+                        allCash.clearFilter();
                         break;
                     case close:
-                        adjCash.setIsShown(false);
+                        allCash.setIsShown(false);
                         break;
                     case print:
-                        adjCash.print();
+                        allCash.print();
                         break;
                 }
                 break;
             case "Petty Cash Zay":
                 switch (type) {
                     case clear:
-                        pettyCashZay.clearFilter();
+                        allCash.clearFilter();
                         break;
                     case close:
-                        pettyCashZay.setIsShown(false);
+                        allCash.setIsShown(false);
                         break;
                     case print:
-                        pettyCashZay.print();
+                        allCash.print();
                         break;
                 }
                 break;
             case "Bank - Saving":
                 switch (type) {
                     case clear:
-                        bankSaving.clearFilter();
+                        allCash.clearFilter();
                         break;
                     case close:
-                        bankSaving.setIsShown(false);
+                        allCash.setIsShown(false);
                         break;
                     case print:
-                        bankSaving.print();
+                        allCash.print();
                         break;
                 }
                 break;
             case "Home Safe":
                 switch (type) {
                     case clear:
-                        homeSafe.clearFilter();
+                        allCash.clearFilter();
                         break;
                     case close:
-                        homeSafe.setIsShown(false);
+                        allCash.setIsShown(false);
                         break;
                     case print:
-                        homeSafe.print();
+                        allCash.print();
                         break;
                 }
                 break;
@@ -1244,7 +1256,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         btnLogout = new javax.swing.JButton();
         btnHistory = new javax.swing.JButton();
         btnSave = new javax.swing.JButton();
-        lblLog = new javax.swing.JLabel();
+        lblCompanyName = new javax.swing.JLabel();
         tabMain = new javax.swing.JTabbedPane();
         menuBar = new javax.swing.JMenuBar();
 
@@ -1336,8 +1348,8 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             }
         });
 
-        lblLog.setFont(Global.textFont);
-        lblLog.setText("Welcome");
+        lblCompanyName.setFont(Global.lableFont);
+        lblCompanyName.setText("Welcome");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -1345,7 +1357,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblLog, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(lblCompanyName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnHistory)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1365,7 +1377,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblLog, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblCompanyName, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                         .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(btnPrint, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -1489,7 +1501,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private javax.swing.JButton btnSave;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JLabel lblLog;
+    private javax.swing.JLabel lblCompanyName;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JTabbedPane tabMain;
     // End of variables declaration//GEN-END:variables

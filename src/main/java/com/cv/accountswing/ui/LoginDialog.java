@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class LoginDialog extends javax.swing.JDialog implements KeyListener {
-
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginDialog.class);
     private boolean login = false;
     private int loginAttempt = 0;
@@ -54,13 +54,13 @@ public class LoginDialog extends javax.swing.JDialog implements KeyListener {
                 LOGGER.info("Control Name : " + jtf.getName());
             }
         }
-
+        
         @Override
         public void focusLost(java.awt.event.FocusEvent evt) {
-
+            
         }
     };
-
+    
     @Autowired
     private TaskExecutor taskExecutor;
     @Autowired
@@ -84,21 +84,19 @@ public class LoginDialog extends javax.swing.JDialog implements KeyListener {
     //KeyListener implementation
     @Override
     public void keyTyped(KeyEvent e) {
-
+        
     }
-
+    
     @Override
     public void keyPressed(KeyEvent e) {
-
+        
     }
-
     
-
     @Override
     public void keyReleased(KeyEvent e) {
         Object sourceObj = e.getSource();
         String ctrlName = "-";
-
+        
         if (sourceObj instanceof JComboBox) {
             ctrlName = ((JComboBox) sourceObj).getName();
         } else if (sourceObj instanceof JFormattedTextField) {
@@ -106,7 +104,7 @@ public class LoginDialog extends javax.swing.JDialog implements KeyListener {
         } else if (sourceObj instanceof JTextField) {
             ctrlName = ((JTextField) sourceObj).getName();
         }
-
+        
         switch (ctrlName) {
             case "txtLoginName":
                 if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_DOWN) {
@@ -163,7 +161,7 @@ public class LoginDialog extends javax.swing.JDialog implements KeyListener {
                 butLogin.setEnabled(false);
                 taskExecutor.execute(new Runnable() {
                     int cnt = 0;
-
+                    
                     @Override
                     public void run() {
                         do {
@@ -176,13 +174,13 @@ public class LoginDialog extends javax.swing.JDialog implements KeyListener {
                                 cnt++;
                             }
                         } while (!Global.synceFinish);
-
+                        
                         butClear.setEnabled(true);
                         butLogin.setEnabled(true);
                         lblStatus.setText("Synce with server finished.");
                     }
                 });
-
+                
             } else {
                 lblStatus.setText("Synce with server finished.");
             }
@@ -190,22 +188,27 @@ public class LoginDialog extends javax.swing.JDialog implements KeyListener {
             LOGGER.error("startThread : " + ex.getMessage());
         }
         loadSysProperties();
-
+        
     }
-
+    
     private void loadSysProperties() {
-        List<SystemProperty> listSys = systemPropertyService.search("-", "-", "-");
-        HashMap<String, String> hmList = new HashMap<>();
-        for (SystemProperty sys : listSys) {
-            hmList.put(sys.getKey().getPropKey(), sys.getPropValue());
+        try {
+            List<SystemProperty> listSys = systemPropertyService.search("-", "-", "-");
+            HashMap<String, String> hmList = new HashMap<>();
+            listSys.forEach(sys -> {
+                hmList.put(sys.getKey().getPropKey(), sys.getPropValue());
+            });
+            Global.sysProperties = hmList;
+        } catch (Exception e) {
+            LOGGER.error("Connection Timeout :" + e.getMessage());
+            System.exit(1);
         }
-        Global.sysProperties = hmList;
     }
-
+    
     public boolean isLogin() {
         return login;
     }
-
+    
     private void login() {
         if (txtLoginName.getText().isEmpty() || txtPassword.getPassword().length == 0) {
             JOptionPane.showMessageDialog(this, "Invalid user name or password.",
@@ -216,7 +219,7 @@ public class LoginDialog extends javax.swing.JDialog implements KeyListener {
                 AppUser user = usrService.login(
                         txtLoginName.getText(), String.copyValueOf(txtPassword.getPassword())
                 );
-
+                
                 if (user == null) {
                     JOptionPane.showMessageDialog(this, "Invalid user name or password.",
                             "Authentication error.", JOptionPane.ERROR_MESSAGE);
@@ -232,25 +235,25 @@ public class LoginDialog extends javax.swing.JDialog implements KeyListener {
                         "Authentication error.", JOptionPane.ERROR_MESSAGE);
             }
         }
-
+        
         if (loginAttempt >= 3) {
             this.dispose();
         }
     }
-
+    
     public void clear() {
         txtLoginName.setText(null);
         txtPassword.setText(null);
         txtLoginName.requestFocus();
     }
-
+    
     private void initKeyListener() {
         txtLoginName.addKeyListener(this);
         txtPassword.addKeyListener(this);
         butClear.addKeyListener(this);
         butLogin.addKeyListener(this);
     }
-
+    
     private void initFocusListener() {
         txtLoginName.addFocusListener(fa);
         txtPassword.addFocusListener(fa);

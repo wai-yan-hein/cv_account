@@ -98,7 +98,7 @@ public class CrDrVoucherEntryTableModel extends AbstractTableModel {
                         Trader trader = (Trader) value;
                         vgl.setTraderId(Util1.getLong(trader.getId()));
                         vgl.setTraderName(trader.getTraderName());
-                        String coaCode = trader.getAccountCode();
+                        String coaCode = trader.getAccount().getCode();
                         ChartOfAccount account = cOAService.findById(coaCode);
                         if (account != null) {
                             vgl.setAccountId(coaCode);

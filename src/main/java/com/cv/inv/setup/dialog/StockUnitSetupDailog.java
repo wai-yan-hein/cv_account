@@ -110,11 +110,10 @@ public class StockUnitSetupDailog extends javax.swing.JDialog implements KeyList
             StockUnit saveItem = itemUnitService.save(itemUnit);
             if (saveItem != null) {
                 JOptionPane.showMessageDialog(Global.parentForm, "Saved");
-
                 if (lblStatus.getText().equals("NEW")) {
-                    itemUnitTableModel.addStockUnit(saveItem);
+                    Global.listStockUnit.add(saveItem);
                 } else {
-                    itemUnitTableModel.setStockUnit(saveItem, selectRow);
+                    Global.listStockUnit.set(selectRow, saveItem);
                 }
                 clear();
             }
@@ -123,12 +122,12 @@ public class StockUnitSetupDailog extends javax.swing.JDialog implements KeyList
     }
 
     private void clear() {
-
         txtFilter.setText(null);
         txtUnitShort.setText(null);
         txtUnitDesp.setText(null);
         lblStatus.setText("NEW");
         txtUnitShort.setEditable(true);
+        itemUnitTableModel.refresh();
 
     }
 

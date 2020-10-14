@@ -194,6 +194,7 @@ public class StockBrandSetupDialog extends javax.swing.JDialog implements KeyLis
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Item Brand Setup");
 
+        tblCategory.setFont(Global.textFont);
         tblCategory.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},

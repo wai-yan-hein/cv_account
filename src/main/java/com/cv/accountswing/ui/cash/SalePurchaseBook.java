@@ -310,20 +310,25 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
         loadingObserver.load(this.getName(), "Start");
         taskExecutor.execute(() -> {
             LOGGER.info(sourceAccId + "----- Searching...");
-            List<VGl> listVGl = vGlService.search(stDate, enDate,
-                    desp, sourceAccId,
-                    accId, currency, "-",
-                    ref, depId, "-", "-",
-                    "-", "-", "-", "-", "-",
-                    traderName, "-", "-",
-                    debAmt,
-                    crdAmt);
-            swapData(listVGl, sourceAccId);
-            spTableModel.setListVGl(listVGl);
-            spTableModel.addNewRow();
-            requestFoucsTable();
-            calTotalAmt();
-            LOGGER.info(sourceAccId + "----- Finished...");
+            if (sourceAccId != null) {
+                List<VGl> listVGl = vGlService.search(stDate, enDate,
+                        desp, sourceAccId,
+                        accId, currency, "-",
+                        ref, depId, "-", "-",
+                        "-", "-", "-", "-", "-",
+                        traderName, "-", "-",
+                        debAmt,
+                        crdAmt);
+                swapData(listVGl, sourceAccId);
+                spTableModel.setListVGl(listVGl);
+                spTableModel.addNewRow();
+                requestFoucsTable();
+                calTotalAmt();
+                LOGGER.info(sourceAccId + "----- Finished...");
+            } else {
+                loadingObserver.load(this.getName(), "Stop");
+
+            }
         });
 
     }

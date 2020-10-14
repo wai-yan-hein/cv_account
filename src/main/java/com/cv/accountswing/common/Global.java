@@ -15,7 +15,6 @@ import java.awt.Font;
 import java.net.ServerSocket;
 import java.util.HashMap;
 import java.util.List;
-import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import com.cv.accountswing.entity.Currency;
 import com.cv.inv.entity.Category;
@@ -42,7 +41,7 @@ public class Global {
     public static Font lableFont = new java.awt.Font("Arial", 1, 13);
     public static Font amtFont = new java.awt.Font("Arial", 1, 15);
     public static Font textFont = new java.awt.Font("Zawgyi-One", 0, 13);
-    public static Font menuFont = new java.awt.Font("Arial", 1, 16);
+    public static Font menuFont = new java.awt.Font("Zawgyi-One", 1, 16);
     public static Font shortCutFont = new java.awt.Font("Arial", 0, 10);
     public static int tblRowHeight = 30;
     public static Color tblHeaderColor = new Color(83, 133, 255);
@@ -66,9 +65,7 @@ public class Global {
     public static ServerSocket sock;
     public static MQTransportListener mqListener;
     public static HashMap<String, ReloadData> hmReloadData = new HashMap();
-    public static ImageIcon loadingIcon = new ImageIcon("./src/main/resources/images/loading.gif");
-    public static ImageIcon logo = new ImageIcon("./src/main/resources/images/logo.png");
-    public static ImageIcon loadingTab = new ImageIcon("./src/main/resources/images/loading_tab_20.gif");
+    public static String companyName;
     public static List<Department> listDepartment;
     public static List<Trader> listTrader;
     public static List<ChartOfAccount> listCOA;

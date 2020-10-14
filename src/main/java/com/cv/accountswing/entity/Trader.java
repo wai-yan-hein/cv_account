@@ -35,7 +35,7 @@ public class Trader implements java.io.Serializable {
     private Date createdDate;
     private String updatedBy;
     private Date updatedDate;
-    private String accountCode;
+    private ChartOfAccount account;
     private boolean active;
     private String remark;
     private String parent;
@@ -147,13 +147,14 @@ public class Trader implements java.io.Serializable {
         this.updatedDate = updatedDate;
     }
 
-    @Column(name = "account_code", nullable = true, length = 15)
-    public String getAccountCode() {
-        return accountCode;
+    @ManyToOne
+    @JoinColumn(name = "coa_code")
+    public ChartOfAccount getAccount() {
+        return account;
     }
 
-    public void setAccountCode(String accountCode) {
-        this.accountCode = accountCode;
+    public void setAccount(ChartOfAccount account) {
+        this.account = account;
     }
 
     @Column(name = "active")

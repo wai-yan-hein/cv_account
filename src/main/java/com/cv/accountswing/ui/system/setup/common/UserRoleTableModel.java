@@ -4,12 +4,19 @@
  */
 package com.cv.accountswing.ui.system.setup.common;
 
+import com.cv.accountswing.common.Global;
+import com.cv.accountswing.entity.Menu;
 import com.cv.accountswing.entity.UserRole;
+import com.cv.accountswing.service.MenuService;
+import com.cv.accountswing.service.PrivilegeService;
+import com.cv.accountswing.service.UserRoleService;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -22,6 +29,12 @@ public class UserRoleTableModel extends AbstractTableModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserRoleTableModel.class);
     private List<UserRole> listRole = new ArrayList();
     private String[] columnNames = {"Role Name"};
+    @Autowired
+    private UserRoleService userRoleService;
+    @Autowired
+    private PrivilegeService privilegeService;
+    @Autowired
+    private MenuService menuService;
 
     @Override
     public String getColumnName(int column) {
@@ -30,7 +43,7 @@ public class UserRoleTableModel extends AbstractTableModel {
 
     @Override
     public boolean isCellEditable(int row, int column) {
-        return false;
+        return true;
     }
 
     @Override
@@ -48,7 +61,7 @@ public class UserRoleTableModel extends AbstractTableModel {
             switch (column) {
                 case 0: //Id
                     return user.getRoleName();
-               
+
                 default:
                     return null;
             }
@@ -61,6 +74,63 @@ public class UserRoleTableModel extends AbstractTableModel {
 
     @Override
     public void setValueAt(Object value, int row, int column) {
+        try {
+            UserRole user = listRole.get(row);
+            if (value != null) {
+                switch (column) {
+                    case 0:
+                        user.setRoleName(value.toString());
+                        break;
+                }
+            }
+            save(user);
+        } catch (Exception e) {
+            LOGGER.error("Set Value At :" + e.getMessage());
+        }
+
+    }
+
+    private void save(UserRole user) {
+        boolean hasMenu = false;
+        try {
+            if (user.getRoleId() != null) {
+                hasMenu = true;
+            }
+            user.setCompCode(Global.compId);
+            UserRole saveUserRole = userRoleService.save(user);
+            if (!hasMenu) {
+                // create menu with role id
+                if (saveUserRole.getRoleId() != null) {
+                    List<Menu> listMenu = menuService.search("-", "-", "-");
+                    privilegeService.save(saveUserRole.getRoleId().toString(), listMenu);
+                    addEmptyRow();
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.error("Save User :" + e.getMessage());
+            JOptionPane.showMessageDialog(Global.parentForm, "Can't save user role.");
+        }
+    }
+
+    public void addEmptyRow() {
+        if (hasEmptyRow()) {
+            UserRole user = new UserRole();
+            listRole.add(user);
+        }
+    }
+
+    private boolean hasEmptyRow() {
+        boolean status = true;
+        if (listRole.isEmpty() || listRole == null) {
+            status = true;
+        } else {
+            UserRole user = listRole.get(listRole.size() - 1);
+            if (user.getRoleId() == null) {
+                status = false;
+            }
+        }
+
+        return status;
 
     }
 
@@ -93,9 +163,6 @@ public class UserRoleTableModel extends AbstractTableModel {
         this.listRole = listRole;
         fireTableDataChanged();
     }
-
-   
-  
 
     public UserRole getRole(int row) {
         return listRole.get(row);

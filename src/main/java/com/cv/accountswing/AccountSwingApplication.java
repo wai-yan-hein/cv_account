@@ -5,9 +5,6 @@ import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.LoginDialog;
 import com.cv.accountswing.entity.view.VUsrCompAssign;
 import com.cv.accountswing.service.UsrCompRoleService;
-import com.cv.accountswing.util.Util1;
-import com.cv.inv.entity.MachineInfo;
-import com.cv.inv.service.MachineInfoService;
 import com.formdev.flatlaf.IntelliJTheme;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -33,7 +30,6 @@ public class AccountSwingApplication {
     private static final Logger LOGGER = LoggerFactory.getLogger(AccountSwingApplication.class);
     private static final SplashWindow SPLASH_WINDOW = new SplashWindow();
     private static ConfigurableApplicationContext context;
-    
 
     @PostConstruct
     void started() {
@@ -109,6 +105,7 @@ public class AccountSwingApplication {
                 } else {
                     Global.roleId = listVUCA.get(0).getKey().getRoleId();
                     Global.compId = listVUCA.get(0).getKey().getCompCode();
+                    Global.companyName = listVUCA.get(0).getCompName();
 
                     ApplicationMainFrame appMain = context.getBean(ApplicationMainFrame.class);
                     java.awt.EventQueue.invokeLater(() -> {
@@ -124,6 +121,7 @@ public class AccountSwingApplication {
                 System.exit(0);
             }
         } catch (BeansException ex) {
+            SPLASH_WINDOW.stopSplah();
             LOGGER.error("main : " + ex.getMessage());
         }
 

@@ -78,7 +78,7 @@ public class COACellEditor extends AbstractCellEditor implements TableCellEditor
             jtf.setText(value.toString());
         }
         completer = new COAAutoCompleter(jtf, Global.listCOA, this);
-
+        component.requestFocus();
         return component;
     }
 

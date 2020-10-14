@@ -110,7 +110,7 @@ public class DatePickerDialog extends javax.swing.JDialog implements KeyListener
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Custom Date");
         setFont(Global.textFont);
-        setIconImage(Global.logo.getImage());
+        setIconImage(null);
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentShown(java.awt.event.ComponentEvent evt) {
                 formComponentShown(evt);

@@ -29,7 +29,6 @@ import com.toedter.calendar.JTextFieldDateEditor;
 import java.awt.Image;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -309,7 +308,7 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener {
         txtShortName.setText(null);
         txtStockCode.setText(null);
         txtStockName.setText(null);
-        chkActive.setSelected(false);
+        chkActive.setSelected(true);
         txtPurPrice.setText(null);
         cboBrand.setSelectedItem(null);
         cboCategory.setSelectedItem(null);
@@ -317,6 +316,15 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener {
         cboPurUnit.setSelectedItem(null);
         cboSaleUnit.setSelectedItem(null);
         cboStockType.setSelectedItem(null);
+        txtFCostPrice.setValue(0.0);
+        txtFPurNo.setValue(0.0);
+        txtFPurPriceNo.setValue(0.0);
+        txtFSalePrice.setValue(0.0);
+        txtFSalePriceA.setValue(0.0);
+        txtFSalePriceB.setValue(0.0);
+        txtFSalePriceC.setValue(0.0);
+        txtFSalePriceD.setValue(0.0);
+        txtFSaleUnitNo.setValue(0.0);
         lblStatus.setText("NEW");
         txtStockCode.setEnabled(true);
         txtStockCode.requestFocus();
@@ -595,6 +603,7 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener {
         });
 
         chkActive.setFont(Global.lableFont);
+        chkActive.setSelected(true);
         chkActive.setText("Active");
         chkActive.setName("chkActive"); // NOI18N
 
