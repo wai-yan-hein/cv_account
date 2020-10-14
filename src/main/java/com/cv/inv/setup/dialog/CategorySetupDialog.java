@@ -109,9 +109,9 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
                 JOptionPane.showMessageDialog(Global.parentForm, "Saved");
 
                 if (lblStatus.getText().equals("NEW")) {
-                    categoryTableModel.addCategory(saveCat);
+                    Global.listCategory.add(saveCat);
                 } else {
-                    categoryTableModel.setCategory(saveCat, selectRow);
+                    Global.listCategory.set(selectRow, saveCat);
                 }
                 clear();
             }
@@ -124,6 +124,7 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
         txtFilter.setText(null);
         txtName.setText(null);
         lblStatus.setText("NEW");
+        categoryTableModel.refresh();
 
     }
 

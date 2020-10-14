@@ -114,9 +114,9 @@ public class CharacterNoSetupDialog extends javax.swing.JDialog implements KeyLi
                 JOptionPane.showMessageDialog(Global.parentForm, "Saved");
 
                 if (lblStatus.getText().equals("NEW")) {
-                    chNoTableModel.addCharacterNo(saveCat);
+                    Global.listCharNo.add(saveCat);
                 } else {
-                    chNoTableModel.setCharacterNo(saveCat, selectRow);
+                    Global.listCharNo.set(selectRow, saveCat);
                 }
                 clear();
             }
@@ -131,6 +131,7 @@ public class CharacterNoSetupDialog extends javax.swing.JDialog implements KeyLi
         txtNo.setText(null);
         lblStatus.setText("NEW");
         txtCh.setEditable(true);
+        chNoTableModel.refresh();
 
     }
 

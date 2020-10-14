@@ -107,9 +107,9 @@ public class VouStatusSetupDialog extends javax.swing.JDialog implements KeyList
                 JOptionPane.showMessageDialog(Global.parentForm, "Saved");
 
                 if (lblStatus.getText().equals("NEW")) {
-                    vouStatusTableModel.addVouStatus(saveVou);
+                    Global.listVou.add(saveVou);
                 } else {
-                    vouStatusTableModel.setVouStatus(saveVou, selectRow);
+                    Global.listVou.set(selectRow, saveVou);
                 }
                 clear();
             }
@@ -119,6 +119,7 @@ public class VouStatusSetupDialog extends javax.swing.JDialog implements KeyList
 
     private void clear() {
         txtName.setText(null);
+        vouStatusTableModel.refresh();
         lblStatus.setText("NEW");
     }
 

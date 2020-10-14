@@ -14,7 +14,6 @@ import com.cv.inv.setup.common.StockBrandTableModel;
 import java.awt.Frame;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
@@ -112,9 +111,9 @@ public class StockBrandSetupDialog extends javax.swing.JDialog implements KeyLis
                 JOptionPane.showMessageDialog(Global.parentForm, "Saved");
 
                 if (lblStatus.getText().equals("NEW")) {
-                    itemBrandTableModel.addItemBrand(saveCat);
+                    Global.listStockBrand.add(saveCat);
                 } else {
-                    itemBrandTableModel.setItemBrand(saveCat, selectRow);
+                    Global.listStockBrand.set(selectRow, saveCat);
                 }
                 clear();
             }
@@ -127,6 +126,7 @@ public class StockBrandSetupDialog extends javax.swing.JDialog implements KeyLis
         txtFilter.setText(null);
         txtName.setText(null);
         lblStatus.setText("NEW");
+        itemBrandTableModel.refresh();
 
     }
 

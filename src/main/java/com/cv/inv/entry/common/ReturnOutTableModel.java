@@ -193,8 +193,8 @@ public class ReturnOutTableModel extends AbstractTableModel {
                             record.setStock(stock);
                             record.setQty(1.0f);
                             record.setPrice(Util1.getDouble(stock.getPurPrice()));
-                            record.setStdWt(stock.getPurMeasure());
-                            record.setStockUnit(stock.getPurUnit());
+                            record.setStdWt(stock.getPurPriceMeasure());
+                            record.setStockUnit(stock.getPurPriceUnit());
                             addNewRow();
                             parent.setColumnSelectionInterval(3, 3);
                         }
@@ -341,7 +341,7 @@ public class ReturnOutTableModel extends AbstractTableModel {
         float stdPrice = stock.getPurPrice();
         float userWt = pd.getStdWt();
         float stdWt = stock.getSaleMeasure();
-        String fromUnit = stock.getPurUnit().getItemUnitCode();
+        String fromUnit = stock.getPurPriceUnit().getItemUnitCode();
 
         if (!fromUnit.equals(toUnit)) {
             RelationKey key = new RelationKey(fromUnit, toUnit);
@@ -405,8 +405,8 @@ public class ReturnOutTableModel extends AbstractTableModel {
 
         fireTableRowsDeleted(row, row);
     }
-    
-     public String getDeleteListStr() {
+
+    public String getDeleteListStr() {
         String deletedListStr;
         if (deletedList == null || deletedList.isEmpty()) {
             return null;

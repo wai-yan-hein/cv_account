@@ -285,8 +285,8 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
         float stdPurPrice = stock.getPurPrice();
         float stdPrice = stock.getPurPrice();
         float userWt = pd.getStdWeight();
-        float stdWt = stock.getPurMeasure();
-        String fromUnit = stock.getPurUnit().getItemUnitCode();
+        float stdWt = stock.getPurPriceMeasure();
+        String fromUnit = stock.getPurPriceUnit().getItemUnitCode();
 
         if (!fromUnit.equals(toUnit)) {
             RelationKey key = new RelationKey(fromUnit, toUnit);

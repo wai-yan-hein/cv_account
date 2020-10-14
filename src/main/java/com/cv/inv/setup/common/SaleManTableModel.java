@@ -85,4 +85,8 @@ public class SaleManTableModel extends AbstractTableModel {
         }
     }
 
+    public void refresh() {
+        fireTableDataChanged();
+    }
+
 }

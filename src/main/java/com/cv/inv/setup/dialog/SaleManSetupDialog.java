@@ -89,6 +89,7 @@ public class SaleManSetupDialog extends javax.swing.JDialog implements KeyListen
         txtPhone.setText(null);
         lblStatus.setText("NEW");
         chkActive.setSelected(false);
+        saleManTableModel.refresh();
     }
 
     private boolean isValidEntry() {
@@ -116,9 +117,9 @@ public class SaleManSetupDialog extends javax.swing.JDialog implements KeyListen
                 LOGGER.info("SALEMAN ID :" + saveSaleMan.getSaleManId());
                 JOptionPane.showMessageDialog(Global.parentForm, "Saved");
                 if ("NEW".equals(lblStatus.getText())) {
-                    saleManTableModel.addSaleMan(saveSaleMan);
+                    Global.listSaleMan.add(saveSaleMan);
                 } else {
-                    saleManTableModel.setSaleMan(saveSaleMan, selectRow);
+                    Global.listSaleMan.set(selectRow, saveSaleMan);
                 }
             }
             clear();

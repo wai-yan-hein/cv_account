@@ -109,9 +109,9 @@ public class StockTypeSetupDialog extends javax.swing.JDialog implements KeyList
             if (saveItem != null) {
                 JOptionPane.showMessageDialog(Global.parentForm, "Saved");
                 if (lblStatus.getText().equals("NEW")) {
-                    itemTypeTableModel.addItemType(saveItem);
+                    Global.listStockType.add(saveItem);
                 } else {
-                    itemTypeTableModel.setItemType(saveItem, selectRow);
+                    Global.listStockType.set(selectRow, saveItem);
                 }
                 clear();
             }
@@ -127,6 +127,7 @@ public class StockTypeSetupDialog extends javax.swing.JDialog implements KeyList
         lblStatus.setText("NEW");
         txtCode.setEnabled(true);
         txtCode.requestFocus();
+        itemTypeTableModel.refresh();
     }
 
     private void delete() {

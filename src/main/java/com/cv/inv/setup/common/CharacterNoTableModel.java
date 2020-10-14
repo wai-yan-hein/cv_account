@@ -89,4 +89,8 @@ public class CharacterNoTableModel extends AbstractTableModel {
         }
     }
 
+    public void refresh() {
+        fireTableDataChanged();
+    }
+
 }

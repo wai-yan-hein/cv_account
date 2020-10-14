@@ -13,3 +13,6 @@
 07 Oct 2020 04:41:03,504 ERROR: com.cv.accountswing.util.StockUP - java.lang.NullPointerException
 07 Oct 2020 05:30:06,686 ERROR: com.cv.inv.util.GenVouNoImpl - getLastVouNo : 63 - org.hibernate.exception.SQLGrammarException: could not extract ResultSet
 07 Oct 2020 16:26:14,533 ERROR: com.cv.inv.util.GenVouNoImpl - getLastVouNo : 63 - org.hibernate.exception.SQLGrammarException: could not extract ResultSet
+14 Oct 2020 06:44:58,985 ERROR: com.cv.inv.util.GenVouNoImpl - getLastVouNo : 247 - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [null]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement
+14 Oct 2020 06:53:20,561 ERROR: com.cv.inv.util.GenVouNoImpl - getLastVouNo : 247 - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [null]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement
+14 Oct 2020 06:56:05,337 ERROR: com.cv.inv.util.GenVouNoImpl - getLastVouNo : 247 - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [null]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement

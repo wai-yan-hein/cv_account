@@ -71,13 +71,6 @@ public class Stock implements java.io.Serializable {
     @JoinColumn(name = "pur_price_unit")
     private StockUnit purPriceUnit;
 
-    @Column(name = "pur_mes")
-    private Float purMeasure;
-
-    @ManyToOne
-    @JoinColumn(name = "pur_unit")
-    private StockUnit purUnit;
-
     @Column(name = "sale_price_mes")
     private Float saleMeasure;
     @ManyToOne
