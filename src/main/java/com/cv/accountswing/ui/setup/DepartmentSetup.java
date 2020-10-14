@@ -194,10 +194,15 @@ public class DepartmentSetup extends javax.swing.JPanel implements TreeSelection
     }
 
     private void deleteDepatment() {
-        if (isValidDelete()) {
-            treeModel.removeNodeFromParent(selectedNode);
-            //treeModel.nodesWereRemoved(child, childIndices, removedChildren);
-            treeModel.reload(selectedNode);
+        try {
+            if (isValidDelete()) {
+                treeModel.removeNodeFromParent(selectedNode);
+                //treeModel.nodesWereRemoved(child, childIndices, removedChildren);
+                treeModel.reload(selectedNode);
+            }
+        } catch (Exception e) {
+            LOGGER.error("Delete Department :" + e.getMessage());
+            JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Delete Department", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -461,7 +466,12 @@ public class DepartmentSetup extends javax.swing.JPanel implements TreeSelection
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         // TODO add your handling code here:
-        saveDepartment();
+        try {
+            saveDepartment();
+        } catch (Exception e) {
+            LOGGER.error("Save Department :" + e.getMessage());
+            JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Save Department", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnSaveActionPerformed
 
     private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed

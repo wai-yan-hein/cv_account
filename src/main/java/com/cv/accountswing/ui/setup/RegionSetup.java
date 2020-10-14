@@ -154,12 +154,16 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
     }
 
     private void deleteRegion() {
-        if (isValidDelete()) {
-            treeModel.removeNodeFromParent(selectedNode);
-            treeModel.reload(selectedNode);
+        try {
+            if (isValidDelete()) {
+                treeModel.removeNodeFromParent(selectedNode);
+                treeModel.reload(selectedNode);
 
+            }
+        } catch (Exception e) {
+            LOGGER.error("Delete Region :" + e.getMessage());
+            JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Delete Region", JOptionPane.ERROR_MESSAGE);
         }
-
     }
 
     private boolean isValidDelete() {
@@ -404,7 +408,12 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
 
     private void btnSaveRActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveRActionPerformed
         // TODO add your handling code here:
-        saveRegion();
+        try {
+            saveRegion();
+        } catch (Exception e) {
+            LOGGER.error("Save Region :" + e.getMessage());
+            JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Save Region", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnSaveRActionPerformed
 
     private void btnClearRActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearRActionPerformed
