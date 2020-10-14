@@ -97,6 +97,8 @@ public class Gl implements java.io.Serializable {
     private Double paid;
     @Column(name = "vou_total")
     private Double vouTotal;
+    @Column(name = "grand_total")
+    private Double grandTotal;
     @Column(name = "location_id")
     private Integer locationId;
     @Column(name = "saleman_id")
@@ -106,7 +108,7 @@ public class Gl implements java.io.Serializable {
     private Date saleDate;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "cerdit_term")
+    @Column(name = "credit_term")
     private Date creditTerm;
     @Column(name = "discount")
     private Double discount;
@@ -513,6 +515,14 @@ public class Gl implements java.io.Serializable {
 
     public void setLocationId(Integer locationId) {
         this.locationId = locationId;
+    }
+
+    public Double getGrandTotal() {
+        return grandTotal;
+    }
+
+    public void setGrandTotal(Double grandTotal) {
+        this.grandTotal = grandTotal;
     }
 
 }
