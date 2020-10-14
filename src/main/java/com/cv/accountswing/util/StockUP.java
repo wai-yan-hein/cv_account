@@ -50,7 +50,7 @@ public class StockUP {
         }
     }
 
-    public Double getPrice(String key, String priceType, float qty) {
+    public Double getPrice(String key, String priceType) {
         Double price = new Double(0);
         List<StockPriceList> priceList = getPriceList(key);
         int index = -1;

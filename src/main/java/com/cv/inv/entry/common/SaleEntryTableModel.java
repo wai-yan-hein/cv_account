@@ -7,6 +7,7 @@ package com.cv.inv.entry.common;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.SelectionObserver;
+import com.cv.accountswing.util.NumberUtil;
 import com.cv.accountswing.util.StockUP;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.Location;
@@ -19,7 +20,6 @@ import com.cv.inv.service.RelationService;
 import com.cv.inv.service.StockUnitService;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.JFormattedTextField;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
@@ -34,11 +34,11 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class SaleEntryTableModel extends AbstractTableModel {
-
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(SaleEntryTableModel.class);
     private String[] columnNames = {"Code", "Description", "Exp-Date",
-        "Qty", "Std-Wt", "Unit", "Sale Price", "Discount", "Discount Type", "Amount", "Location"};
-
+        "Qty", "Std-Wt", "Unit", "Sale Price", "Discount", "Disc-Type", "Amount", "Location"};
+    
     private JTable parent;
     private List<SaleDetailHis> listDetail = new ArrayList();
     private String sourceName;
@@ -48,56 +48,51 @@ public class SaleEntryTableModel extends AbstractTableModel {
     private String sourceAccId;
     private StockInfo stockInfo;
     private String cusType;
-    private JFormattedTextField txtTotalAmount;
     @Autowired
     private StockUnitService unitService;
     @Autowired
     private RelationService relationService;
-
+    
     public SaleEntryTableModel(List<SaleDetailHis> listDetail, StockInfo stockInfo, StockUP stockUp) {
         this.listDetail = listDetail;
         this.stockInfo = stockInfo;
         this.stockUp = stockUp;
     }
-
-    public void setTxtTotalAmount(JFormattedTextField txtTotalAmount) {
-        this.txtTotalAmount = txtTotalAmount;
-    }
-
+    
     public void setSourceName(String sourceName) {
         this.sourceName = sourceName;
     }
-
+    
     public void setSelectionObserver(SelectionObserver selectionObserver) {
         this.selectionObserver = selectionObserver;
     }
-
+    
     public void setParent(JTable parent) {
         this.parent = parent;
     }
-
+    
     public void setSourceAccId(String sourceAccId) {
         this.sourceAccId = sourceAccId;
     }
-
+    
     @Override
     public String getColumnName(int column) {
         return columnNames[column];
     }
-
+    
     @Override
     public int getColumnCount() {
         return columnNames.length;
     }
-
+    
     public String[] getColumnNames() {
         return columnNames;
     }
-
+    
     public void setColumnNames(String[] columnNames) {
         this.columnNames = columnNames;
     }
-
+    
     @Override
     public int getRowCount() {
         if (listDetail == null) {
@@ -105,7 +100,7 @@ public class SaleEntryTableModel extends AbstractTableModel {
         }
         return listDetail.size();
     }
-
+    
     @Override
     public Class getColumnClass(int column) {
         switch (column) {
@@ -135,7 +130,7 @@ public class SaleEntryTableModel extends AbstractTableModel {
                 return Object.class;
         }
     }
-
+    
     @Override
     public boolean isCellEditable(int row, int column) {
         if (listDetail == null) {
@@ -144,7 +139,7 @@ public class SaleEntryTableModel extends AbstractTableModel {
         if (listDetail.isEmpty()) {
             return false;
         }
-
+        
         SaleDetailHis record = listDetail.get(row);
         switch (column) {
             case 0://Code
@@ -152,9 +147,9 @@ public class SaleEntryTableModel extends AbstractTableModel {
             case 1://Name
                 return false;
             case 2://Exp Date
-                return record.getStockCode().getStockCode() != null;
+                return record.getStock().getStockCode() != null;
             case 3://Qty
-                return record.getStockCode().getStockCode() != null;
+                return record.getStock().getStockCode() != null;
             case 4://Std-Wt
                 return true;
             case 5://Unit
@@ -162,28 +157,28 @@ public class SaleEntryTableModel extends AbstractTableModel {
             case 7://Disc
                 return true;
             case 10://Loc
-                return record.getStockCode().getStockCode() != null;
+                return record.getStock().getStockCode() != null;
             default:
                 return false;
         }
     }
-
+    
     @Override
     public Object getValueAt(int row, int column) {
         try {
             SaleDetailHis record = listDetail.get(row);
             switch (column) {
                 case 0://code
-                    if (record.getStockCode() == null) {
+                    if (record.getStock() == null) {
                         return null;
                     } else {
-                        return record.getStockCode().getStockCode();
+                        return record.getStock().getStockCode();
                     }
                 case 1://Name
-                    if (record.getStockCode() == null) {
+                    if (record.getStock() == null) {
                         return null;
                     } else {
-                        return record.getStockCode().getStockName();
+                        return record.getStock().getStockName();
                     }
                 case 2://exp-date
                     if (record.getExpDate() == null) {
@@ -221,13 +216,13 @@ public class SaleEntryTableModel extends AbstractTableModel {
         }
         return null;
     }
-
+    
     @Override
     public void setValueAt(Object value, int row, int column) {
         if (listDetail == null) {
             return;
         }
-
+        
         if (listDetail.isEmpty()) {
             return;
         }
@@ -236,13 +231,13 @@ public class SaleEntryTableModel extends AbstractTableModel {
             SaleDetailHis record = listDetail.get(row);
             switch (column) {
                 case 0://Code
-                    if (!((String) value).isEmpty()) {
-                        String[] strList = value.toString().split("@");
+                    if (value != null) {
+                        Stock stock = (Stock) value;
+                        String stockCode = stock.getStockCode();
+                        String[] strList = stockCode.split("@");
                         stockInfo.getStockInfo(strList[0]);
-                        if (listDetail.get(parent.getSelectedRow()).getStockCode() != null) {
-                            String stockId = listDetail.get(parent.getSelectedRow()).getStockCode().getStockCode();
-                            float qty = record.getQuantity();
-                            record.setPrice(stockUp.getPrice(stockId, getCusType(), qty));
+                        if (listDetail.get(parent.getSelectedRow()).getStock() != null) {
+                            record.setPrice(stockUp.getPrice(stockCode, getCusType()));
                         }
                     }
                     parent.setColumnSelectionInterval(3, 3);
@@ -264,34 +259,60 @@ public class SaleEntryTableModel extends AbstractTableModel {
                     parent.setColumnSelectionInterval(3, 3);
                     break;
                 case 3://Qty
-                    float qty = Util1.getFloat(value);
-                    record.setQuantity(qty);
+                    if (NumberUtil.isNumber(value)) {
+                        if (NumberUtil.isPositive(value)) {
+                            record.setQuantity(Util1.getFloat(value));
+                        } else {
+                            showMessageBox("Input value must be positive");
+                            parent.setColumnSelectionInterval(column, column);
+                        }
+                    } else {
+                        showMessageBox("Input value must be number.");
+                        parent.setColumnSelectionInterval(column, column);
+                    }
                     parent.setColumnSelectionInterval(4, 4);
                     break;
                 case 4://Std-Wt
-                    if (value != null) {
-                        record.setStdWeight(Util1.getFloat(value));
-                        String toUnit = record.getItemUnit().getItemUnitCode();
-                        Double calAmount = calPrice(record, toUnit);
-                        record.setPrice(calAmount);
+                    if (NumberUtil.isNumber(value)) {
+                        if (NumberUtil.isPositive(value)) {
+                            record.setStdWeight(Util1.getFloat(value));
+                            String toUnit = record.getItemUnit().getItemUnitCode();
+                            Double calAmount = calPrice(record, toUnit);
+                            record.setAmount(calAmount);
+                        } else {
+                            showMessageBox("Input value must be positive");
+                            parent.setColumnSelectionInterval(column, column);
+                        }
+                    } else {
+                        showMessageBox("Input value must be positive");
+                        parent.setColumnSelectionInterval(column, column);
                     }
-                    parent.setColumnSelectionInterval(5, 5);
                     break;
-
+                
                 case 5://Unit
                     if (value != null) {
                         record.setItemUnit((StockUnit) value);
                         String toUnit = record.getItemUnit().getItemUnitCode();
                         Double calAmount = calPrice(record, toUnit);
-                        record.setPrice(calAmount);
+                        record.setAmount(calAmount);
                     } else {
                         record.setItemUnit(null);
                     }
                     parent.setColumnSelectionInterval(6, 6);
                     break;
                 case 6://Sale Price
-                    //record.setPrice(Util1.getDouble(value));
-                    parent.setColumnSelectionInterval(7, 7);
+                    if (NumberUtil.isNumber(value)) {
+                        if (NumberUtil.isPositive(value)) {
+                            record.setPrice(Util1.getDouble(value));
+                            parent.setColumnSelectionInterval(8, 8);
+                        } else {
+                            showMessageBox("Input value must be positive");
+                            parent.setColumnSelectionInterval(column, column);
+                        }
+                    } else {
+                        showMessageBox("Input value must be number.");
+                        parent.setColumnSelectionInterval(column, column);
+                    }
                     break;
                 case 7://Discount
                     if (value != null) {
@@ -309,7 +330,6 @@ public class SaleEntryTableModel extends AbstractTableModel {
                     if (value != null) {
                         record.setAmount(Util1.getDouble(value));
                         isAmount = true;
-                        //fireTableCellUpdated(row, 6);
                     }
                     break;
                 case 10://Loc
@@ -329,7 +349,7 @@ public class SaleEntryTableModel extends AbstractTableModel {
         }
         fireTableCellUpdated(row, column);
     }
-
+    
     public boolean hasEmptyRow() {
         if (listDetail == null) {
             return false;
@@ -337,101 +357,109 @@ public class SaleEntryTableModel extends AbstractTableModel {
         if (listDetail.isEmpty()) {
             return false;
         }
-
+        
         SaleDetailHis detailHis = listDetail.get(listDetail.size() - 1);
-        if (detailHis.getStockCode() != null) {
-            return detailHis.getStockCode().getStockCode() == null;
+        if (detailHis.getStock() != null) {
+            return detailHis.getStock().getStockCode() == null;
         } else {
             return true;
         }
     }
-
+    
     public void addEmptyRow() {
         if (listDetail != null) {
             if (!hasEmptyRow()) {
                 SaleDetailHis detailHis = new SaleDetailHis();
-                detailHis.setStockCode(new Stock());
+                detailHis.setStock(new Stock());
                 listDetail.add(detailHis);
-
+                
                 fireTableRowsInserted(listDetail.size() - 1, listDetail.size() - 1);
                 parent.scrollRectToVisible(parent.getCellRect(parent.getRowCount() - 1, 0, true));
             }
         }
     }
-
+    
     public Location getLocation() {
         return location;
     }
-
+    
     public void setLocation(Location location) {
         this.location = location;
     }
 
     //set stock when enter stock code
-    public void setStock(Stock stock, int pos) {
+    public void setStock(Stock stock, int row) {
         if (listDetail == null) {
             return;
         }
         if (listDetail.isEmpty()) {
             return;
         }
-        SaleDetailHis record = listDetail.get(pos);
-        record.setStockCode(stock);
+        SaleDetailHis record = listDetail.get(row);
+        record.setStock(stock);
         record.setQuantity(1.0f);
         record.setStdWeight(stock.getSaleMeasure());
         record.setItemUnit(stock.getSaleUnit());
+        record.setUniqueId(row + 1);
         //record.setPrice(stock.getSalePriceN());
-        if (Util1.getPropValue("system.sale.detail.location").equals("Y")) {
+        if (Util1.getPropValue("system.default.location").equals("23")) {
             record.setLocation(location);
         }
         if (!hasEmptyRow()) {
             addEmptyRow();
         }
-
-        fireTableCellUpdated(pos, 0);
+        
+        fireTableCellUpdated(row, 0);
     }
-
+    
     public void setListDetail(List<SaleDetailHis> listDetail) {
         this.listDetail = listDetail;
-
+        
         if (!hasEmptyRow()) {
             addEmptyRow();
         }
-
+        
         fireTableDataChanged();
     }
-
+    
     private String getCusType() {
         if (cusType == null) {
             cusType = "N";
         }
-
+        
         return cusType;
     }
-
+    
     public void setCusType(String type) {
         cusType = type;
     }
-
+    
     public List<SaleDetailHis> getCurrentRow() {
         return this.listDetail;
     }
-
+    
     public void removeListDetail() {
         this.listDetail.clear();
         addEmptyRow();
     }
-
+    
     private void calculateAmount(SaleDetailHis sale) {
-        if (sale.getStockCode() != null) {
+        if (sale.getStock() != null) {
+            Stock stock = sale.getStock();
+            String stockCode = stock.getStockCode();
             float saleQty = sale.getQuantity();
-            double salePrice = sale.getPrice();
+            double stdSalePrice = stockUp.getPrice(stockCode, getCusType());
             double discount = Util1.getDouble(sale.getDiscount());
-
+            double calAmount = Util1.getDouble(sale.getAmount());
+            float userWt = sale.getStdWeight();
+            float stdWt = stock.getSaleMeasure();
+            sale.setSmallestWT(getSmallestUnit(userWt, sale.getItemUnit().getItemUnitCode()));
+            sale.setSmallestUnit("oz");
+            
             String discType = Util1.getPropValue("system.app.sale.discount.calculation");
             switch (discType) {
                 case "Percent":
-                    discount = ((saleQty * salePrice) * (discount / 100));
+                    discount = ((saleQty * stdSalePrice) * (discount / 100));
                     break;
                 case "Value":
                     break;
@@ -439,26 +467,26 @@ public class SaleEntryTableModel extends AbstractTableModel {
                     discount = discount * saleQty;
                     break;
             }
-            double amount = (saleQty * salePrice) - discount;
-            sale.setAmount(amount);
-
-            float ttlAmt = 0.0f;
-            for (SaleDetailHis sdh : listDetail) {
-                ttlAmt += Util1.getDouble(sdh.getAmount());
+            if (userWt != stdWt) {
+                double amount = (saleQty * calAmount) - discount;
+                sale.setAmount(amount);
+            } else {
+                double amount = (saleQty * stdSalePrice) - discount;
+                sale.setAmount(amount);
             }
-            txtTotalAmount.setValue(ttlAmt);
         }
     }
-
+    
     private Double calPrice(SaleDetailHis sdh, String toUnit) {
-        Stock stock = sdh.getStockCode();
+        Stock stock = sdh.getStock();
+        String stockCode = stock.getStockCode();
         double saleAmount = 0.0;
-        double stdSalePrice = sdh.getPrice();
-        double stdPrice = sdh.getPrice();
+        double stdSalePrice = stockUp.getPrice(stockCode, getCusType());
+        double stdPrice = stockUp.getPrice(stockCode, getCusType());
         float userWt = sdh.getStdWeight();
         float stdWt = stock.getSaleMeasure();
         String fromUnit = stock.getSaleUnit().getItemUnitCode();
-
+        
         if (!fromUnit.equals(toUnit)) {
             RelationKey key = new RelationKey(fromUnit, toUnit);
             UnitRelation unitRelation = relationService.findByKey(key);
@@ -481,5 +509,27 @@ public class SaleEntryTableModel extends AbstractTableModel {
             saleAmount = (userWt / stdWt) * stdSalePrice;
         }
         return saleAmount;
+    }
+    
+    private Float getSmallestUnit(Float weight, String unit) {
+        float sWt = 0.0f;
+        RelationKey key = new RelationKey(unit, "oz");
+        Float factor = Global.hmRelation.get(key);
+        if (factor != null) {
+            sWt = factor * weight;
+        } else {
+            JOptionPane.showMessageDialog(Global.parentForm, String.format("Need Relation  %s with Smallest Unit", unit));
+            listDetail.remove(parent.getSelectedRow());
+        }
+        LOGGER.info("Smallest Weight :" + sWt + "From >>>" + unit + "<<<");
+        return sWt;
+    }
+    
+    private void showMessageBox(String text) {
+        JOptionPane.showMessageDialog(Global.parentForm, text);
+    }
+    
+    public List<SaleDetailHis> getListSaleDetail() {
+        return listDetail;
     }
 }

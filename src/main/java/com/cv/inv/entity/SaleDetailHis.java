@@ -7,8 +7,8 @@ package com.cv.inv.entity;
 
 import java.util.Date;
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -23,8 +23,8 @@ import javax.persistence.TemporalType;
 @Table(name = "sale_detail_his")
 public class SaleDetailHis implements java.io.Serializable {
 
-    private Long saleDetailId;
-    private Stock stockCode;
+    private SaleDetailKey saleDetailKey;
+    private Stock stock;
     private Date expDate;
     private Float quantity;
     private Float saleSmallestQty;
@@ -36,29 +36,27 @@ public class SaleDetailHis implements java.io.Serializable {
     private Location location;
     private Integer uniqueId;
     private Float stdWeight;
+    private Long glId;
+    private Float smallestWT;
+    private String smallestUnit;
 
-    public SaleDetailHis() {
-
+    @EmbeddedId
+    public SaleDetailKey getSaleDetailKey() {
+        return saleDetailKey;
     }
 
-    @Id
-    @Column(name = "sale_detail_id", unique = true, nullable = false)
-    public Long getSaleDetailId() {
-        return saleDetailId;
-    }
-
-    public void setSaleDetailId(Long saleDetailId) {
-        this.saleDetailId = saleDetailId;
+    public void setSaleDetailKey(SaleDetailKey saleDetailKey) {
+        this.saleDetailKey = saleDetailKey;
     }
 
     @ManyToOne
-    @JoinColumn(name = "stock_id")
-    public Stock getStockCode() {
-        return stockCode;
+    @JoinColumn(name = "stock_code", nullable = false)
+    public Stock getStock() {
+        return stock;
     }
 
-    public void setStockCode(Stock stockCode) {
-        this.stockCode = stockCode;
+    public void setStock(Stock stock) {
+        this.stock = stock;
     }
 
     @Temporal(TemporalType.DATE)
@@ -71,7 +69,7 @@ public class SaleDetailHis implements java.io.Serializable {
         this.expDate = expDate;
     }
 
-    @Column(name = "sale_qty")
+    @Column(name = "sale_qty", nullable = false)
     public Float getQuantity() {
         return quantity;
     }
@@ -90,7 +88,7 @@ public class SaleDetailHis implements java.io.Serializable {
     }
 
     @ManyToOne
-    @JoinColumn(name = "item_unit")
+    @JoinColumn(name = "item_unit", nullable = false)
     public StockUnit getItemUnit() {
         return itemUnit;
     }
@@ -99,7 +97,7 @@ public class SaleDetailHis implements java.io.Serializable {
         this.itemUnit = itemUnit;
     }
 
-    @Column(name = "sale_price")
+    @Column(name = "sale_price", nullable = false)
     public Double getPrice() {
         return price;
     }
@@ -126,7 +124,7 @@ public class SaleDetailHis implements java.io.Serializable {
         this.discType = discType;
     }
 
-    @Column(name = "sale_amount")
+    @Column(name = "sale_amount", nullable = false)
     public Double getAmount() {
         return amount;
     }
@@ -135,7 +133,8 @@ public class SaleDetailHis implements java.io.Serializable {
         this.amount = amount;
     }
 
-    @Column(name = "location_id")
+    @ManyToOne
+    @JoinColumn(name = "location_id")
     public Location getLocation() {
         return location;
     }
@@ -153,13 +152,40 @@ public class SaleDetailHis implements java.io.Serializable {
         this.uniqueId = uniqueId;
     }
 
-    @Column(name = "std_weight")
+    @Column(name = "std_weight", nullable = false)
     public Float getStdWeight() {
         return stdWeight;
     }
 
     public void setStdWeight(Float stdWeight) {
         this.stdWeight = stdWeight;
+    }
+
+    @Column(name = "gl_id")
+    public Long getGlId() {
+        return glId;
+    }
+
+    public void setGlId(Long glId) {
+        this.glId = glId;
+    }
+
+    @Column(name = "smallest_wt")
+    public Float getSmallestWT() {
+        return smallestWT;
+    }
+
+    public void setSmallestWT(Float smallestWT) {
+        this.smallestWT = smallestWT;
+    }
+
+    @Column(name = "smallest_unit")
+    public String getSmallestUnit() {
+        return smallestUnit;
+    }
+
+    public void setSmallestUnit(String smallestUnit) {
+        this.smallestUnit = smallestUnit;
     }
 
 }

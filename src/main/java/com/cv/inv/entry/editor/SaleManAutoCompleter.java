@@ -150,6 +150,10 @@ public class SaleManAutoCompleter implements KeyListener, SelectionObserver {
         }
     }
 
+    public SaleMan getSaleMan() {
+        return saleMan;
+    }
+
     public void mouseSelect() {
         if (table.getSelectedRow() != -1) {
             saleMan = saleManTableModel.getSaleMan(table.convertRowIndexToModel(
