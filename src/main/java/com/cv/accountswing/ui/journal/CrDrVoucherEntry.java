@@ -660,7 +660,12 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         // TODO add your handling code here:
-        saveCreditVoucher();
+        try{
+        saveCreditVoucher();}
+         catch (Exception e) {
+            LOGGER.error("Save CrDrVoucher :" + e.getMessage());
+            JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Save CrDrVoucher", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnSaveActionPerformed
 
     private void btnSave1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSave1ActionPerformed

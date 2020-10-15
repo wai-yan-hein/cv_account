@@ -350,12 +350,22 @@ public class StockUnitSetupDailog extends javax.swing.JDialog implements KeyList
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         // TODO add your handling code here:
-        save();
+        try {
+            save();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(Global.parentForm, e.getMessage());
+            LOGGER.error("Save StockUnit :" + e.getMessage());
+        }
     }//GEN-LAST:event_btnSaveActionPerformed
 
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
         // TODO add your handling code here:
-        delete();
+        try {
+            delete();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(Global.parentForm, e.getMessage());
+            LOGGER.error("Delete StockUnit :" + e.getMessage());
+        }
     }//GEN-LAST:event_btnDeleteActionPerformed
 
     private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed

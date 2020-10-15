@@ -129,13 +129,14 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
     }
 
     private void delete() {
-        Category cat = categoryTableModel.getCategory(selectRow);
-        int delete = categoryService.delete(cat.getCatId().toString());
-        if (delete == 1) {
-            Global.listCategory.remove(selectRow);
-            JOptionPane.showMessageDialog(Global.parentForm, "Deleted");
-            clear();
-        }
+        
+            Category cat = categoryTableModel.getCategory(selectRow);
+            int delete = categoryService.delete(cat.getCatId().toString());
+            if (delete == 1) {
+                Global.listCategory.remove(selectRow);
+                JOptionPane.showMessageDialog(Global.parentForm, "Deleted");
+                clear();
+            }
     }
 
     private boolean isValidEntry() {

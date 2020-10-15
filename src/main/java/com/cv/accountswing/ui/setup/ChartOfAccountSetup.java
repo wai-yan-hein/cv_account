@@ -165,16 +165,20 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements MouseList
     }
 
     private void deleteCOA() {
-        if (selectedNode != null) {
-            ChartOfAccount coa = (ChartOfAccount) selectedNode.getUserObject();
-            if (coa != null) {
-                String code = coa.getCode();
-                coaServcie.delete(code, Global.compId.toString());
+        try {
+            if (selectedNode != null) {
+                ChartOfAccount coa = (ChartOfAccount) selectedNode.getUserObject();
+                if (coa != null) {
+                    String code = coa.getCode();
+                    coaServcie.delete(code, Global.compId.toString());
+                }
+                treeModel.removeNodeFromParent(selectedNode);
+                treeModel.reload(selectedNode);
             }
-            treeModel.removeNodeFromParent(selectedNode);
-            treeModel.reload(selectedNode);
+        } catch (Exception e) {
+            LOGGER.error("Delete ChartOfAccount :" + e.getMessage());
+            JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Delete ChartOfAccount", JOptionPane.ERROR_MESSAGE);
         }
-
     }
 
     private void initPopup() {

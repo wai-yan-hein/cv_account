@@ -343,7 +343,13 @@ public class SaleManSetupDialog extends javax.swing.JDialog implements KeyListen
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
-        save();
+        try {
+            save();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(Global.parentForm, e.getMessage());
+            LOGGER.error("Save SaleMan :" + e.getMessage());
+        }
+
     }//GEN-LAST:event_btnSaveActionPerformed
 
     private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed
@@ -351,7 +357,12 @@ public class SaleManSetupDialog extends javax.swing.JDialog implements KeyListen
     }//GEN-LAST:event_btnClearActionPerformed
 
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
-        delete();
+        try {
+            delete();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(Global.parentForm, e.getMessage());
+            LOGGER.error("Delete SaleMan :" + e.getMessage());
+        }
     }//GEN-LAST:event_btnDeleteActionPerformed
 
     /**

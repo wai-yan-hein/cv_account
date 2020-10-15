@@ -27,6 +27,8 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -42,6 +44,7 @@ public class LocationSetupDialog extends javax.swing.JDialog implements KeyListe
     /**
      * Creates new form LocationSetupDialog
      */
+    private static final Logger LOGGER = LoggerFactory.getLogger(LocationSetupDialog.class);
     private String parentRootName = "Location";
     private DefaultMutableTreeNode selectedNode;
     private DefaultMutableTreeNode child;
@@ -321,11 +324,21 @@ public class LocationSetupDialog extends javax.swing.JDialog implements KeyListe
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         // TODO add your handling code here:
-        saveLocaiton();
+        try {
+            saveLocaiton();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(Global.parentForm, e.getMessage());
+            LOGGER.error("Save Location :" + e.getMessage());
+        }
     }//GEN-LAST:event_btnSaveActionPerformed
 
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
-        delLoc();        // TODO add your handling code here:
+        try {
+            delLoc();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(Global.parentForm, e.getMessage());
+            LOGGER.error("Delete Location :" + e.getMessage());
+        }// TODO add your handling code here:
     }//GEN-LAST:event_btnDeleteActionPerformed
 
     private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed

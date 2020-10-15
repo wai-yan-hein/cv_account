@@ -247,11 +247,16 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
     }
 
     private void delete() {
-        if (selectedNode != null) {
-            VRoleMenu rMenu = (VRoleMenu) selectedNode.getUserObject();
-            menuService.delete(rMenu.getKey().getMenuId().toString());
-            treeModel.removeNodeFromParent(selectedNode);
-            treeModel.reload(selectedNode);
+        try {
+            if (selectedNode != null) {
+                VRoleMenu rMenu = (VRoleMenu) selectedNode.getUserObject();
+                menuService.delete(rMenu.getKey().getMenuId().toString());
+                treeModel.removeNodeFromParent(selectedNode);
+                treeModel.reload(selectedNode);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(Global.parentForm, e.getMessage());
+            LOGGER.error("Delete Menu :" + e.getMessage());
         }
     }
 
@@ -399,7 +404,12 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        saveMenu();
+        try {
+            saveMenu();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(Global.parentForm, e.getMessage());
+            LOGGER.error("Save Menu :" + e.getMessage());
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void txtMenuNameFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtMenuNameFocusGained

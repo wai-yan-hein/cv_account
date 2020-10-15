@@ -845,6 +845,7 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
     }
 
     public void delete() {
+        
         if (Util1.getNullTo(gl.getDeleted())) {
             JOptionPane.showConfirmDialog(Global.parentForm, "Voucher already deleted.",
                     "Return In voucher delete", JOptionPane.ERROR);
