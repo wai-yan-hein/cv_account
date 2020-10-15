@@ -11,13 +11,11 @@ import javax.persistence.GeneratedValue;
 import static javax.persistence.GenerationType.IDENTITY;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import lombok.Data;
 
 /**
  *
  * @author Mg Kyaw Thura Aung
  */
-@Data
 @Entity
 @Table(name = "vou_status")
 public class VouStatus implements java.io.Serializable {
@@ -26,7 +24,23 @@ public class VouStatus implements java.io.Serializable {
     @GeneratedValue(strategy = IDENTITY)
     @Column(name = "vou_status_id", unique = true, nullable = false)
     private Integer vouStatusId;
-     @Column(name = "status_desp", nullable = false, length = 15, unique = true)
+    @Column(name = "status_desp", nullable = false, length = 15, unique = true)
     private String statusDesp;
+
+    public Integer getVouStatusId() {
+        return vouStatusId;
+    }
+
+    public void setVouStatusId(Integer vouStatusId) {
+        this.vouStatusId = vouStatusId;
+    }
+
+    public String getStatusDesp() {
+        return statusDesp;
+    }
+
+    public void setStatusDesp(String statusDesp) {
+        this.statusDesp = statusDesp;
+    }
 
 }

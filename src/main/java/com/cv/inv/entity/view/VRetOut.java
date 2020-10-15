@@ -14,13 +14,11 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import lombok.Data;
 
 /**
  *
  * @author lenovo
  */
-@Data
 @Entity
 @Table(name = "v_ret_out")
 public class VRetOut implements Serializable {
@@ -51,5 +49,109 @@ public class VRetOut implements Serializable {
     private String  userName;
     @Column(name = "from_cur_id")
     private String  fromCurId;
+
+    public RetOutCompoundKey getKey() {
+        return key;
+    }
+
+    public void setKey(RetOutCompoundKey key) {
+        this.key = key;
+    }
+
+    public String getStockId() {
+        return stockId;
+    }
+
+    public void setStockId(String stockId) {
+        this.stockId = stockId;
+    }
+
+    public Long getTraderId() {
+        return traderId;
+    }
+
+    public void setTraderId(Long traderId) {
+        this.traderId = traderId;
+    }
+
+    public String getTraderName() {
+        return traderName;
+    }
+
+    public void setTraderName(String traderName) {
+        this.traderName = traderName;
+    }
+
+    public Date getGlDate() {
+        return glDate;
+    }
+
+    public void setGlDate(Date glDate) {
+        this.glDate = glDate;
+    }
+
+    public Double getVouTotal() {
+        return vouTotal;
+    }
+
+    public void setVouTotal(Double vouTotal) {
+        this.vouTotal = vouTotal;
+    }
+
+    public Double getVouPaid() {
+        return vouPaid;
+    }
+
+    public void setVouPaid(Double vouPaid) {
+        this.vouPaid = vouPaid;
+    }
+
+    public Double getVouBalance() {
+        return vouBalance;
+    }
+
+    public void setVouBalance(Double vouBalance) {
+        this.vouBalance = vouBalance;
+    }
+
+    public Integer getLocationId() {
+        return locationId;
+    }
+
+    public void setLocationId(Integer locationId) {
+        this.locationId = locationId;
+    }
+
+    public Integer getCompId() {
+        return compId;
+    }
+
+    public void setCompId(Integer compId) {
+        this.compId = compId;
+    }
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getFromCurId() {
+        return fromCurId;
+    }
+
+    public void setFromCurId(String fromCurId) {
+        this.fromCurId = fromCurId;
+    }
     
 }

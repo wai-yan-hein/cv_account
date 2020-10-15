@@ -9,13 +9,12 @@ import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import lombok.Data;
 
 /**
  *
  * @author Lenovo
  */
-@Data
+
 @Entity
 @Table(name = "unit_relation")
 public class UnitRelation {
@@ -24,5 +23,21 @@ public class UnitRelation {
     private RelationKey unitKey;
     @Column(name = "factor")
     private Float factor;
+
+    public RelationKey getUnitKey() {
+        return unitKey;
+    }
+
+    public void setUnitKey(RelationKey unitKey) {
+        this.unitKey = unitKey;
+    }
+
+    public Float getFactor() {
+        return factor;
+    }
+
+    public void setFactor(Float factor) {
+        this.factor = factor;
+    }
 
 }

@@ -9,13 +9,11 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import lombok.Data;
 
 /**
  *
  * @author Lenovo
  */
-@Data
 @Entity
 @Table(name = "stock_type")
 public class StockType implements java.io.Serializable {
@@ -38,6 +36,31 @@ public class StockType implements java.io.Serializable {
     public String toString() {
         return this.itemTypeName;
     }
+
+    public String getItemTypeCode() {
+        return itemTypeCode;
+    }
+
+    public void setItemTypeCode(String itemTypeCode) {
+        this.itemTypeCode = itemTypeCode;
+    }
+
+    public String getItemTypeName() {
+        return itemTypeName;
+    }
+
+    public void setItemTypeName(String itemTypeName) {
+        this.itemTypeName = itemTypeName;
+    }
+
+    public String getAccountId() {
+        return accountId;
+    }
+
+    public void setAccountId(String accountId) {
+        this.accountId = accountId;
+    }
+    
 
 
 }

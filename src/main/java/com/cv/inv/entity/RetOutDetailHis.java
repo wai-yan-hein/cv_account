@@ -14,13 +14,11 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import lombok.Data;
 
 /**
  *
  * @author lenovo
  */
-@Data
 @Entity
 @Table(name = "ret_out_detail")
 public class RetOutDetailHis implements java.io.Serializable {
@@ -48,6 +46,78 @@ public class RetOutDetailHis implements java.io.Serializable {
     private Float stdWt;
 
     public RetOutDetailHis() {
+    }
+
+    public RetOutCompoundKey getOutCompoundKey() {
+        return outCompoundKey;
+    }
+
+    public void setOutCompoundKey(RetOutCompoundKey outCompoundKey) {
+        this.outCompoundKey = outCompoundKey;
+    }
+
+    public Stock getStock() {
+        return stock;
+    }
+
+    public void setStock(Stock stock) {
+        this.stock = stock;
+    }
+
+    public Date getExpireDate() {
+        return expireDate;
+    }
+
+    public void setExpireDate(Date expireDate) {
+        this.expireDate = expireDate;
+    }
+
+    public Float getQty() {
+        return qty;
+    }
+
+    public void setQty(Float qty) {
+        this.qty = qty;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
+    }
+
+    public StockUnit getStockUnit() {
+        return stockUnit;
+    }
+
+    public void setStockUnit(StockUnit stockUnit) {
+        this.stockUnit = stockUnit;
+    }
+
+    public Double getAmount() {
+        return amount;
+    }
+
+    public void setAmount(Double amount) {
+        this.amount = amount;
+    }
+
+    public Integer getUniqueId() {
+        return uniqueId;
+    }
+
+    public void setUniqueId(Integer uniqueId) {
+        this.uniqueId = uniqueId;
+    }
+
+    public Float getStdWt() {
+        return stdWt;
+    }
+
+    public void setStdWt(Float stdWt) {
+        this.stdWt = stdWt;
     }
 
 }

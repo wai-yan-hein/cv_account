@@ -84,6 +84,7 @@ public class MyDataModel extends MyAbstractTreeTableModel {
                             setAllow(roleMenu.getChild(), (Boolean) aValue);
                         }
                         roleMenu.setIsAllow((Boolean) aValue);
+                       
                     }
                 }
                 break;

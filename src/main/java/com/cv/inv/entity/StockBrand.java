@@ -11,13 +11,11 @@ import javax.persistence.GeneratedValue;
 import static javax.persistence.GenerationType.IDENTITY;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import lombok.Data;
 
 /**
  *
  * @author Lenovo
  */
-@Data
 @Entity
 @Table(name = "stock_brand")
 public class StockBrand implements java.io.Serializable {
@@ -35,5 +33,30 @@ public class StockBrand implements java.io.Serializable {
     public String toString() {
         return brandName;
     }
+
+    public Integer getBrandId() {
+        return brandId;
+    }
+
+    public void setBrandId(Integer brandId) {
+        this.brandId = brandId;
+    }
+
+    public String getBrandName() {
+        return brandName;
+    }
+
+    public void setBrandName(String brandName) {
+        this.brandName = brandName;
+    }
+
+    public Integer getMigId() {
+        return migId;
+    }
+
+    public void setMigId(Integer migId) {
+        this.migId = migId;
+    }
+    
 
 }

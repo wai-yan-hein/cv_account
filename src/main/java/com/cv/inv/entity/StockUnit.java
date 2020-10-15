@@ -12,13 +12,11 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import lombok.Data;
 
 /**
  *
  * @author Lenovo
  */
-@Data
 @Entity
 @Table(name = "stock_unit")
 public class StockUnit implements java.io.Serializable {
@@ -38,6 +36,30 @@ public class StockUnit implements java.io.Serializable {
     @Override
     public String toString() {
         return this.itemUnitCode;
+    }
+
+    public String getItemUnitCode() {
+        return itemUnitCode;
+    }
+
+    public void setItemUnitCode(String itemUnitCode) {
+        this.itemUnitCode = itemUnitCode;
+    }
+
+    public String getItemUnitName() {
+        return itemUnitName;
+    }
+
+    public void setItemUnitName(String itemUnitName) {
+        this.itemUnitName = itemUnitName;
+    }
+
+    public Date getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
     }
 
 }
