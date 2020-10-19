@@ -33,7 +33,8 @@ public class StockBrandTableModel extends AbstractTableModel {
     public int getColumnCount() {
         return columnNames.length;
     }
-     @Override
+
+    @Override
     public String getColumnName(int column) {
         return columnNames[column];
     }
@@ -84,6 +85,10 @@ public class StockBrandTableModel extends AbstractTableModel {
             listItemBrand.add(item);
             fireTableRowsInserted(listItemBrand.size() - 1, listItemBrand.size() - 1);
         }
+    }
+
+    public void refresh() {
+        fireTableDataChanged();
     }
 
 }

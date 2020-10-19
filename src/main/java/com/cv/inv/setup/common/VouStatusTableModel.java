@@ -82,4 +82,8 @@ public class VouStatusTableModel extends AbstractTableModel {
         }
     }
 
+    public void refresh() {
+        fireTableDataChanged();
+    }
+
 }

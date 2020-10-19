@@ -9,13 +9,11 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import lombok.Data;
 
 /**
  *
  * @author Lenovo
  */
-@Data
 @Entity
 @Table(name = "char_seq")
 public class CharacterNo implements java.io.Serializable {
@@ -34,5 +32,22 @@ public class CharacterNo implements java.io.Serializable {
         this.ch = ch;
         this.strNumber = strNumber;
     }
+
+    public String getCh() {
+        return ch;
+    }
+
+    public void setCh(String ch) {
+        this.ch = ch;
+    }
+
+    public String getStrNumber() {
+        return strNumber;
+    }
+
+    public void setStrNumber(String strNumber) {
+        this.strNumber = strNumber;
+    }
+    
 
 }

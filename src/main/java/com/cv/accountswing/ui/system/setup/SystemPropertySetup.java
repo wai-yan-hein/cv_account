@@ -21,6 +21,8 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
@@ -32,6 +34,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SystemPropertySetup extends javax.swing.JPanel implements KeyListener {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SystemPropertySetup.class);
     private int selectRow = -1;
     private SystemProperty systemProperty;
     @Autowired
@@ -322,7 +325,12 @@ public class SystemPropertySetup extends javax.swing.JPanel implements KeyListen
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         // TODO add your handling code here:
-        save();
+        try {
+            save();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(Global.parentForm, e.getMessage());
+            LOGGER.error("Save SystemProperty :" + e.getMessage());
+        }
     }//GEN-LAST:event_btnSaveActionPerformed
 
     private void jPanel1ComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jPanel1ComponentShown

@@ -8,6 +8,7 @@ package com.cv.accountswing.ui;
 import com.cv.accountswing.AccountSwingApplication;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
+import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.ReloadData;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.view.VRoleMenu;
@@ -102,18 +103,12 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadData,
-        SelectionObserver, LoadingObserver, KeyListener {
+        SelectionObserver, LoadingObserver, KeyListener, PanelControl {
 
     private final ConfigurableApplicationContext context;
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationMainFrame.class);
     private final HashMap<String, JLabel> hmTabLoading = new HashMap();
     JPopupMenu popupmenu;
-    private final String clear = "Clear";
-    private final String close = "Close";
-    private final String print = "Print";
-    private final String save = "Save";
-    private final String delete = "Delete";
-    private final String history = "History";
     ImageIcon online = null;
     ImageIcon offline = null;
 
@@ -201,12 +196,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private COAOpeningSetup cOAOpeningSetup;
     @Autowired
     private OtherSetup otherSetup;
-
-    @Autowired
-    private ReturnIn retIn;
-    @Autowired
-    private ReturnOut retOut;
-
     //Inventory Setup
     @Autowired
     private StockSetup stockSetup;
@@ -243,8 +232,20 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private StockUnitService stockUnitService;
     @Autowired
     private RelationService relationService;
+<<<<<<< HEAD
     @Autowired
     private ChargeTypeService chargeTypeService;
+=======
+    private PanelControl control;
+
+    public PanelControl getControl() {
+        return control;
+    }
+
+    public void setControl(PanelControl control) {
+        this.control = control;
+    }
+>>>>>>> 7fa91e6d01ebe7e3e4865da24b73cc35acb6e4a1
 
     //@Autowired
     //private TaskExecutor threadPoolTaskExecutor;
@@ -258,9 +259,13 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         initComponents();
         initKeyFoucsManager();
         this.context = context;
-        ImageIcon size = new ImageIcon(getClass().getResource("/images/logo.png"));
-        setIconImage(size.getImage());
 
+    }
+
+    @Override
+    public void setIconImage(Image image) {
+        ImageIcon size = new ImageIcon(getClass().getResource("/images/logo.png"));
+        super.setIconImage(size.getImage()); //To change body of generated methods, choose Tools | Templates.
     }
 
     private JPanel getPanel(String className, String panelName) {
@@ -476,15 +481,25 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher((KeyEvent ke) -> {
             switch (ke.getID()) {
                 case KeyEvent.KEY_PRESSED:
-                    switch (ke.getKeyCode()) {
-                        case KeyEvent.VK_F7:
-                            toolBar(getCurrentPanelName(), print);
-                            break;
-                        case KeyEvent.VK_F10:
-                            toolBar(getCurrentPanelName(), clear);
-                            break;
+                    if (control != null) {
+                        switch (ke.getKeyCode()) {
+                            case KeyEvent.VK_F5:
+                                control.save();
+                            case KeyEvent.VK_F7:
+                                control.print();
+                                break;
+                            case KeyEvent.VK_F8:
+                                control.delete();
+                                break;
+                            case KeyEvent.VK_F9:
+                                control.history();
+                                break;
+                            case KeyEvent.VK_F10:
+                                control.newForm();
+                                break;
+                        }
+                        break;
                     }
-                    break;
             }
             return false;
         });
@@ -535,7 +550,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             @Override
             public void mouseClicked(MouseEvent e) {
                 tabbedPane.remove(panel);
-                toolBar(panel.getName(), close);
 
             }
 
@@ -565,11 +579,9 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             tabMain.removeAll();
         });
         clearData.addActionListener((ActionEvent e) -> {
-            toolBar(getCurrentPanelName(), this.clear);
 
         });
         printReport.addActionListener((ActionEvent e) -> {
-            toolBar(getCurrentPanelName(), this.print);
 
         });
         popupmenu.add(printReport);
@@ -626,37 +638,39 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         taskExecutor.execute(() -> {
             List<VRoleMenu> listVRM = menuService.getParentChildMenu(Global.roleId.toString());
             listVRM.forEach((menu) -> {
-                if (menu.getChild() != null) {
-                    if (!menu.getChild().isEmpty()) {
-                        JMenu parent = new JMenu();
-                        parent.setName(menu.getMenuClass() + "," + menu.getSoureAccCode());
-                        parent.setText(menu.getMenuName());
-                        parent.setFont(Global.menuFont);
+                if (menu.getIsAllow()) {
+                    if (menu.getChild() != null) {
+                        if (!menu.getChild().isEmpty()) {
+                            JMenu parent = new JMenu();
+                            parent.setName(menu.getMenuClass() + "," + menu.getSoureAccCode());
+                            parent.setText(menu.getMenuName());
+                            parent.setFont(Global.menuFont);
 
-                        //Need to add action listener
-                        //====================================
-                        menuBar.add(parent);
-                        addChildMenu(parent, menu.getChild());
+                            //Need to add action listener
+                            //====================================
+                            menuBar.add(parent);
+                            addChildMenu(parent, menu.getChild());
+                        } else {  //No Child
+                            JMenu jmenu = new JMenu();
+                            jmenu.setName(menu.getMenuClass() + "," + menu.getSoureAccCode());
+
+                            jmenu.setText(menu.getMenuName());
+                            jmenu.setFont(Global.menuFont);
+
+                            //Need to add action listener
+                            //====================================
+                            menuBar.add(jmenu);
+                        }
                     } else {  //No Child
                         JMenu jmenu = new JMenu();
-                        jmenu.setName(menu.getMenuClass() + "," + menu.getSoureAccCode());
 
                         jmenu.setText(menu.getMenuName());
                         jmenu.setFont(Global.menuFont);
-
+                        jmenu.setName(menu.getMenuClass() + "," + menu.getSoureAccCode());
                         //Need to add action listener
                         //====================================
                         menuBar.add(jmenu);
                     }
-                } else {  //No Child
-                    JMenu jmenu = new JMenu();
-
-                    jmenu.setText(menu.getMenuName());
-                    jmenu.setFont(Global.menuFont);
-                    jmenu.setName(menu.getMenuClass() + "," + menu.getSoureAccCode());
-                    //Need to add action listener
-                    //====================================
-                    menuBar.add(jmenu);
                 }
             });
             addMargin();
@@ -666,37 +680,39 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
 
     private void addChildMenu(JMenu parent, List<VRoleMenu> listVRM) {
         listVRM.forEach((vrMenu) -> {
-            if (vrMenu.getChild() != null) {
-                if (!vrMenu.getChild().isEmpty()) {
-                    JMenu menu = new JMenu();
-                    menu.setText(vrMenu.getMenuName());
-                    menu.setFont(Global.menuFont);
-                    menu.setName(vrMenu.getMenuClass() + "," + vrMenu.getSoureAccCode());
+            if (vrMenu.getIsAllow()) {
+                if (vrMenu.getChild() != null) {
+                    if (!vrMenu.getChild().isEmpty()) {
+                        JMenu menu = new JMenu();
+                        menu.setText(vrMenu.getMenuName());
+                        menu.setFont(Global.menuFont);
+                        menu.setName(vrMenu.getMenuClass() + "," + vrMenu.getSoureAccCode());
 
-                    //Need to add action listener
-                    //====================================
-                    parent.add(menu);
-                    addChildMenu(menu, vrMenu.getChild());
+                        //Need to add action listener
+                        //====================================
+                        parent.add(menu);
+                        addChildMenu(menu, vrMenu.getChild());
+                    } else {  //No Child
+                        JMenuItem menuItem = new JMenuItem();
+                        menuItem.setText(vrMenu.getMenuName());
+                        //Need to add action listener
+                        menuItem.addActionListener(menuListener);
+                        menuItem.setFont(Global.menuFont);
+                        menuItem.setName(vrMenu.getMenuClass() + "," + vrMenu.getSoureAccCode());
+
+                        //====================================
+                        parent.add(menuItem);
+                    }
                 } else {  //No Child
                     JMenuItem menuItem = new JMenuItem();
                     menuItem.setText(vrMenu.getMenuName());
+                    menuItem.setName(vrMenu.getMenuClass() + "," + vrMenu.getSoureAccCode());
                     //Need to add action listener
                     menuItem.addActionListener(menuListener);
                     menuItem.setFont(Global.menuFont);
-                    menuItem.setName(vrMenu.getMenuClass() + "," + vrMenu.getSoureAccCode());
-
                     //====================================
                     parent.add(menuItem);
                 }
-            } else {  //No Child
-                JMenuItem menuItem = new JMenuItem();
-                menuItem.setText(vrMenu.getMenuName());
-                menuItem.setName(vrMenu.getMenuClass() + "," + vrMenu.getSoureAccCode());
-                //Need to add action listener
-                menuItem.addActionListener(menuListener);
-                menuItem.setFont(Global.menuFont);
-                //====================================
-                parent.add(menuItem);
             }
         });
     }
@@ -920,339 +936,10 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         return scaledBI;
     }
 
-    private void toolBar(String menuName, String type) {
-        switch (menuName) {
-            case "Customer":
-                switch (type) {
-                    case clear:
-                        customerSetup.clear();
-                        break;
-                    case close:
-                        customerSetup.setIsShown(false);
-                        break;
-                    /* case print:
-                        dailyCash.print();
-                        break;*/
-                }
-                break;
-            case "Currency":
-                switch (type) {
-                    case clear:
-                        currencySetup.clear();
-                        break;
-                    case close:
-                        currencySetup.setIsShown(false);
-                        break;
-                    /* case print:
-                        currencySetup.print();
-                        break;*/
-                }
-                break;
-            case "Supplier":
-                switch (type) {
-                    case clear:
-                        currencySetup.clear();
-                        break;
-                    case close:
-                        currencySetup.setIsShown(false);
-                        break;
-                    /* case print:
-                        currencySetup.print();
-                        break;*/
-                }
-                break;
-            case "Role Assign":
-                switch (type) {
-                    /*case clear:
-                     roleAssignSetup.clear();
-                     break;*/
-                    case close:
-                        roleAssignSetup.setIsShown(false);
-                        break;
-                    /* case print:
-                        currencySetup.print();
-                        break;*/
-                }
-                break;
-            case "Department":
-                switch (type) {
-                    case clear:
-                        departmentSetup.clear();
-                        break;
-                    case close:
-                        departmentSetup.setIsShown(false);
-                        break;
-                    /* case print:
-                        currencySetup.print();
-                        break;*/
-                }
-                break;
-            case "Region":
-                switch (type) {
-                    case clear:
-                        regionSetup.clear();
-                        break;
-                    case close:
-                        regionSetup.setIsShown(false);
-                        break;
-                    /* case print:
-                        currencySetup.print();
-                        break;*/
-                }
-                break;
-            case "Chart of Account":
-                switch (type) {
-                    case clear:
-                        chartOfAccountSetup.clear();
-                        break;
-                    case close:
-                        chartOfAccountSetup.setIsShown(false);
-                        break;
-                    /* case print:
-                        currencySetup.print();
-                        break;*/
-                }
-                break;
-            case "Daily Cash":
-                switch (type) {
-                    case clear:
-                        allCash.clearFilter();
-                        break;
-                    case close:
-                        allCash.setIsShown(false);
-                        break;
-                    case print:
-                        allCash.print();
-                        break;
-                }
-                break;
-            case "Patty Cash":
-                switch (type) {
-                    case clear:
-                        allCash.clearFilter();
-                        break;
-                    case close:
-                        allCash.setIsShown(false);
-                        break;
-                    case print:
-                        allCash.print();
-                        break;
-                }
-                break;
-            case "Adj Cash":
-                switch (type) {
-                    case clear:
-                        allCash.clearFilter();
-                        break;
-                    case close:
-                        allCash.setIsShown(false);
-                        break;
-                    case print:
-                        allCash.print();
-                        break;
-                }
-                break;
-            case "Petty Cash Zay":
-                switch (type) {
-                    case clear:
-                        allCash.clearFilter();
-                        break;
-                    case close:
-                        allCash.setIsShown(false);
-                        break;
-                    case print:
-                        allCash.print();
-                        break;
-                }
-                break;
-            case "Bank - Saving":
-                switch (type) {
-                    case clear:
-                        allCash.clearFilter();
-                        break;
-                    case close:
-                        allCash.setIsShown(false);
-                        break;
-                    case print:
-                        allCash.print();
-                        break;
-                }
-                break;
-            case "Home Safe":
-                switch (type) {
-                    case clear:
-                        allCash.clearFilter();
-                        break;
-                    case close:
-                        allCash.setIsShown(false);
-                        break;
-                    case print:
-                        allCash.print();
-                        break;
-                }
-                break;
-            case "Purchase":
-                switch (type) {
-                    case clear:
-                        purchaseBook.clearFilter();
-                        break;
-                    case close:
-                        purchaseBook.setIsShown(false);
-                        break;
-                    case print:
-                        purchaseBook.print();
-                        break;
-                }
-            case "Sale":
-                switch (type) {
-                    case clear:
-                        saleBook.clearFilter();
-                        break;
-                    case close:
-                        saleBook.setIsShown(false);
-                        break;
-                    case print:
-                        saleBook.print();
-                        break;
-                }
-                break;
-            case "Stock Setup":
-                switch (type) {
-                    case clear:
-                        stockSetup.clear();
-                        break;
-                    case close:
-                        stockSetup.setIsShown(false);
-                        break;
-                    case print:
-                        //saleBook.print();
-                        break;
-                }
-                break;
-            case "Journal":
-                switch (type) {
-                    case clear:
-                        journal.clear();
-                        break;
-                    case close:
-                        journal.setIsShown(false);
-                        break;
-                    case print:
-                        //saleBook.print();
-                        break;
-                }
-                break;
-            case "Credit Voucher":
-                switch (type) {
-                    case clear:
-                        crdrVoucher.clear();
-                        break;
-                    case close:
-                        crdrVoucher.setIsShown(false);
-                        break;
-                    case print:
-                        //saleBook.print();
-                        break;
-                }
-            case "System Property":
-                switch (type) {
-                    case clear:
-                        systemPropertySetup.clear();
-                        break;
-                    case close:
-                        systemPropertySetup.setIsShown(false);
-                        break;
-                    case print:
-                        //saleBook.print();
-                        break;
-                }
-                break;
-            case "User Setup":
-                switch (type) {
-                    case clear:
-                        user.clear();
-                        break;
-                    case close:
-                        user.setIsShown(false);
-                        break;
-                    case print:
-                        //saleBook.print();
-                        break;
-                }
-                break;
-            case "AP/AR":
-                switch (type) {
-                    case clear:
-                        aPARReport.clear();
-                        break;
-                    case close:
-                        aPARReport.setIsShown(false);
-                        break;
-                    case print:
-                        aPARReport.printApar();
-                        break;
-                }
-                break;
-            case "Return In":
-                switch (type) {
-                    case clear:
-                        retIn.clear();
-                        break;
-                    case save:
-                        retIn.save();
-                        break;
-                    case history:
-                        retIn.history();
-                        break;
-                    case delete:
-                        retIn.delete();
-                        break;
-                }
-
-                break;
-            case "Return Out":
-                switch (type) {
-                    case clear:
-                        retOut.clear();
-                        break;
-                    case save:
-                        retOut.save();
-                        break;
-                    case history:
-                        retOut.history();
-                        break;
-                    case delete:
-                        retOut.delete();
-                        break;
-                }
-
-            case "Purchase Entry":
-                switch (type) {
-                    case save:
-                        purchaseEntry.save();
-                        break;
-                    case clear:
-                        purchaseEntry.clear();
-                        break;
-                    case close:
-                        purchaseEntry.setIsShown(false);
-                        break;
-
-                }
-
-                break;
-
-            default:
-                break;
-
-        }
-    }
-
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel2 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         btnPrint = new javax.swing.JButton();
         btnDelete = new javax.swing.JButton();
@@ -1264,25 +951,20 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         tabMain = new javax.swing.JTabbedPane();
         menuBar = new javax.swing.JMenuBar();
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
-        );
-
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Core Account\n");
         setFont(Global.lableFont);
+        setMinimumSize(new java.awt.Dimension(1024, 720));
         addHierarchyBoundsListener(new java.awt.event.HierarchyBoundsListener() {
             public void ancestorMoved(java.awt.event.HierarchyEvent evt) {
             }
             public void ancestorResized(java.awt.event.HierarchyEvent evt) {
                 formAncestorResized(evt);
+            }
+        });
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentResized(java.awt.event.ComponentEvent evt) {
+                formComponentResized(evt);
             }
         });
         addWindowStateListener(new java.awt.event.WindowStateListener() {
@@ -1306,6 +988,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
 
         btnPrint.setFont(Global.lableFont);
         btnPrint.setText("F7 - Print");
+        btnPrint.setFocusable(false);
         btnPrint.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnPrintActionPerformed(evt);
@@ -1314,6 +997,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
 
         btnDelete.setFont(Global.lableFont);
         btnDelete.setText("F8 - Delete");
+        btnDelete.setFocusable(false);
         btnDelete.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnDeleteActionPerformed(evt);
@@ -1322,6 +1006,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
 
         btnClear.setFont(Global.lableFont);
         btnClear.setText("F10 - Clear");
+        btnClear.setFocusable(false);
         btnClear.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnClearActionPerformed(evt);
@@ -1330,6 +1015,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
 
         btnLogout.setFont(Global.lableFont);
         btnLogout.setText("Logout");
+        btnLogout.setFocusable(false);
         btnLogout.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnLogoutActionPerformed(evt);
@@ -1337,7 +1023,8 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         });
 
         btnHistory.setFont(Global.lableFont);
-        btnHistory.setText("F6-History");
+        btnHistory.setText("F9-History");
+        btnHistory.setFocusable(false);
         btnHistory.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnHistoryActionPerformed(evt);
@@ -1346,6 +1033,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
 
         btnSave.setFont(Global.lableFont);
         btnSave.setText("F5-Save");
+        btnSave.setFocusable(false);
         btnSave.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSaveActionPerformed(evt);
@@ -1362,20 +1050,23 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(lblCompanyName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnHistory)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(102, 102, 102)
                 .addComponent(btnSave)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnPrint)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnDelete)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnHistory)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnClear)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnLogout)
                 .addContainerGap())
         );
+
+        jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnClear, btnDelete, btnHistory, btnLogout, btnPrint, btnSave});
+
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
@@ -1385,10 +1076,11 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                         .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(btnPrint, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnHistory, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(btnSave))
                         .addComponent(btnDelete, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnClear, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnClear, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnHistory, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addComponent(btnLogout, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -1442,16 +1134,16 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     }//GEN-LAST:event_formWindowClosing
 
     private void formAncestorResized(java.awt.event.HierarchyEvent evt) {//GEN-FIRST:event_formAncestorResized
-        LOGGER.info("formAncestorResized");
     }//GEN-LAST:event_formAncestorResized
 
     private void formWindowStateChanged(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowStateChanged
-        LOGGER.info("formWindowStateChanged");
+        //LOGGER.info("formWindowStateChanged");
+        setLocationRelativeTo(null);
         assignWindoInfo();
     }//GEN-LAST:event_formWindowStateChanged
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
-        LOGGER.info("formWindowOpened");
+        //LOGGER.info("formWindowOpened");
         assignWindoInfo();
         initMenu();
         initializeData();
@@ -1464,17 +1156,23 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
 
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
         // TODO add your handling code here:
-        toolBar(getCurrentPanelName(), delete);
+        if (control != null) {
+            control.delete();
+        }
     }//GEN-LAST:event_btnDeleteActionPerformed
 
     private void btnPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintActionPerformed
         // TODO add your handling code here:
-        toolBar(getCurrentPanelName(), print);
+        if (control != null) {
+            control.print();
+        }
     }//GEN-LAST:event_btnPrintActionPerformed
 
     private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed
         // TODO add your handling code here:
-        toolBar(getCurrentPanelName(), clear);
+        if (control != null) {
+            control.newForm();
+        }
 
     }//GEN-LAST:event_btnClearActionPerformed
 
@@ -1487,14 +1185,22 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
 
     private void btnHistoryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHistoryActionPerformed
         // TODO add your handling code here:
-        toolBar(getCurrentPanelName(), history);
+        if (control != null) {
+            control.history();
+        }
 
     }//GEN-LAST:event_btnHistoryActionPerformed
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         // TODO add your handling code here:
-        toolBar(getCurrentPanelName(), save);
+        if (control != null) {
+            control.save();
+        }
     }//GEN-LAST:event_btnSaveActionPerformed
+
+    private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
+        // TODO add your handling code here:
+    }//GEN-LAST:event_formComponentResized
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClear;
@@ -1504,7 +1210,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private javax.swing.JButton btnPrint;
     private javax.swing.JButton btnSave;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JLabel lblCompanyName;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JTabbedPane tabMain;
@@ -1537,25 +1242,11 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     }
 
     @Override
-    public void keyPressed(KeyEvent e
-    ) {
+    public void keyPressed(KeyEvent e) {
     }
 
     @Override
-    public void keyReleased(KeyEvent e
-    ) {
-        if (e.getKeyCode() == KeyEvent.VK_F7) {
-            LOGGER.info("PRESSED F7");
-            toolBar(getCurrentPanelName(), clear);
-        }
-        if (e.getKeyCode() == KeyEvent.VK_F5) {
-            LOGGER.info("PRESSED F5");
-            toolBar(getCurrentPanelName(), save);
-        }
-        if (e.getKeyCode() == KeyEvent.VK_F6) {
-            LOGGER.info("PRESSED F6");
-            toolBar(getCurrentPanelName(), history);
-        }
+    public void keyReleased(KeyEvent e) {
     }
 
     private void getMachinceInfo() {
@@ -1578,5 +1269,30 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             LOGGER.error("getMachieInfo : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.toString());
 
         }
+    }
+
+    @Override
+    public void save() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void delete() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void newForm() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void history() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void print() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

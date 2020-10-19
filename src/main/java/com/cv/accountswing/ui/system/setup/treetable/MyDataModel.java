@@ -5,15 +5,24 @@
  */
 package com.cv.accountswing.ui.system.setup.treetable;
 
+import com.cv.accountswing.common.Global;
+import com.cv.accountswing.entity.Privilege;
+import com.cv.accountswing.entity.PrivilegeKey;
 import com.cv.accountswing.entity.view.VRoleMenu;
 import com.cv.accountswing.service.PrivilegeService;
+import static com.lowagie.text.pdf.BidiOrder.L;
 import java.util.List;
+import javax.swing.JOptionPane;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Lenovo
  */
 public class MyDataModel extends MyAbstractTreeTableModel {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MyDataModel.class);
 
     // Spalten Name.
     static protected String[] columnNames = {"Name", "Type", "Allow"};
@@ -84,6 +93,8 @@ public class MyDataModel extends MyAbstractTreeTableModel {
                             setAllow(roleMenu.getChild(), (Boolean) aValue);
                         }
                         roleMenu.setIsAllow((Boolean) aValue);
+                        savePrivilege(roleMenu, (Boolean) aValue);
+
                     }
                 }
                 break;
@@ -94,14 +105,29 @@ public class MyDataModel extends MyAbstractTreeTableModel {
     }
 
     private void setAllow(List<VRoleMenu> parent, boolean allow) {
-        for (VRoleMenu child : parent) {
+        parent.forEach(child -> {
             if (child.getChild() != null) {
                 child.setIsAllow(allow);
+                savePrivilege(child, allow);
                 setAllow(child.getChild(), allow);
             } else {
                 child.setIsAllow(allow);
             }
-            
+        });
+    }
+
+    private void savePrivilege(VRoleMenu roleMenu, boolean allow) {
+        try {
+            if (roleMenu.getKey() != null) {
+                PrivilegeKey key = new PrivilegeKey(roleMenu.getKey().getRoleId(), roleMenu.getKey().getMenuId());
+                Privilege privilege = new Privilege();
+                privilege.setKey(key);
+                privilege.setIsAllow(allow);
+                privilegeService.save(privilege);
+            }
+        } catch (Exception e) {
+            LOGGER.error("Save Priviliges  :" + e.getMessage());
+            JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Permission Allow.", JOptionPane.ERROR_MESSAGE);
         }
     }
 

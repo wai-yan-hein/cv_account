@@ -6,6 +6,7 @@
 package com.cv.inv.entity;
 
 import java.io.Serializable;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
@@ -56,4 +57,37 @@ public class RetOutCompoundKey implements Serializable {
         this.vouNo = vouNo;
     }
 
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 59 * hash + Objects.hashCode(this.retOutDetailId);
+        hash = 59 * hash + Objects.hashCode(this.glId);
+        hash = 59 * hash + Objects.hashCode(this.vouNo);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final RetOutCompoundKey other = (RetOutCompoundKey) obj;
+        if (!Objects.equals(this.retOutDetailId, other.retOutDetailId)) {
+            return false;
+        }
+        if (!Objects.equals(this.vouNo, other.vouNo)) {
+            return false;
+        }
+        if (!Objects.equals(this.glId, other.glId)) {
+            return false;
+        }
+        return true;
+    }
+    
 }

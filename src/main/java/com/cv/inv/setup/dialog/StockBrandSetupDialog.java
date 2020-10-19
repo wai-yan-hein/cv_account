@@ -14,7 +14,6 @@ import com.cv.inv.setup.common.StockBrandTableModel;
 import java.awt.Frame;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
@@ -112,9 +111,9 @@ public class StockBrandSetupDialog extends javax.swing.JDialog implements KeyLis
                 JOptionPane.showMessageDialog(Global.parentForm, "Saved");
 
                 if (lblStatus.getText().equals("NEW")) {
-                    itemBrandTableModel.addItemBrand(saveCat);
+                    Global.listStockBrand.add(saveCat);
                 } else {
-                    itemBrandTableModel.setItemBrand(saveCat, selectRow);
+                    Global.listStockBrand.set(selectRow, saveCat);
                 }
                 clear();
             }
@@ -127,6 +126,7 @@ public class StockBrandSetupDialog extends javax.swing.JDialog implements KeyLis
         txtFilter.setText(null);
         txtName.setText(null);
         lblStatus.setText("NEW");
+        itemBrandTableModel.refresh();
 
     }
 
@@ -329,12 +329,22 @@ public class StockBrandSetupDialog extends javax.swing.JDialog implements KeyLis
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         // TODO add your handling code here:
-        save();
+        try {
+            save();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(Global.parentForm, e.getMessage());
+            LOGGER.error("Save StockBrand :" + e.getMessage());
+        }
     }//GEN-LAST:event_btnSaveActionPerformed
 
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
         // TODO add your handling code here:
-        delete();
+        try {
+            delete();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(Global.parentForm, e.getMessage());
+            LOGGER.error("Delete StockBrand :" + e.getMessage());
+        }
     }//GEN-LAST:event_btnDeleteActionPerformed
 
     private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed

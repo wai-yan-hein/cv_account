@@ -13,6 +13,7 @@
 07 Oct 2020 04:41:03,504 ERROR: com.cv.accountswing.util.StockUP - java.lang.NullPointerException
 07 Oct 2020 05:30:06,686 ERROR: com.cv.inv.util.GenVouNoImpl - getLastVouNo : 63 - org.hibernate.exception.SQLGrammarException: could not extract ResultSet
 07 Oct 2020 16:26:14,533 ERROR: com.cv.inv.util.GenVouNoImpl - getLastVouNo : 63 - org.hibernate.exception.SQLGrammarException: could not extract ResultSet
+<<<<<<< HEAD
 14 Oct 2020 06:35:35,090 ERROR: com.cv.inv.util.GenVouNoImpl - getLastVouNo : 247 - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [null]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement
 14 Oct 2020 06:41:48,429 ERROR: com.cv.inv.util.GenVouNoImpl - getLastVouNo : 247 - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [null]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement
 14 Oct 2020 06:49:08,331 ERROR: com.cv.inv.util.GenVouNoImpl - getLastVouNo : 247 - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [null]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement
@@ -23,3 +24,111 @@
 14 Oct 2020 09:28:58,271 ERROR: com.cv.inv.util.GenVouNoImpl - getLastVouNo : 247 - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [null]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement
 15 Oct 2020 16:24:49,295 ERROR: com.cv.accountswing.util.StockUP - java.lang.NullPointerException
 15 Oct 2020 16:24:49,326 ERROR: com.cv.accountswing.util.StockUP - java.lang.NullPointerException
+=======
+14 Oct 2020 06:44:58,985 ERROR: com.cv.inv.util.GenVouNoImpl - getLastVouNo : 247 - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [null]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement
+14 Oct 2020 06:53:20,561 ERROR: com.cv.inv.util.GenVouNoImpl - getLastVouNo : 247 - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [null]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement
+14 Oct 2020 06:56:05,337 ERROR: com.cv.inv.util.GenVouNoImpl - getLastVouNo : 247 - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [null]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement
+17 Oct 2020 09:15:44,190 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+17 Oct 2020 09:15:52,227 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+17 Oct 2020 09:15:52,237 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 06:34:37,085 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 06:34:37,085 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 06:34:38,976 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 06:34:38,976 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 10:32:18,629 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 10:32:18,629 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 10:32:20,138 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 10:32:20,138 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 10:40:08,880 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 10:40:08,880 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 10:40:11,069 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 10:40:11,069 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 10:57:26,862 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 10:57:26,862 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 10:57:28,805 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 10:57:28,805 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 10:57:31,130 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 10:57:31,130 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 10:57:31,140 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 10:57:31,140 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 10:58:16,127 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 10:58:16,127 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 10:58:17,272 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 10:58:17,272 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 10:58:19,442 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 10:58:19,442 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 10:58:19,442 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 10:58:19,442 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 11:46:01,743 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 11:46:01,743 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 11:46:03,910 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 11:46:03,910 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 11:46:40,035 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 11:46:40,035 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 11:46:40,035 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 11:46:40,035 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 11:47:41,573 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 11:47:41,573 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 11:48:08,702 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 11:48:08,712 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 11:49:06,909 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 11:49:06,909 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 11:49:06,909 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 11:49:06,909 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 11:56:58,002 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 11:56:58,002 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 11:56:59,495 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 11:56:59,495 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 11:59:34,967 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 11:59:34,967 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 11:59:36,072 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 11:59:36,072 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 12:00:34,032 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 12:00:34,032 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 12:00:35,098 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 12:00:35,098 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 12:01:38,277 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 12:01:38,277 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 12:01:39,696 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+18 Oct 2020 12:01:39,696 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+19 Oct 2020 03:21:13,936 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+19 Oct 2020 03:21:13,936 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+19 Oct 2020 03:21:15,387 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+19 Oct 2020 03:21:15,387 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+19 Oct 2020 03:22:45,409 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+19 Oct 2020 03:22:45,409 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+19 Oct 2020 03:22:46,566 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+19 Oct 2020 03:22:46,566 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+19 Oct 2020 03:26:12,417 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+19 Oct 2020 03:26:12,417 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+19 Oct 2020 03:26:14,342 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+19 Oct 2020 03:26:14,342 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+19 Oct 2020 03:32:57,743 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+19 Oct 2020 03:32:57,743 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+19 Oct 2020 03:33:01,269 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+19 Oct 2020 03:33:01,269 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+19 Oct 2020 04:27:10,325 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+19 Oct 2020 04:27:10,325 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+19 Oct 2020 04:27:12,671 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+19 Oct 2020 04:27:12,671 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+19 Oct 2020 04:37:40,831 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+19 Oct 2020 04:37:40,831 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+19 Oct 2020 04:37:42,747 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+19 Oct 2020 04:37:42,747 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+19 Oct 2020 04:37:54,948 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+19 Oct 2020 04:37:54,948 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+19 Oct 2020 04:37:56,500 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+19 Oct 2020 04:37:56,500 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+19 Oct 2020 04:38:21,164 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+19 Oct 2020 04:38:21,164 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+19 Oct 2020 04:38:22,727 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+19 Oct 2020 04:38:22,727 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+19 Oct 2020 04:44:07,662 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+19 Oct 2020 04:44:07,662 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+19 Oct 2020 04:44:09,005 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+19 Oct 2020 04:44:09,005 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+19 Oct 2020 04:47:16,775 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+19 Oct 2020 04:47:16,775 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+19 Oct 2020 04:47:17,825 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+19 Oct 2020 04:47:17,825 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+>>>>>>> 7fa91e6d01ebe7e3e4865da24b73cc35acb6e4a1

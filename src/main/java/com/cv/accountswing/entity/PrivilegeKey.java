@@ -15,11 +15,20 @@ import javax.persistence.Embeddable;
  * @author winswe
  */
 @Embeddable
-public class PrivilegeKey implements Serializable{
+public class PrivilegeKey implements Serializable {
+
     private Integer roleId;
     private Integer menuId;
-    
-    @Column(name="role_id")
+
+    public PrivilegeKey() {
+    }
+
+    public PrivilegeKey(Integer roleId, Integer menuId) {
+        this.roleId = roleId;
+        this.menuId = menuId;
+    }
+
+    @Column(name = "role_id")
     public Integer getRoleId() {
         return roleId;
     }
@@ -28,7 +37,7 @@ public class PrivilegeKey implements Serializable{
         this.roleId = roleId;
     }
 
-    @Column(name="menu_id")
+    @Column(name = "menu_id")
     public Integer getMenuId() {
         return menuId;
     }
@@ -62,5 +71,5 @@ public class PrivilegeKey implements Serializable{
         }
         return true;
     }
-    
+
 }

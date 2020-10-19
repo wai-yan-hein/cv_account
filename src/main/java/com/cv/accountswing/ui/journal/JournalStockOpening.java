@@ -213,7 +213,12 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
                     StockOpValue sov = gson.fromJson(strSOV, StockOpValue.class);
                     sov.getKey().setTranDate(Util1.toDate(stDate));
                     sov.setCreatedDate(new Date());
-                    sovService.save(sov, userId);
+                    try {
+                        sovService.save(sov, userId);
+                    } catch (Exception e) {
+                        LOGGER.error("Save StockOpening :" + e.getMessage());
+                        JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Save StockOpening", JOptionPane.ERROR_MESSAGE);
+                    }
 
                     tmpVSOV.getKey().setTranDate(Util1.toDate(stDate));
                     tmpVSOV.setCreatedDate(new Date());

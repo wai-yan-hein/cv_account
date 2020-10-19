@@ -11,13 +11,11 @@ import javax.persistence.GeneratedValue;
 import static javax.persistence.GenerationType.IDENTITY;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import lombok.Data;
 
 /**
  *
  * @author Lenovo
  */
-@Data
 @Entity
 @Table(name = "category")
 public class Category implements java.io.Serializable {
@@ -38,5 +36,30 @@ public class Category implements java.io.Serializable {
     public String toString() {
         return this.catName;
     }
+
+    public Integer getCatId() {
+        return catId;
+    }
+
+    public void setCatId(Integer catId) {
+        this.catId = catId;
+    }
+
+    public String getCatName() {
+        return catName;
+    }
+
+    public void setCatName(String catName) {
+        this.catName = catName;
+    }
+
+    public Integer getMigId() {
+        return migId;
+    }
+
+    public void setMigId(Integer migId) {
+        this.migId = migId;
+    }
+    
 
 }

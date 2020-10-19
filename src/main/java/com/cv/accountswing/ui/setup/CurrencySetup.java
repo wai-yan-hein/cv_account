@@ -52,7 +52,6 @@ public class CurrencySetup extends javax.swing.JPanel implements KeyListener {
     public void setIsShown(boolean isShown) {
         this.isShown = isShown;
     }
-    
 
     public void setLoadingObserver(LoadingObserver loadingObserver) {
         this.loadingObserver = loadingObserver;
@@ -366,7 +365,12 @@ public class CurrencySetup extends javax.swing.JPanel implements KeyListener {
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         // TODO add your handling code here:
-        save();
+        try {
+            save();
+        } catch (Exception e) {
+            LOGGER.error("Save Currency :" + e.getMessage());
+            JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Save Currency", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnSaveActionPerformed
 
     private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed

@@ -20,6 +20,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -59,6 +61,7 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements MouseList
     private MenuService menuService;
     JPopupMenu popupmenu;
     private LoadingObserver loadingObserver;
+    private HashMap<String, Menu> hmMenu = new HashMap<>();
     private boolean isShown = false;
 
     public void setIsShown(boolean isShown) {
@@ -102,15 +105,17 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements MouseList
     }
 
     private void initCombo() {
-        BindingUtil.BindCombo(cboMenu, menuService.getParentChildMenu(), null, false);
-        cboMenu.setSelectedItem(null);
-        cboMenu.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                saveMenu();
-
+        List<Menu> listMenu = menuService.getParentChildMenu();
+        BindingUtil.BindCombo(cboMenu, listMenu, null, false);
+        listMenu.forEach((menu) -> {
+            if (menu.getChild() != null) {
+                menu.getChild().stream().filter(m -> (m.getSoureAccCode() != null)).forEachOrdered(m -> {
+                    hmMenu.put(m.getSoureAccCode(), menu);
+                });
             }
         });
+        cboMenu.setSelectedItem(null);
+
     }
 
     private void newCOA() {
@@ -165,16 +170,20 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements MouseList
     }
 
     private void deleteCOA() {
-        if (selectedNode != null) {
-            ChartOfAccount coa = (ChartOfAccount) selectedNode.getUserObject();
-            if (coa != null) {
-                String code = coa.getCode();
-                coaServcie.delete(code, Global.compId.toString());
+        try {
+            if (selectedNode != null) {
+                ChartOfAccount coa = (ChartOfAccount) selectedNode.getUserObject();
+                if (coa != null) {
+                    String code = coa.getCode();
+                    coaServcie.delete(code, Global.compId.toString());
+                }
+                treeModel.removeNodeFromParent(selectedNode);
+                treeModel.reload(selectedNode);
             }
-            treeModel.removeNodeFromParent(selectedNode);
-            treeModel.reload(selectedNode);
+        } catch (Exception e) {
+            LOGGER.error("Delete ChartOfAccount :" + e.getMessage());
+            JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Delete ChartOfAccount", JOptionPane.ERROR_MESSAGE);
         }
-
     }
 
     private void initPopup() {
@@ -205,11 +214,11 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements MouseList
 
     private void createTreeNode(String parentMenuID, DefaultMutableTreeNode treeRoot) {
         List<ChartOfAccount> listChild = coaServcie.getChild(Global.compId.toString(), parentMenuID);
-        for (ChartOfAccount child : listChild) {
+        listChild.forEach(child -> {
             DefaultMutableTreeNode root = new DefaultMutableTreeNode(child);
             treeRoot.add(root);
             createTreeNode(child.getCode(), root);
-        }
+        });
 
     }
 
@@ -218,12 +227,14 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements MouseList
         txtSysCode.setText(coa.getCode());
         txtName.setText(coa.getCoaNameEng());
         txtUsrCode.setText(coa.getCoaCodeUsr());
-        boolean aBoolean = Util1.getBoolean(coa.isActive());
-        chkActive.setSelected(aBoolean);
+        chkActive.setSelected(Util1.getBoolean(coa.isActive()));
         lblStatus.setText("EDIT");
-        if (coa.getCode() != null) {
-            /*Menu menu = menuService.search("-", "-", "-");
-            cboMenu.setSelectedItem(menu);*/
+        if (coa.getLevel() == 3) {
+            btnCreate.setEnabled(true);
+            Menu menu = hmMenu.get(coa.getCode());
+            cboMenu.setSelectedItem(menu == null ? null : menu);
+        } else {
+            btnCreate.setEnabled(false);
         }
     }
 
@@ -254,22 +265,23 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements MouseList
         btnSave.setEnabled(status);
         btnClear.setEnabled(status);
         chkActive.setEnabled(status);
-        cboMenu.setEditable(status);
 
     }
 
     private void saveMenu() {
         LOGGER.info("Save Menu Method Start...");
         try {
-            if (cboMenu.getSelectedItem() instanceof Menu) {
-                ChartOfAccount coa = (ChartOfAccount) selectedNode.getUserObject();
-                Menu selectMenu = (Menu) cboMenu.getSelectedItem();
-                Menu menu = new Menu();
-                menu.setMenuName(coa.getCoaNameEng());
-                menu.setMenuClass(selectMenu.getMenuClass());
-                menu.setParent(selectMenu.getId().toString());
-                menu.setSoureAccCode(coa.getCode());
-                menuService.saveMenu(menu);
+            if (cboMenu.getSelectedItem() != null) {
+                if (cboMenu.getSelectedItem() instanceof Menu) {
+                    ChartOfAccount coa = (ChartOfAccount) selectedNode.getUserObject();
+                    Menu selectMenu = (Menu) cboMenu.getSelectedItem();
+                    Menu menu = new Menu();
+                    menu.setMenuName(coa.getCoaNameEng());
+                    menu.setMenuClass(selectMenu.getMenuClass());
+                    menu.setParent(selectMenu.getId().toString());
+                    menu.setSoureAccCode(coa.getCode());
+                    menuService.saveMenu(menu);
+                }
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(Global.parentForm, e.getMessage());
@@ -301,6 +313,7 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements MouseList
         btnClear = new javax.swing.JButton();
         panelMenu = new javax.swing.JPanel();
         cboMenu = new javax.swing.JComboBox<>();
+        btnCreate = new javax.swing.JButton();
 
         addContainerListener(new java.awt.event.ContainerAdapter() {
             public void componentRemoved(java.awt.event.ContainerEvent evt) {
@@ -402,6 +415,15 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements MouseList
             }
         });
 
+        btnCreate.setFont(Global.lableFont);
+        btnCreate.setText("Create");
+        btnCreate.setEnabled(false);
+        btnCreate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCreateActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout panelMenuLayout = new javax.swing.GroupLayout(panelMenu);
         panelMenu.setLayout(panelMenuLayout);
         panelMenuLayout.setHorizontalGroup(
@@ -409,13 +431,17 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements MouseList
             .addGroup(panelMenuLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(cboMenu, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnCreate)
                 .addContainerGap())
         );
         panelMenuLayout.setVerticalGroup(
             panelMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelMenuLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(cboMenu, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(panelMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(cboMenu, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnCreate))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -498,7 +524,12 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements MouseList
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         // TODO add your handling code here:
-        save();
+        try {
+            save();
+        } catch (Exception e) {
+            LOGGER.error("Save Account Group :" + e.getMessage());
+            JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Save Account Group", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnSaveActionPerformed
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
@@ -549,9 +580,15 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements MouseList
         // TODO add your handling code here:
     }//GEN-LAST:event_cboMenuActionPerformed
 
+    private void btnCreateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreateActionPerformed
+        // TODO add your handling code here:
+        saveMenu();
+    }//GEN-LAST:event_btnCreateActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClear;
+    private javax.swing.JButton btnCreate;
     private javax.swing.JButton btnSave;
     private javax.swing.JComboBox<String> cboMenu;
     private javax.swing.JCheckBox chkActive;

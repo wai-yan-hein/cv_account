@@ -403,6 +403,20 @@ public class Util1 {
         return intValue;
     }
 
+    public static Double NZeroDouble(Object number) {
+        Double value = 0.0;
+
+        try {
+            if (number == null) {
+                return new Double(0);
+            } else {
+                return value = Double.parseDouble(number.toString());
+            }
+        } catch (NumberFormatException ex) {
+            return new Double(0);
+        }
+    }
+
     public static int isNullZero(Integer value) {
         if (value == null) {
             return 0;

@@ -150,6 +150,11 @@ public class DateAutoCompleter implements KeyListener, SelectionObserver {
             public void popupMenuCanceled(PopupMenuEvent e) {
                 textComp.unregisterKeyboardAction(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
                 popupOpen = false;
+                if (!popupOpen) {
+                    if (editor != null) {
+                        editor.stopCellEditing();
+                    }
+                }
 
             }
         });
@@ -219,20 +224,6 @@ public class DateAutoCompleter implements KeyListener, SelectionObserver {
         @Override
         public void actionPerformed(ActionEvent e) {
             mouseSelect();
-            /*JComponent tf = (JComponent) e.getSource();
-            DateAutoCompleter completer = (DateAutoCompleter) tf.getClientProperty(AUTOCOMPLETER);
-            
-            if (completer.table.getSelectedRow() != -1) {
-            dateModel = dateTableModel.getDate(completer.table.convertRowIndexToModel(
-            completer.table.getSelectedRow()));
-            ((JTextField) completer.textComp).setText(dateModel.getText());
-            }
-            
-            completer.popup.setVisible(false);
-            if (editor != null) {
-            editor.stopCellEditing();
-            
-            }*/
         }
     };
     DocumentListener documentListener = new DocumentListener() {

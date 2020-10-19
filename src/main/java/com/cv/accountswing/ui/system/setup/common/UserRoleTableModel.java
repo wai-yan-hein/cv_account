@@ -101,7 +101,7 @@ public class UserRoleTableModel extends AbstractTableModel {
             if (!hasMenu) {
                 // create menu with role id
                 if (saveUserRole.getRoleId() != null) {
-                    List<Menu> listMenu = menuService.search("-", "-", "-");
+                    List<Menu> listMenu = menuService.search("-", "-", "-", "-");
                     privilegeService.save(saveUserRole.getRoleId().toString(), listMenu);
                     addEmptyRow();
                 }

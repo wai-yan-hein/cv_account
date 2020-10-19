@@ -11,13 +11,11 @@ import javax.persistence.GeneratedValue;
 import static javax.persistence.GenerationType.IDENTITY;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import lombok.Data;
 
 /**
  *
  * @author Lenovo
  */
-@Data
 @Entity
 @Table(name = "location")
 public class Location implements java.io.Serializable {
@@ -45,5 +43,38 @@ public class Location implements java.io.Serializable {
     public String toString() {
         return locationName;
     }
+
+    public Integer getLocationId() {
+        return locationId;
+    }
+
+    public void setLocationId(Integer locationId) {
+        this.locationId = locationId;
+    }
+
+    public String getLocationName() {
+        return locationName;
+    }
+
+    public void setLocationName(String locationName) {
+        this.locationName = locationName;
+    }
+
+    public Integer getParent() {
+        return parent;
+    }
+
+    public void setParent(Integer parent) {
+        this.parent = parent;
+    }
+
+    public boolean isCalcStock() {
+        return calcStock;
+    }
+
+    public void setCalcStock(boolean calcStock) {
+        this.calcStock = calcStock;
+    }
+    
 
 }

@@ -9,11 +9,7 @@ import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.view.VGl;
-import com.cv.accountswing.service.COAService;
-import com.cv.accountswing.service.CurrencyService;
-import com.cv.accountswing.service.DepartmentService;
 import com.cv.accountswing.service.ReportService;
-import com.cv.accountswing.service.TraderService;
 import com.cv.accountswing.service.VGlService;
 import com.cv.accountswing.ui.editor.CurrencyEditor;
 import com.cv.accountswing.ui.editor.DepartmentCellEditor;
@@ -75,16 +71,7 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
     private TaskExecutor taskExecutor;
     @Autowired
     private SalePurchaseTableModel spTableModel;
-    @Autowired
-    private DepartmentService departmentService;
-    @Autowired
-    private COAService cOAService;
-    @Autowired
-    private TraderService traderService;
-    @Autowired
-    private CurrencyService currencyService;
-    @Autowired
-    ReportService rService;
+
     private TableRowSorter<TableModel> sorter;
     private SelectionObserver selectionObserver;
     private LoadingObserver loadingObserver;
@@ -308,9 +295,9 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
     private void searchCash() {
         initializeParameter();
         loadingObserver.load(this.getName(), "Start");
-        taskExecutor.execute(() -> {
-            LOGGER.info(sourceAccId + "----- Searching...");
-            if (sourceAccId != null) {
+        if (sourceAccId != null) {
+            taskExecutor.execute(() -> {
+                LOGGER.info(sourceAccId + "----- Searching...");
                 List<VGl> listVGl = vGlService.search(stDate, enDate,
                         desp, sourceAccId,
                         accId, currency, "-",
@@ -325,11 +312,10 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
                 requestFoucsTable();
                 calTotalAmt();
                 LOGGER.info(sourceAccId + "----- Finished...");
-            } else {
-                loadingObserver.load(this.getName(), "Stop");
-
-            }
-        });
+            });
+        } else {
+            loadingObserver.load(this.getName(), "Stop");
+        }
 
     }
 

@@ -109,9 +109,9 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
                 JOptionPane.showMessageDialog(Global.parentForm, "Saved");
 
                 if (lblStatus.getText().equals("NEW")) {
-                    categoryTableModel.addCategory(saveCat);
+                    Global.listCategory.add(saveCat);
                 } else {
-                    categoryTableModel.setCategory(saveCat, selectRow);
+                    Global.listCategory.set(selectRow, saveCat);
                 }
                 clear();
             }
@@ -124,15 +124,19 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
         txtFilter.setText(null);
         txtName.setText(null);
         lblStatus.setText("NEW");
+        categoryTableModel.refresh();
 
     }
 
     private void delete() {
-        Category cat = categoryTableModel.getCategory(selectRow);
-        int delete = categoryService.delete(cat.getCatId().toString());
-        if (delete == 1) {
-            JOptionPane.showMessageDialog(Global.parentForm, "Deleted");
-        }
+        
+            Category cat = categoryTableModel.getCategory(selectRow);
+            int delete = categoryService.delete(cat.getCatId().toString());
+            if (delete == 1) {
+                Global.listCategory.remove(selectRow);
+                JOptionPane.showMessageDialog(Global.parentForm, "Deleted");
+                clear();
+            }
     }
 
     private boolean isValidEntry() {
@@ -145,6 +149,9 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
             txtName.requestFocusInWindow();
         } else {
             category = new Category();
+            if (lblStatus.getText().equals("EDIT")) {
+                category.setCatId(categoryTableModel.getCategory(selectRow).getCatId());
+            }
             category.setCatName(txtName.getText());
         }
 

@@ -140,6 +140,11 @@ public class CurrencyAutoCompleter implements KeyListener, SelectionObserver {
 
             @Override
             public void popupMenuCanceled(PopupMenuEvent e) {
+                if (!popupOpen) {
+                    if (editor != null) {
+                        editor.stopCellEditing();
+                    }
+                }
             }
         });
 
@@ -174,20 +179,6 @@ public class CurrencyAutoCompleter implements KeyListener, SelectionObserver {
         @Override
         public void actionPerformed(ActionEvent e) {
             mouseSelect();
-            /*JComponent tf = (JComponent) e.getSource();
-            DateAutoCompleter completer = (DateAutoCompleter) tf.getClientProperty(AUTOCOMPLETER);
-            
-            if (completer.table.getSelectedRow() != -1) {
-            currency = currencyTabelModel.getDate(completer.table.convertRowIndexToModel(
-            completer.table.getSelectedRow()));
-            ((JTextField) completer.textComp).setText(currency.getText());
-            }
-            
-            completer.popup.setVisible(false);
-            if (editor != null) {
-            editor.stopCellEditing();
-            
-            }*/
         }
     };
     DocumentListener documentListener = new DocumentListener() {

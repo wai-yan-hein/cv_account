@@ -139,13 +139,20 @@ public class TraderAutoCompleter implements KeyListener {
 
             @Override
             public void popupMenuCanceled(PopupMenuEvent e) {
+                if (!popupOpen) {
+                    if (editor != null) {
+                        editor.stopCellEditing();
+                    }
+                }
             }
         });
 
         table.setRequestFocusEnabled(false);
 
-        if (list.size() > 0) {
-            table.setRowSelectionInterval(0, 0);
+        if (list != null) {
+            if (list.size() > 0) {
+                table.setRowSelectionInterval(0, 0);
+            }
         }
     }
 

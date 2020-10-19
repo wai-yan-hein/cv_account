@@ -677,7 +677,11 @@
             <Property name="text" type="java.lang.String" value="History"/>
           </Properties>
           <Events>
+<<<<<<< HEAD
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnHistoryActionPerformed"/>
+=======
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton3ActionPerformed"/>
+>>>>>>> 7fa91e6d01ebe7e3e4865da24b73cc35acb6e4a1
           </Events>
         </Component>
         <Component class="javax.swing.JButton" name="btnSaveSaleDetail">

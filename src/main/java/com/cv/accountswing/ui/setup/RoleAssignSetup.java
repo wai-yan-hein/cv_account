@@ -65,7 +65,6 @@ public class RoleAssignSetup extends javax.swing.JPanel implements KeyListener {
     public void setIsShown(boolean isShown) {
         this.isShown = isShown;
     }
-    
 
     public void setLoadingObserver(LoadingObserver loadingObserver) {
         this.loadingObserver = loadingObserver;
@@ -325,7 +324,12 @@ public class RoleAssignSetup extends javax.swing.JPanel implements KeyListener {
 
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
         // TODO add your handling code here:
-        save();
+        try {
+            save();
+        } catch (Exception e) {
+            LOGGER.error("Save RoleAssign :" + e.getMessage());
+            JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Save RoleAssign", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnAddActionPerformed
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown

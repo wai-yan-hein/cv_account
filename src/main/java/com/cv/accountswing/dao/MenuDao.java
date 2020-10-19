@@ -15,7 +15,7 @@ import java.util.List;
 public interface MenuDao {
     public Menu saveMenu(Menu menu);
     public Menu findById(String id);
-    public List<Menu> search(String name, String nameMM, String parentId);
+    public List<Menu> search(String name, String nameMM, String parentId,String coaCode);
     public List<Menu> getParentChildMenu();
     public List getParentChildMenu(String roleId);
     public int delete(String id);

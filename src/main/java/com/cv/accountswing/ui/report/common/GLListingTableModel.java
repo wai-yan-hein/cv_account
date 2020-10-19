@@ -135,4 +135,9 @@ public class GLListingTableModel extends AbstractTableModel {
         }
     }
 
+    public void clear() {
+        listTBal.clear();
+        fireTableDataChanged();
+    }
+
 }

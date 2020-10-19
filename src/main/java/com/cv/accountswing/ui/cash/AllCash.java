@@ -7,6 +7,7 @@ package com.cv.accountswing.ui.cash;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
+import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.ReloadData;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.CompanyInfo;
@@ -19,6 +20,7 @@ import com.cv.accountswing.service.CompanyInfoService;
 import com.cv.accountswing.service.ReportService;
 import com.cv.accountswing.service.SystemPropertyService;
 import com.cv.accountswing.service.VGlService;
+import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.editor.CurrencyEditor;
 import com.cv.accountswing.ui.editor.DepartmentCellEditor;
 import com.cv.accountswing.ui.editor.TraderCellEditor;
@@ -29,7 +31,6 @@ import com.cv.accountswing.ui.editor.COACellEditor;
 import com.cv.accountswing.ui.filter.FilterPanel;
 import com.cv.accountswing.util.Util1;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
@@ -62,7 +63,7 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-public class AllCash extends javax.swing.JPanel implements SelectionObserver {
+public class AllCash extends javax.swing.JPanel implements SelectionObserver, PanelControl {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AllCash.class);
     String stDate;
@@ -93,6 +94,8 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver {
     ReportService rService;
     @Autowired
     private ApplicationContext applicationContext;
+    @Autowired
+    private ApplicationMainFrame mainFrame;
     private TableRowSorter<TableModel> sorter;
     private SelectionObserver selectionObserver;
     private LoadingObserver loadingObserver;
@@ -227,7 +230,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver {
         popupmenu = new JPopupMenu("Edit");
         JMenuItem closeAll = new JMenuItem("Print");
         closeAll.addActionListener((ActionEvent e) -> {
-            print();
+            printVoucher();
         });
         popupmenu.add(closeAll);
         initMouseLisener();
@@ -263,28 +266,32 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver {
     private final Action actionItemDeleteExp = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            VGl vgl;
-            int yes_no;
-
-            if (tblCash.getSelectedRow() >= 0) {
-                vgl = allCashTableModel.getVGl(tblCash.convertRowIndexToModel(tblCash.getSelectedRow()));
-
-                if (vgl.getGlId() != null) {
-                    yes_no = JOptionPane.showConfirmDialog(Global.parentForm, "Are you sure to delete?",
-                            "Expense item delete", JOptionPane.YES_NO_OPTION);
-                    if (tblCash.getCellEditor() != null) {
-                        tblCash.getCellEditor().stopCellEditing();
-                    }
-                    if (yes_no == 0) {
-                        allCashTableModel.deleteVGl(tblCash.getSelectedRow());
-                        calDebitCredit();
-                    }
-                }
-            }
+            deleteVoucher();
         }
     };
 
-    public void print() {
+    private void deleteVoucher() {
+        VGl vgl;
+        int yes_no;
+
+        if (tblCash.getSelectedRow() >= 0) {
+            vgl = allCashTableModel.getVGl(tblCash.convertRowIndexToModel(tblCash.getSelectedRow()));
+
+            if (vgl.getGlId() != null) {
+                yes_no = JOptionPane.showConfirmDialog(Global.parentForm, "Are you sure to delete?",
+                        "Expense item delete", JOptionPane.YES_NO_OPTION);
+                if (tblCash.getCellEditor() != null) {
+                    tblCash.getCellEditor().stopCellEditing();
+                }
+                if (yes_no == 0) {
+                    allCashTableModel.deleteVGl(tblCash.getSelectedRow());
+                    calDebitCredit();
+                }
+            }
+        }
+    }
+
+    public void printVoucher() {
         loadingObserver.load(this.getName(), "Start");
         taskExecutor.execute(() -> {
             try {
@@ -393,19 +400,19 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver {
     }
 
     private void swapData(List<VGl> listVGL, String targetId) {
-        for (VGl vgl : listVGL) {
+        listVGL.forEach(vgl -> {
             String sourceAcId = Util1.isNull(vgl.getSourceAcId(), "-");
             String accId = Util1.isNull(vgl.getAccountId(), "-");
             if (sourceAcId.equals(targetId)) {
                 /*if(Util1.isNullZero(vgl.getSplitId()) == 8){ //Credit Voucher
-                 Double tmpAmt = vgl.getDrAmt();
-                 vgl.setDrAmt(vgl.getCrAmt());
-                 vgl.setCrAmt(tmpAmt);
-                 } else if(Util1.isNullZero(vgl.getSplitId()) == 9){ //Debit Voucher
-                 Double tmpAmt = vgl.getCrAmt();
-                 vgl.setCrAmt(vgl.getDrAmt());
-                 vgl.setDrAmt(tmpAmt);
-                 }*/
+                Double tmpAmt = vgl.getDrAmt();
+                vgl.setDrAmt(vgl.getCrAmt());
+                vgl.setCrAmt(tmpAmt);
+                } else if(Util1.isNullZero(vgl.getSplitId()) == 9){ //Debit Voucher
+                Double tmpAmt = vgl.getCrAmt();
+                vgl.setCrAmt(vgl.getDrAmt());
+                vgl.setDrAmt(tmpAmt);
+                }*/
             } else if (accId.equals(targetId)) {
                 double tmpDrAmt = 0;
                 if (vgl.getDrAmt() != null) {
@@ -421,7 +428,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver {
                 vgl.setDrAmt(0.0);
                 vgl.setCrAmt(0.0);
             }
-        }
+        });
     }
 
     /**
@@ -598,6 +605,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver {
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
+        mainFrame.setControl(this);
         if (!isShown) {
             initMain();
         } else {
@@ -725,6 +733,30 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver {
     private void searchValidation(String str) {
 
         searchCash();
+    }
+
+    @Override
+    public void save() {
+        
+    }
+
+    @Override
+    public void delete() {
+        deleteVoucher();
+    }
+
+    @Override
+    public void newForm() {
+        clearFilter();
+    }
+
+    @Override
+    public void history() {
+    }
+
+    @Override
+    public void print() {
+        printVoucher();
     }
 
 }

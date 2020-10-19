@@ -8,13 +8,11 @@ import java.util.Date;
 import javax.persistence.*;
 import org.hibernate.annotations.GenerationTime;
 import static javax.persistence.GenerationType.IDENTITY;
-import lombok.Data;
 
 /**
  *
  * @author WSwe
  */
-@Data
 @Entity
 @Table(name = "machine_info")
 public class MachineInfo implements java.io.Serializable {
@@ -35,4 +33,37 @@ public class MachineInfo implements java.io.Serializable {
 
     public MachineInfo() {
     }
+
+    public Integer getMachineId() {
+        return machineId;
+    }
+
+    public void setMachineId(Integer machineId) {
+        this.machineId = machineId;
+    }
+
+    public String getMachineName() {
+        return machineName;
+    }
+
+    public void setMachineName(String machineName) {
+        this.machineName = machineName;
+    }
+
+    public String getIpAddress() {
+        return ipAddress;
+    }
+
+    public void setIpAddress(String ipAddress) {
+        this.ipAddress = ipAddress;
+    }
+
+    public Date getRegDate() {
+        return regDate;
+    }
+
+    public void setRegDate(Date regDate) {
+        this.regDate = regDate;
+    }
+    
 }

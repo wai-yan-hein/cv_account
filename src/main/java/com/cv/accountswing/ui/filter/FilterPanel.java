@@ -137,8 +137,10 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
         txtDate.requestFocus();
         txtDate.setText("Today");
         String depId = Global.sysProperties.get("system.default.department");
-        Department findById = departmentService.findById(depId);
-        txtDepartment.setText(findById.getDeptName());
+        Department dep = departmentService.findById(depId);
+        if (dep != null) {
+            txtDepartment.setText(dep.getDeptName());
+        }
     }
 
     /**

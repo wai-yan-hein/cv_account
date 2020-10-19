@@ -900,11 +900,19 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
             }
         });
 
+<<<<<<< HEAD
         btnHistory.setFont(Global.lableFont);
         btnHistory.setText("History");
         btnHistory.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnHistoryActionPerformed(evt);
+=======
+        jButton3.setFont(Global.lableFont);
+        jButton3.setText("History");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+>>>>>>> 7fa91e6d01ebe7e3e4865da24b73cc35acb6e4a1
             }
         });
 
@@ -1019,9 +1027,15 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
         save();
     }//GEN-LAST:event_btnSaveSaleDetailActionPerformed
 
+<<<<<<< HEAD
     private void btnHistoryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHistoryActionPerformed
         history();
     }//GEN-LAST:event_btnHistoryActionPerformed
+=======
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton3ActionPerformed
+>>>>>>> 7fa91e6d01ebe7e3e4865da24b73cc35acb6e4a1
 
     private void tabToTable(KeyEvent e) {
         if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_RIGHT) {

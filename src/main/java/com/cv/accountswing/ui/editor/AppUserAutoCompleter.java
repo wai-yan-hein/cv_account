@@ -9,7 +9,6 @@ import com.cv.accountswing.common.Global;
 import com.cv.accountswing.entity.AppUser;
 import com.cv.accountswing.ui.cash.common.DepartmentTableModel;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
-import com.cv.accountswing.ui.cash.common.TraderTableModel;
 import com.cv.accountswing.ui.setup.common.UserTableModel;
 import java.awt.Color;
 import java.awt.Rectangle;
@@ -36,7 +35,6 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 import org.slf4j.LoggerFactory;
 
@@ -133,6 +131,11 @@ public class AppUserAutoCompleter implements KeyListener {
 
             @Override
             public void popupMenuCanceled(PopupMenuEvent e) {
+                if (!popupOpen) {
+                    if (editor != null) {
+                        editor.stopCellEditing();
+                    }
+                }
             }
         });
 

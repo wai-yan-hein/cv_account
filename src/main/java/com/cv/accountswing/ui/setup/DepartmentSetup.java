@@ -194,10 +194,15 @@ public class DepartmentSetup extends javax.swing.JPanel implements TreeSelection
     }
 
     private void deleteDepatment() {
-        if (isValidDelete()) {
-            treeModel.removeNodeFromParent(selectedNode);
-            //treeModel.nodesWereRemoved(child, childIndices, removedChildren);
-            treeModel.reload(selectedNode);
+        try {
+            if (isValidDelete()) {
+                treeModel.removeNodeFromParent(selectedNode);
+                //treeModel.nodesWereRemoved(child, childIndices, removedChildren);
+                treeModel.reload(selectedNode);
+            }
+        } catch (Exception e) {
+            LOGGER.error("Delete Department :" + e.getMessage());
+            JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Delete Department", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -238,7 +243,7 @@ public class DepartmentSetup extends javax.swing.JPanel implements TreeSelection
         department.setDeptName(txtName.getText());
         department.setUsrCode(txtUserCode.getText());
         department.setActive(chkActive.isSelected());
-        department.setUsrCode(parentRootName);
+        department.setCompCode(Global.compId);
 
         if (isValidDepartment(department, Global.loginUser.getUserId().toString(), Global.compId)) {
             Department dep = deptService.save(department);
@@ -265,16 +270,17 @@ public class DepartmentSetup extends javax.swing.JPanel implements TreeSelection
 
             if (dept.getDeptCode().isEmpty()) {
                 //dept.setDeptCode(getDeptCode(compCode));
-                dept.setCompCode(compCode);
                 dept.setCreatedBy(userId);
                 dept.setCreatedDt(Util1.getTodayDate());
             } else {
-                List<Department> listDept = deptService.search(dept.getDeptCode(),
-                        "-", compCode.toString(), "-", "-");
-                if (listDept != null) {
-                    if (listDept.size() > 0) {
-                        status = false;
-                        JOptionPane.showMessageDialog(Global.parentForm, "Duplicate department code.");
+                if (labelStatus.getText().equals("NEW")) {
+                    List<Department> listDept = deptService.search(dept.getDeptCode(),
+                            "-", compCode.toString(), "-", "-");
+                    if (listDept != null) {
+                        if (listDept.size() > 0) {
+                            status = false;
+                            JOptionPane.showMessageDialog(Global.parentForm, "Duplicate department code.");
+                        }
                     }
                 }
             }
@@ -461,7 +467,12 @@ public class DepartmentSetup extends javax.swing.JPanel implements TreeSelection
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         // TODO add your handling code here:
-        saveDepartment();
+        try {
+            saveDepartment();
+        } catch (Exception e) {
+            LOGGER.error("Save Department :" + e.getMessage());
+            JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Save Department", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnSaveActionPerformed
 
     private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed

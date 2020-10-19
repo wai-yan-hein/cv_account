@@ -87,4 +87,7 @@ public class CategoryTableModel extends AbstractTableModel {
         }
     }
 
+    public void refresh() {
+        fireTableDataChanged();
+    }
 }
