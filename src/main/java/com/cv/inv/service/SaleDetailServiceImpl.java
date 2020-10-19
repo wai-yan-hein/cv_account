@@ -6,10 +6,13 @@
 package com.cv.inv.service;
 
 import com.cv.accountswing.dao.GlDao;
+import com.cv.accountswing.entity.Department;
 import com.cv.accountswing.entity.Gl;
 import com.cv.inv.dao.SaleDetailDao;
+import com.cv.inv.dao.SaleHisDao;
 import com.cv.inv.entity.SaleDetailHis;
 import com.cv.inv.entity.SaleDetailKey;
+import com.cv.inv.entity.SaleHis;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +34,7 @@ public class SaleDetailServiceImpl implements SaleDetailService {
     private SaleDetailDao dao;
 
     @Autowired
-    private GlDao glDao;
+    private SaleHisDao hisDao;
 
     @Override
     public SaleDetailHis save(SaleDetailHis sdh) {
@@ -44,26 +47,20 @@ public class SaleDetailServiceImpl implements SaleDetailService {
     }
 
     @Override
-    public void save(Gl gl, List<SaleDetailHis> listSaleDetail) {
+    public void save(SaleHis saleHis, List<SaleDetailHis> listSaleDetail) throws Exception {
 
-        String saleDetailId;
-
+        SaleHis saveSaleHis = hisDao.save(saleHis);
         try {
-            Gl saveGL = glDao.save(gl);
-            String vouNo = gl.getVouNo();
             for (SaleDetailHis sdh : listSaleDetail) {
                 if (sdh.getStock().getStockCode() != null) {
-                    saleDetailId = vouNo + '-' + sdh.getUniqueId();
-                    sdh.setSaleDetailKey(new SaleDetailKey(vouNo, saleDetailId));
-                    sdh.setGlId(saveGL.getGlId());
+                    String vouNo = saveSaleHis.getVouNo();
+                    sdh.setVouNo(vouNo);
                     dao.save(sdh);
                 }
             }
-
         } catch (Exception ex) {
             logger.error("saveSaleDetail : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
 
         }
     }
-
 }

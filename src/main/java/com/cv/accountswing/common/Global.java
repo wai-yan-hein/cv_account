@@ -19,6 +19,7 @@ import javax.swing.JFrame;
 import com.cv.accountswing.entity.Currency;
 import com.cv.inv.entity.Category;
 import com.cv.inv.entity.CharacterNo;
+import com.cv.inv.entity.ChargeType;
 import com.cv.inv.entity.Location;
 import com.cv.inv.entity.RelationKey;
 import com.cv.inv.entity.SaleMan;
@@ -81,6 +82,7 @@ public class Global {
     public static List<VouStatus> listVou = new ArrayList<>();
     public static List<Stock> listStock = new ArrayList<>();
     public static List<SaleMan> listSaleMan;
+    public static List<ChargeType> listChargeType;
     public static List<UnitRelation> listRelation = new ArrayList<>();
     public static HashMap<String, String> sysProperties;
     public static HashMap<String, String> hmCashFilter = new HashMap<>();
