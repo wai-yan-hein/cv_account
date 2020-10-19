@@ -33,8 +33,8 @@ public class MenuServiceImpl implements MenuService{
     }
     
     @Override
-    public List<Menu> search(String name, String nameMM, String parentId){
-        return dao.search(name, nameMM, parentId);
+    public List<Menu> search(String name, String nameMM, String parentId,String coaCode){
+        return dao.search(name, nameMM, parentId,coaCode);
     }
     
     @Override

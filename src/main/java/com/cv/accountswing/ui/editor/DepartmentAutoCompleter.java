@@ -138,6 +138,11 @@ public class DepartmentAutoCompleter implements KeyListener {
 
             @Override
             public void popupMenuCanceled(PopupMenuEvent e) {
+                if (!popupOpen) {
+                    if (editor != null) {
+                        editor.stopCellEditing();
+                    }
+                }
             }
         });
 

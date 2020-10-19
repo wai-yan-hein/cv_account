@@ -135,4 +135,9 @@ public class APARTableModel extends AbstractTableModel {
         }
     }
 
+    public void clear() {
+        listAPAR.clear();
+        fireTableDataChanged();
+    }
+
 }

@@ -7,13 +7,13 @@ package com.cv.accountswing.ui.journal;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.SelectionObserver;
+import com.cv.accountswing.entity.Currency;
+import com.cv.accountswing.entity.CurrencyKey;
 import com.cv.accountswing.entity.Gl;
 import com.cv.accountswing.entity.view.VGl;
-import com.cv.accountswing.service.COAService;
-import com.cv.accountswing.service.DepartmentService;
+import com.cv.accountswing.service.CurrencyService;
 import com.cv.accountswing.service.GlService;
 import com.cv.accountswing.service.SeqTableService;
-import com.cv.accountswing.service.TraderService;
 import com.cv.accountswing.service.VGlService;
 import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
@@ -47,18 +47,14 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-public class JournalEntryDialog extends javax.swing.JDialog implements KeyListener, SelectionObserver {
+public class JournalEntryDialog extends javax.swing.JDialog implements KeyListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JournalEntryDialog.class);
 
     @Autowired
     private JournalEntryTableModel journalTablModel;
     @Autowired
-    private DepartmentService departmentService;
-    @Autowired
-    private TraderService traderService;
-    @Autowired
-    private COAService cOAService;
+    private CurrencyService currencyService;
     @Autowired
     private SeqTableService seqService;
     @Autowired
@@ -67,7 +63,7 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
     private VGlService vGlService;
 
     private String glVouId = null;
-    private String currencyId;
+    CurrencyAutoCompleter autoCompleter;
 
     public void setGlVouId(String glVouId) {
         this.glVouId = glVouId;
@@ -93,8 +89,13 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
     }
 
     private void initCombo() {
-        CurrencyAutoCompleter autoCompleter = new CurrencyAutoCompleter(txtCurrency, Global.listCurrency, null);
-        autoCompleter.setSelectionObserver(this);
+        autoCompleter = new CurrencyAutoCompleter(txtCurrency, Global.listCurrency, null);
+        String cuId = Global.sysProperties.get("system.default.currency");
+        CurrencyKey key = new CurrencyKey();
+        key.setCode(cuId);
+        key.setCompCode(Global.compId);
+        Currency currency = currencyService.findById(key);
+        autoCompleter.setCurrency(currency);
 
     }
 
@@ -139,8 +140,7 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
             txtVouNo.setText(vgl.getVouNo());
             txtDate.setDate(vgl.getGlDate());
             txtRefrence.setText(vgl.getReference());
-            currencyId = vgl.getFromCurId();
-            txtCurrency.setText(currencyId);
+            txtCurrency.setText(vgl.getfCurName());
             journalTablModel.addEmptyRow();
         }
 
@@ -193,6 +193,7 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
                 } catch (NumberFormatException ex) {
                     LOGGER.error("saveGeneralVoucher : " + ex);
                 } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(Global.parentForm, ex.getMessage(), "Save Journal.", JOptionPane.ERROR_MESSAGE);
                     LOGGER.error("saveGeneralVoucher : " + ex);
                 }
             }
@@ -201,7 +202,7 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
     }
 
     private boolean isValidEntry() {
-        if (currencyId == null) {
+        if (autoCompleter.getCurrency() == null) {
             JOptionPane.showMessageDialog(Global.parentForm, "Invalid Entry");
             return false;
         }
@@ -256,7 +257,7 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
                 gl.setReference(ref);
                 gl.setGlDate(Util1.toDate(strGvDate, "dd/MM/yyyy"));
                 gl.setTranSource("GV");
-                gl.setFromCurId(currencyId);
+                gl.setFromCurId(autoCompleter.getCurrency().getKey().getCode());
             }
         }
         /*if (listGV.size() < 2) {
@@ -649,17 +650,4 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
         }
     }
 
-    @Override
-    public void selected(Object source, Object selectObj) {
-        if (source != null) {
-            String name = source.toString();
-            switch (name) {
-                case "Currency":
-                    currencyId = selectObj.toString();
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
 }

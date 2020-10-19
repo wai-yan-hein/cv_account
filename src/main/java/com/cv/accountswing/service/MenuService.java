@@ -13,10 +13,16 @@ import java.util.List;
  * @author winswe
  */
 public interface MenuService {
+
     public Menu saveMenu(Menu menu);
+
     public Menu findById(String id);
-    public List<Menu> search(String name, String nameMM, String parentId);
+
+    public List<Menu> search(String name, String nameMM, String parentId, String coaCode);
+
     public int delete(String id);
+
     public List<Menu> getParentChildMenu();
+
     public List getParentChildMenu(String roleId);
 }

@@ -30,7 +30,7 @@ public class MenuDaoImpl extends AbstractDao<String, Menu> implements MenuDao {
     }
 
     @Override
-    public List<Menu> search(String name, String nameMM, String parentId) {
+    public List<Menu> search(String name, String nameMM, String parentId, String coaCode) {
         String strSql = "select o from Menu o ";
         String strFilter = "";
 
@@ -55,6 +55,13 @@ public class MenuDaoImpl extends AbstractDao<String, Menu> implements MenuDao {
                 strFilter = "o.parent = " + parentId;
             } else {
                 strFilter = strFilter + " and o.parent = " + parentId;
+            }
+        }
+        if (!coaCode.equals("-")) {
+            if (strFilter.isEmpty()) {
+                strFilter = "o.soureAccCode = " + coaCode;
+            } else {
+                strFilter = strFilter + " and o.soureAccCode = " + coaCode;
             }
         }
 

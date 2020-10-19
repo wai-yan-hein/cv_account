@@ -11,6 +11,7 @@ import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.CompanyInfo;
 import com.cv.accountswing.entity.SystemProperty;
 import com.cv.accountswing.entity.SystemPropertyKey;
+import com.cv.accountswing.entity.temp.TmpOpeningClosing;
 import com.cv.accountswing.entity.view.VApar;
 import com.cv.accountswing.entity.view.VGl;
 import com.cv.accountswing.entity.view.VTriBalance;
@@ -90,12 +91,11 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
     private TrialBalanceDetailDialog trialBalanceDetailDialog;
     private boolean isShown = false;
     private LoadingObserver loadingObserver;
-    JPopupMenu popup;
+    private JPopupMenu popup;
     private String stDate;
     private String enDate;
     private String cvId;
     private String dept;
-    private String opDate;
     private String currency;
     private String userId;
     private String panelName;
@@ -134,7 +134,6 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
     }
 
     private void initTable() {
-        initializeParameter();
         if (panelName.equals("AP/AR")) {
             tblAPAR.setModel(aPARTableModel);
             searchAPAR();
@@ -199,11 +198,13 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
     }
 
     private void searchAPAR() {
+        cleaTable();
         loadingObserver.load(this.getName(), "Start");
+        initializeParameter();
         taskExecutor.execute(() -> {
             try {
                 coaOpDService.genArAp(Global.compId.toString(),
-                        Util1.toDateStrMYSQL(stDate, "dd/MM/yyyy"), opDate,
+                        Util1.toDateStrMYSQL(stDate, "dd/MM/yyyy"), Global.finicialPeriodFrom,
                         Util1.toDateStrMYSQL(enDate, "dd/MM/yyyy"), "-",
                         currency, dept, cvId,
                         userId);
@@ -220,66 +221,87 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
     }
 
     private void searchGLListing() {
+        cleaTable();
         loadingObserver.load(this.getName(), "Start");
+        initializeParameter();
         taskExecutor.execute(() -> {
             try {
                 coaOpDService.genTriBalance(Global.compId.toString(),
                         Util1.toDateStrMYSQL(stDate, "dd/MM/yyyy"),
-                        opDate, Util1.toDateStrMYSQL(enDate, "dd/MM/yyyy"),
+                        Global.finicialPeriodFrom, Util1.toDateStrMYSQL(enDate, "dd/MM/yyyy"),
                         "-", currency, dept, cvId, userId);
                 List<VTriBalance> listVTB = vTriBalanceService.getTriBalance(userId, Global.compId.toString());
                 glListingTableModel.setListTBAL(listVTB);
                 calGLTotlaAmount(listVTB);
                 loadingObserver.load(this.getName(), "Stop");
             } catch (Exception ex) {
-                loadingObserver.load(this.getName(), "Stop");
                 LOGGER.error("searchGLListing -----" + ex.getMessage());
+                loadingObserver.load(this.getName(), "Stop");
             }
         });
 
     }
 
     private void searchTriBalDetail(String cvId, String coaId, String desp, Double netChange) {
-
         List<VGl> listVGL = vGlService.searchGlDrCr(Util1.isNull(stDate, "-"),
                 Util1.isNull(enDate, "-"), coaId, currency, dept,
                 cvId, Global.compId.toString(),
                 "DR");
-        sweapDrCrAmt(listVGL, getTarget());
-        LOGGER.info("TRIBALANCE LIST :::" + listVGL.size());
+        swapDrCrAmt(listVGL, getTarget());
+        calculateOpening();
         openTBDDialog(listVGL, desp, netChange);
+
+    }
+
+    private void calculateOpening() {
+        List<TmpOpeningClosing> opBalanceGL;
+        try {
+            opBalanceGL = coaOpDService.getOpBalanceGL(getTarget(),
+                    Util1.toDateStrMYSQL(stDate, "dd/MM/yyyy"),
+                    enDate, 3, "MMK",
+                    Global.loginUser.getUserId().toString(),
+                    Util1.isNull(dept, "-"));
+            if (!opBalanceGL.isEmpty()) {
+                TmpOpeningClosing tmpOC = opBalanceGL.get(0);
+                trialBalanceDetailDialog.setOpeningAmt(tmpOC.getOpening());
+                LOGGER.info("OPENING :" + tmpOC.getOpening());
+                //txtFOpening.setValue(tmpOC.getOpening());
+            }
+        } catch (Exception ex) {
+            LOGGER.error("Calculation Opening :" + ex.getMessage());
+        }
+
     }
 
     private void openTBDDialog(List<VGl> listVGl, String traderName, Double netChange) {
         trialBalanceDetailDialog.setDesp(traderName);
         trialBalanceDetailDialog.setNetChange(netChange);
-        
         trialBalanceDetailDialog.setListVGl(listVGl);
         trialBalanceDetailDialog.setSize(Global.width - 200, Global.height - 200);
         trialBalanceDetailDialog.setLocationRelativeTo(null);
         trialBalanceDetailDialog.setVisible(true);
     }
 
-    private void sweapDrCrAmt(List<VGl> listVGL, String targetId) {
-        for (VGl vgl : listVGL) {
+    private void swapDrCrAmt(List<VGl> listVGL, String targetId) {
+        listVGL.forEach(vgl -> {
             String sourceAcId = Util1.isNull(vgl.getSourceAcId(), "-");
             String accId = Util1.isNull(vgl.getAccountId(), "-");
             if (sourceAcId.equals(targetId)) {
                 /*if(Util1.isNullZero(vgl.getSplitId()) == 8){ //Credit Voucher
-                 Double tmpAmt = vgl.getDrAmt();
-                 vgl.setDrAmt(vgl.getCrAmt());
-                 vgl.setCrAmt(tmpAmt);
-                 } else if(Util1.isNullZero(vgl.getSplitId()) == 9){ //Debit Voucher
-                 Double tmpAmt = vgl.getCrAmt();
-                 vgl.setCrAmt(vgl.getDrAmt());
-                 vgl.setDrAmt(tmpAmt);
-                 }*/
+                Double tmpAmt = vgl.getDrAmt();
+                vgl.setDrAmt(vgl.getCrAmt());
+                vgl.setCrAmt(tmpAmt);
+                } else if(Util1.isNullZero(vgl.getSplitId()) == 9){ //Debit Voucher
+                Double tmpAmt = vgl.getCrAmt();
+                vgl.setCrAmt(vgl.getDrAmt());
+                vgl.setDrAmt(tmpAmt);
+                }*/
             } else if (accId.equals(targetId)) {
-                double tmpDrAmt = 0;
+                double tmpDrAmt = 0.0;
                 if (vgl.getDrAmt() != null) {
                     tmpDrAmt = vgl.getDrAmt();
                 }
-                vgl.setDrAmt(vgl.getCrAmt());
+                vgl.setDrAmt(Util1.getDouble(vgl.getCrAmt()));
                 vgl.setCrAmt(tmpDrAmt);
 
                 String tmpStr = vgl.getAccName();
@@ -289,7 +311,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                 vgl.setDrAmt(0.0);
                 vgl.setCrAmt(0.0);
             }
-        }
+        });
     }
 
     private void calAPARTotalAmount(List<VApar> listApar) {
@@ -307,58 +329,42 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
     }
 
     private void calGLTotlaAmount(List<VTriBalance> listTB) {
-        String curr = listTB.get(0).getKey().getCurrId();
-        double ttlDrAmt = 0.0;
-        double ttlCrAmt = 0.0;
-        for (VTriBalance tb : listTB) {
-            ttlDrAmt += Util1.getDouble(tb.getDrAmt());
-            ttlCrAmt += Util1.getDouble(tb.getCrAmt());
+        if (!listTB.isEmpty()) {
+            String curr = listTB.get(0).getKey().getCurrId();
+            double ttlDrAmt = 0.0;
+            double ttlCrAmt = 0.0;
+            for (VTriBalance tb : listTB) {
+                ttlDrAmt += Util1.getDouble(tb.getDrAmt());
+                ttlCrAmt += Util1.getDouble(tb.getCrAmt());
+            }
+            txtFTotalCrAmt.setValue(ttlCrAmt);
+            txtFTotalDrAmt.setValue(ttlDrAmt);
+            txtDisplayCurr.setText(curr);
+            txtFOFB.setValue(ttlDrAmt - ttlCrAmt);
         }
-        txtFTotalCrAmt.setValue(ttlCrAmt);
-        txtFTotalDrAmt.setValue(ttlDrAmt);
-        txtDisplayCurr.setText(curr);
-        txtFOFB.setValue(ttlDrAmt - ttlCrAmt);
     }
 
     private void initializeParameter() {
-        if (txtDep.getText().isEmpty()) {
-            dept = "-";
-        }
-        if (txtPerson.getText().isEmpty()) {
-            cvId = "-1";
-        }
-        if (txtCurrency.getText().isEmpty()) {
-            currency = "-";
-        }
-        if (txtDate.getText().isEmpty()) {
-            stDate = Util1.toDateStr(Util1.getTodayDate(), "dd/MM/yyyy");
-            enDate = Util1.toDateStr(Util1.getTodayDate(), "dd/MM/yyyy");
-        }
+        dept = Util1.isNull(txtDep.getText(), "-");
+        cvId = Util1.isNull(txtPerson.getText(), "-1");
+        currency = Util1.isNull(txtCurrency.getText(), "-");
+        stDate = Util1.isNull(stDate, Global.finicialPeriodFrom);
+        enDate = Util1.isNull(enDate, Util1.toDateStr(Util1.getTodayDate(), "dd/MM/yyyy"));
         userId = Global.loginUser.getUserId().toString();
-        opDate = Global.finicialPeriodFrom;
     }
 
     private void initCombo() {
         DateAutoCompleter dateAutoCompleter = new DateAutoCompleter(txtDate,
                 Global.listDateModel, null);
         dateAutoCompleter.setSelectionObserver(this);
-        if (Global.listTrader == null) {
-            Global.listTrader = tradeService.searchTrader("-", "-", "-", "-",
-                    "-", "-");
-        }
+
         TraderAutoCompleter traderAutoCompleter = new TraderAutoCompleter(txtPerson,
                 Global.listTrader, null);
         traderAutoCompleter.setSelectionObserver(this);
-        if (Global.listDepartment == null) {
-            Global.listDepartment = departmentService.search("-", "-", "-", "-",
-                    "-");
-        }
+
         DepartmentAutoCompleter departmentAutoCompleter = new DepartmentAutoCompleter(txtDep,
                 Global.listDepartment, null);
         departmentAutoCompleter.setSelectionObserver(this);
-        if (Global.listCurrency == null) {
-            Global.listCurrency = currencyService.search("-", "-", "-");
-        }
         CurrencyAutoCompleter currencyAutoCompleter = new CurrencyAutoCompleter(txtCurrency,
                 Global.listCurrency, null);
         currencyAutoCompleter.setSelectionObserver(this);
@@ -404,6 +410,22 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         txtDate.setText(null);
         txtDep.setText(null);
         txtPerson.setText(null);
+    }
+
+    private void search() {
+        if (panelName.equals("AP/AR")) {
+            searchAPAR();
+        } else if (panelName.equals("G/L Listing")) {
+            searchGLListing();
+        }
+    }
+
+    private void cleaTable() {
+        if (panelName.equals("AP/AR")) {
+            aPARTableModel.clear();
+        } else if (panelName.equals("G/L Listing")) {
+            glListingTableModel.clear();
+        }
     }
 
     /**
@@ -453,15 +475,30 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
 
         txtDep.setFont(Global.textFont);
         txtDep.setName("txtDep"); // NOI18N
+        txtDep.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtDepActionPerformed(evt);
+            }
+        });
 
         txtPerson.setFont(Global.textFont);
         txtPerson.setName("txtPerson"); // NOI18N
+        txtPerson.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtPersonActionPerformed(evt);
+            }
+        });
 
         jLabel3.setFont(Global.lableFont);
         jLabel3.setText("Person");
 
         txtCurrency.setFont(Global.lableFont);
         txtCurrency.setName("txtCurrency"); // NOI18N
+        txtCurrency.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtCurrencyActionPerformed(evt);
+            }
+        });
 
         jLabel4.setFont(Global.lableFont);
         jLabel4.setText("Currency");
@@ -622,6 +659,21 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         }
     }//GEN-LAST:event_formComponentShown
 
+    private void txtDepActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDepActionPerformed
+        // TODO add your handling code here:
+        search();
+    }//GEN-LAST:event_txtDepActionPerformed
+
+    private void txtPersonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPersonActionPerformed
+        // TODO add your handling code here:
+        search();
+    }//GEN-LAST:event_txtPersonActionPerformed
+
+    private void txtCurrencyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCurrencyActionPerformed
+        // TODO add your handling code here:
+        search();
+    }//GEN-LAST:event_txtCurrencyActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
@@ -668,12 +720,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                     cvId = selectObj.toString();
                     break;
             }
-            if (panelName.equals("AP/AR")) {
-                searchAPAR();
-            } else if (panelName.equals("G/L Listing")) {
-                tblAPAR.setModel(glListingTableModel);
-                searchGLListing();
-            }
+            search();
 
         }
     }

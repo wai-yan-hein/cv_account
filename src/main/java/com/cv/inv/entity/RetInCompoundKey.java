@@ -6,6 +6,7 @@
 package com.cv.inv.entity;
 
 import java.io.Serializable;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
@@ -55,5 +56,39 @@ public class RetInCompoundKey implements Serializable {
     public void setVouNo(String vouNo) {
         this.vouNo = vouNo;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 41 * hash + Objects.hashCode(this.retInDetailId);
+        hash = 41 * hash + Objects.hashCode(this.glId);
+        hash = 41 * hash + Objects.hashCode(this.vouNo);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final RetInCompoundKey other = (RetInCompoundKey) obj;
+        if (!Objects.equals(this.retInDetailId, other.retInDetailId)) {
+            return false;
+        }
+        if (!Objects.equals(this.vouNo, other.vouNo)) {
+            return false;
+        }
+        if (!Objects.equals(this.glId, other.glId)) {
+            return false;
+        }
+        return true;
+    }
+    
 
 }

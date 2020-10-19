@@ -6,17 +6,15 @@
 package com.cv.accountswing.ui.report;
 
 import com.cv.accountswing.common.Global;
-import com.cv.accountswing.entity.temp.TmpOpeningClosing;
 import com.cv.accountswing.entity.view.VGl;
-import com.cv.accountswing.service.COAOpeningDService;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.report.common.CrAmtTableModel;
 import com.cv.accountswing.ui.report.common.DrAmtTableModel;
-import com.cv.accountswing.util.Util1;
 import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.ListSelectionModel;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
@@ -29,7 +27,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class TrialBalanceDetailDialog extends javax.swing.JDialog {
 
-    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(TrialBalanceDetailDialog.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TrialBalanceDetailDialog.class);
 
     @Autowired
     private CrAmtTableModel crAmtTableModel;
@@ -38,14 +36,18 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog {
     @Autowired
     private TaskExecutor taskExecutor;
 
-    @Autowired
-    private COAOpeningDService coaOpDService;
     private String desp;
     private Double netChange;
     private List<VGl> listVGl;
-    private String depId;
-    private String sourceId;
-    private String triDate;
+    private Double openingAmt = 0.0;
+
+    public Double getOpeningAmt() {
+        return openingAmt;
+    }
+
+    public void setOpeningAmt(Double openingAmt) {
+        this.openingAmt = openingAmt;
+    }
 
     public List<VGl> getListVGl() {
         return listVGl;
@@ -88,19 +90,21 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog {
             double ttlDrAmt = 0.0;
             double ttlCrAmt = 0.0;
             for (VGl vgl : listVGl) {
-                if (vgl.getDrAmt() != null) {
+                if (vgl.getDrAmt() > 0) {
                     ttlDrAmt += vgl.getDrAmt();
                     drAmtTableModel.addVGl(vgl);
                 }
-                if (vgl.getCrAmt() != null) {
+                if (vgl.getCrAmt() > 0) {
                     ttlCrAmt += vgl.getCrAmt();
                     crAmtTableModel.addVGl(vgl);
                 }
             }
             txtFCrAmt.setValue(ttlCrAmt);
             txtFDrAmt.setValue(ttlDrAmt);
+            Double closingAmt = openingAmt + ttlDrAmt - ttlCrAmt;
+            txtOpening.setValue(openingAmt);
+            txtClosing.setValue(closingAmt);
         }
-        calOpeningClosing();
     }
 
     private void tblCR() {
@@ -126,31 +130,9 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog {
         tblDr.getColumnModel().getColumn(0).setPreferredWidth(80);
         tblDr.getColumnModel().getColumn(0).setPreferredWidth(80);
         tblDr.getColumnModel().getColumn(0).setPreferredWidth(20);
-
         tblDr.setDefaultRenderer(Double.class, new TableCellRender());
         tblDr.setDefaultRenderer(Object.class, new TableCellRender());
 
-    }
-
-    private void calOpeningClosing() {
-        taskExecutor.execute(() -> {
-            String opDate = Global.finicialPeriodFrom;
-            try {
-                if (triDate.equals("-")) {
-                    triDate = opDate;
-                }
-                List<TmpOpeningClosing> opBalanceGL = coaOpDService.getOpBalanceGL(sourceId, opDate, triDate, 3, "MMK",
-                        Global.loginUser.getUserId().toString(),
-                        Util1.isNull(depId, "-"));
-                if (!opBalanceGL.isEmpty()) {
-                    TmpOpeningClosing tmpOC = opBalanceGL.get(0);
-                    txtOpening.setValue(tmpOC.getOpening());
-                }
-
-            } catch (Exception ex) {
-                LOGGER.error("TmpOpeningClosing" + ex.getMessage());
-            }
-        });
     }
 
     /**
@@ -180,7 +162,7 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog {
         jLabel5 = new javax.swing.JLabel();
         txtOpening = new javax.swing.JFormattedTextField();
         jLabel6 = new javax.swing.JLabel();
-        txtOpening1 = new javax.swing.JFormattedTextField();
+        txtClosing = new javax.swing.JFormattedTextField();
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -244,6 +226,7 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tblDr.setRowHeight(Global.tblRowHeight);
         jScrollPane1.setViewportView(tblDr);
 
         tblCr.setFont(Global.textFont);
@@ -258,6 +241,7 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tblCr.setRowHeight(Global.tblRowHeight);
         jScrollPane2.setViewportView(tblCr);
 
         txtFDrAmt.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
@@ -310,8 +294,8 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog {
         jLabel6.setFont(Global.lableFont);
         jLabel6.setText("Closing");
 
-        txtOpening1.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txtOpening1.setFont(Global.amtFont);
+        txtClosing.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        txtClosing.setFont(Global.amtFont);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -330,11 +314,7 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog {
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel5)
                                 .addGap(18, 18, 18)
-                                .addComponent(txtOpening))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel6)
-                                .addGap(18, 18, 18)
-                                .addComponent(txtOpening1))))
+                                .addComponent(txtOpening))))
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -343,11 +323,15 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog {
                         .addComponent(jLabel2)
                         .addGap(18, 18, 18)
                         .addComponent(txtFCrAmt))
-                    .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel6)
+                        .addGap(18, 18, 18)
+                        .addComponent(txtClosing)))
                 .addContainerGap())
         );
 
-        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jLabel1, jLabel5, jLabel6});
+        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jLabel1, jLabel2, jLabel5, jLabel6});
 
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -368,11 +352,10 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtOpening, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtOpening1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(txtClosing, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
 
@@ -406,11 +389,11 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTable tblCr;
     private javax.swing.JTable tblDr;
+    private javax.swing.JFormattedTextField txtClosing;
     private javax.swing.JFormattedTextField txtFCrAmt;
     private javax.swing.JFormattedTextField txtFDrAmt;
     private javax.swing.JFormattedTextField txtFNetChange;
     private javax.swing.JTextField txtName;
     private javax.swing.JFormattedTextField txtOpening;
-    private javax.swing.JFormattedTextField txtOpening1;
     // End of variables declaration//GEN-END:variables
 }

@@ -12,7 +12,6 @@ import com.cv.accountswing.entity.Department;
 import com.cv.accountswing.entity.Gl;
 import com.cv.accountswing.entity.Trader;
 import com.cv.accountswing.entity.view.VGl;
-import com.cv.accountswing.service.COAService;
 import com.cv.accountswing.service.GlService;
 import com.cv.accountswing.util.Util1;
 import com.google.gson.Gson;
@@ -39,8 +38,7 @@ public class SalePurchaseTableModel extends AbstractTableModel {
     private List<VGl> listVGl = new ArrayList();
     private String[] columnNames = {"Date", "Dept:", "Description", "Ref", "Person", "Account", "Curr", "Total-Amt"};
     Gson gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
-    @Autowired
-    private COAService cOAService;
+
     @Autowired
     private GlService glService;
     private String sourceAccId;
@@ -71,12 +69,7 @@ public class SalePurchaseTableModel extends AbstractTableModel {
 
     @Override
     public boolean isCellEditable(int row, int column) {
-        /*if (column == 6) {
-        if (Global.sysProperties.get("system.multi.currency.flag").equals("0")) {
-        return false;
-        }
-        }*/
-        return false;
+        return true;
     }
 
     @Override

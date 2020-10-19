@@ -101,7 +101,7 @@ public class RoleSetup extends javax.swing.JPanel implements KeyListener {
         JDialog loading = Util1.getLoading(Global.parentForm);
         taskExecutor.execute(() -> {
             List<VRoleMenu> listVRM = menuService.getParentChildMenu(roleId);
-            VRoleMenu vRoleMenu = new VRoleMenu("Best-System", "System", false, listVRM);
+            VRoleMenu vRoleMenu = new VRoleMenu("Best-System", "System", true, listVRM);
             MyAbstractTreeTableModel treeTableModel = new MyDataModel(vRoleMenu, privilegeService);
             MyTreeTable treeTable = new MyTreeTable(treeTableModel);
             scrollPane.getViewport().add(treeTable);

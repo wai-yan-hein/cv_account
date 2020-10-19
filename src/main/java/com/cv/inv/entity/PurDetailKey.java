@@ -6,6 +6,7 @@
 package com.cv.inv.entity;
 
 import java.io.Serializable;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
@@ -20,6 +21,9 @@ public class PurDetailKey implements Serializable {
     private String vouId;
     @Column(name = "pur_detail_code", length = 20)
     private String purDetailId;
+
+    public PurDetailKey() {
+    }
 
     public String getVouId() {
         return vouId;
@@ -42,4 +46,30 @@ public class PurDetailKey implements Serializable {
         this.purDetailId = purDetailId;
     }
 
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 67 * hash + Objects.hashCode(this.vouId);
+        hash = 67 * hash + Objects.hashCode(this.purDetailId);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final PurDetailKey other = (PurDetailKey) obj;
+        if (!Objects.equals(this.vouId, other.vouId)) {
+            return false;
+        }
+        return Objects.equals(this.purDetailId, other.purDetailId);
+    }
+    
 }

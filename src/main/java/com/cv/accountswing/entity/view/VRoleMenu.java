@@ -141,7 +141,7 @@ public class VRoleMenu implements java.io.Serializable {
         this.soureAccCode = soureAccCode;
     }
 
-    @Transient
+    @Column(name = "allow")
     public Boolean getIsAllow() {
         return isAllow;
     }
