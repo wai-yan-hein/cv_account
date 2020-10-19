@@ -34,12 +34,12 @@ public class DamageDetailHisDaoImpl extends AbstractDao<Long, DamageDetailHis> i
         String strFilter = "";
           if (!saleInvId.equals("-")) {
             if (strFilter.isEmpty()) {
-                strFilter = "v.dmgVouId = " + saleInvId;
+                strFilter = "v.dmgVouId = '" + saleInvId+"'";
             } else {
-                strFilter = strFilter + " and v.dmgVouId = " + saleInvId;
+                strFilter = strFilter + " and v.dmgVouId = '" + saleInvId+"'";
             }
         }
-            String strSql = "select  v from DamageDetailHis v";
+            String strSql = "select v from DamageDetailHis v";
 
         List<DamageDetailHis> listDH = null;
         if (!strFilter.isEmpty()) {

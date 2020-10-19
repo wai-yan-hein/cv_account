@@ -32,9 +32,9 @@ public class DamageHisDaoImpl extends AbstractDao<String, DamageHis> implements 
     @Override
     public DamageHis findById(String id) {
         DamageHis ph = getByKey(id);
-        String dmgId=ph.getDmgVouId();
-        List<DamageDetailHis> listDetail=detaildao.search(dmgId);
-      //  ph.setListDetail(listDetail);
+//        String dmgId = ph.getDmgVouId();
+//        List<DamageDetailHis> listDetail = detaildao.search(dmgId);
+        //  ph.setListDetail(listDetail);
         return ph;
     }
 
@@ -44,23 +44,23 @@ public class DamageHisDaoImpl extends AbstractDao<String, DamageHis> implements 
 
         if (!from.equals("-") && !to.equals("-")) {
             if (strFilter.isEmpty()) {
-                strFilter = "v.dmgDate between '" + Util1.toDateStr(from, "dd/MM/yyyy", "yyyy-MM-dd")
-                        + "' and '" + Util1.toDateStr(to, "dd/MM/yyyy", "yyyy-MM-dd") + "'";
+                strFilter = "v.dmgDate between '" + from
+                        + "' and '" + to + "'";
             } else {
-                strFilter = strFilter + " and v.dmgDate between '" + Util1.toDateStr(from, "dd/MM/yyyy", "yyyy-MM-dd")
-                        + "' and '" + Util1.toDateStr(to, "dd/MM/yyyy", "yyyy-MM-dd") + "'";
+                strFilter = strFilter + " and v.dmgDate between '" + from
+                        + "' and '" + to + "'";
             }
         } else if (!from.equals("-")) {
             if (strFilter.isEmpty()) {
-                strFilter = "v.dmgDate >= '" + Util1.toDateStr(from, "dd/MM/yyyy", "yyyy-MM-dd") + "'";
+                strFilter = "v.dmgDate >= '" + from + "'";
             } else {
-                strFilter = strFilter + " and v.dmgDate >= '" + Util1.toDateStr(from, "dd/MM/yyyy", "yyyy-MM-dd") + "'";
+                strFilter = strFilter + " and v.dmgDate >= '" + from + "'";
             }
         } else if (!to.equals("-")) {
             if (strFilter.isEmpty()) {
-                strFilter = "v.dmgDate <= '" + Util1.toDateStr(to, "dd/MM/yyyy", "yyyy-MM-dd") + "'";
+                strFilter = "v.dmgDate <= '" + to + "'";
             } else {
-                strFilter = strFilter + " and v.dmgDate <= '" + Util1.toDateStr(to, "dd/MM/yyyy", "yyyy-MM-dd") + "'";
+                strFilter = strFilter + " and v.dmgDate <= '" + to + "'";
             }
         }
 

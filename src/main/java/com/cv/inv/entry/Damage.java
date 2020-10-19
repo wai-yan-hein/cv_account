@@ -7,7 +7,9 @@ package com.cv.inv.entry;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
+import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.SelectionObserver;
+import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.util.Util1;
@@ -47,7 +49,7 @@ import org.springframework.stereotype.Component;
  * @author Mg Kyaw Thura Aung
  */
 @Component
-public class Damage extends javax.swing.JPanel implements SelectionObserver, KeyListener {
+public class Damage extends javax.swing.JPanel implements SelectionObserver, KeyListener, PanelControl {
 
     /**
      * Creates new form Damage
@@ -69,6 +71,8 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
     private DamageHisService dhService;
     @Autowired
     private DamageSearchDialog dmgSearchDialog;
+    @Autowired
+    private ApplicationMainFrame mainFrame;
 
     public Damage() {
         initComponents();
@@ -164,7 +168,7 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
         txtVouNo.setText(vouEngine.genVouNo());
     }
 
-    private boolean save() {
+    private boolean saveDamage() {
         boolean status = false;
         if (isValidEntry() && damageTableModel.isValidEntry()) {
             List<DamageDetailHis> listDmgDetail = damageTableModel.getDetail();
@@ -180,6 +184,7 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
             }
         }
         return status;
+
     }
 
     private boolean isValidEntry() {
@@ -253,7 +258,7 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
         }
     };
 
-    public void setDamageVoucher(DamageHis dmgHis) {
+    public void setDamageVoucher(DamageHis dmgHis, List<DamageDetailHis> listDetailHis) {
         if (!lblStatus.getText().equals("NEW")) {
             clear();
         }
@@ -268,7 +273,7 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
             txtDate.setDate(dmgHis.getDmgDate());
 //            txtLocation.setText(rohh2.getLocation().toString());
 //            txtTotalAmount.setText(rohh2.getTotalAmount().toString());
-        //    damageTableModel.setListDetail(dmgHis.getListDetail());
+            damageTableModel.setListDetail(listDetailHis);
         }
     }
 
@@ -297,9 +302,6 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
         jPanel3 = new javax.swing.JPanel();
         txtTotalAmount = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
-        butSave = new javax.swing.JButton();
-        butClear = new javax.swing.JButton();
-        butHistory = new javax.swing.JButton();
 
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentShown(java.awt.event.ComponentEvent evt) {
@@ -427,27 +429,6 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        butSave.setText("Save");
-        butSave.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                butSaveActionPerformed(evt);
-            }
-        });
-
-        butClear.setText("Clear");
-        butClear.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                butClearActionPerformed(evt);
-            }
-        });
-
-        butHistory.setText("History");
-        butHistory.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                butHistoryActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -458,12 +439,6 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(butSave)
-                        .addGap(12, 12, 12)
-                        .addComponent(butClear)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(butHistory)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1071, Short.MAX_VALUE)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -477,46 +452,21 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 247, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(butSave)
-                        .addComponent(butClear)
-                        .addComponent(butHistory)))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(9, 9, 9))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
+        mainFrame.setControl(this);
         initMain();
         txtVouNo.requestFocus();
     }//GEN-LAST:event_formComponentShown
 
-    private void butSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_butSaveActionPerformed
-        // TODO add your handling code here:
-        if (save()) {
-            clear();
-        }
-    }//GEN-LAST:event_butSaveActionPerformed
-
-    private void butClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_butClearActionPerformed
-        // TODO add your handling code here:
-        clear();
-    }//GEN-LAST:event_butClearActionPerformed
-
-    private void butHistoryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_butHistoryActionPerformed
-        dmgSearchDialog.setLocationRelativeTo(null);
-        dmgSearchDialog.setVisible(true);
-        // TODO add your handling code here:
-    }//GEN-LAST:event_butHistoryActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton butClear;
-    private javax.swing.JButton butHistory;
-    private javax.swing.JButton butSave;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
@@ -605,5 +555,33 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
                 tabToTable(e);
                 break;
         }
+    }
+
+    @Override
+    public void save() {
+        if (saveDamage()) {
+            clear();
+        }
+    }
+
+    @Override
+    public void delete() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void newForm() {
+        clear();
+    }
+
+    @Override
+    public void history() {
+        dmgSearchDialog.setLocationRelativeTo(null);
+        dmgSearchDialog.setVisible(true);
+    }
+
+    @Override
+    public void print() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
