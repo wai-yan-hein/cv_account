@@ -11,7 +11,6 @@ import com.cv.inv.entity.VouId;
 import com.cv.inv.service.VouIdService;
 import javax.swing.JOptionPane;
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
