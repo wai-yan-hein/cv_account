@@ -925,6 +925,11 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
 
         jButton3.setFont(Global.lableFont);
         jButton3.setText("History");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         btnSaveSaleDetail.setFont(Global.lableFont);
         btnSaveSaleDetail.setText("Save");
@@ -1036,6 +1041,10 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
     private void btnSaveSaleDetailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveSaleDetailActionPerformed
         save();
     }//GEN-LAST:event_btnSaveSaleDetailActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton3ActionPerformed
 
     private void tabToTable(KeyEvent e) {
         if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_RIGHT) {

@@ -8,15 +8,36 @@ package com.cv.inv.entry;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.SelectionObserver;
+import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.util.Util1;
+import com.cv.inv.entity.DamageDetailHis;
+import com.cv.inv.entity.DamageHis;
+import com.cv.inv.entity.Stock;
 import com.cv.inv.entry.common.DamageTableModel;
+import com.cv.inv.entry.dialog.DamageSearchDialog;
 import com.cv.inv.entry.editor.LocationAutoCompleter;
+import com.cv.inv.entry.editor.StockCellEditor;
+import com.cv.inv.entry.editor.StockUnitEditor;
+import com.cv.inv.service.DamageHisService;
+import com.cv.inv.service.StockService;
+import com.cv.inv.service.VouIdService;
+import com.cv.inv.util.GenVouNoImpl;
 import com.toedter.calendar.JTextFieldDateEditor;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -33,18 +54,40 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
      */
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(Damage.class);
     private LoadingObserver loadingObserver;
+    private SelectionObserver selectionObserver;
+    private LocationAutoCompleter locCompleter;
+    private List<DamageDetailHis> listDetail = new ArrayList();
+    private DamageHis rohh2 = new DamageHis();
+    private GenVouNoImpl vouEngine = null;
     @Autowired
     private DamageTableModel damageTableModel;
+    @Autowired
+    private VouIdService voudIdService;
+    @Autowired
+    private StockService stockService;
+    @Autowired
+    private DamageHisService dhService;
+    @Autowired
+    private DamageSearchDialog dmgSearchDialog;
 
     public Damage() {
         initComponents();
+        //   addNewRow();
+        initKeyListener();
     }
 
     private void initMain() {
+        initCombo();
         initTable();
+        actionMapping();
         initKeyListener();
         setTodayDate();
-        initCombo();
+        //   assignDefalutValue();
+        genVouNo();
+    }
+
+    public void setSelectionObserver(SelectionObserver selectionObserver) {
+        this.selectionObserver = selectionObserver;
     }
 
     public void setLoadingObserver(LoadingObserver loadingObserver) {
@@ -54,19 +97,34 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
     private void initTable() {
         tblDamage.setModel(damageTableModel);
         damageTableModel.setParent(tblDamage);
+        damageTableModel.addEmptyRow();
+        damageTableModel.setCallBack(this);
         tblDamage.getTableHeader().setFont(Global.lableFont);
-        tblDamage.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        //  tblDamage.setCellSelectionEnabled(true);
+
         tblDamage.getColumnModel().getColumn(0).setPreferredWidth(50);
         tblDamage.getColumnModel().getColumn(1).setPreferredWidth(300);
         tblDamage.getColumnModel().getColumn(2).setPreferredWidth(60);
         tblDamage.getColumnModel().getColumn(3).setPreferredWidth(50);
-        tblDamage.getColumnModel().getColumn(4).setPreferredWidth(40);
-        tblDamage.getColumnModel().getColumn(5).setPreferredWidth(30);
-        tblDamage.getColumnModel().getColumn(6).setPreferredWidth(40);
-        tblDamage.getColumnModel().getColumn(7).setPreferredWidth(50);
+        tblDamage.getColumnModel().getColumn(4).setPreferredWidth(50);
+        tblDamage.getColumnModel().getColumn(5).setPreferredWidth(60);
+
+        tblDamage.getColumnModel().getColumn(0).setCellEditor(new StockCellEditor());
+        tblDamage.getColumnModel().getColumn(2).setCellEditor(new AutoClearEditor());
+        tblDamage.getColumnModel().getColumn(3).setCellEditor(new StockUnitEditor());
 
         tblDamage.setDefaultRenderer(Boolean.class, new TableCellRender());
         tblDamage.setDefaultRenderer(Object.class, new TableCellRender());
+        tblDamage.setDefaultRenderer(Float.class, new TableCellRender());
+        tblDamage.setDefaultRenderer(Double.class, new TableCellRender());
+        tblDamage.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tblDamage.getSelectionModel().addListSelectionListener(
+                new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                //     txtRecNo.setText(Integer.toString(tblDamage.getSelectedRow() + 1));
+            }
+        });
     }
 
     private void initKeyListener() {
@@ -95,6 +153,125 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
         locAutoCompleter.setSelectionObserver(this);
     }
 
+    private void addNewRow() {
+        DamageDetailHis sale = new DamageDetailHis();
+        sale.setStock(new Stock());
+        listDetail.add(sale);
+    }
+
+    private void genVouNo() {
+        vouEngine = new GenVouNoImpl(voudIdService, "Damage", Util1.getPeriod(txtDate.getDate()));
+        txtVouNo.setText(vouEngine.genVouNo());
+    }
+
+    private boolean save() {
+        boolean status = false;
+        if (isValidEntry() && damageTableModel.isValidEntry()) {
+            List<DamageDetailHis> listDmgDetail = damageTableModel.getDetail();
+
+            try {
+                String vouStatus = lblStatus.getText();
+                dhService.save(rohh2, listDmgDetail, vouStatus);
+                vouEngine.updateVouNo();
+                genVouNo();
+                status = true;
+            } catch (Exception ex) {
+                LOGGER.error("save Damage : " + rohh2.getDmgVouId() + " : " + ex.getMessage());
+            }
+        }
+        return status;
+    }
+
+    private boolean isValidEntry() {
+        boolean status = true;
+
+        rohh2.setDmgVouId(txtVouNo.getText());
+        rohh2.setRemark(txtRemark.getText());
+        if (lblStatus.getText().equals("NEW")) {
+            rohh2.setDmgDate(txtDate.getDate());
+            rohh2.setCreatedBy(Global.loginUser);
+            rohh2.setSession(Global.sessionId);
+        } else {
+            Date tmpDate = txtDate.getDate();
+            if (!Util1.isSameDate(tmpDate, rohh2.getDmgDate())) {
+                rohh2.setDmgDate(txtDate.getDate());
+            }
+            rohh2.setUpdatedBy(Global.loginUser);
+            rohh2.setUpdatedDate(Util1.getTodayDate());
+        }
+        rohh2.setDmgVouId(txtVouNo.getText());
+//        rohh2.setLocation(locCompleter.getLocation());
+        rohh2.setDeleted(Util1.getNullTo(rohh2.isDeleted()));
+        rohh2.setTotalAmount(Util1.getDouble(txtTotalAmount.getText()));
+
+        return status;
+    }
+
+    private void clear() {
+        lblStatus.setText("NEW");
+        if (Global.loginDate != null) {
+            txtDate.setDate(Util1.toDate(Global.loginDate, "dd/MM/yyyy"));
+        } else {
+            txtDate.setDate(Util1.getTodayDate());
+        }
+        txtRemark.setText(null);
+        txtTotalAmount.setText("0.0");
+        damageTableModel.clearData();
+        //retOutTableModel.setLocation((LocationH2) cboLocation.getSelectedItem());
+        rohh2 = new DamageHis();
+        genVouNo();
+    }
+
+    private void actionMapping() {
+        //F8 event on tblSale
+        tblDamage.getInputMap().put(KeyStroke.getKeyStroke("F8"), "F8-Action");
+        tblDamage.getActionMap().put("F8-Action", actionItemDelete);
+
+        //Enter event on tblSale
+        tblDamage.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "ENTER-Action");
+        tblDamage.getActionMap().put("ENTER-Action", actionTblPurEnterKey);
+    }
+    private final Action actionItemDelete = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (tblDamage.getSelectedRow() >= 0) {
+                int yes_no = JOptionPane.showConfirmDialog(Global.parentForm,
+                        "Are you sure to delete?", "Damage item delete", JOptionPane.YES_NO_OPTION);
+                if (yes_no == 0) {
+                    damageTableModel.delete(tblDamage.getSelectedRow());
+                }
+            }
+        }
+    };
+    private final Action actionTblPurEnterKey = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                tblDamage.getCellEditor().stopCellEditing();
+            } catch (Exception ex) {
+            }
+        }
+    };
+
+    public void setDamageVoucher(DamageHis dmgHis) {
+        if (!lblStatus.getText().equals("NEW")) {
+            clear();
+        }
+        if (dmgHis != null) {
+            if (dmgHis.isDeleted()) {
+                lblStatus.setText("DELETED");
+            } else {
+                lblStatus.setText("EDIT");
+            }
+            txtVouNo.setText(dmgHis.getDmgVouId());
+            txtRemark.setText(dmgHis.getRemark());
+            txtDate.setDate(dmgHis.getDmgDate());
+//            txtLocation.setText(rohh2.getLocation().toString());
+//            txtTotalAmount.setText(rohh2.getTotalAmount().toString());
+        //    damageTableModel.setListDetail(dmgHis.getListDetail());
+        }
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -116,10 +293,13 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
         jScrollPane1 = new javax.swing.JScrollPane();
         tblDamage = new javax.swing.JTable();
         jPanel2 = new javax.swing.JPanel();
-        jLabel7 = new javax.swing.JLabel();
+        lblStatus = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
-        jTextField5 = new javax.swing.JTextField();
+        txtTotalAmount = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
+        butSave = new javax.swing.JButton();
+        butClear = new javax.swing.JButton();
+        butHistory = new javax.swing.JButton();
 
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentShown(java.awt.event.ComponentEvent evt) {
@@ -194,19 +374,16 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
         tblDamage.setFont(Global.textFont);
         tblDamage.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+
             }
         ));
         jScrollPane1.setViewportView(tblDamage);
 
-        jLabel7.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
-        jLabel7.setText("NEW");
+        lblStatus.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
+        lblStatus.setText("NEW");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -214,18 +391,18 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel7)
+                .addComponent(lblStatus)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel7)
+                .addComponent(lblStatus)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jTextField5.setFont(Global.amtFont);
+        txtTotalAmount.setFont(Global.amtFont);
 
         jLabel6.setFont(Global.lableFont);
         jLabel6.setText("Total Amount :");
@@ -238,17 +415,38 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
                 .addGap(0, 13, Short.MAX_VALUE)
                 .addComponent(jLabel6)
                 .addGap(18, 18, 18)
-                .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(txtTotalAmount, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtTotalAmount, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel6))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+
+        butSave.setText("Save");
+        butSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                butSaveActionPerformed(evt);
+            }
+        });
+
+        butClear.setText("Clear");
+        butClear.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                butClearActionPerformed(evt);
+            }
+        });
+
+        butHistory.setText("History");
+        butHistory.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                butHistoryActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -260,6 +458,12 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(butSave)
+                        .addGap(12, 12, 12)
+                        .addComponent(butClear)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(butHistory)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1071, Short.MAX_VALUE)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -273,9 +477,14 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 247, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(butSave)
+                        .addComponent(butClear)
+                        .addComponent(butHistory)))
                 .addGap(9, 9, 9))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -285,23 +494,44 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
         txtVouNo.requestFocus();
     }//GEN-LAST:event_formComponentShown
 
+    private void butSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_butSaveActionPerformed
+        // TODO add your handling code here:
+        if (save()) {
+            clear();
+        }
+    }//GEN-LAST:event_butSaveActionPerformed
+
+    private void butClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_butClearActionPerformed
+        // TODO add your handling code here:
+        clear();
+    }//GEN-LAST:event_butClearActionPerformed
+
+    private void butHistoryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_butHistoryActionPerformed
+        dmgSearchDialog.setLocationRelativeTo(null);
+        dmgSearchDialog.setVisible(true);
+        // TODO add your handling code here:
+    }//GEN-LAST:event_butHistoryActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton butClear;
+    private javax.swing.JButton butHistory;
+    private javax.swing.JButton butSave;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextField jTextField5;
+    private javax.swing.JLabel lblStatus;
     private javax.swing.JTable tblDamage;
     private com.toedter.calendar.JDateChooser txtDate;
     private javax.swing.JTextField txtLocation;
     private javax.swing.JTextField txtRemark;
+    private javax.swing.JTextField txtTotalAmount;
     private javax.swing.JTextField txtVouNo;
     // End of variables declaration//GEN-END:variables
 
