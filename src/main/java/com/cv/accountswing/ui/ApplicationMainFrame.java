@@ -232,10 +232,8 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private StockUnitService stockUnitService;
     @Autowired
     private RelationService relationService;
-<<<<<<< HEAD
     @Autowired
     private ChargeTypeService chargeTypeService;
-=======
     private PanelControl control;
 
     public PanelControl getControl() {
@@ -245,7 +243,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     public void setControl(PanelControl control) {
         this.control = control;
     }
->>>>>>> 7fa91e6d01ebe7e3e4865da24b73cc35acb6e4a1
 
     //@Autowired
     //private TaskExecutor threadPoolTaskExecutor;
@@ -626,7 +623,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             Global.listRelation.forEach(ur -> {
                 Global.hmRelation.put(ur.getUnitKey(), ur.getFactor());
             });
-            Global.listChargeType=chargeTypeService.findAll();
+            Global.listChargeType = chargeTypeService.findAll();
 
             getMachinceInfo();
         });
