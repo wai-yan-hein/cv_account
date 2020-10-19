@@ -67,4 +67,9 @@ public class DepartmentServiceImpl implements DepartmentService {
         return coaCode;
     }
 
+    @Override
+    public List<Department> findAll() {
+        return dao.findAll();
+    }
+
 }

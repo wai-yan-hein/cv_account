@@ -89,4 +89,10 @@ public class DepartmentDaoImpl extends AbstractDao<String, Department> implement
         int cnt = execUpdateOrDelete(strSql);
         return cnt;
     }
+
+    @Override
+    public List<Department> findAll() {
+        String hsql = "select o from Department o";
+        return findHSQL(hsql);
+    }
 }

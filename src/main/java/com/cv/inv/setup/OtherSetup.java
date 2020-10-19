@@ -7,6 +7,7 @@ package com.cv.inv.setup;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
+import com.cv.inv.setup.dialog.ChargeTypeSetupDialog;
 import com.cv.inv.setup.dialog.LocationSetupDialog;
 import com.cv.inv.setup.dialog.RelationSetupDialog;
 import com.cv.inv.setup.dialog.SaleManSetupDialog;
@@ -33,6 +34,8 @@ public class OtherSetup extends javax.swing.JPanel {
     private SaleManSetupDialog saleManSetupDialog;
     @Autowired
     private RelationSetupDialog relationSetupDialog;
+    @Autowired
+    private ChargeTypeSetupDialog chargeTypeSetupDialog;
 
     public void setLoadingObserver(LoadingObserver loadingObserver) {
         this.loadingObserver = loadingObserver;
@@ -58,6 +61,7 @@ public class OtherSetup extends javax.swing.JPanel {
         btnVouStatus = new javax.swing.JButton();
         btnSaleMan = new javax.swing.JButton();
         btnRelation = new javax.swing.JButton();
+        btnChargeType = new javax.swing.JButton();
 
         jButton1.setText("Location");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -87,23 +91,33 @@ public class OtherSetup extends javax.swing.JPanel {
             }
         });
 
+        btnChargeType.setText("Charge Type");
+        btnChargeType.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnChargeTypeActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnSaleMan, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(btnVouStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnRelation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(566, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnSaleMan, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(btnVouStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnRelation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(btnChargeType))
+                .addContainerGap(546, Short.MAX_VALUE))
         );
 
-        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnRelation, btnSaleMan, btnVouStatus, jButton1});
+        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnChargeType, btnRelation, btnSaleMan, btnVouStatus, jButton1});
 
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -116,7 +130,9 @@ public class OtherSetup extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnSaleMan)
                     .addComponent(btnRelation))
-                .addContainerGap(371, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnChargeType)
+                .addContainerGap(337, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -155,8 +171,17 @@ public class OtherSetup extends javax.swing.JPanel {
 
     }//GEN-LAST:event_btnRelationActionPerformed
 
+    private void btnChargeTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChargeTypeActionPerformed
+        chargeTypeSetupDialog.initMain();
+        chargeTypeSetupDialog.setIconImage(image);
+        chargeTypeSetupDialog.setSize(Global.width / 2, Global.height / 2);
+        chargeTypeSetupDialog.setLocationRelativeTo(null);
+        chargeTypeSetupDialog.setVisible(true);
+    }//GEN-LAST:event_btnChargeTypeActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnChargeType;
     private javax.swing.JButton btnRelation;
     private javax.swing.JButton btnSaleMan;
     private javax.swing.JButton btnVouStatus;

@@ -181,6 +181,11 @@ public class SaleManSetupDialog extends javax.swing.JDialog implements KeyListen
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Sale Man Setup");
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentShown(java.awt.event.ComponentEvent evt) {
+                formComponentShown(evt);
+            }
+        });
 
         tblSaleMan.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -352,6 +357,10 @@ public class SaleManSetupDialog extends javax.swing.JDialog implements KeyListen
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
         delete();
     }//GEN-LAST:event_btnDeleteActionPerformed
+
+    private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
+        // TODO add your handling code here:
+    }//GEN-LAST:event_formComponentShown
 
     /**
      * @param args the command line arguments

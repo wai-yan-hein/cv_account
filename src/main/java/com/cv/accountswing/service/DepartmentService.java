@@ -21,4 +21,6 @@ public interface DepartmentService {
     public List<Department> search(String code, String name, String compCode, String userCode, String parentId);
 
     public int delete(String code);
+
+    public List<Department> findAll();
 }
