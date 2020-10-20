@@ -167,15 +167,11 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
     }
 
     private void initTable() {
-        if (this.getName().equals("Daily Cash")) {
-            allCashTableModel.setColumnName(7, "Cash In / Dr");
-            allCashTableModel.setColumnName(8, "Cash Out / Cr");
-        }
         allCashTableModel.setSelectionObserver(this);
         allCashTableModel.setReloadData(reloadData);
         tblCash.setModel(allCashTableModel);
         tblCash.getTableHeader().setFont(Global.tblHeaderFont);
-        tblCash.getTableHeader().setPreferredSize(new Dimension(40, 40));
+        tblCash.getTableHeader().setPreferredSize(new Dimension(35, 35));
         //tblCash.getTableHeader().setBackground(Global.tblHeaderColor);
         sorter = new TableRowSorter<>(tblCash.getModel());
         tblCash.setRowSorter(sorter);

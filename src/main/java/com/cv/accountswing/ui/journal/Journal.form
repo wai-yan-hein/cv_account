@@ -103,6 +103,7 @@
             <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="Global.lableFont" type="code"/>
             </Property>
+            <Property name="horizontalAlignment" type="int" value="0"/>
             <Property name="text" type="java.lang.String" value="From"/>
           </Properties>
         </Component>
@@ -111,13 +112,14 @@
             <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="Global.lableFont" type="code"/>
             </Property>
+            <Property name="horizontalAlignment" type="int" value="0"/>
             <Property name="text" type="java.lang.String" value="To"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="txtVouNo">
           <Properties>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="Global.textFont" type="code"/>
+              <Connection code="Global.shortCutFont" type="code"/>
             </Property>
             <Property name="name" type="java.lang.String" value="txtVouNo" noResource="true"/>
           </Properties>
@@ -127,6 +129,7 @@
             <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="Global.lableFont" type="code"/>
             </Property>
+            <Property name="horizontalAlignment" type="int" value="0"/>
             <Property name="text" type="java.lang.String" value="Vou"/>
           </Properties>
         </Component>
@@ -135,13 +138,14 @@
             <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="Global.lableFont" type="code"/>
             </Property>
+            <Property name="horizontalAlignment" type="int" value="0"/>
             <Property name="text" type="java.lang.String" value="Refrence"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="txtRefrence">
           <Properties>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="Global.textFont" type="code"/>
+              <Connection code="Global.shortCutFont" type="code"/>
             </Property>
             <Property name="name" type="java.lang.String" value="txtRefrence" noResource="true"/>
           </Properties>
@@ -167,7 +171,7 @@
               <Connection code="&quot;dd/MM/yyyy&quot;" type="code"/>
             </Property>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="Global.lableFont" type="code"/>
+              <Connection code="Global.shortCutFont" type="code"/>
             </Property>
           </Properties>
         </Component>
@@ -177,7 +181,7 @@
               <Connection code="&quot;dd/MM/yyyy&quot;" type="code"/>
             </Property>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="Global.lableFont" type="code"/>
+              <Connection code="Global.shortCutFont" type="code"/>
             </Property>
           </Properties>
         </Component>

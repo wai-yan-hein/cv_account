@@ -11,6 +11,7 @@ import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.ReloadData;
 import com.cv.accountswing.common.SelectionObserver;
+import com.cv.accountswing.entity.CurrencyKey;
 import com.cv.accountswing.entity.SystemProperty;
 import com.cv.accountswing.entity.view.VRoleMenu;
 import com.cv.accountswing.entity.view.VUsrCompAssign;
@@ -87,6 +88,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTabbedPane;
@@ -110,6 +112,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private final ConfigurableApplicationContext context;
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationMainFrame.class);
     private final HashMap<String, JLabel> hmTabLoading = new HashMap();
+    private HashMap<String, JPanel> hmPanel = new HashMap<>();
     JPopupMenu popupmenu;
     ImageIcon online = null;
     ImageIcon offline = null;
@@ -118,7 +121,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         JMenuItem actionMenu = (JMenuItem) evt.getSource();
         String className = actionMenu.getName();
         String menuName = actionMenu.getText();
-        LOGGER.info("Selected Menu : " + menuName);
         JPanel panel = getPanel(className, menuName);
         addTabMain(panel, menuName);
     };
@@ -273,7 +275,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         String[] split = className.split(",");
         String cName = split[0]; // group name
         String sourceId = split[1];
-        //  LOGGER.info("getPanel : " + panelName);
         switch (cName) {
             case "Setup":
                 switch (panelName) {
@@ -326,22 +327,33 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                         return null;
                 }
             case "Bank":
-                //dynamic bank
-                AllCash bank = allCash.newInstance();
-                bank.setName(panelName);
-                bank.setLoadingObserver(this);
-                bank.setReloadData(this);
-                bank.setSourceAccId(sourceId);
-                return bank;
-            case "AllCash":
-                //dynamic cash
-                AllCash cash = allCash.newInstance();
-                cash.setName(panelName);
-                cash.setLoadingObserver(this);
-                cash.setReloadData(this);
-                cash.setSourceAccId(sourceId);
+                JPanel panelBank = hmPanel.get(panelName);
+                if (panelBank == null) {
+                    //dynamic bank
+                    AllCash bank = allCash.newInstance();
+                    bank.setName(panelName);
+                    bank.setLoadingObserver(this);
+                    bank.setReloadData(this);
+                    bank.setSourceAccId(sourceId);
+                    panelBank = bank;
+                    hmPanel.put(panelName, bank);
+                }
 
-                return cash;
+                return panelBank;
+            case "AllCash":
+                JPanel panelCash = hmPanel.get(panelName);
+                if (panelCash == null) {
+                    AllCash cash = allCash.newInstance();
+                    cash.setName(panelName);
+                    cash.setLoadingObserver(this);
+                    cash.setReloadData(this);
+                    cash.setSourceAccId(sourceId);
+                    panelCash = cash;
+                    hmPanel.put(panelName, cash);
+                }
+                //dynamic cash
+
+                return panelCash;
             case "DayBook":
                 switch (panelName) {
                     case "Purchase":
@@ -617,33 +629,44 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
 
     private void initializeData() {
         this.setTitle(this.getTitle() + "(" + Global.loginUser.getUserName() + ")");
-        loadSysProperties();
         taskExecutor.execute(() -> {
-            List listCI = usrCompRoleService.getAssignCompany(Global.loginUser.getUserId().toString());
-            if (listCI.size() > 0) {
-                VUsrCompAssign vuca = (VUsrCompAssign) listCI.get(0);
-                Global.finicialPeriodFrom = Util1.toDateStr(vuca.getFinicialPeriodFrom(), "yyyy-MM-dd");
-                Global.finicialPeriodTo = Util1.toDateStr(vuca.getFinicialPeriodTo(), "yyyy-MM-dd");
+            try {
+                loadSysProperties();
+                List listCI = usrCompRoleService.getAssignCompany(Global.loginUser.getUserId().toString());
+                if (listCI.size() > 0) {
+                    VUsrCompAssign vuca = (VUsrCompAssign) listCI.get(0);
+                    Global.finicialPeriodFrom = Util1.toDateStr(vuca.getFinicialPeriodFrom(), "yyyy-MM-dd");
+                    Global.finicialPeriodTo = Util1.toDateStr(vuca.getFinicialPeriodTo(), "yyyy-MM-dd");
+                }
+                Global.listAppUser = userService.search("-", "-", "-", "-");
+                Global.listCOA = cOAService.search("-", "-", Global.compId.toString(), "3", "-", "-", "-");
+                Global.listCurrency = currencyService.search("-", "-", Global.compId.toString());
+                Global.listDepartment = departmentService.search("-", "-", Global.compId.toString(),
+                        "-", "-");
+                Global.listTrader = traderService.searchTrader("-", "-", "-", "-", "-", Global.compId.toString());
+                Global.listLocation = locationService.findAll();
+                Global.listVou = vouService.findAll();
+                Global.listSaleMan = saleManService.findAll();
+                Global.listStock = stockService.findActiveStock();
+                Global.listStock = stockService.findAll();
+                Global.listStockUnit = stockUnitService.findAll();
+                Global.listRelation = relationService.findAll();
+                Global.listRelation.forEach(ur -> {
+                    Global.hmRelation.put(ur.getUnitKey(), ur.getFactor());
+                });
+                Global.listChargeType = chargeTypeService.findAll();
+                String cuId = Global.sysProperties.get("system.default.currency");
+                //Default Currency
+                CurrencyKey key = new CurrencyKey();
+                key.setCode(cuId);
+                key.setCompCode(Global.compId);
+                Global.defalutCurrency = currencyService.findById(key);
+                getMachinceInfo();
+            } catch (Exception e) {
+                LOGGER.error("Initialize Data :" + e.getMessage());
+                JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Initialize Data", JOptionPane.ERROR_MESSAGE);
+                System.exit(1);
             }
-            Global.listAppUser = userService.search("-", "-", "-", "-");
-            Global.listCOA = cOAService.search("-", "-", Global.compId.toString(), "3", "-", "-", "-");
-            Global.listCurrency = currencyService.search("-", "-", Global.compId.toString());
-            Global.listDepartment = departmentService.search("-", "-", Global.compId.toString(),
-                    "-", "-");
-            Global.listTrader = traderService.searchTrader("-", "-", "-", "-", "-", Global.compId.toString());
-            Global.listLocation = locationService.findAll();
-            Global.listVou = vouService.findAll();
-            Global.listSaleMan = saleManService.findAll();
-            Global.listStock = stockService.findActiveStock();
-            Global.listStock = stockService.findAll();
-            Global.listStockUnit = stockUnitService.findAll();
-            Global.listRelation = relationService.findAll();
-            Global.listRelation.forEach(ur -> {
-                Global.hmRelation.put(ur.getUnitKey(), ur.getFactor());
-            });
-            Global.listChargeType = chargeTypeService.findAll();
-
-            getMachinceInfo();
         });
 
     }
@@ -973,6 +996,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         addHierarchyBoundsListener(new java.awt.event.HierarchyBoundsListener() {
             public void ancestorMoved(java.awt.event.HierarchyEvent evt) {
             }
+
             public void ancestorResized(java.awt.event.HierarchyEvent evt) {
                 formAncestorResized(evt);
             }
@@ -991,9 +1015,11 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             public void windowClosed(java.awt.event.WindowEvent evt) {
                 formWindowClosed(evt);
             }
+
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
             }
+
             public void windowOpened(java.awt.event.WindowEvent evt) {
                 formWindowOpened(evt);
             }
@@ -1061,43 +1087,43 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lblCompanyName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(102, 102, 102)
-                .addComponent(btnSave)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnPrint)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnDelete)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnHistory)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnClear)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnLogout)
-                .addContainerGap())
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(lblCompanyName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGap(102, 102, 102)
+                                .addComponent(btnSave)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnPrint)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnDelete)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnHistory)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnClear)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnLogout)
+                                .addContainerGap())
         );
 
-        jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnClear, btnDelete, btnHistory, btnLogout, btnPrint, btnSave});
+        jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[]{btnClear, btnDelete, btnHistory, btnLogout, btnPrint, btnSave});
 
         jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblCompanyName, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(btnPrint, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnSave))
-                        .addComponent(btnDelete, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(btnClear, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnHistory, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addComponent(btnLogout, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(lblCompanyName, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                        .addComponent(btnPrint, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(btnSave))
+                                                .addComponent(btnDelete, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                        .addComponent(btnClear, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(btnHistory, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                                .addComponent(btnLogout, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         tabMain.setTabPlacement(javax.swing.JTabbedPane.BOTTOM);
@@ -1115,19 +1141,19 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addComponent(tabMain)
-                .addContainerGap())
-            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(tabMain)
+                                .addContainerGap())
+                        .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tabMain, javax.swing.GroupLayout.DEFAULT_SIZE, 285, Short.MAX_VALUE)
-                .addContainerGap())
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(tabMain, javax.swing.GroupLayout.DEFAULT_SIZE, 285, Short.MAX_VALUE)
+                                .addContainerGap())
         );
 
         pack();

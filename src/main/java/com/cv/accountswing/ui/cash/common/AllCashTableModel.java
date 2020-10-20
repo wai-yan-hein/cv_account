@@ -41,7 +41,7 @@ public class AllCashTableModel extends AbstractTableModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AllCashTableModel.class);
     private List<VGl> listVGl = new ArrayList();
-    private String[] columnNames = {"Date", "Dept:", "Description", "Ref", "Person", "Account", "Curr", "Dr-Amt", "Cr-Amt"};
+    private String[] columnNames = {"Date", "Dept:", "Description", "Ref", "Person", "Account", "Curr", "Cash In / Dr", "Cash Out / Cr"};
     Gson gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
 
     @Autowired

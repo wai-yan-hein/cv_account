@@ -85,18 +85,6 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
 
     private void initializeData() {
         taskExecutor.execute(() -> {
-            if (Global.listTrader == null) {
-                Global.listTrader = traderService.searchTrader("-", "-", "-", "-", "-", "-");
-            }
-            if (Global.listDepartment == null) {
-                Global.listDepartment = departmentService.search("-", "-", "-", "-", "-");
-            }
-            if (Global.listCOA == null) {
-                Global.listCOA = cOAService.search("-", "-", "-", "-", "-", "-", "-");
-            }
-            if (Global.listCurrency == null) {
-                Global.listCurrency = currencyService.search("-", "-", "-");
-            }
             traderAutoCompleter = new TraderAutoCompleter(txtPerson, Global.listTrader, null);
             departmentAutoCompleter = new DepartmentAutoCompleter(txtDepartment, Global.listDepartment, null);
             coaAutoCompleter = new COAAutoCompleter(txtAccount, Global.listCOA, null);
@@ -107,6 +95,7 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
             traderAutoCompleter.setSelectionObserver(selectionObserver);
             coaAutoCompleter.setSelectionObserver(selectionObserver);
             currencyAutoCompleter.setSelectionObserver(selectionObserver);
+            currencyAutoCompleter.setCurrency(Global.defalutCurrency);
             txtDate.setText("Today");
         });
 
@@ -287,6 +276,7 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
         });
 
         txtCurrency.setFont(Global.textFont);
+        txtCurrency.setEnabled(false);
         txtCurrency.setName("txtCurrency"); // NOI18N
         txtCurrency.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {

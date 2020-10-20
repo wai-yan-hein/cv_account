@@ -90,7 +90,6 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
     private boolean isShown = false;
     private LoadingObserver loadingObserver;
     private JPopupMenu popup;
-    private DateAutoCompleter dateAutoCompleter;
     private String stDate;
     private String enDate;
     private String cvId;
@@ -358,14 +357,14 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
     private void initializeParameter() {
         dept = Util1.isNull(txtDep.getText(), "-");
         cvId = Util1.isNull(txtPerson.getText(), "-1");
-        currency = Util1.isNull(txtCurrency.getText(), "-");
+        currency = Global.sysProperties.get("system.default.currency");
         stDate = Util1.isNull(stDate, Util1.toDateStr(Util1.getTodayDate(), "dd/MM/yyyy"));
         enDate = Util1.isNull(enDate, Util1.toDateStr(Util1.getTodayDate(), "dd/MM/yyyy"));
         userId = Global.loginUser.getUserId().toString();
     }
 
     private void initCombo() {
-        dateAutoCompleter = new DateAutoCompleter(txtDate,
+        DateAutoCompleter dateAutoCompleter = new DateAutoCompleter(txtDate,
                 Global.listDateModel, null);
         dateAutoCompleter.setSelectionObserver(this);
 
@@ -379,6 +378,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         CurrencyAutoCompleter currencyAutoCompleter = new CurrencyAutoCompleter(txtCurrency,
                 Global.listCurrency, null);
         currencyAutoCompleter.setSelectionObserver(this);
+        currencyAutoCompleter.setCurrency(Global.defalutCurrency);
     }
 
     public void printApar() {
@@ -504,6 +504,8 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         jLabel3.setText("Person");
 
         txtCurrency.setFont(Global.lableFont);
+        txtCurrency.setToolTipText("");
+        txtCurrency.setEnabled(false);
         txtCurrency.setName("txtCurrency"); // NOI18N
         txtCurrency.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
