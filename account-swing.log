@@ -13,6 +13,18 @@
 07 Oct 2020 04:41:03,504 ERROR: com.cv.accountswing.util.StockUP - java.lang.NullPointerException
 07 Oct 2020 05:30:06,686 ERROR: com.cv.inv.util.GenVouNoImpl - getLastVouNo : 63 - org.hibernate.exception.SQLGrammarException: could not extract ResultSet
 07 Oct 2020 16:26:14,533 ERROR: com.cv.inv.util.GenVouNoImpl - getLastVouNo : 63 - org.hibernate.exception.SQLGrammarException: could not extract ResultSet
+<<<<<<< HEAD
+14 Oct 2020 06:35:35,090 ERROR: com.cv.inv.util.GenVouNoImpl - getLastVouNo : 247 - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [null]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement
+14 Oct 2020 06:41:48,429 ERROR: com.cv.inv.util.GenVouNoImpl - getLastVouNo : 247 - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [null]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement
+14 Oct 2020 06:49:08,331 ERROR: com.cv.inv.util.GenVouNoImpl - getLastVouNo : 247 - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [null]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement
+14 Oct 2020 06:50:00,865 ERROR: com.cv.inv.util.GenVouNoImpl - getLastVouNo : 247 - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [null]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement
+14 Oct 2020 06:56:35,947 ERROR: com.cv.inv.util.GenVouNoImpl - getLastVouNo : 247 - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [null]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement
+14 Oct 2020 06:58:54,352 ERROR: com.cv.inv.util.GenVouNoImpl - getLastVouNo : 247 - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [null]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement
+14 Oct 2020 07:00:32,071 ERROR: com.cv.inv.util.GenVouNoImpl - getLastVouNo : 247 - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [null]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement
+14 Oct 2020 09:28:58,271 ERROR: com.cv.inv.util.GenVouNoImpl - getLastVouNo : 247 - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [null]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement
+15 Oct 2020 16:24:49,295 ERROR: com.cv.accountswing.util.StockUP - java.lang.NullPointerException
+15 Oct 2020 16:24:49,326 ERROR: com.cv.accountswing.util.StockUP - java.lang.NullPointerException
+=======
 14 Oct 2020 06:44:58,985 ERROR: com.cv.inv.util.GenVouNoImpl - getLastVouNo : 247 - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [null]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement
 14 Oct 2020 06:53:20,561 ERROR: com.cv.inv.util.GenVouNoImpl - getLastVouNo : 247 - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [null]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement
 14 Oct 2020 06:56:05,337 ERROR: com.cv.inv.util.GenVouNoImpl - getLastVouNo : 247 - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [null]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement
@@ -119,6 +131,7 @@
 19 Oct 2020 04:47:16,775 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
 19 Oct 2020 04:47:17,825 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
 19 Oct 2020 04:47:17,825 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
+<<<<<<< HEAD
 19 Oct 2020 09:56:26,277 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.inv.entity.Location.getLocationName()" because the return value of "com.cv.inv.entity.DamageHis.getLocation()" is null
 19 Oct 2020 09:56:26,278 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.inv.entity.Location.getLocationName()" because the return value of "com.cv.inv.entity.DamageHis.getLocation()" is null
 19 Oct 2020 09:56:27,572 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.inv.entity.Location.getLocationName()" because the return value of "com.cv.inv.entity.DamageHis.getLocation()" is null
@@ -179,3 +192,6 @@
 19 Oct 2020 12:14:16,576 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.accountswing.entity.AppUser.getUserShort()" because the return value of "com.cv.inv.entity.DamageHis.getCreatedBy()" is null
 19 Oct 2020 12:14:17,860 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.inv.entity.Location.getLocationName()" because the return value of "com.cv.inv.entity.DamageHis.getLocation()" is null
 19 Oct 2020 12:14:17,860 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.accountswing.entity.AppUser.getUserShort()" because the return value of "com.cv.inv.entity.DamageHis.getCreatedBy()" is null
+=======
+>>>>>>> 7fa91e6d01ebe7e3e4865da24b73cc35acb6e4a1
+>>>>>>> ef5b070b8172f7a577c4e191a04a4eff8c1b538e

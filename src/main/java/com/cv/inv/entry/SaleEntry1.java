@@ -27,11 +27,11 @@ import com.cv.accountswing.util.StockUP;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.Location;
 import com.cv.inv.entity.SaleDetailHis;
-import com.cv.inv.entity.SaleDetailHis;
+import com.cv.inv.entity.SaleDetailHis1;
 import com.cv.inv.entity.SaleHis;
 import com.cv.inv.entity.Stock;
 import com.cv.inv.entity.VouStatus;
-import com.cv.inv.entry.common.SaleEntryTableModel;
+import com.cv.inv.entry.common.SaleEntryTableModel1;
 import com.cv.inv.entry.common.StockInfo;
 import com.cv.inv.entry.editor.LocationAutoCompleter;
 import com.cv.inv.entry.editor.SaleManAutoCompleter;
@@ -77,14 +77,14 @@ import org.springframework.stereotype.Component;
  * @author Mg Kyaw Thura Aung
  */
 @Component
-public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, KeyListener, KeyPropagate, StockInfo {
+public class SaleEntry1 extends javax.swing.JPanel implements SelectionObserver, KeyListener, KeyPropagate {
 
     //Need implements StockInfo (Needed to Change)
-    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(SaleEntry.class.getName());
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(SaleEntry1.class.getName());
 
-    private List<SaleDetailHis> listDetail = new ArrayList();
+    private List<SaleDetailHis1> listDetail = new ArrayList();
     @Autowired
-    private SaleEntryTableModel saleTableModel;
+    private SaleEntryTableModel1 saleTableModel;
     @Autowired
     private StockService stockService;
     @Autowired
@@ -138,7 +138,7 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
     /**
      * Creates new form SaleEntry1
      */
-    public SaleEntry() {
+    public SaleEntry1() {
         initComponents();
         addNewRow();
         initKeyListener();
@@ -172,6 +172,9 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
         tblSale.getColumnModel().getColumn(6).setPreferredWidth(80);//Sale Price
         tblSale.getColumnModel().getColumn(7).setPreferredWidth(40);//Disc
         tblSale.getColumnModel().getColumn(8).setPreferredWidth(80);//Disc-Type
+        tblSale.getColumnModel().getColumn(9).setPreferredWidth(80);//Charge-Type
+        tblSale.getColumnModel().getColumn(10).setPreferredWidth(80);//Amount
+        tblSale.getColumnModel().getColumn(11).setPreferredWidth(60);//Location
 
         addSaleTableModelListener();
 
@@ -286,12 +289,12 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
     }
 
     private void addNewRow() {
-        SaleDetailHis sale = new SaleDetailHis();
+        SaleDetailHis1 sale = new SaleDetailHis1();
         sale.setStock(new Stock());
         listDetail.add(sale);
     }
 
-    @Override
+    //@Override
     public void getStockInfo(String stockCode) {
         Stock stock;
 
@@ -457,7 +460,7 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
         Double totalAmount = new Double(0);
         listDetail = saleTableModel.getListSaleDetail();
 
-        for (SaleDetailHis sdh : listDetail) {
+        for (SaleDetailHis1 sdh : listDetail) {
             totalAmount += NumberUtil.NZero(sdh.getAmount());
         }
         txtVouTotal.setValue(totalAmount);
@@ -1093,30 +1096,30 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
         switch (source.toString()) {
             case "CustomerList":
                 try {
-                Trader cus = (Trader) selectObj;
+                    Trader cus = (Trader) selectObj;
 
-                if (cus != null) {
-                    txtCus.setText(cus.getTraderName());
+                    if (cus != null) {
+                        txtCus.setText(cus.getTraderName());
 
-                    if (cus.getTraderType() != null) {
-                        saleTableModel.setCusType(cus.getTraderType().getDescription());
+                        if (cus.getTraderType() != null) {
+                            saleTableModel.setCusType(cus.getTraderType().getDescription());
+                        } else {
+                            saleTableModel.setCusType("N");
+                        }
+                        //calculateTotalAmount();
                     } else {
-                        saleTableModel.setCusType("N");
+                        txtCus.setText(null);
                     }
-                    //calculateTotalAmount();
-                } else {
-                    txtCus.setText(null);
+                } catch (Exception ex) {
+                    LOGGER.error("selected CustomerList : " + selectObj.toString() + " - " + ex.getMessage());
                 }
-            } catch (Exception ex) {
-                LOGGER.error("selected CustomerList : " + selectObj.toString() + " - " + ex.getMessage());
-            }
-            break;
+                break;
             case "StockList":
                 Stock stock = (Stock) selectObj;
                 int selectRow = tblSale.getSelectedRow();
                 saleTableModel.setStock(stock, selectRow);
                 stockUp.add(stock);
-                List<SaleDetailHis> listDetail = saleTableModel.getCurrentRow();
+                List<SaleDetailHis1> listDetail = saleTableModel.getCurrentRow();
                 txtTotalItem.setText(Integer.toString((listDetail.size() - 1)));
         }
     }

@@ -5,7 +5,6 @@
  */
 package com.cv.inv.service;
 
-import com.cv.inv.entity.SaleDetailHis;
 import com.cv.inv.entity.SaleHis;
 import java.util.List;
 
@@ -13,11 +12,9 @@ import java.util.List;
  *
  * @author Mg Kyaw Thura Aung
  */
-public interface SaleDetailService {
+public interface SaleHisService {
 
-    public SaleDetailHis save(SaleDetailHis sdh);
-
-    public List<SaleDetailHis> search(String glId);
-
-    public void save(SaleHis saleHis, List<SaleDetailHis> listSaleDetail) throws Exception;
+    public SaleHis save(SaleHis saleHis) throws Exception;
+    
+    public List<SaleHis> search(String fromDate, String toDate, String cusId, String vouStatusId, String remark);
 }

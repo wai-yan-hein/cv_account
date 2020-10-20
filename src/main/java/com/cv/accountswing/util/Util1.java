@@ -552,6 +552,14 @@ public class Util1 {
         return value;
     }
 
+    public static String getStringValue(Object obj) {
+        String value = "";
+        if (obj != null) {
+            value = obj.toString();
+        }
+        return value;
+    }
+
     public static boolean getBoolean(Boolean obj) {
         if (obj == null) {
             obj = false;

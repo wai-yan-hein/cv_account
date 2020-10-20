@@ -286,17 +286,19 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         listVGL.forEach(vgl -> {
             String sourceAcId = Util1.isNull(vgl.getSourceAcId(), "-");
             String accId = Util1.isNull(vgl.getAccountId(), "-");
-            if (sourceAcId.equals(targetId)) {
-                /*if(Util1.isNullZero(vgl.getSplitId()) == 8){ //Credit Voucher
-                Double tmpAmt = vgl.getDrAmt();
-                vgl.setDrAmt(vgl.getCrAmt());
-                vgl.setCrAmt(tmpAmt);
-                } else if(Util1.isNullZero(vgl.getSplitId()) == 9){ //Debit Voucher
-                Double tmpAmt = vgl.getCrAmt();
-                vgl.setCrAmt(vgl.getDrAmt());
-                vgl.setDrAmt(tmpAmt);
-                }*/
-            } else if (accId.equals(targetId)) {
+            /*if (sourceAcId.equals(targetId)) {
+            double tmpAmt;
+            if (Util1.isNullZero(vgl.getSplitId()) == 8) { //Credit Voucher
+            tmpAmt = Util1.getDouble(vgl.getDrAmt());
+            vgl.setDrAmt(Util1.getDouble(vgl.getCrAmt()));
+            vgl.setCrAmt(tmpAmt);
+            } else if (Util1.isNullZero(vgl.getSplitId()) == 9) { //Debit Voucher
+            tmpAmt = Util1.getDouble(vgl.getCrAmt());
+            vgl.setCrAmt(Util1.getDouble(vgl.getDrAmt()));
+            vgl.setDrAmt(tmpAmt);
+            }
+            } else */
+            if (accId.equals(targetId)) {
                 double tmpDrAmt = 0.0;
                 if (vgl.getDrAmt() != null) {
                     tmpDrAmt = vgl.getDrAmt();

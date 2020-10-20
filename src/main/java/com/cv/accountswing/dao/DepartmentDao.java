@@ -22,4 +22,6 @@ public interface DepartmentDao {
             String usrCode, String parentId);
 
     public int delete(String code);
+
+    public List<Department> findAll();
 }

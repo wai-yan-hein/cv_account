@@ -25,7 +25,7 @@ import javax.persistence.TemporalType;
  */
 @Entity
 @Table(name = "sale_detail_his")
-public class SaleDetailHis implements java.io.Serializable {
+public class SaleDetailHis1 implements java.io.Serializable {
 
     private Integer saleDetailId;
     private String vouNo;
@@ -35,6 +35,8 @@ public class SaleDetailHis implements java.io.Serializable {
     private Float saleSmallestQty;
     private StockUnit itemUnit;
     private Double price;
+    private Double discount;
+    private String discType;
     private Double amount;
     private Location location;
     private Integer uniqueId;
@@ -42,6 +44,7 @@ public class SaleDetailHis implements java.io.Serializable {
     private Long glId;
     private Float smallestWT;
     private String smallestUnit;
+    private String chargeType;
     private Department department;
 
     @Id
@@ -121,6 +124,24 @@ public class SaleDetailHis implements java.io.Serializable {
         this.price = price;
     }
 
+    @Column(name = "item_discount")
+    public Double getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(Double discount) {
+        this.discount = discount;
+    }
+
+    @Column(name = "disc_type")
+    public String getDiscType() {
+        return discType;
+    }
+
+    public void setDiscType(String discType) {
+        this.discType = discType;
+    }
+
     @Column(name = "sale_amount", nullable = false)
     public Double getAmount() {
         return amount;
@@ -185,8 +206,16 @@ public class SaleDetailHis implements java.io.Serializable {
         this.smallestUnit = smallestUnit;
     }
 
-    @ManyToOne
-    @JoinColumn(name = "dept_id")
+    @Column(name = "charge_type")
+    public String getChargeType() {
+        return chargeType;
+    }
+
+    public void setChargeType(String chargeType) {
+        this.chargeType = chargeType;
+    }
+
+    @Column(name = "department")
     public Department getDepartment() {
         return department;
     }
@@ -194,5 +223,7 @@ public class SaleDetailHis implements java.io.Serializable {
     public void setDepartment(Department department) {
         this.department = department;
     }
+    
+    
 
 }

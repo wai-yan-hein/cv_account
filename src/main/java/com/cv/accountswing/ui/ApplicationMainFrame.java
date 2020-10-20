@@ -57,6 +57,7 @@ import com.cv.inv.service.SaleManService;
 import com.cv.inv.service.VouStatusService;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.MachineInfo;
+import com.cv.inv.service.ChargeTypeService;
 import com.cv.inv.service.MachineInfoService;
 import com.cv.inv.service.RelationService;
 import com.cv.inv.service.StockUnitService;
@@ -231,6 +232,8 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private StockUnitService stockUnitService;
     @Autowired
     private RelationService relationService;
+    @Autowired
+    private ChargeTypeService chargeTypeService;
     private PanelControl control;
 
     public PanelControl getControl() {
@@ -620,6 +623,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             Global.listRelation.forEach(ur -> {
                 Global.hmRelation.put(ur.getUnitKey(), ur.getFactor());
             });
+            Global.listChargeType = chargeTypeService.findAll();
 
             getMachinceInfo();
         });
