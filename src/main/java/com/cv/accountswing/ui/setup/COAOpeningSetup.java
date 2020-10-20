@@ -98,8 +98,8 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
         tblOpening.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblOpening.getColumnModel().getColumn(0).setPreferredWidth(10);
         tblOpening.getColumnModel().getColumn(1).setPreferredWidth(250);
-        tblOpening.getColumnModel().getColumn(2).setPreferredWidth(250);
-        tblOpening.getColumnModel().getColumn(3).setPreferredWidth(10);
+        tblOpening.getColumnModel().getColumn(2).setPreferredWidth(20);
+        tblOpening.getColumnModel().getColumn(3).setPreferredWidth(250);
         tblOpening.getColumnModel().getColumn(4).setPreferredWidth(5);
         tblOpening.getColumnModel().getColumn(5).setPreferredWidth(10);
         tblOpening.getColumnModel().getColumn(6).setPreferredWidth(20);
@@ -178,20 +178,32 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
     }
 
     private void generate() {
-        if (isValidGen()) {
-            try {
-                String curId = currencyAutoCompleter.getCurrency().getKey().getCode();
-                String depCode = departmentAutoCompleter.getDepartment().getDeptCode();
-                String userId = Global.loginUser.getUserId().toString();
-                btnGen.setEnabled(false);
-                cOAOpeningService.GenerateZeroGL(Util1.toDateStr(txtDate.getDate(), "dd/MM/yyyy"),
-                        userId, Global.compId.toString(), curId, depCode);
-                searchOpening();
-                btnGen.setEnabled(true);
-            } catch (Exception ex) {
-                LOGGER.error("GENERATE  :" + ex.getMessage());
+        loadingObserver.load(this.getName(), "Start");
+        taskExecutor.execute(() -> {
+            btnGen.setEnabled(false);
+            if (isValidGen()) {
+                try {
+                    String curId = currencyAutoCompleter.getCurrency().getKey().getCode();
+                    String depCode = departmentAutoCompleter.getDepartment().getDeptCode();
+                    String userId = Global.loginUser.getUserId().toString();
+                    btnGen.setEnabled(false);
+                    String coaGroup = Global.sysProperties.get("system.opening.coa.group");
+                    if (coaGroup != null) {
+                        cOAOpeningService.GenerateZeroGL(Util1.toDateStr(txtDate.getDate(), "dd/MM/yyyy"),
+                                userId, Global.compId.toString(), curId, depCode, coaGroup);
+                        searchOpening();
+                        btnGen.setEnabled(true);
+                    } else {
+                        JOptionPane.showMessageDialog(Global.parentForm, "COA Group Openning in System Property.");
+                    }
+                } catch (Exception ex) {
+                    LOGGER.error("GENERATE  :" + ex.getMessage());
+                    JOptionPane.showMessageDialog(Global.parentForm, ex.getMessage(), "GENERATE OPENING", JOptionPane.ERROR_MESSAGE);
+                    btnGen.setEnabled(true);
+                }
             }
-        }
+        });
+
     }
 
     private void initKeyListener() {
