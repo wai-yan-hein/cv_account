@@ -129,11 +129,9 @@ public class JournalEntryTableModel extends AbstractTableModel {
                         Trader trader = (Trader) value;
                         gv.setTraderId(Util1.getLong(trader.getId()));
                         gv.setTraderName(trader.getTraderName());
-                        String coaCode = trader.getAccount().getCode();
-                        ChartOfAccount account = cOAService.findById(coaCode);
-                        if (account != null) {
-                            gv.setAccountId(coaCode);
-                            gv.setAccName(account.getCoaNameEng());
+                        if (trader.getAccount() != null) {
+                            gv.setSourceAcId(trader.getAccount().getCode());
+                            gv.setAccName(trader.getAccount().getCoaNameEng());
                             parent.setColumnSelectionInterval(3, 3);
                         } else {
                             parent.setColumnSelectionInterval(2, 3);
@@ -146,7 +144,7 @@ public class JournalEntryTableModel extends AbstractTableModel {
                 if (value != null) {
                     if (value instanceof ChartOfAccount) {
                         ChartOfAccount coa = (ChartOfAccount) value;
-                        gv.setAccountId(coa.getCode());
+                        gv.setSourceAcId(coa.getCode());
                         gv.setAccName(coa.getCoaNameEng());
 
                     }
@@ -282,6 +280,7 @@ public class JournalEntryTableModel extends AbstractTableModel {
     public void clear() {
         if (listGV != null) {
             listGV.clear();
+            fireTableDataChanged();
         }
     }
 

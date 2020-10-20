@@ -7,6 +7,7 @@ package com.cv.accountswing.ui.journal;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
+import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.view.VGeneralVoucher;
 import com.cv.accountswing.service.VGvService;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
@@ -33,7 +34,7 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-public class Journal extends javax.swing.JPanel implements KeyListener {
+public class Journal extends javax.swing.JPanel implements KeyListener, SelectionObserver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Journal.class);
     private int selectRow = -1;
@@ -160,6 +161,7 @@ public class Journal extends javax.swing.JPanel implements KeyListener {
     private void openJournalEntryDialog(String gvId) {
         loadingObserver.load(this.getName(), "Start");
         taskExecutor.execute(() -> {
+            journalEntryDialog.setSelectionObserver(this);
             journalEntryDialog.clear();
             journalEntryDialog.setGlVouId(gvId);
             journalEntryDialog.setSize(Global.width - 40, Global.height - 200);
@@ -452,6 +454,13 @@ public class Journal extends javax.swing.JPanel implements KeyListener {
             if (tblJournal.getRowCount() >= 0) {
                 tblJournal.setRowSelectionInterval(0, 0);
             }
+        }
+    }
+
+    @Override
+    public void selected(Object source, Object selectObj) {
+        if (source.toString().equals("SEARCHVOUCHER")) {
+            searchGV();
         }
     }
 

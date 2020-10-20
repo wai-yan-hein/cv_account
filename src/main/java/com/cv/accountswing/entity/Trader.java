@@ -148,7 +148,7 @@ public class Trader implements java.io.Serializable {
     }
 
     @ManyToOne
-    @JoinColumn(name = "coa_code")
+    @JoinColumn(name = "account_code")
     public ChartOfAccount getAccount() {
         return account;
     }
