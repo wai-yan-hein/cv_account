@@ -6,8 +6,6 @@
 package com.cv.inv.dao;
 
 import com.cv.accountswing.dao.AbstractDao;
-import com.cv.accountswing.util.Util1;
-import com.cv.inv.entity.DamageDetailHis;
 import com.cv.inv.entity.DamageHis;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;

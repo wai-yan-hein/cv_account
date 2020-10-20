@@ -361,4 +361,16 @@ public class DamageTableModel extends AbstractTableModel {
 
         fireTableDataChanged();
     }
+    public double getTotal() {
+        double total = 0.0;
+        for (DamageDetailHis sdh2 : listDetail) {
+            if (sdh2.getStock() != null) {
+                if (sdh2.getStock().getStockCode()!= null) {
+                    total += Util1.NZeroDouble(sdh2.getAmount());
+                }
+            }
+        }
+
+        return total;
+    }
 }

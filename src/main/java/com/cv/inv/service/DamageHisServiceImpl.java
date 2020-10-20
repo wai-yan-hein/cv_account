@@ -61,4 +61,9 @@ public class DamageHisServiceImpl implements DamageHisService {
         return dao.findById(id);
     }
 
+    @Override
+    public int delete(String vouNo) {
+        return dao.delete(vouNo);
+    }
+
 }

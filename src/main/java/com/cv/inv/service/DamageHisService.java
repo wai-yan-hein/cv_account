@@ -24,4 +24,6 @@ public interface DamageHisService {
     public void save(DamageHis sdh, List<DamageDetailHis> listDamageDetail, String vouStatus);
 
     public DamageHis findById(String id);
+
+    public int delete(String vouNo);
 }
