@@ -9,9 +9,11 @@ import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.Currency;
+import com.cv.accountswing.entity.CurrencyKey;
 import com.cv.accountswing.entity.Department;
 import com.cv.accountswing.entity.view.VGl;
 import com.cv.accountswing.service.COAOpeningService;
+import com.cv.accountswing.service.CurrencyService;
 import com.cv.accountswing.service.VGlService;
 import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
@@ -52,6 +54,8 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
     private COAOpeningService cOAOpeningService;
     @Autowired
     private TaskExecutor taskExecutor;
+    @Autowired
+    private CurrencyService currencyService;
     private LoadingObserver loadingObserver;
     private DepartmentAutoCompleter departmentAutoCompleter;
     private CurrencyAutoCompleter currencyAutoCompleter;
@@ -85,9 +89,14 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
     }
 
     private void initCombo() {
-
         departmentAutoCompleter = new DepartmentAutoCompleter(txtDep, Global.listDepartment, null);
         currencyAutoCompleter = new CurrencyAutoCompleter(txtCurrency, Global.listCurrency, null);
+        String cuId = Global.sysProperties.get("system.default.currency");
+        CurrencyKey key = new CurrencyKey();
+        key.setCode(cuId);
+        key.setCompCode(Global.compId);
+        Currency currency = currencyService.findById(key);
+        currencyAutoCompleter.setCurrency(currency);
     }
 
     private void initTable() {
@@ -266,7 +275,9 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
         jLabel3.setFont(Global.lableFont);
         jLabel3.setText("Currency");
 
+        txtCurrency.setEditable(false);
         txtCurrency.setFont(Global.textFont);
+        txtCurrency.setEnabled(false);
         txtCurrency.setName("txtCurrency"); // NOI18N
         txtCurrency.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -349,12 +360,14 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
         jLabel5.setText("Dr-Amt");
 
         txtFDrAmt.setEditable(false);
+        txtFDrAmt.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         txtFDrAmt.setFont(Global.amtFont);
 
         jLabel6.setFont(Global.lableFont);
         jLabel6.setText("Cr-Amt");
 
         txtFCrAmt.setEditable(false);
+        txtFCrAmt.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         txtFCrAmt.setFont(Global.amtFont);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
