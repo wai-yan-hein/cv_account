@@ -11,12 +11,14 @@ import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.ReloadData;
 import com.cv.accountswing.common.SelectionObserver;
+import com.cv.accountswing.entity.SystemProperty;
 import com.cv.accountswing.entity.view.VRoleMenu;
 import com.cv.accountswing.entity.view.VUsrCompAssign;
 import com.cv.accountswing.service.COAService;
 import com.cv.accountswing.service.CurrencyService;
 import com.cv.accountswing.service.DepartmentService;
 import com.cv.accountswing.service.MenuService;
+import com.cv.accountswing.service.SystemPropertyService;
 import com.cv.accountswing.service.TraderService;
 import com.cv.accountswing.service.UserService;
 import com.cv.accountswing.service.UsrCompRoleService;
@@ -234,6 +236,8 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private RelationService relationService;
     @Autowired
     private ChargeTypeService chargeTypeService;
+    @Autowired
+    private SystemPropertyService systemPropertyService;
     private PanelControl control;
 
     public PanelControl getControl() {
@@ -597,9 +601,23 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
 
     }
 
-    private void initializeData() {
+    private void loadSysProperties() {
+        try {
+            List<SystemProperty> listSys = systemPropertyService.search("-", Global.compId.toString(), "-");
+            HashMap<String, String> hmList = new HashMap<>();
+            listSys.forEach(sys -> {
+                hmList.put(sys.getKey().getPropKey(), sys.getPropValue());
+            });
+            Global.sysProperties = hmList;
+        } catch (Exception e) {
+            LOGGER.error("Connection Timeout :" + e.getMessage());
+            System.exit(1);
+        }
+    }
 
+    private void initializeData() {
         this.setTitle(this.getTitle() + "(" + Global.loginUser.getUserName() + ")");
+        loadSysProperties();
         taskExecutor.execute(() -> {
             List listCI = usrCompRoleService.getAssignCompany(Global.loginUser.getUserId().toString());
             if (listCI.size() > 0) {

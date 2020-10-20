@@ -372,7 +372,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
         accId = Util1.isNull(accId, "-");
         currency = Util1.isNull(currency, "-");
         ref = Util1.isNull(ref, "-");
-        depId = Util1.isNull(depId, Global.sysProperties.get("system.default.department"));
+        depId = Util1.isNull(depId, Util1.isNull(Global.sysProperties.get("system.default.department"), "-"));
         traderName = Util1.isNull(traderName, "-");
         debAmt = Util1.isNull(debAmt, "-");
         crdAmt = Util1.isNull(crdAmt, "-");
@@ -737,7 +737,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
 
     @Override
     public void save() {
-        
+
     }
 
     @Override

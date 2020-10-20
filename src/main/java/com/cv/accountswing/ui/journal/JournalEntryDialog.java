@@ -37,6 +37,8 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +64,7 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
     @Autowired
     private VGlService vGlService;
     private SelectionObserver selectionObserver;
+    private TableRowSorter<TableModel> sorter;
 
     public void setSelectionObserver(SelectionObserver selectionObserver) {
         this.selectionObserver = selectionObserver;
@@ -129,7 +132,8 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
 
         tblJournal.setDefaultRenderer(Double.class, new TableCellRender());
         tblJournal.setDefaultRenderer(Object.class, new TableCellRender());
-
+        sorter = new TableRowSorter<>(tblJournal.getModel());
+        tblJournal.setRowSorter(sorter);
         journalTablModel.addEmptyRow();
         tblJournal.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                 .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
@@ -385,7 +389,7 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
         });
 
         btnPrint.setFont(Global.textFont);
-        btnPrint.setText("Save");
+        btnPrint.setText("Print");
         btnPrint.setName("btnSave"); // NOI18N
         btnPrint.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -414,9 +418,9 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
                 .addComponent(jLabel7)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(txtCurrency, javax.swing.GroupLayout.DEFAULT_SIZE, 138, Short.MAX_VALUE)
-                .addGap(18, 18, 18)
+                .addGap(30, 30, 30)
                 .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnPrint, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );

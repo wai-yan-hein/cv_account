@@ -87,7 +87,7 @@ public class JournalEntryTableModel extends AbstractTableModel {
                 case 2://Cus Id
                     return gv.getTraderName();
                 case 3://accc
-                    return gv.getAccName();
+                    return gv.getSrcAccName();
 
                 case 4://dr
                     return gv.getDrAmt();
@@ -131,7 +131,7 @@ public class JournalEntryTableModel extends AbstractTableModel {
                         gv.setTraderName(trader.getTraderName());
                         if (trader.getAccount() != null) {
                             gv.setSourceAcId(trader.getAccount().getCode());
-                            gv.setAccName(trader.getAccount().getCoaNameEng());
+                            gv.setSrcAccName(trader.getAccount().getCoaNameEng());
                             parent.setColumnSelectionInterval(3, 3);
                         } else {
                             parent.setColumnSelectionInterval(2, 3);
@@ -155,25 +155,25 @@ public class JournalEntryTableModel extends AbstractTableModel {
             case 4:
                 if (value != null) {
                     gv.setDrAmt(Util1.getDouble(value));
-                    save(row);
+                    if (gv.getCrAmt() != null) {
+                        gv.setCrAmt(Double.NaN);
+                        parent.setColumnSelectionInterval(3, 3);
+                        parent.setRowSelectionInterval(row + 1, row + 1);
+                    }
                 }
                 break;
             case 5:
                 if (value != null) {
                     gv.setCrAmt(Util1.getDouble(value));
-                    save(row);
+                    if (gv.getDrAmt() != null) {
+                        gv.setDrAmt(Double.NaN);
+                    }
                 }
                 break;
         }
-        parent.requestFocusInWindow();
-    }
-
-    private void save(int row) {
-        addRow();
-        parent.setRowSelectionInterval(row + 1, row + 1);
-        parent.setColumnSelectionInterval(0, 0);
+        addEmptyRow();
         calTotalAmt();
-        // Save object ? List ?
+        parent.requestFocusInWindow();
     }
 
     public VGl getVGl(int row) {
@@ -250,7 +250,7 @@ public class JournalEntryTableModel extends AbstractTableModel {
             status = true;
         } else {
             VGl vgl = listGV.get(listGV.size() - 1);
-            if (vgl.getGlId() == null) {
+            if (vgl.getSourceAcId() == null) {
                 status = false;
             }
         }

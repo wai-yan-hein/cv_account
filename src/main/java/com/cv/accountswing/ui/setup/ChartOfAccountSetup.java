@@ -9,8 +9,11 @@ import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.entity.ChartOfAccount;
 import com.cv.accountswing.entity.Menu;
+import com.cv.accountswing.entity.Privilege;
+import com.cv.accountswing.entity.PrivilegeKey;
 import com.cv.accountswing.service.COAService;
 import com.cv.accountswing.service.MenuService;
+import com.cv.accountswing.service.PrivilegeService;
 import com.cv.accountswing.util.BindingUtil;
 import com.cv.accountswing.util.Util1;
 import java.awt.event.ActionListener;
@@ -59,6 +62,8 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements MouseList
     private TaskExecutor taskExecutor;
     @Autowired
     private MenuService menuService;
+    @Autowired
+    private PrivilegeService privilegeService;
     JPopupMenu popupmenu;
     private LoadingObserver loadingObserver;
     private HashMap<String, Menu> hmMenu = new HashMap<>();
@@ -269,7 +274,6 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements MouseList
     }
 
     private void saveMenu() {
-        LOGGER.info("Save Menu Method Start...");
         try {
             if (cboMenu.getSelectedItem() != null) {
                 if (cboMenu.getSelectedItem() instanceof Menu) {
@@ -280,7 +284,15 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements MouseList
                     menu.setMenuClass(selectMenu.getMenuClass());
                     menu.setParent(selectMenu.getId().toString());
                     menu.setSoureAccCode(coa.getCode());
-                    menuService.saveMenu(menu);
+                    Menu saveMenu = menuService.saveMenu(menu);
+                    if (saveMenu != null) {
+                        Integer menuId = saveMenu.getId();
+                        Privilege p = new Privilege();
+                        PrivilegeKey key = new PrivilegeKey(Global.roleId, menuId);
+                        p.setKey(key);
+                        p.setIsAllow(Boolean.FALSE);
+                        privilegeService.save(p);
+                    }
                 }
             }
         } catch (Exception e) {

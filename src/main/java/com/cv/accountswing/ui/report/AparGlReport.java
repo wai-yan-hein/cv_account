@@ -18,11 +18,8 @@ import com.cv.accountswing.entity.view.VGl;
 import com.cv.accountswing.entity.view.VTriBalance;
 import com.cv.accountswing.service.COAOpeningDService;
 import com.cv.accountswing.service.CompanyInfoService;
-import com.cv.accountswing.service.CurrencyService;
-import com.cv.accountswing.service.DepartmentService;
 import com.cv.accountswing.service.ReportService;
 import com.cv.accountswing.service.SystemPropertyService;
-import com.cv.accountswing.service.TraderService;
 import com.cv.accountswing.service.VAParService;
 import com.cv.accountswing.service.VGlService;
 import com.cv.accountswing.service.VTriBalanceService;
@@ -45,6 +42,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
@@ -87,6 +86,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
     private TrialBalanceDetailDialog trialBalanceDetailDialog;
     @Autowired
     private ApplicationMainFrame mainFrame;
+    private TableRowSorter<TableModel> sorter;
     private boolean isShown = false;
     private LoadingObserver loadingObserver;
     private JPopupMenu popup;
@@ -157,6 +157,8 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         tblAPAR.getColumnModel().getColumn(5).setPreferredWidth(50);
         tblAPAR.setDefaultRenderer(Double.class, new TableCellRender());
         tblAPAR.setDefaultRenderer(Object.class, new TableCellRender());
+        sorter = new TableRowSorter<>(tblAPAR.getModel());
+        tblAPAR.setRowSorter(sorter);
 
         tblAPAR.addMouseListener(new MouseAdapter() {
             @Override
