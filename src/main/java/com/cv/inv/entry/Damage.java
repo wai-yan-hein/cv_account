@@ -227,6 +227,19 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
         genVouNo();
     }
 
+    private void deleteDamage() {
+        int yes_no = JOptionPane.showConfirmDialog(Global.parentForm,
+                "Are you sure to delete?", "Damage item delete", JOptionPane.YES_NO_OPTION);
+        if (yes_no == 0) {
+            String vouNo = txtVouNo.getText();
+            if (lblStatus.getText().equals("EDIT")) {
+                dhService.delete(vouNo);
+                clear();
+            }
+        }
+
+    }
+
     private void actionMapping() {
         //F8 event on tblSale
         tblDamage.getInputMap().put(KeyStroke.getKeyStroke("F8"), "F8-Action");
@@ -272,7 +285,7 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
             txtRemark.setText(dmgHis.getRemark());
             txtDate.setDate(dmgHis.getDmgDate());
 //            txtLocation.setText(rohh2.getLocation().toString());
-//            txtTotalAmount.setText(rohh2.getTotalAmount().toString());
+            txtTotalAmount.setText(dmgHis.getTotalAmount().toString());
             damageTableModel.setListDetail(listDetailHis);
         }
     }
@@ -487,7 +500,16 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
 
     @Override
     public void selected(Object source, Object selectObj) {
+        if (source != null) {
+            switch (source.toString()) {
 
+                case "STM-TOTAL":
+                    Double grossTotal = damageTableModel.getTotal();
+                    txtTotalAmount.setText(grossTotal.toString());
+                    break;
+
+            }
+        }
     }
 
     @Override
@@ -566,7 +588,7 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
 
     @Override
     public void delete() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        deleteDamage();
     }
 
     @Override
