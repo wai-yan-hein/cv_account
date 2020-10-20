@@ -153,8 +153,8 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
     }
 
     private void initCombo() {
-        LocationAutoCompleter locAutoCompleter = new LocationAutoCompleter(txtLocation, Global.listLocation, null);
-        locAutoCompleter.setSelectionObserver(this);
+        locCompleter = new LocationAutoCompleter(txtLocation, Global.listLocation, null);
+        locCompleter.setSelectionObserver(this);
     }
 
     private void addNewRow() {
@@ -205,7 +205,7 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
             rohh2.setUpdatedDate(Util1.getTodayDate());
         }
         rohh2.setDmgVouId(txtVouNo.getText());
-//        rohh2.setLocation(locCompleter.getLocation());
+        rohh2.setLocation(locCompleter.getLocation());
         rohh2.setDeleted(Util1.getNullTo(rohh2.isDeleted()));
         rohh2.setTotalAmount(Util1.getDouble(txtTotalAmount.getText()));
 
@@ -284,7 +284,7 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
             txtVouNo.setText(dmgHis.getDmgVouId());
             txtRemark.setText(dmgHis.getRemark());
             txtDate.setDate(dmgHis.getDmgDate());
-//            txtLocation.setText(rohh2.getLocation().toString());
+            locCompleter.setLocation(dmgHis.getLocation());
             txtTotalAmount.setText(dmgHis.getTotalAmount().toString());
             damageTableModel.setListDetail(listDetailHis);
         }
