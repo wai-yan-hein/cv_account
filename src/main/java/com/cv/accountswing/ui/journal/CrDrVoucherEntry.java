@@ -108,6 +108,7 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
     private COAAutoCompleter cOAAutoCompleter;
     private DepartmentAutoCompleter departmentAutoCompleter;
     private CurrencyAutoCompleter currencyAutoCompleter;
+    private boolean isShown = false;
 
     public void setVoucherId(String voucherId) {
         this.voucherId = voucherId;
@@ -659,7 +660,9 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
         mainFrame.setControl(this);
-        initMain();
+        if (!isShown) {
+            initMain();
+        }
     }//GEN-LAST:event_formComponentShown
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed

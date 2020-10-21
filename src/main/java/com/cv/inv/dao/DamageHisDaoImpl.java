@@ -37,7 +37,7 @@ public class DamageHisDaoImpl extends AbstractDao<String, DamageHis> implements 
     }
 
     @Override
-    public List<DamageHis> search(String from, String to, String location, String session, String remark, String vouNo) {
+    public List<DamageHis> search(String from, String to, String location, String remark, String vouNo) {
         String strFilter = "";
 
         if (!from.equals("-") && !to.equals("-")) {
@@ -67,14 +67,6 @@ public class DamageHisDaoImpl extends AbstractDao<String, DamageHis> implements 
                 strFilter = "v.location = " + location;
             } else {
                 strFilter = strFilter + " and v.location = " + location;
-            }
-        }
-
-        if (!session.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "v.session = " + session;
-            } else {
-                strFilter = strFilter + " and v.session = " + session;
             }
         }
 

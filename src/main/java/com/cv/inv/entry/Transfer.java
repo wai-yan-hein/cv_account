@@ -35,6 +35,7 @@ public class Transfer extends javax.swing.JPanel implements SelectionObserver, K
      */
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(Issue.class);
     private LoadingObserver loadingObserver;
+    private boolean isShown = false;
 
     public void setLoadingObserver(LoadingObserver loadingObserver) {
         this.loadingObserver = loadingObserver;
@@ -312,7 +313,9 @@ public class Transfer extends javax.swing.JPanel implements SelectionObserver, K
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         mainFrame.setControl(this);
-        initMain();
+        if (!isShown) {
+            initMain();
+        }
         txtVouNo.requestFocus();
     }//GEN-LAST:event_formComponentShown
 

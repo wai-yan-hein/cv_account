@@ -81,6 +81,7 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
     private ApplicationMainFrame mainFrame;
 
     private LoadingObserver loadingObserver;
+    private boolean isShown = false;
 
     private String stDate;
     private String enDate;
@@ -362,7 +363,9 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
         mainFrame.setControl(this);
-        initMain();
+        if (!isShown) {
+            initMain();
+        }
     }//GEN-LAST:event_formComponentShown
 
     private void btnNewEntryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewEntryActionPerformed

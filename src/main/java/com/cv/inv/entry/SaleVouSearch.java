@@ -468,7 +468,7 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
                 break;
             case "txtCus":
                 if (e.getKeyCode() == KeyEvent.VK_UP) {
-                   txtToDate.getDateEditor().getUiComponent().requestFocusInWindow();
+                    txtToDate.getDateEditor().getUiComponent().requestFocusInWindow();
                 }
                 if (e.getKeyCode() == KeyEvent.VK_DOWN || e.getKeyCode() == KeyEvent.VK_ENTER) {
                     txtVouNo.requestFocus();

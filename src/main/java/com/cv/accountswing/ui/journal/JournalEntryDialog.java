@@ -69,6 +69,7 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
     private TableRowSorter<TableModel> sorter;
     private String glVouId = null;
     private CurrencyAutoCompleter autoCompleter;
+    private boolean isShown = false;
 
     public void setGlVouId(String glVouId) {
         this.glVouId = glVouId;
@@ -541,7 +542,9 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
-        initMain();
+        if (!isShown) {
+            initMain();
+        }
     }//GEN-LAST:event_formComponentShown
 
     private void txtFCrdAmtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtFCrdAmtActionPerformed

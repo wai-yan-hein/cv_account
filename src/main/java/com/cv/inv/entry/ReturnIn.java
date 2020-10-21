@@ -75,7 +75,7 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
     private CurrencyAutoCompleter currencyAutoCompleter;
     private Gl gl = new Gl();
     private GenVouNoImpl vouEngine = null;
-
+    private boolean isShown = false;
     private Long glId;
 
     public void setLoadingObserver(LoadingObserver loadingObserver) {
@@ -527,7 +527,9 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         mainFrame.setControl(this);
-        initMain();
+        if (!isShown) {
+            initMain();
+        }
         txtVouNo.requestFocus();
     }//GEN-LAST:event_formComponentShown
 

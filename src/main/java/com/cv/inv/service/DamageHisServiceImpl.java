@@ -55,8 +55,8 @@ public class DamageHisServiceImpl implements DamageHisService {
     }
 
     @Override
-    public List<DamageHis> search(String from, String to, String location, String session, String remark, String vouNo) {
-        return dao.search(from, to, location, session, remark, vouNo);
+    public List<DamageHis> search(String from, String to, String location, String remark, String vouNo) {
+        return dao.search(from, to, location, remark, vouNo);
     }
 
     @Override

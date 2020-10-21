@@ -77,6 +77,7 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
     private GenVouNoImpl vouEngine = null;
     private Long glId;
     private Gl gl = new Gl();
+    private boolean isShown = false;
     @Autowired
     private ReturnOutTableModel retOutTableModel;
 
@@ -569,7 +570,9 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         mainFrame.setControl(this);
-        initMain();
+        if (!isShown) {
+            initMain();
+        }
         txtVouNo.requestFocus();
     }//GEN-LAST:event_formComponentShown
 
