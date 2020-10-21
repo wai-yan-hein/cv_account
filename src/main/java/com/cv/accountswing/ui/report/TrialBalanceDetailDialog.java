@@ -39,15 +39,8 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Pan
     private DrAmtTableModel drAmtTableModel;
     @Autowired
     private TaskExecutor taskExecutor;
-<<<<<<< HEAD
     @Autowired
     private ApplicationMainFrame mainFrame;
-=======
-
-    @Autowired
-    private ApplicationMainFrame mainFrame;
-
->>>>>>> 5ee782c70ede17c97156e01c319a23078ae9f40c
     private TableRowSorter<TableModel> sorter;
     private String desp;
     private Double netChange;
