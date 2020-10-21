@@ -6,7 +6,7 @@
 package com.cv.accountswing.ui.journal;
 
 import com.cv.accountswing.common.Global;
-import com.cv.accountswing.common.SelectionObserver;
+import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.entity.CompanyInfo;
 import com.cv.accountswing.entity.Gl;
 import com.cv.accountswing.entity.SystemProperty;
@@ -22,6 +22,7 @@ import com.cv.accountswing.service.SeqTableService;
 import com.cv.accountswing.service.SystemPropertyService;
 import com.cv.accountswing.service.TraderService;
 import com.cv.accountswing.service.VGlService;
+import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.editor.COAAutoCompleter;
 import com.cv.accountswing.ui.editor.COACellEditor;
@@ -66,7 +67,7 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener {
+public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener, PanelControl {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CrDrVoucherEntry.class);
     Gson gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
@@ -95,6 +96,8 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
     private CompanyInfoService ciService;
     @Autowired
     private TaskExecutor taskExecutor;
+    @Autowired
+    private ApplicationMainFrame mainFrame;
     private JPopupMenu popupMenu;
     private String voucherType;
     private String depCode = "-";
@@ -225,7 +228,7 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
         popupMenu = new JPopupMenu("Edit");
         JMenuItem closeAll = new JMenuItem("Print");
         closeAll.addActionListener((ActionEvent e) -> {
-            print();
+            printCrDrVOu();
         });
         popupMenu.add(closeAll);
         initMouseLisener();
@@ -243,7 +246,7 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
         });
     }
 
-    private void print() {
+    private void printCrDrVOu() {
         taskExecutor.execute(() -> {
             try {
                 String vouNo = txtVouNo.getText();
@@ -655,14 +658,15 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
+        mainFrame.setControl(this);
         initMain();
     }//GEN-LAST:event_formComponentShown
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         // TODO add your handling code here:
-        try{
-        saveCreditVoucher();}
-         catch (Exception e) {
+        try {
+            saveCreditVoucher();
+        } catch (Exception e) {
             LOGGER.error("Save CrDrVoucher :" + e.getMessage());
             JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Save CrDrVoucher", JOptionPane.ERROR_MESSAGE);
         }
@@ -868,5 +872,28 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
                 tblCredit.setRowSelectionInterval(0, 0);
             }
         }
+    }
+
+    @Override
+    public void save() {
+        saveCreditVoucher();
+    }
+
+    @Override
+    public void delete() {
+    }
+
+    @Override
+    public void newForm() {
+        clear();
+    }
+
+    @Override
+    public void history() {
+    }
+
+    @Override
+    public void print() {
+        printCrDrVOu();
     }
 }

@@ -7,6 +7,8 @@ package com.cv.inv.entry;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
+import com.cv.accountswing.common.PanelControl;
+import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.toedter.calendar.JTextFieldDateEditor;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -15,6 +17,7 @@ import javax.swing.JTextField;
 import javax.swing.text.JTextComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -22,10 +25,12 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-public class StockReceiving extends javax.swing.JPanel implements KeyListener {
+public class StockReceiving extends javax.swing.JPanel implements KeyListener, PanelControl {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StockReceiving.class);
     private LoadingObserver loadingObserver;
+    @Autowired
+    private ApplicationMainFrame mainFrame;
 
     public void setLoadingObserver(LoadingObserver loadingObserver) {
         this.loadingObserver = loadingObserver;
@@ -71,6 +76,12 @@ public class StockReceiving extends javax.swing.JPanel implements KeyListener {
         btnOut = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblSR = new javax.swing.JTable();
+
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentShown(java.awt.event.ComponentEvent evt) {
+                formComponentShown(evt);
+            }
+        });
 
         jLabel1.setFont(Global.lableFont);
         jLabel1.setText("ID");
@@ -185,6 +196,10 @@ public class StockReceiving extends javax.swing.JPanel implements KeyListener {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
+        mainFrame.setControl(this);        // TODO add your handling code here:
+    }//GEN-LAST:event_formComponentShown
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnOut;
@@ -295,5 +310,25 @@ public class StockReceiving extends javax.swing.JPanel implements KeyListener {
                 }
                 break;
         }
+    }
+
+    @Override
+    public void save() {
+    }
+
+    @Override
+    public void delete() {
+    }
+
+    @Override
+    public void newForm() {
+    }
+
+    @Override
+    public void history() {
+    }
+
+    @Override
+    public void print() {
     }
 }

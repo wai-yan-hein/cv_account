@@ -7,6 +7,7 @@ package com.cv.accountswing.ui.setup;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
+import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.StartWithRowFilter;
 import com.cv.accountswing.entity.ChartOfAccount;
 import com.cv.accountswing.entity.Customer;
@@ -17,6 +18,7 @@ import com.cv.accountswing.service.CustomerService;
 import com.cv.accountswing.service.RegionService;
 import com.cv.accountswing.service.SystemPropertyService;
 import com.cv.accountswing.service.TraderTypeService;
+import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.setup.common.CustomerTabelModel;
 import com.cv.accountswing.util.BindingUtil;
@@ -46,7 +48,7 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-public class CustomerSetup extends javax.swing.JPanel implements KeyListener {
+public class CustomerSetup extends javax.swing.JPanel implements KeyListener, PanelControl {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CustomerSetup.class);
     private int selectRow = -1;
@@ -67,6 +69,8 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener {
     private RegionService regionService;
     @Autowired
     private TaskExecutor taskExecutor;
+    @Autowired
+    private ApplicationMainFrame mainFrame;
     private LoadingObserver loadingObserver;
     private boolean isShown = false;
 
@@ -546,6 +550,7 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener {
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
+        mainFrame.setControl(this);
         if (!isShown) {
             initMain();
         }
@@ -845,6 +850,28 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener {
                 tblCustomer.setRowSelectionInterval(0, 0);
             }
         }
+    }
+
+    @Override
+    public void save() {
+        saveCustomer();
+    }
+
+    @Override
+    public void delete() {
+    }
+
+    @Override
+    public void newForm() {
+        clear();
+    }
+
+    @Override
+    public void history() {
+    }
+
+    @Override
+    public void print() {
     }
 
 }

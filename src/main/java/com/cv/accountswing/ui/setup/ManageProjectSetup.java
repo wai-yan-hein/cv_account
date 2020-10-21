@@ -7,6 +7,7 @@ package com.cv.accountswing.ui.setup;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
+import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.entity.Department;
 import com.cv.accountswing.entity.Project;
 import com.cv.accountswing.entity.view.VProjectCOAMapping;
@@ -19,6 +20,7 @@ import com.cv.accountswing.service.ProjectTraderMappingService;
 import com.cv.accountswing.service.ProjectUserMappingService;
 import com.cv.accountswing.service.TraderService;
 import com.cv.accountswing.service.UserService;
+import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.editor.AppUserCellEditor;
 import com.cv.accountswing.ui.editor.COACellEditor;
@@ -53,7 +55,7 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-public class ManageProjectSetup extends javax.swing.JPanel implements KeyListener {
+public class ManageProjectSetup extends javax.swing.JPanel implements KeyListener, PanelControl {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ManageProjectSetup.class);
 
@@ -81,6 +83,8 @@ public class ManageProjectSetup extends javax.swing.JPanel implements KeyListene
     private ProjectUserTableModel projectUserTableModel;
     @Autowired
     private ProjectTraderTableModel projectTraderTableModel;
+    @Autowired
+    private ApplicationMainFrame mainFrame;
 
     private LoadingObserver loadingObserver;
     private boolean isShown = false;
@@ -858,6 +862,7 @@ public class ManageProjectSetup extends javax.swing.JPanel implements KeyListene
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
+        mainFrame.setControl(this);
         if (!isShown) {
             initMain();
         }
@@ -894,5 +899,27 @@ public class ManageProjectSetup extends javax.swing.JPanel implements KeyListene
     private javax.swing.JTextField txtProjectName;
     private javax.swing.JTextField txtStDate;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void save() {
+        saveProject();
+    }
+
+    @Override
+    public void delete() {
+    }
+
+    @Override
+    public void newForm() {
+        clearProject();
+    }
+
+    @Override
+    public void history() {
+    }
+
+    @Override
+    public void print() {
+    }
 
 }

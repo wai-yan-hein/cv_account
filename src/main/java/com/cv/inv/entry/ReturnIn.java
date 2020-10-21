@@ -7,6 +7,7 @@ package com.cv.inv.entry;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
+import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.Gl;
 import com.cv.accountswing.entity.Currency;
@@ -15,6 +16,7 @@ import com.cv.accountswing.entity.Trader;
 import com.cv.accountswing.service.CurrencyService;
 import com.cv.accountswing.service.GlService;
 import com.cv.accountswing.service.TraderService;
+import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.inv.service.RetInService;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.editor.CurrencyAutoCompleter;
@@ -60,7 +62,7 @@ import org.springframework.stereotype.Component;
  * @author Mg Kyaw Thura Aung
  */
 @Component
-public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, KeyListener {
+public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, KeyListener, PanelControl {
 
     /**
      * Creates new form ReturnIn
@@ -100,6 +102,8 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
     private RetInVouSearch retInVouSearch;
     @Autowired
     private TraderService traderService;
+    @Autowired
+    private ApplicationMainFrame mainFrame;
 
     public ReturnIn() {
         initComponents();
@@ -522,6 +526,7 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
     }//GEN-LAST:event_butGetSaleItemActionPerformed
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
+        mainFrame.setControl(this);
         initMain();
         txtVouNo.requestFocus();
     }//GEN-LAST:event_formComponentShown
@@ -824,11 +829,12 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
         deleteRetInDetail();
     }
 
+    @Override
     public void newForm() {
         clear();
     }
 
-    public void save() {
+    public void saveReturnIn() {
         if (isValidEntry()) {
             try {
                 retInService.save(gl, listDetail);
@@ -844,8 +850,8 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
 
     }
 
-    public void delete() {
-        
+    public void deleteReturnIn() {
+
         if (Util1.getNullTo(gl.getDeleted())) {
             JOptionPane.showConfirmDialog(Global.parentForm, "Voucher already deleted.",
                     "Return In voucher delete", JOptionPane.ERROR);
@@ -855,13 +861,13 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
 
             if (yes_no == 0) {
                 gl.setDeleted(true);
-                save();
+                saveReturnIn();
             }
         }
 
     }
 
-    public void history() {
+    public void historyReturnIn() {
         retInVouSearch.setPanelName(this.getName());
         retInVouSearch.initMain();
         retInVouSearch.setTitle("Return In Voucher Search");
@@ -993,6 +999,25 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
             }
 
         }
+    }
+
+    @Override
+    public void print() {
+    }
+
+    @Override
+    public void save() {
+        saveReturnIn();
+    }
+
+    @Override
+    public void delete() {
+        deleteReturnIn();
+    }
+
+    @Override
+    public void history() {
+        historyReturnIn();
     }
 
 }

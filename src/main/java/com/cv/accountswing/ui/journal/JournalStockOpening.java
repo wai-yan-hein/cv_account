@@ -7,6 +7,7 @@ package com.cv.accountswing.ui.journal;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
+import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.ChartOfAccount;
 import com.cv.accountswing.entity.Currency;
@@ -21,6 +22,7 @@ import com.cv.accountswing.service.CurrencyService;
 import com.cv.accountswing.service.DepartmentService;
 import com.cv.accountswing.service.StockOpValueService;
 import com.cv.accountswing.service.SystemPropertyService;
+import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.editor.CurrencyAutoCompleter;
 import com.cv.accountswing.ui.editor.DateAutoCompleter;
@@ -52,7 +54,7 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-public class JournalStockOpening extends javax.swing.JPanel implements SelectionObserver, KeyListener {
+public class JournalStockOpening extends javax.swing.JPanel implements SelectionObserver, KeyListener, PanelControl {
 
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(ChartOfAccountSetup.class);
     private Gson gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
@@ -75,6 +77,8 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
     private DepartmentService deptService;
     @Autowired
     private COAService coaService;
+    @Autowired
+    private ApplicationMainFrame mainFrame;
 
     private LoadingObserver loadingObserver;
 
@@ -357,6 +361,7 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
+        mainFrame.setControl(this);
         initMain();
     }//GEN-LAST:event_formComponentShown
 
@@ -477,5 +482,25 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
                 tblOpening.setRowSelectionInterval(0, 0);
             }
         }
+    }
+
+    @Override
+    public void save() {
+    }
+
+    @Override
+    public void delete() {
+    }
+
+    @Override
+    public void newForm() {
+    }
+
+    @Override
+    public void history() {
+    }
+
+    @Override
+    public void print() {
     }
 }

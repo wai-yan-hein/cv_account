@@ -73,6 +73,7 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
     private DamageSearchDialog dmgSearchDialog;
     @Autowired
     private ApplicationMainFrame mainFrame;
+    private boolean isShown = false;
 
     public Damage() {
         initComponents();
@@ -88,6 +89,7 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
         setTodayDate();
         //   assignDefalutValue();
         genVouNo();
+        isShown = true;
     }
 
     public void setSelectionObserver(SelectionObserver selectionObserver) {
@@ -172,10 +174,11 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
         boolean status = false;
         if (isValidEntry() && damageTableModel.isValidEntry()) {
             List<DamageDetailHis> listDmgDetail = damageTableModel.getDetail();
+            List<String> delList = damageTableModel.getDelList();
 
             try {
                 String vouStatus = lblStatus.getText();
-                dhService.save(rohh2, listDmgDetail, vouStatus);
+                dhService.save(rohh2, listDmgDetail, vouStatus, delList);
                 vouEngine.updateVouNo();
                 genVouNo();
                 status = true;
@@ -205,9 +208,16 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
             rohh2.setUpdatedDate(Util1.getTodayDate());
         }
         rohh2.setDmgVouId(txtVouNo.getText());
-        rohh2.setLocation(locCompleter.getLocation());
+
         rohh2.setDeleted(Util1.getNullTo(rohh2.isDeleted()));
         rohh2.setTotalAmount(Util1.getDouble(txtTotalAmount.getText()));
+        if (locCompleter.getLocation() != null) {
+            rohh2.setLocation(locCompleter.getLocation());
+        } else {
+            JOptionPane.showMessageDialog(Global.parentForm, "Location cannot be null.",
+                    "Invalid.", JOptionPane.ERROR_MESSAGE);
+            status = false;
+        }
 
         return status;
     }
@@ -222,9 +232,13 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
         txtRemark.setText(null);
         txtTotalAmount.setText("0.0");
         damageTableModel.clearData();
+//        locCompleter = new LocationAutoCompleter(txtLocation, Global.listLocation, null);
+//        locCompleter.setSelectionObserver(this);
+        //   locCompleter.setLocation(null);
         //retOutTableModel.setLocation((LocationH2) cboLocation.getSelectedItem());
         rohh2 = new DamageHis();
         genVouNo();
+        isShown = false;
     }
 
     private void deleteDamage() {
@@ -242,8 +256,8 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
 
     private void actionMapping() {
         //F8 event on tblSale
-        tblDamage.getInputMap().put(KeyStroke.getKeyStroke("F8"), "F8-Action");
-        tblDamage.getActionMap().put("F8-Action", actionItemDelete);
+        tblDamage.getInputMap().put(KeyStroke.getKeyStroke("F6"), "F6-Action");
+        tblDamage.getActionMap().put("F6-Action", actionItemDelete);
 
         //Enter event on tblSale
         tblDamage.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "ENTER-Action");
@@ -474,7 +488,9 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         mainFrame.setControl(this);
-        initMain();
+        if (!isShown) {
+            initMain();
+        }
         txtVouNo.requestFocus();
     }//GEN-LAST:event_formComponentShown
 
@@ -598,12 +614,12 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
 
     @Override
     public void history() {
+        dmgSearchDialog.setSize(Global.width - 200, Global.height - 200);
         dmgSearchDialog.setLocationRelativeTo(null);
         dmgSearchDialog.setVisible(true);
     }
 
     @Override
     public void print() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

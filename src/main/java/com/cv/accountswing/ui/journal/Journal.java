@@ -7,9 +7,11 @@ package com.cv.accountswing.ui.journal;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
+import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.view.VGeneralVoucher;
 import com.cv.accountswing.service.VGvService;
+import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.journal.common.JournalTableModel;
 import com.cv.accountswing.util.Util1;
@@ -34,7 +36,7 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-public class Journal extends javax.swing.JPanel implements KeyListener, SelectionObserver {
+public class Journal extends javax.swing.JPanel implements KeyListener, SelectionObserver, PanelControl {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Journal.class);
     private int selectRow = -1;
@@ -46,6 +48,8 @@ public class Journal extends javax.swing.JPanel implements KeyListener, Selectio
     private JournalEntryDialog journalEntryDialog;
     @Autowired
     private TaskExecutor taskExecutor;
+    @Autowired
+    private ApplicationMainFrame mainFrame;
     private LoadingObserver loadingObserver;
     private boolean isShown = false;
 
@@ -339,6 +343,7 @@ public class Journal extends javax.swing.JPanel implements KeyListener, Selectio
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
+        mainFrame.setControl(this);
         if (!isShown) {
             initMain();
         }
@@ -462,6 +467,27 @@ public class Journal extends javax.swing.JPanel implements KeyListener, Selectio
         if (source.toString().equals("SEARCHVOUCHER")) {
             searchGV();
         }
+    }
+
+    @Override
+    public void save() {
+    }
+
+    @Override
+    public void delete() {
+    }
+
+    @Override
+    public void newForm() {
+        clear();
+    }
+
+    @Override
+    public void history() {
+    }
+
+    @Override
+    public void print() {
     }
 
 }

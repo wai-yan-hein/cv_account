@@ -15,6 +15,7 @@ import com.cv.accountswing.service.CurrencyService;
 import com.cv.accountswing.service.GlService;
 import com.cv.accountswing.service.SeqTableService;
 import com.cv.accountswing.service.VGlService;
+import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.editor.COACellEditor;
@@ -61,6 +62,8 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
     private GlService glService;
     @Autowired
     private VGlService vGlService;
+    @Autowired
+    private ApplicationMainFrame mainFrame;
     private SelectionObserver selectionObserver;
 
     public void setSelectionObserver(SelectionObserver selectionObserver) {

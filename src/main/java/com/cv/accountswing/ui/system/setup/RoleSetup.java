@@ -6,11 +6,13 @@
 package com.cv.accountswing.ui.system.setup;
 
 import com.cv.accountswing.common.Global;
+import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.entity.UserRole;
 import com.cv.accountswing.entity.view.VRoleMenu;
 import com.cv.accountswing.service.MenuService;
 import com.cv.accountswing.service.PrivilegeService;
 import com.cv.accountswing.service.UserRoleService;
+import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.system.setup.common.UserRoleTableModel;
@@ -36,7 +38,7 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-public class RoleSetup extends javax.swing.JPanel implements KeyListener {
+public class RoleSetup extends javax.swing.JPanel implements KeyListener, PanelControl {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RoleSetup.class);
 
@@ -50,6 +52,8 @@ public class RoleSetup extends javax.swing.JPanel implements KeyListener {
     private PrivilegeService privilegeService;
     @Autowired
     private TaskExecutor taskExecutor;
+    @Autowired
+    private ApplicationMainFrame mainFrame;
 
     private int selectRow = -1;
     private boolean isShown = false;
@@ -217,6 +221,7 @@ public class RoleSetup extends javax.swing.JPanel implements KeyListener {
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
+        mainFrame.setControl(this);
         if (!isShown) {
             initMain();
         }
@@ -258,5 +263,25 @@ public class RoleSetup extends javax.swing.JPanel implements KeyListener {
                 }
                 break;
         }
+    }
+
+    @Override
+    public void save() {
+    }
+
+    @Override
+    public void delete() {
+    }
+
+    @Override
+    public void newForm() {
+    }
+
+    @Override
+    public void history() {
+    }
+
+    @Override
+    public void print() {
     }
 }

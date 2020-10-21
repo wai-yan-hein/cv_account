@@ -7,8 +7,10 @@ package com.cv.accountswing.ui.setup;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
+import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.entity.Region;
 import com.cv.accountswing.service.RegionService;
+import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.util.Util1;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -39,7 +41,8 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-public class RegionSetup extends javax.swing.JPanel implements TreeSelectionListener, MouseListener, KeyListener {
+public class RegionSetup extends javax.swing.JPanel implements TreeSelectionListener, MouseListener, KeyListener,
+        PanelControl {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RegionSetup.class);
     DefaultMutableTreeNode root;
@@ -50,6 +53,8 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
     private final String parentRootName = "Region";
     @Autowired
     private TaskExecutor taskExecutor;
+    @Autowired
+    private ApplicationMainFrame mainFrame;
     private LoadingObserver loadingObserver;
     private boolean isShown = false;
 
@@ -399,6 +404,7 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
+        mainFrame.setControl(this);
         if (!isShown) {
             initMain();
         }
@@ -558,5 +564,27 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
         btnSaveR.setEnabled(status);
         btnClearR.setEnabled(status);
 
+    }
+
+    @Override
+    public void save() {
+        saveRegion();
+    }
+
+    @Override
+    public void delete() {
+    }
+
+    @Override
+    public void newForm() {
+        clear();
+    }
+
+    @Override
+    public void history() {
+    }
+
+    @Override
+    public void print() {
     }
 }

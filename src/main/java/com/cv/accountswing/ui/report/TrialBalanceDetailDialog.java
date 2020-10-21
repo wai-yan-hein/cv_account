@@ -6,7 +6,9 @@
 package com.cv.accountswing.ui.report;
 
 import com.cv.accountswing.common.Global;
+import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.entity.view.VGl;
+import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.report.common.CrAmtTableModel;
 import com.cv.accountswing.ui.report.common.DrAmtTableModel;
@@ -25,7 +27,7 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-public class TrialBalanceDetailDialog extends javax.swing.JDialog {
+public class TrialBalanceDetailDialog extends javax.swing.JDialog implements PanelControl {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TrialBalanceDetailDialog.class);
 
@@ -35,6 +37,8 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog {
     private DrAmtTableModel drAmtTableModel;
     @Autowired
     private TaskExecutor taskExecutor;
+    @Autowired
+    private ApplicationMainFrame mainFrame;
 
     private String desp;
     private Double netChange;
@@ -350,12 +354,13 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog {
                     .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtFCrAmt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtOpening, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(txtClosing, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(txtOpening, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
 
@@ -364,6 +369,7 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog {
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
+        mainFrame.setControl(this);
         initMain();
     }//GEN-LAST:event_formComponentShown
 
@@ -396,4 +402,24 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog {
     private javax.swing.JTextField txtName;
     private javax.swing.JFormattedTextField txtOpening;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void save() {
+    }
+
+    @Override
+    public void delete() {
+    }
+
+    @Override
+    public void newForm() {
+    }
+
+    @Override
+    public void history() {
+    }
+
+    @Override
+    public void print() {
+    }
 }
