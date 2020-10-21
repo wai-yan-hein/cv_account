@@ -563,6 +563,9 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             @Override
             public void mouseClicked(MouseEvent e) {
                 tabbedPane.remove(panel);
+                if (control != null) {
+                    control.newForm();
+                }
 
             }
 

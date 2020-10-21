@@ -43,15 +43,10 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-<<<<<<< HEAD
 public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObserver, KeyListener, PanelControl {
 
-=======
-public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObserver, KeyListener {
-    
->>>>>>> f99da13e2a9811307e724bc8dad573eec9c24135
     private static final Logger LOGGER = LoggerFactory.getLogger(COAOpeningSetup.class);
-    
+
     @Autowired
     private COAOpeningTableModel cOAOpeningTableModel;
     @Autowired
@@ -70,11 +65,11 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
     private String endDate;
     private String curId;
     private String depCode;
-    
+
     public void setIsShown(boolean isShown) {
         this.isShown = isShown;
     }
-    
+
     public void setLoadingObserver(LoadingObserver loadingObserver) {
         this.loadingObserver = loadingObserver;
     }
@@ -85,7 +80,7 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
     public COAOpeningSetup() {
         initComponents();
     }
-    
+
     private void initMain() {
         txtDate.setDate(Util1.toDate(Global.finicialPeriodFrom));
         initKeyListener();
@@ -93,7 +88,7 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
         initTable();
         searchOpening();
     }
-    
+
     private void initCombo() {
         DepartmentAutoCompleter departmentAutoCompleter = new DepartmentAutoCompleter(txtDep, Global.listDepartment, null);
         departmentAutoCompleter.setSelectionObserver(this);
@@ -105,7 +100,7 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
         Currency currency = currencyService.findById(key);
         currencyAutoCompleter.setCurrency(currency);
     }
-    
+
     private void initTable() {
         tblOpening.setModel(cOAOpeningTableModel);
         cOAOpeningTableModel.setSelectionObserver(this);
@@ -127,9 +122,9 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
         tblOpening.setCellSelectionEnabled(true);
         tblOpening.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                 .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
-        
+
     }
-    
+
     private void searchOpening() {
         initializeParameter();
         loadingObserver.load(this.getName(), "Start");
@@ -143,7 +138,7 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
             loadingObserver.load(this.getName(), "Stop");
         });
     }
-    
+
     private void initializeParameter() {
         stDate = Util1.toDateStr(Global.finicialPeriodFrom, "yyyy-MM-dd", "dd/MM/yyyy");
         endDate = Util1.toDateStr(txtDate.getDate(), "dd/MM/yyyy");
@@ -157,7 +152,7 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
         }
         btnGen.setEnabled(false);
     }
-    
+
     private void calTotalAmt(List<VGl> listVGl) {
         double drAmt = 0.0;
         double crAmt = 0.0;
@@ -171,7 +166,7 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
             txtDisplayCur.setText(listVGl.get(0).getFromCurId());
         }
     }
-    
+
     private boolean isValidGen() {
         boolean status = true;
         if (txtDep.getText().isEmpty() || depCode == null) {
@@ -186,7 +181,7 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
         }
         return status;
     }
-    
+
     private void generate() {
         if (isValidGen()) {
             loadingObserver.load(this.getName(), "Start");
@@ -208,12 +203,12 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
                     JOptionPane.showMessageDialog(Global.parentForm, ex.getMessage(), "GENERATE OPENING", JOptionPane.ERROR_MESSAGE);
                     btnGen.setEnabled(true);
                 }
-                
+
             });
         }
-        
+
     }
-    
+
     private void initKeyListener() {
         txtDate.getDateEditor().getUiComponent().setName("txtDate");
         txtDate.getDateEditor().getUiComponent().addKeyListener(this);
@@ -221,7 +216,7 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
         txtCurrency.addKeyListener(this);
         btnGen.addKeyListener(this);
         tblOpening.addKeyListener(this);
-        
+
     }
 
     /**
@@ -490,17 +485,17 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
                 calTotalAmt(cOAOpeningTableModel.getListVGl());
                 break;
         }
-        
+
     }
-    
+
     @Override
     public void keyTyped(KeyEvent e) {
     }
-    
+
     @Override
     public void keyPressed(KeyEvent e) {
     }
-    
+
     @Override
     public void keyReleased(KeyEvent e) {
         Object sourceObj = e.getSource();
@@ -518,7 +513,7 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
             case "txtDate":
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     txtDep.requestFocus();
-                    
+
                 }
                 tabToTable(e);
                 break;
@@ -538,7 +533,7 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
                         break;
                 }
                 tabToTable(e);
-                
+
                 break;
             case "txtCurrency":
                 /*if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_RIGHT) {
@@ -548,7 +543,7 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
                     txtDep.requestFocus();
                 }
                 tabToTable(e);
-                
+
                 break;
             case "btnGen":
                 if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_RIGHT) {
@@ -565,7 +560,7 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
                 }
         }
     }
-    
+
     private void tabToTable(KeyEvent e) {
         if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_RIGHT) {
             tblOpening.requestFocus();

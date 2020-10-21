@@ -37,13 +37,9 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-<<<<<<< HEAD
+
 public class Journal extends javax.swing.JPanel implements KeyListener, SelectionObserver, PanelControl {
 
-=======
-public class Journal extends javax.swing.JPanel implements KeyListener, SelectionObserver {
-    
->>>>>>> f99da13e2a9811307e724bc8dad573eec9c24135
     private static final Logger LOGGER = LoggerFactory.getLogger(Journal.class);
     private int selectRow = -1;
     @Autowired
@@ -474,7 +470,7 @@ public class Journal extends javax.swing.JPanel implements KeyListener, Selectio
             searchGV();
         }
     }
-<<<<<<< HEAD
+
 
     @Override
     public void save() {
@@ -497,7 +493,5 @@ public class Journal extends javax.swing.JPanel implements KeyListener, Selectio
     public void print() {
     }
 
-=======
-    
->>>>>>> f99da13e2a9811307e724bc8dad573eec9c24135
+
 }

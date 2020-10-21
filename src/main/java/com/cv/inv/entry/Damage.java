@@ -124,12 +124,8 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
         tblDamage.setDefaultRenderer(Float.class, new TableCellRender());
         tblDamage.setDefaultRenderer(Double.class, new TableCellRender());
         tblDamage.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        tblDamage.getSelectionModel().addListSelectionListener(
-                new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                //     txtRecNo.setText(Integer.toString(tblDamage.getSelectedRow() + 1));
-            }
+        tblDamage.getSelectionModel().addListSelectionListener((ListSelectionEvent e) -> {
+            //     txtRecNo.setText(Integer.toString(tblDamage.getSelectedRow() + 1));
         });
     }
 
