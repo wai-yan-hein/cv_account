@@ -43,13 +43,8 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-<<<<<<< HEAD
 public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObserver, KeyListener, PanelControl {
 
-=======
-public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObserver, KeyListener {
-    
->>>>>>> f99da13e2a9811307e724bc8dad573eec9c24135
     private static final Logger LOGGER = LoggerFactory.getLogger(COAOpeningSetup.class);
     
     @Autowired

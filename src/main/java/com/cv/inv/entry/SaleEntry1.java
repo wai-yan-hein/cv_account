@@ -120,6 +120,7 @@ public class SaleEntry1 extends javax.swing.JPanel implements SelectionObserver,
     private StockUP stockUp = new StockUP();
     private GenVouNoImpl vouEngine = null;
     private SaleHis saleHis = new SaleHis();
+    private boolean isShown = false;
 
     public void setLoadingObserver(LoadingObserver loadingObserver) {
         this.loadingObserver = loadingObserver;
@@ -1062,7 +1063,9 @@ public class SaleEntry1 extends javax.swing.JPanel implements SelectionObserver,
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         mainFrame.setControl(this);
-        initMain();
+        if (!isShown) {
+            initMain();
+        }
         txtVouNo.requestFocus();
     }//GEN-LAST:event_formComponentShown
 

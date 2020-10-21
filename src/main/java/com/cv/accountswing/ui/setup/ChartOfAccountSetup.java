@@ -14,11 +14,8 @@ import com.cv.accountswing.entity.Privilege;
 import com.cv.accountswing.entity.PrivilegeKey;
 import com.cv.accountswing.service.COAService;
 import com.cv.accountswing.service.MenuService;
-<<<<<<< HEAD
 import com.cv.accountswing.ui.ApplicationMainFrame;
-=======
 import com.cv.accountswing.service.PrivilegeService;
->>>>>>> f99da13e2a9811307e724bc8dad573eec9c24135
 import com.cv.accountswing.util.BindingUtil;
 import com.cv.accountswing.util.Util1;
 import java.awt.event.ActionListener;
@@ -66,11 +63,8 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements MouseList
     @Autowired
     private MenuService menuService;
     @Autowired
-<<<<<<< HEAD
     private ApplicationMainFrame mainFrame;
-=======
     private PrivilegeService privilegeService;
->>>>>>> f99da13e2a9811307e724bc8dad573eec9c24135
     JPopupMenu popupmenu;
     private LoadingObserver loadingObserver;
     private HashMap<String, Menu> hmMenu = new HashMap<>();

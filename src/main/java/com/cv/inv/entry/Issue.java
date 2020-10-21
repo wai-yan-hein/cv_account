@@ -36,6 +36,7 @@ public class Issue extends javax.swing.JPanel implements SelectionObserver, KeyL
      */
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(Issue.class);
     private LoadingObserver loadingObserver;
+    private boolean isShown = false;
     @Autowired
     private IssueTableModel issueTableModel;
     @Autowired
@@ -262,7 +263,9 @@ public class Issue extends javax.swing.JPanel implements SelectionObserver, KeyL
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         mainFrame.setControl(this);
-        initMain();
+        if (!isShown) {
+            initMain();
+        }
         txtIssueId.requestFocus();
     }//GEN-LAST:event_formComponentShown
 

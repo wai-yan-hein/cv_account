@@ -29,6 +29,7 @@ public class StockReceiving extends javax.swing.JPanel implements KeyListener, P
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StockReceiving.class);
     private LoadingObserver loadingObserver;
+    private boolean isShown = false;
     @Autowired
     private ApplicationMainFrame mainFrame;
 
@@ -197,7 +198,9 @@ public class StockReceiving extends javax.swing.JPanel implements KeyListener, P
     }// </editor-fold>//GEN-END:initComponents
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
-        mainFrame.setControl(this);        // TODO add your handling code here:
+        mainFrame.setControl(this);
+        if (!isShown) {
+        }// TODO add your handling code here:
     }//GEN-LAST:event_formComponentShown
 
 

@@ -67,18 +67,12 @@ public class DamageSearchDialog extends javax.swing.JDialog implements Selection
         String from = Util1.toDateStr(txtFromDate.getDate(), "yyyy-MM-dd HH:mm:ss");
         String to = Util1.toDateStr(txtToDate.getDate(), "yyyy-MM-dd HH:mm:ss");
         String location = null;
-        String session = null;
         String remark = null;
         String vouNo = null;
         if (!txtLocation.getText().trim().isEmpty()) {
             location = txtLocation.getText();
         } else {
             location = "-";
-        }
-        if (!txtSession.getText().trim().isEmpty()) {
-            session = txtSession.getText();
-        } else {
-            session = "-";
         }
         if (!txtVouNo.getText().trim().isEmpty()) {
             vouNo = txtVouNo.getText();
@@ -90,7 +84,7 @@ public class DamageSearchDialog extends javax.swing.JDialog implements Selection
         } else {
             remark = "-";
         }
-        List<DamageHis> listDamageHis = dhService.search(from, to, location, session, remark, vouNo);
+        List<DamageHis> listDamageHis = dhService.search(from, to, location, remark, vouNo);
         vouTableModel.setListDamageHis(listDamageHis);
         butSearch.setEnabled(true);
     }
@@ -122,7 +116,6 @@ public class DamageSearchDialog extends javax.swing.JDialog implements Selection
 
         jPanel1 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         txtVouNo = new javax.swing.JFormattedTextField();
@@ -132,7 +125,6 @@ public class DamageSearchDialog extends javax.swing.JDialog implements Selection
         jLabel9 = new javax.swing.JLabel();
         txtToDate = new com.toedter.calendar.JDateChooser();
         txtLocation = new javax.swing.JTextField();
-        txtSession = new javax.swing.JTextField();
         lblTotalRec = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblVoucher = new javax.swing.JTable();
@@ -150,9 +142,6 @@ public class DamageSearchDialog extends javax.swing.JDialog implements Selection
         jLabel4.setFont(Global.lableFont);
         jLabel4.setText("Location");
 
-        jLabel5.setFont(Global.lableFont);
-        jLabel5.setText("Session");
-
         jLabel7.setFont(Global.lableFont);
         jLabel7.setText("Remark");
 
@@ -160,8 +149,18 @@ public class DamageSearchDialog extends javax.swing.JDialog implements Selection
         jLabel8.setText("Vou No");
 
         txtVouNo.setFont(new java.awt.Font("Zawgyi-One", 0, 12)); // NOI18N
+        txtVouNo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtVouNoActionPerformed(evt);
+            }
+        });
 
         txtDesp.setFont(new java.awt.Font("Zawgyi-One", 0, 12)); // NOI18N
+        txtDesp.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtDespActionPerformed(evt);
+            }
+        });
 
         jLabel1.setText("Date ");
 
@@ -174,9 +173,6 @@ public class DamageSearchDialog extends javax.swing.JDialog implements Selection
         txtLocation.setFont(Global.textFont);
         txtLocation.setName("txtLocation"); // NOI18N
 
-        txtSession.setFont(Global.textFont);
-        txtSession.setName("txtLocation"); // NOI18N
-
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -185,25 +181,26 @@ public class DamageSearchDialog extends javax.swing.JDialog implements Selection
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel4)
-                            .addComponent(jLabel5)
-                            .addComponent(jLabel7)
-                            .addComponent(jLabel8))
+                        .addComponent(jLabel4)
                         .addGap(22, 22, 22)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtVouNo)
-                            .addComponent(txtDesp)
-                            .addComponent(txtLocation)
-                            .addComponent(txtSession, javax.swing.GroupLayout.Alignment.TRAILING)))
+                        .addComponent(txtLocation))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txtFromDate, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel9)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(txtToDate, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addComponent(txtToDate, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel7)
+                        .addGap(26, 26, 26)
+                        .addComponent(txtDesp))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel8)
+                        .addGap(28, 28, 28)
+                        .addComponent(txtVouNo))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -220,19 +217,15 @@ public class DamageSearchDialog extends javax.swing.JDialog implements Selection
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
                     .addComponent(txtLocation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel5)
-                    .addComponent(txtSession, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel7)
                     .addComponent(txtDesp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel8)
                     .addComponent(txtVouNo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(163, Short.MAX_VALUE))
+                .addContainerGap(180, Short.MAX_VALUE))
         );
 
         lblTotalRec.setText("Total Records : 0");
@@ -318,6 +311,14 @@ public class DamageSearchDialog extends javax.swing.JDialog implements Selection
         }
     }//GEN-LAST:event_tblVoucherMouseClicked
 
+    private void txtDespActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDespActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtDespActionPerformed
+
+    private void txtVouNoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtVouNoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtVouNoActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -326,7 +327,6 @@ public class DamageSearchDialog extends javax.swing.JDialog implements Selection
     private javax.swing.JButton butSelect;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
@@ -337,7 +337,6 @@ public class DamageSearchDialog extends javax.swing.JDialog implements Selection
     private javax.swing.JFormattedTextField txtDesp;
     private com.toedter.calendar.JDateChooser txtFromDate;
     private javax.swing.JTextField txtLocation;
-    private javax.swing.JTextField txtSession;
     private com.toedter.calendar.JDateChooser txtToDate;
     private javax.swing.JFormattedTextField txtVouNo;
     // End of variables declaration//GEN-END:variables

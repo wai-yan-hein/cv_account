@@ -39,17 +39,16 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Pan
     private DrAmtTableModel drAmtTableModel;
     @Autowired
     private TaskExecutor taskExecutor;
-<<<<<<< HEAD
+
     @Autowired
     private ApplicationMainFrame mainFrame;
 
-=======
     private TableRowSorter<TableModel> sorter;
->>>>>>> f99da13e2a9811307e724bc8dad573eec9c24135
     private String desp;
     private Double netChange;
     private List<VGl> listVGl;
     private Double openingAmt = 0.0;
+    private boolean isShown = false;
 
     public Double getOpeningAmt() {
         return openingAmt;
@@ -380,7 +379,9 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Pan
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
         mainFrame.setControl(this);
-        initMain();
+        if (!isShown) {
+            initMain();
+        }
     }//GEN-LAST:event_formComponentShown
 
     private void formFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_formFocusLost

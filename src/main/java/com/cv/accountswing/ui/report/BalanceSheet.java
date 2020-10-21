@@ -42,6 +42,7 @@ public class BalanceSheet extends javax.swing.JPanel implements SelectionObserve
     private String enDate;
     private String depId;
     private String currency;
+    private boolean isShown = false;
     @Autowired
     private SystemPropertyService spService;
     @Autowired
@@ -287,7 +288,9 @@ public class BalanceSheet extends javax.swing.JPanel implements SelectionObserve
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
         mainFrame.setControl(this);
-        initMain();
+        if (!isShown) {
+            initMain();
+        }
     }//GEN-LAST:event_formComponentShown
 
     private void btnPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintActionPerformed
