@@ -7,6 +7,7 @@ package com.cv.accountswing.ui.setup;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
+import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.Currency;
 import com.cv.accountswing.entity.CurrencyKey;
@@ -14,6 +15,7 @@ import com.cv.accountswing.entity.view.VGl;
 import com.cv.accountswing.service.COAOpeningService;
 import com.cv.accountswing.service.CurrencyService;
 import com.cv.accountswing.service.VGlService;
+import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.editor.CurrencyAutoCompleter;
@@ -41,8 +43,13 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
+<<<<<<< HEAD
+public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObserver, KeyListener, PanelControl {
+
+=======
 public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObserver, KeyListener {
     
+>>>>>>> f99da13e2a9811307e724bc8dad573eec9c24135
     private static final Logger LOGGER = LoggerFactory.getLogger(COAOpeningSetup.class);
     
     @Autowired
@@ -55,6 +62,8 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
     private TaskExecutor taskExecutor;
     @Autowired
     private CurrencyService currencyService;
+    @Autowired
+    private ApplicationMainFrame mainFrame;
     private LoadingObserver loadingObserver;
     private boolean isShown = false;
     private String stDate;
@@ -422,6 +431,7 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
+        mainFrame.setControl(this);
         if (!isShown) {
             initMain();
         }
@@ -563,5 +573,25 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
                 tblOpening.setRowSelectionInterval(0, 0);
             }
         }
+    }
+
+    @Override
+    public void save() {
+    }
+
+    @Override
+    public void delete() {
+    }
+
+    @Override
+    public void newForm() {
+    }
+
+    @Override
+    public void history() {
+    }
+
+    @Override
+    public void print() {
     }
 }

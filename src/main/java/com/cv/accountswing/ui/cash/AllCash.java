@@ -135,6 +135,8 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
      * Creates new form CashBook
      *
      */
+    
+
     public AllCash() {
         initComponents();
         initPopup();

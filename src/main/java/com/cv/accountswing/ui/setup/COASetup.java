@@ -7,8 +7,10 @@ package com.cv.accountswing.ui.setup;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
+import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.entity.ChartOfAccount;
 import com.cv.accountswing.service.COAService;
+import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.setup.common.COAGroupChildTableModel;
@@ -29,7 +31,7 @@ import org.springframework.stereotype.Component;
  * @author MyoGyi
  */
 @Component
-public class COASetup extends javax.swing.JPanel implements KeyListener {
+public class COASetup extends javax.swing.JPanel implements KeyListener, PanelControl {
 
     private int selectRow = -1;
     @Autowired
@@ -42,6 +44,8 @@ public class COASetup extends javax.swing.JPanel implements KeyListener {
     private COAGroupChildTableModel cOAGroupChildTableModel;
     @Autowired
     private TaskExecutor taskExecutor;
+    @Autowired
+    private ApplicationMainFrame mainFrame;
     private LoadingObserver loadingObserver;
     private boolean isShown = false;
 
@@ -321,6 +325,7 @@ public class COASetup extends javax.swing.JPanel implements KeyListener {
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
+        mainFrame.setControl(this);
         if (!isShown) {
             initMain();
         }
@@ -405,6 +410,26 @@ public class COASetup extends javax.swing.JPanel implements KeyListener {
         tblCoaHead.addKeyListener(this);
         tblCoaGroup.addKeyListener(this);
         tblCOAGroupChild.addKeyListener(this);
+    }
+
+    @Override
+    public void save() {
+    }
+
+    @Override
+    public void delete() {
+    }
+
+    @Override
+    public void newForm() {
+    }
+
+    @Override
+    public void history() {
+    }
+
+    @Override
+    public void print() {
     }
 
 }

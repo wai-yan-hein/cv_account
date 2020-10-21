@@ -52,7 +52,7 @@ public class DamageDetailHisDaoImpl extends AbstractDao<Long, DamageDetailHis> i
 
     @Override
     public int delete(String id) {
-        String strSql = "delete from DamageDetailHis o where o.dmgVouId = " + id;
+        String strSql = "delete from DamageDetailHis o where o.dmgDetailId = " + id;
         int cnt = execUpdateOrDelete(strSql);
         return cnt;
     }

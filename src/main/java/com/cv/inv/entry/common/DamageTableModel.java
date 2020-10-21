@@ -308,9 +308,6 @@ public class DamageTableModel extends AbstractTableModel {
         for (DamageDetailHis pdh2 : listDetail) {
             if (pdh2.getStock() != null) {
                 if (pdh2.getStock().getStockCode() != null) {
-                    if (pdh2.getDmgDetailId() != null) {
-                        pdh2.setDmgDetailId(null);
-                    }
                     listRetInDetail.add(pdh2);
                 }
             }

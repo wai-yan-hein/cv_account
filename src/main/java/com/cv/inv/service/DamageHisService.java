@@ -21,7 +21,7 @@ public interface DamageHisService {
     public List<DamageHis> search(String from, String to, String location, String session,
             String remark, String vouNo);
 
-    public void save(DamageHis sdh, List<DamageDetailHis> listDamageDetail, String vouStatus);
+    public void save(DamageHis sdh, List<DamageDetailHis> listDamageDetail, String vouStatus, List<String> delList);
 
     public DamageHis findById(String id);
 

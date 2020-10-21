@@ -7,6 +7,7 @@ package com.cv.inv.entry;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
+import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.Currency;
 import com.cv.accountswing.entity.CurrencyKey;
@@ -14,6 +15,7 @@ import com.cv.accountswing.entity.Department;
 import com.cv.accountswing.entity.Gl;
 import com.cv.accountswing.service.CurrencyService;
 import com.cv.accountswing.service.DepartmentService;
+import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.editor.CurrencyAutoCompleter;
@@ -53,7 +55,7 @@ import org.springframework.stereotype.Component;
  * @author Mg Kyaw Thura Aung
  */
 @Component
-public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserver, KeyListener {
+public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserver, KeyListener, PanelControl {
 
     /**
      * Creates new form PurchaseEntry
@@ -76,6 +78,8 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
     private VouIdService vouIdService;
     @Autowired
     private TaskExecutor taskExecutor;
+    @Autowired
+    private ApplicationMainFrame mainFrame;
     private boolean isShown = false;
     private LocationAutoCompleter locCompleter;
     private VouStatusAutoCompleter vouCompleter;
@@ -236,7 +240,7 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
         genVouNo();
     }
 
-    public void save() {
+    public void savePurchase() {
         if (isValidEntry()) {
             try {
                 purchaseDetailService.save(gl, purTableModel.getListPurDetail());
@@ -711,6 +715,7 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
     }//GEN-LAST:event_txtVouStatusActionPerformed
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
+        mainFrame.setControl(this);
         if (!isShown) {
             initMain();
         }
@@ -927,6 +932,29 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
                 tabToTable(e);
                 break;
         }
+    }
+
+    @Override
+    public void delete() {
+    }
+
+    @Override
+    public void newForm() {
+        clear();
+    }
+
+    @Override
+    public void history() {
+
+    }
+
+    @Override
+    public void print() {
+    }
+
+    @Override
+    public void save() {
+        savePurchase();
     }
 
 }

@@ -7,8 +7,10 @@ package com.cv.accountswing.ui.setup;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
+import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.entity.Department;
 import com.cv.accountswing.service.DepartmentService;
+import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.util.Util1;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -39,7 +41,8 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-public class DepartmentSetup extends javax.swing.JPanel implements TreeSelectionListener, MouseListener, KeyListener {
+public class DepartmentSetup extends javax.swing.JPanel implements TreeSelectionListener, MouseListener, KeyListener,
+        PanelControl {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DepartmentSetup.class);
     DefaultMutableTreeNode treeRoot;
@@ -60,6 +63,8 @@ public class DepartmentSetup extends javax.swing.JPanel implements TreeSelection
 
     @Autowired
     private TaskExecutor taskExecutor;
+    @Autowired
+    private ApplicationMainFrame mainFrame;
 
     JPopupMenu popupmenu;
     private final ActionListener menuListener = (java.awt.event.ActionEvent evt) -> {
@@ -482,6 +487,7 @@ public class DepartmentSetup extends javax.swing.JPanel implements TreeSelection
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
+        mainFrame.setControl(this);
         if (!isShown) {
             initMain();
         }
@@ -651,6 +657,28 @@ public class DepartmentSetup extends javax.swing.JPanel implements TreeSelection
         if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_RIGHT) {
             treeDept.requestFocus();
         }
+    }
+
+    @Override
+    public void save() {
+        saveDepartment();
+    }
+
+    @Override
+    public void delete() {
+    }
+
+    @Override
+    public void newForm() {
+        clear();
+    }
+
+    @Override
+    public void history() {
+    }
+
+    @Override
+    public void print() {
     }
 
 }

@@ -7,6 +7,7 @@ package com.cv.inv.setup;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
+import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.inv.setup.dialog.ChargeTypeSetupDialog;
 import com.cv.inv.setup.dialog.LocationSetupDialog;
 import com.cv.inv.setup.dialog.RelationSetupDialog;
@@ -36,6 +37,8 @@ public class OtherSetup extends javax.swing.JPanel {
     private RelationSetupDialog relationSetupDialog;
     @Autowired
     private ChargeTypeSetupDialog chargeTypeSetupDialog;
+    @Autowired
+    private ApplicationMainFrame mainFrame;
 
     public void setLoadingObserver(LoadingObserver loadingObserver) {
         this.loadingObserver = loadingObserver;

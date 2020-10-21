@@ -37,10 +37,13 @@ public class DamageHisServiceImpl implements DamageHisService {
     }
 
     @Override
-    public void save(DamageHis sdh, List<DamageDetailHis> listDamageDetail, String vouStatus) {
+    public void save(DamageHis sdh, List<DamageDetailHis> listDamageDetail, String vouStatus, List<String> delList) {
         if (vouStatus.equals("EDIT")) {
-            String vouNo = sdh.getDmgVouId();
-            dao.delete(vouNo);
+            if (delList != null) {
+                for (String detailId : delList) {
+                    detailDao.delete(detailId);
+                }
+            }
         }
         dao.save(sdh);
         for (DamageDetailHis dh : listDamageDetail) {

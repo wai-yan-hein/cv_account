@@ -8,7 +8,9 @@ package com.cv.inv.entry;
 import ch.qos.logback.classic.pattern.Util;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
+import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.SelectionObserver;
+import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entry.common.AdjustmentTableModel;
@@ -27,7 +29,7 @@ import org.springframework.stereotype.Component;
  * @author Mg Kyaw Thura Aung
  */
 @Component
-public class Adjustment extends javax.swing.JPanel implements SelectionObserver, KeyListener {
+public class Adjustment extends javax.swing.JPanel implements SelectionObserver, KeyListener, PanelControl {
 
     /**
      * Creates new form Adjustment
@@ -36,6 +38,8 @@ public class Adjustment extends javax.swing.JPanel implements SelectionObserver,
     private LoadingObserver loadingObserver;
     @Autowired
     private AdjustmentTableModel adjustTableModel;
+    @Autowired
+    private ApplicationMainFrame mainFrame;
 
     public Adjustment() {
         initComponents();
@@ -302,6 +306,7 @@ public class Adjustment extends javax.swing.JPanel implements SelectionObserver,
     }// </editor-fold>//GEN-END:initComponents
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
+        mainFrame.setControl(this);
         initMain();
         txtVouNo.requestFocus();
     }//GEN-LAST:event_formComponentShown
@@ -397,5 +402,25 @@ public class Adjustment extends javax.swing.JPanel implements SelectionObserver,
                 tabToTable(e);
                 break;
         }
+    }
+
+    @Override
+    public void save() {
+    }
+
+    @Override
+    public void delete() {
+    }
+
+    @Override
+    public void newForm() {
+    }
+
+    @Override
+    public void history() {
+    }
+
+    @Override
+    public void print() {
     }
 }

@@ -7,11 +7,13 @@ package com.cv.accountswing.ui.system.setup;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
+import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.entity.Menu;
 import com.cv.accountswing.entity.view.VRoleMenu;
 import com.cv.accountswing.entity.view.VRoleMenuKey;
 import com.cv.accountswing.service.COAService;
 import com.cv.accountswing.service.MenuService;
+import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.util.Util1;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -38,7 +40,7 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListener {
+public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListener, PanelControl {
 
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(MenuSetup.class);
     Gson gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
@@ -51,6 +53,8 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
     private MenuService menuService;
     @Autowired
     private TaskExecutor taskExecutor;
+    @Autowired
+    private ApplicationMainFrame mainFrame;
     private LoadingObserver loadingObserver;
     private boolean isShown = false;
     private String parentRootName = "Root Menu";
@@ -69,7 +73,7 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
                 newMenu("Menu");
                 break;
             case "Delete":
-                delete();//deleteCOA();
+                deleteMenu();//deleteCOA();
                 break;
             case "New Function":
                 newMenu("Function");
@@ -246,7 +250,7 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
         }
     }
 
-    private void delete() {
+    private void deleteMenu() {
         try {
             if (selectedNode != null) {
                 VRoleMenu rMenu = (VRoleMenu) selectedNode.getUserObject();
@@ -397,6 +401,7 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
+        mainFrame.setControl(this);
         if (!isShown) {
             initMain();
         }
@@ -449,5 +454,26 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
                 //setEnabledControl(false);
             }
         }
+    }
+
+    @Override
+    public void save() {
+        saveMenu();
+    }
+
+    @Override
+    public void newForm() {
+    }
+
+    @Override
+    public void history() {
+    }
+
+    @Override
+    public void print() {
+    }
+
+    @Override
+    public void delete() {
     }
 }

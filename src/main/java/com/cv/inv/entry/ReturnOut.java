@@ -7,6 +7,7 @@ package com.cv.inv.entry;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
+import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.Currency;
 import com.cv.accountswing.entity.CurrencyKey;
@@ -15,6 +16,7 @@ import com.cv.accountswing.entity.Trader;
 import com.cv.accountswing.service.CurrencyService;
 import com.cv.accountswing.service.GlService;
 import com.cv.accountswing.service.TraderService;
+import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.editor.CurrencyAutoCompleter;
 import com.cv.accountswing.ui.editor.TraderAutoCompleter;
@@ -60,7 +62,7 @@ import org.springframework.stereotype.Component;
  * @author Mg Kyaw Thura Aung
  */
 @Component
-public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, KeyListener {
+public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, KeyListener, PanelControl {
 
     /**
      * Creates new form ReturnOut
@@ -96,6 +98,8 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
     private TraderService traderService;
     @Autowired
     private RetOutService retOutService;
+    @Autowired
+    private ApplicationMainFrame mainFrame;
 
     public void setLoadingObserver(LoadingObserver loadingObserver) {
         this.loadingObserver = loadingObserver;
@@ -564,6 +568,7 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
     }//GEN-LAST:event_txtRemarkActionPerformed
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
+        mainFrame.setControl(this);
         initMain();
         txtVouNo.requestFocus();
     }//GEN-LAST:event_formComponentShown
@@ -758,7 +763,7 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
         txtVouNo.setText(vouEngine.genVouNo());
     }
 
-    public void save() {
+    public void saveReturnOut() {
         if (isValidEntry()) {
             try {
                 outService.save(gl, listDetail);
@@ -769,7 +774,7 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
                 LOGGER.error("saveRetOut : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
             }
 
-            newForm();
+            clear();
         }
 
     }
@@ -858,11 +863,10 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
         deleteRetOutDetail();
     }
 
-    private void newForm() {
-        clear();
-    }
-
-    public void history() {
+//    private void newForm() {
+//        clear();
+//    }
+    public void historyReturnOut() {
         retInVouSearch.setPanelName(this.getName());
         retInVouSearch.initMain();
         retInVouSearch.setTitle("Return Out Voucher Search");
@@ -874,7 +878,7 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
         retInVouSearch.setVisible(true);
     }
 
-    public void delete() {
+    public void deleteReturnOut() {
         if (Util1.getNullTo(gl.getDeleted())) {
             JOptionPane.showConfirmDialog(Global.parentForm, "Voucher already deleted.",
                     "Return Out voucher delete", JOptionPane.ERROR);
@@ -901,6 +905,30 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
             }
 
         }
+    }
+
+    @Override
+    public void print() {
+    }
+
+    @Override
+    public void save() {
+        saveReturnOut();
+    }
+
+    @Override
+    public void delete() {
+        deleteReturnOut();
+    }
+
+    @Override
+    public void newForm() {
+        clear();
+    }
+
+    @Override
+    public void history() {
+        historyReturnOut();
     }
 
 }

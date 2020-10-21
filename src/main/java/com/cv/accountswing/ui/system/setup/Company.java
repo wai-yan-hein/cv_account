@@ -6,10 +6,12 @@
 package com.cv.accountswing.ui.system.setup;
 
 import com.cv.accountswing.common.Global;
+import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.entity.BusinessType;
 import com.cv.accountswing.entity.CompanyInfo;
 import com.cv.accountswing.service.BusinessTypeService;
 import com.cv.accountswing.service.CompanyInfoService;
+import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.system.setup.common.CompanyTableModel;
 import com.cv.accountswing.util.BindingUtil;
 import com.cv.accountswing.util.Util1;
@@ -34,7 +36,7 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-public class Company extends javax.swing.JPanel implements KeyListener {
+public class Company extends javax.swing.JPanel implements KeyListener, PanelControl {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Company.class);
 
@@ -48,6 +50,8 @@ public class Company extends javax.swing.JPanel implements KeyListener {
     private BusinessTypeService companyTypeService;
     @Autowired
     private TaskExecutor taskExecutor;
+    @Autowired
+    private ApplicationMainFrame mainFrame;
 
     /**
      * Creates new form Company
@@ -100,7 +104,7 @@ public class Company extends javax.swing.JPanel implements KeyListener {
 
     }
 
-    private void save() {
+    private void saveCompany() {
         if (isValidEntry()) {
             try {
                 String status = lblStatus.getText();
@@ -480,6 +484,7 @@ public class Company extends javax.swing.JPanel implements KeyListener {
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
+        mainFrame.setControl(this);
         txtCode.requestFocus();
     }//GEN-LAST:event_formComponentShown
 
@@ -660,6 +665,31 @@ public class Company extends javax.swing.JPanel implements KeyListener {
                 tblCompany.setRowSelectionInterval(0, 0);
             }
         }
+    }
+
+    @Override
+    public void delete() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void newForm() {
+        clear();
+    }
+
+    @Override
+    public void history() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void print() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void save() {
+        saveCompany();
     }
 
 }

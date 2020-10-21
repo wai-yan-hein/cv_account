@@ -7,12 +7,14 @@ package com.cv.accountswing.ui.journal;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
+import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.view.VCrDrVoucher;
 import com.cv.accountswing.service.COAService;
 import com.cv.accountswing.service.CurrencyService;
 import com.cv.accountswing.service.DepartmentService;
 import com.cv.accountswing.service.VCrDrVoucherService;
+import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.editor.COAAutoCompleter;
 import com.cv.accountswing.ui.editor.CurrencyAutoCompleter;
@@ -41,7 +43,7 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-public class CrDrVoucher extends javax.swing.JPanel implements KeyListener, SelectionObserver {
+public class CrDrVoucher extends javax.swing.JPanel implements KeyListener, SelectionObserver, PanelControl {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CrDrVoucher.class);
     private int selectRow = -1;
@@ -59,6 +61,8 @@ public class CrDrVoucher extends javax.swing.JPanel implements KeyListener, Sele
     private CurrencyService currencyService;
     @Autowired
     private CrDrVoucherEntry creditVoucherEntry;
+    @Autowired
+    private ApplicationMainFrame mainFrame;
     private LoadingObserver loadingObserver;
     private boolean isShown = false;
 
@@ -520,6 +524,7 @@ public class CrDrVoucher extends javax.swing.JPanel implements KeyListener, Sele
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
+        mainFrame.setControl(this);
         txtFromDate.requestFocusInWindow();
         if (!isShown) {
             initMain();
@@ -749,6 +754,26 @@ public class CrDrVoucher extends javax.swing.JPanel implements KeyListener, Sele
             searchCreditVoucher();
 
         }
+    }
+
+    @Override
+    public void save() {
+    }
+
+    @Override
+    public void delete() {
+    }
+
+    @Override
+    public void newForm() {
+    }
+
+    @Override
+    public void history() {
+    }
+
+    @Override
+    public void print() {
     }
 
 }
