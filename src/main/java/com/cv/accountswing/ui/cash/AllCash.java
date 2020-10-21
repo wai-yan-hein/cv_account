@@ -171,7 +171,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
         allCashTableModel.setReloadData(reloadData);
         tblCash.setModel(allCashTableModel);
         tblCash.getTableHeader().setFont(Global.tblHeaderFont);
-        tblCash.getTableHeader().setPreferredSize(new Dimension(35, 35));
+        tblCash.getTableHeader().setPreferredSize(new Dimension(30, 30));
         //tblCash.getTableHeader().setBackground(Global.tblHeaderColor);
         sorter = new TableRowSorter<>(tblCash.getModel());
         tblCash.setRowSorter(sorter);
@@ -180,10 +180,10 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
         allCashTableModel.setParent(tblCash);
         allCashTableModel.addNewRow();
         tblCash.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        tblCash.getColumnModel().getColumn(0).setPreferredWidth(7);// Date
+        tblCash.getColumnModel().getColumn(0).setPreferredWidth(15);// Date
         tblCash.getColumnModel().getColumn(1).setPreferredWidth(13);// Department
-        tblCash.getColumnModel().getColumn(2).setPreferredWidth(200);// Description      
-        tblCash.getColumnModel().getColumn(3).setPreferredWidth(200);// Ref  
+        tblCash.getColumnModel().getColumn(2).setPreferredWidth(195);// Description      
+        tblCash.getColumnModel().getColumn(3).setPreferredWidth(195);// Ref  
         tblCash.getColumnModel().getColumn(4).setPreferredWidth(90);// Person
         tblCash.getColumnModel().getColumn(5).setPreferredWidth(150);// Account
         tblCash.getColumnModel().getColumn(6).setPreferredWidth(1);// Curr      

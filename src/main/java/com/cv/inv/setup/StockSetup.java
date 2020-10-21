@@ -58,7 +58,7 @@ import com.cv.inv.service.StockTypeService;
 public class StockSetup extends javax.swing.JPanel implements KeyListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StockSetup.class);
-    Image image = new ImageIcon(getClass().getResource("/images/setting.png")).getImage();
+    Image image = new ImageIcon(getClass().getResource("/images/date.png")).getImage();
     private int selectRow = -1;
     @Autowired
     private StockTypeSetupDialog itemTypeSetupDialog;
