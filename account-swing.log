@@ -235,6 +235,36 @@
 20 Oct 2020 07:26:27,478 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.accountswing.entity.AppUser.getUserShort()" because the return value of "com.cv.inv.entity.DamageHis.getCreatedBy()" is null
 20 Oct 2020 07:38:11,193 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.inv.entity.Location.getLocationName()" because the return value of "com.cv.inv.entity.DamageHis.getLocation()" is null
 20 Oct 2020 07:38:12,399 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.inv.entity.Location.getLocationName()" because the return value of "com.cv.inv.entity.DamageHis.getLocation()" is null
+<<<<<<< HEAD
+>>>>>>> dfc554283d81166b4ba79a968fe679bc6866d9e0
+20 Oct 2020 08:54:10,417 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.inv.entity.Location.getLocationName()" because the return value of "com.cv.inv.entity.DamageHis.getLocation()" is null
+20 Oct 2020 08:54:11,620 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.inv.entity.Location.getLocationName()" because the return value of "com.cv.inv.entity.DamageHis.getLocation()" is null
+20 Oct 2020 08:58:50,028 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.inv.entity.Location.getLocationName()" because the return value of "com.cv.inv.entity.DamageHis.getLocation()" is null
+20 Oct 2020 08:58:56,107 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.inv.entity.Location.getLocationName()" because the return value of "com.cv.inv.entity.DamageHis.getLocation()" is null
+20 Oct 2020 08:58:56,171 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.inv.entity.Location.getLocationName()" because the return value of "com.cv.inv.entity.DamageHis.getLocation()" is null
+20 Oct 2020 08:58:56,337 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.inv.entity.Location.getLocationName()" because the return value of "com.cv.inv.entity.DamageHis.getLocation()" is null
+20 Oct 2020 08:58:56,371 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.inv.entity.Location.getLocationName()" because the return value of "com.cv.inv.entity.DamageHis.getLocation()" is null
+20 Oct 2020 08:58:58,409 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.inv.entity.Location.getLocationName()" because the return value of "com.cv.inv.entity.DamageHis.getLocation()" is null
+20 Oct 2020 08:58:58,465 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.inv.entity.Location.getLocationName()" because the return value of "com.cv.inv.entity.DamageHis.getLocation()" is null
+20 Oct 2020 08:58:58,556 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.inv.entity.Location.getLocationName()" because the return value of "com.cv.inv.entity.DamageHis.getLocation()" is null
+20 Oct 2020 08:58:58,568 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.inv.entity.Location.getLocationName()" because the return value of "com.cv.inv.entity.DamageHis.getLocation()" is null
+20 Oct 2020 08:58:58,750 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.inv.entity.Location.getLocationName()" because the return value of "com.cv.inv.entity.DamageHis.getLocation()" is null
+20 Oct 2020 08:58:58,936 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.inv.entity.Location.getLocationName()" because the return value of "com.cv.inv.entity.DamageHis.getLocation()" is null
+20 Oct 2020 08:59:00,625 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.inv.entity.Location.getLocationName()" because the return value of "com.cv.inv.entity.DamageHis.getLocation()" is null
+20 Oct 2020 08:59:00,709 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.inv.entity.Location.getLocationName()" because the return value of "com.cv.inv.entity.DamageHis.getLocation()" is null
+20 Oct 2020 08:59:00,817 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.inv.entity.Location.getLocationName()" because the return value of "com.cv.inv.entity.DamageHis.getLocation()" is null
+20 Oct 2020 08:59:00,971 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.inv.entity.Location.getLocationName()" because the return value of "com.cv.inv.entity.DamageHis.getLocation()" is null
+20 Oct 2020 08:59:02,883 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.inv.entity.Location.getLocationName()" because the return value of "com.cv.inv.entity.DamageHis.getLocation()" is null
+20 Oct 2020 08:59:02,983 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.inv.entity.Location.getLocationName()" because the return value of "com.cv.inv.entity.DamageHis.getLocation()" is null
+20 Oct 2020 08:59:03,038 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.inv.entity.Location.getLocationName()" because the return value of "com.cv.inv.entity.DamageHis.getLocation()" is null
+20 Oct 2020 08:59:03,093 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.inv.entity.Location.getLocationName()" because the return value of "com.cv.inv.entity.DamageHis.getLocation()" is null
+20 Oct 2020 08:59:03,257 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.inv.entity.Location.getLocationName()" because the return value of "com.cv.inv.entity.DamageHis.getLocation()" is null
+20 Oct 2020 08:59:03,414 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.inv.entity.Location.getLocationName()" because the return value of "com.cv.inv.entity.DamageHis.getLocation()" is null
+20 Oct 2020 08:59:03,446 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.inv.entity.Location.getLocationName()" because the return value of "com.cv.inv.entity.DamageHis.getLocation()" is null
+20 Oct 2020 08:59:03,511 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.inv.entity.Location.getLocationName()" because the return value of "com.cv.inv.entity.DamageHis.getLocation()" is null
+20 Oct 2020 08:59:03,535 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.inv.entity.Location.getLocationName()" because the return value of "com.cv.inv.entity.DamageHis.getLocation()" is null
+20 Oct 2020 08:59:05,259 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.inv.entity.Location.getLocationName()" because the return value of "com.cv.inv.entity.DamageHis.getLocation()" is null
+=======
 20 Oct 2020 09:20:32,055 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.inv.entity.Location.getLocationName()" because the return value of "com.cv.inv.entity.DamageHis.getLocation()" is null
 20 Oct 2020 09:20:32,056 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.inv.entity.Location.getLocationName()" because the return value of "com.cv.inv.entity.DamageHis.getLocation()" is null
 20 Oct 2020 09:20:33,122 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.inv.entity.Location.getLocationName()" because the return value of "com.cv.inv.entity.DamageHis.getLocation()" is null
@@ -257,7 +287,11 @@
 20 Oct 2020 11:30:23,768 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.inv.entity.Location.getLocationName()" because the return value of "com.cv.inv.entity.DamageHis.getLocation()" is null
 20 Oct 2020 11:30:29,197 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.inv.entity.Location.getLocationName()" because the return value of "com.cv.inv.entity.DamageHis.getLocation()" is null
 20 Oct 2020 11:30:29,197 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.inv.entity.Location.getLocationName()" because the return value of "com.cv.inv.entity.DamageHis.getLocation()" is null
+<<<<<<< HEAD
 21 Oct 2020 05:16:40,459 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.accountswing.entity.AppUser.getUserShort()" because the return value of "com.cv.inv.entity.DamageHis.getCreatedBy()" is null
 21 Oct 2020 05:16:41,688 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.accountswing.entity.AppUser.getUserShort()" because the return value of "com.cv.inv.entity.DamageHis.getCreatedBy()" is null
 21 Oct 2020 08:14:22,156 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.accountswing.entity.AppUser.getUserShort()" because the return value of "com.cv.inv.entity.DamageHis.getCreatedBy()" is null
 21 Oct 2020 08:14:23,902 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.accountswing.entity.AppUser.getUserShort()" because the return value of "com.cv.inv.entity.DamageHis.getCreatedBy()" is null
+=======
+>>>>>>> 2eb31b995c705787f9c38e3d96867a14b2f49b59
+>>>>>>> f99da13e2a9811307e724bc8dad573eec9c24135

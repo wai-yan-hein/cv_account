@@ -16,6 +16,8 @@ import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.ListSelectionModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,9 +39,13 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Pan
     private DrAmtTableModel drAmtTableModel;
     @Autowired
     private TaskExecutor taskExecutor;
+<<<<<<< HEAD
     @Autowired
     private ApplicationMainFrame mainFrame;
 
+=======
+    private TableRowSorter<TableModel> sorter;
+>>>>>>> f99da13e2a9811307e724bc8dad573eec9c24135
     private String desp;
     private Double netChange;
     private List<VGl> listVGl;
@@ -122,6 +128,8 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Pan
         tblCr.getColumnModel().getColumn(0).setPreferredWidth(20);
         tblCr.setDefaultRenderer(Double.class, new TableCellRender());
         tblCr.setDefaultRenderer(Object.class, new TableCellRender());
+        sorter = new TableRowSorter<>(tblCr.getModel());
+        tblCr.setRowSorter(sorter);
 
     }
 
@@ -136,6 +144,8 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Pan
         tblDr.getColumnModel().getColumn(0).setPreferredWidth(20);
         tblDr.setDefaultRenderer(Double.class, new TableCellRender());
         tblDr.setDefaultRenderer(Object.class, new TableCellRender());
+        sorter = new TableRowSorter<>(tblDr.getModel());
+        tblDr.setRowSorter(sorter);
 
     }
 

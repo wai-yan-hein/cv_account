@@ -169,15 +169,11 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
     }
 
     private void initTable() {
-        if (this.getName().equals("Daily Cash")) {
-            allCashTableModel.setColumnName(7, "Cash In / Dr");
-            allCashTableModel.setColumnName(8, "Cash Out / Cr");
-        }
         allCashTableModel.setSelectionObserver(this);
         allCashTableModel.setReloadData(reloadData);
         tblCash.setModel(allCashTableModel);
         tblCash.getTableHeader().setFont(Global.tblHeaderFont);
-        tblCash.getTableHeader().setPreferredSize(new Dimension(40, 40));
+        tblCash.getTableHeader().setPreferredSize(new Dimension(35, 35));
         //tblCash.getTableHeader().setBackground(Global.tblHeaderColor);
         sorter = new TableRowSorter<>(tblCash.getModel());
         tblCash.setRowSorter(sorter);
@@ -374,7 +370,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
         accId = Util1.isNull(accId, "-");
         currency = Util1.isNull(currency, "-");
         ref = Util1.isNull(ref, "-");
-        depId = Util1.isNull(depId, Global.sysProperties.get("system.default.department"));
+        depId = Util1.isNull(depId, Util1.isNull(Global.sysProperties.get("system.default.department"), "-"));
         traderName = Util1.isNull(traderName, "-");
         debAmt = Util1.isNull(debAmt, "-");
         crdAmt = Util1.isNull(crdAmt, "-");

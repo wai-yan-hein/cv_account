@@ -18,11 +18,8 @@ import com.cv.accountswing.entity.view.VGl;
 import com.cv.accountswing.entity.view.VTriBalance;
 import com.cv.accountswing.service.COAOpeningDService;
 import com.cv.accountswing.service.CompanyInfoService;
-import com.cv.accountswing.service.CurrencyService;
-import com.cv.accountswing.service.DepartmentService;
 import com.cv.accountswing.service.ReportService;
 import com.cv.accountswing.service.SystemPropertyService;
-import com.cv.accountswing.service.TraderService;
 import com.cv.accountswing.service.VAParService;
 import com.cv.accountswing.service.VGlService;
 import com.cv.accountswing.service.VTriBalanceService;
@@ -45,6 +42,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
@@ -87,10 +86,10 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
     private TrialBalanceDetailDialog trialBalanceDetailDialog;
     @Autowired
     private ApplicationMainFrame mainFrame;
+    private TableRowSorter<TableModel> sorter;
     private boolean isShown = false;
     private LoadingObserver loadingObserver;
     private JPopupMenu popup;
-    private DateAutoCompleter dateAutoCompleter;
     private String stDate;
     private String enDate;
     private String cvId;
@@ -157,6 +156,8 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         tblAPAR.getColumnModel().getColumn(5).setPreferredWidth(50);
         tblAPAR.setDefaultRenderer(Double.class, new TableCellRender());
         tblAPAR.setDefaultRenderer(Object.class, new TableCellRender());
+        sorter = new TableRowSorter<>(tblAPAR.getModel());
+        tblAPAR.setRowSorter(sorter);
 
         tblAPAR.addMouseListener(new MouseAdapter() {
             @Override
@@ -356,14 +357,14 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
     private void initializeParameter() {
         dept = Util1.isNull(txtDep.getText(), "-");
         cvId = Util1.isNull(txtPerson.getText(), "-1");
-        currency = Util1.isNull(txtCurrency.getText(), "-");
+        currency = Global.sysProperties.get("system.default.currency");
         stDate = Util1.isNull(stDate, Util1.toDateStr(Util1.getTodayDate(), "dd/MM/yyyy"));
         enDate = Util1.isNull(enDate, Util1.toDateStr(Util1.getTodayDate(), "dd/MM/yyyy"));
         userId = Global.loginUser.getUserId().toString();
     }
 
     private void initCombo() {
-        dateAutoCompleter = new DateAutoCompleter(txtDate,
+        DateAutoCompleter dateAutoCompleter = new DateAutoCompleter(txtDate,
                 Global.listDateModel, null);
         dateAutoCompleter.setSelectionObserver(this);
 
@@ -377,6 +378,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         CurrencyAutoCompleter currencyAutoCompleter = new CurrencyAutoCompleter(txtCurrency,
                 Global.listCurrency, null);
         currencyAutoCompleter.setSelectionObserver(this);
+        currencyAutoCompleter.setCurrency(Global.defalutCurrency);
     }
 
     public void printApar() {
@@ -502,6 +504,8 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         jLabel3.setText("Person");
 
         txtCurrency.setFont(Global.lableFont);
+        txtCurrency.setToolTipText("");
+        txtCurrency.setEnabled(false);
         txtCurrency.setName("txtCurrency"); // NOI18N
         txtCurrency.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

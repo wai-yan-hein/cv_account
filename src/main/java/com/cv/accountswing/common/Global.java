@@ -93,6 +93,9 @@ public class Global {
     public static String finicialPeriodFrom;
     public static String finicialPeriodTo;
     public static String dateFormat;
-    public static final boolean useActiveMQ = true;
+    //active messaging on / off
+    public static final boolean useActiveMQ = false;
+    //default currency
+    public static Currency defalutCurrency;
 
 }

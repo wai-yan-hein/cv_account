@@ -57,7 +57,7 @@ public class MessagingServiceImpl implements MessagingService {
                     mm.setInt("locationId", locationId);
                     mm.setString("currency", "MMK");
                     mm.setLong("glId", gl.getGlId());
-                    mm.setString("accId", gl.getAccountId());
+                    mm.setString("accId", gl.getSourceAcId());
                     double paid = 0;
                     if (trader instanceof Customer) {
                         if (gl.getDrAmt() != null) {

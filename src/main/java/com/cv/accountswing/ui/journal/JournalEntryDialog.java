@@ -28,16 +28,20 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.toedter.calendar.JTextFieldDateEditor;
+import java.awt.Image;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.text.DateFormat;
 import java.util.List;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +55,7 @@ import org.springframework.stereotype.Component;
 public class JournalEntryDialog extends javax.swing.JDialog implements KeyListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JournalEntryDialog.class);
+    private Gson gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
 
     @Autowired
     private JournalEntryTableModel journalTablModel;
@@ -65,19 +70,17 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
     @Autowired
     private ApplicationMainFrame mainFrame;
     private SelectionObserver selectionObserver;
-
-    public void setSelectionObserver(SelectionObserver selectionObserver) {
-        this.selectionObserver = selectionObserver;
-    }
-
+    private TableRowSorter<TableModel> sorter;
     private String glVouId = null;
-    CurrencyAutoCompleter autoCompleter;
+    private CurrencyAutoCompleter autoCompleter;
 
     public void setGlVouId(String glVouId) {
         this.glVouId = glVouId;
     }
 
-    Gson gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
+    public void setSelectionObserver(SelectionObserver selectionObserver) {
+        this.selectionObserver = selectionObserver;
+    }
 
     /**
      * Creates new form JournalEntryDialog
@@ -98,12 +101,7 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
 
     private void initCombo() {
         autoCompleter = new CurrencyAutoCompleter(txtCurrency, Global.listCurrency, null);
-        String cuId = Global.sysProperties.get("system.default.currency");
-        CurrencyKey key = new CurrencyKey();
-        key.setCode(cuId);
-        key.setCompCode(Global.compId);
-        Currency currency = currencyService.findById(key);
-        autoCompleter.setCurrency(currency);
+        autoCompleter.setCurrency(Global.defalutCurrency);
 
     }
 
@@ -124,15 +122,16 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
         tblJournal.getColumnModel().getColumn(4).setCellEditor(new AutoClearEditor());
         tblJournal.getColumnModel().getColumn(5).setCellEditor(new AutoClearEditor());
         tblJournal.getColumnModel().getColumn(0).setPreferredWidth(10);//dep
-        tblJournal.getColumnModel().getColumn(1).setPreferredWidth(300);//Desp
-        tblJournal.getColumnModel().getColumn(2).setPreferredWidth(300);//cus
-        tblJournal.getColumnModel().getColumn(3).setPreferredWidth(300);//acc
-        tblJournal.getColumnModel().getColumn(4).setPreferredWidth(20);//dr
-        tblJournal.getColumnModel().getColumn(5).setPreferredWidth(20);//cr
+        tblJournal.getColumnModel().getColumn(1).setPreferredWidth(250);//Desp
+        tblJournal.getColumnModel().getColumn(2).setPreferredWidth(250);//cus
+        tblJournal.getColumnModel().getColumn(3).setPreferredWidth(250);//acc
+        tblJournal.getColumnModel().getColumn(4).setPreferredWidth(50);//dr
+        tblJournal.getColumnModel().getColumn(5).setPreferredWidth(50);//cr
 
         tblJournal.setDefaultRenderer(Double.class, new TableCellRender());
         tblJournal.setDefaultRenderer(Object.class, new TableCellRender());
-
+        sorter = new TableRowSorter<>(tblJournal.getModel());
+        tblJournal.setRowSorter(sorter);
         journalTablModel.addEmptyRow();
         tblJournal.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                 .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
@@ -330,7 +329,7 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
         jLabel3.setText("jLabel3");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Journal Entry");
+        setTitle("Journal Voucher");
         setFont(Global.textFont);
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentShown(java.awt.event.ComponentEvent evt) {
@@ -388,7 +387,7 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
         });
 
         btnPrint.setFont(Global.textFont);
-        btnPrint.setText("Save");
+        btnPrint.setText("Print");
         btnPrint.setName("btnSave"); // NOI18N
         btnPrint.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -417,9 +416,9 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
                 .addComponent(jLabel7)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(txtCurrency, javax.swing.GroupLayout.DEFAULT_SIZE, 138, Short.MAX_VALUE)
-                .addGap(18, 18, 18)
+                .addGap(30, 30, 30)
                 .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnPrint, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -579,7 +578,6 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
     /**
      * @param args the command line arguments
      */
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnPrint;
     private javax.swing.JButton btnSave;
