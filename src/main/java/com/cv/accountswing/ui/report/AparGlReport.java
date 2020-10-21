@@ -264,8 +264,9 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
     private void calculateOpening() {
         List<TmpOpeningClosing> opBalanceGL;
         try {
+            String minuStDate = Util1.addDateTo(stDate, -1);
             opBalanceGL = coaOpDService.getOpBalanceGL(getTarget(),
-                    Util1.toDateStrMYSQL(stDate, "dd/MM/yyyy"),
+                    minuStDate,
                     enDate, 3, "MMK",
                     Global.loginUser.getUserId().toString(),
                     Util1.isNull(dept, "-"));

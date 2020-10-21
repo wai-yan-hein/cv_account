@@ -86,7 +86,7 @@ public class AllCashTableModel extends AbstractTableModel {
         return false;
         }
         }*/
-        return column == 6 ? false : true;
+        return column != 6;
     }
 
     @Override
@@ -113,7 +113,7 @@ public class AllCashTableModel extends AbstractTableModel {
                         return Util1.toDateStr(vgi.getGlDate(), "dd/MM/yyyy");
                     }
                 case 1: //Department
-                    return vgi.getDeptName();
+                    return vgi.getDeptUsrCode();
                 case 2://Desp
                     return vgi.getDescription();
                 case 3://Ref
@@ -165,7 +165,7 @@ public class AllCashTableModel extends AbstractTableModel {
                 if (value != null) {
                     if (value instanceof Department) {
                         Department dep = (Department) value;
-                        vgl.setDeptName(dep.getDeptName());
+                        vgl.setDeptUsrCode(dep.getUsrCode());
                         vgl.setDeptId(dep.getDeptCode());
                     }
                 }

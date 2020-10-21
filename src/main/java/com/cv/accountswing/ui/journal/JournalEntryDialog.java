@@ -7,8 +7,6 @@ package com.cv.accountswing.ui.journal;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.SelectionObserver;
-import com.cv.accountswing.entity.Currency;
-import com.cv.accountswing.entity.CurrencyKey;
 import com.cv.accountswing.entity.Gl;
 import com.cv.accountswing.entity.view.VGl;
 import com.cv.accountswing.service.CurrencyService;
@@ -28,12 +26,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.toedter.calendar.JTextFieldDateEditor;
-import java.awt.Image;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.text.DateFormat;
 import java.util.List;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
@@ -169,23 +165,10 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
             if (glVouId.equals("-")) {
                 glVouId = getVouNo("GV", strDate, Global.compId.toString());
             }
-
             if (isGeneralVoucher(listGl, glVouId, vouNo, refrence, strDate)) {
-                //Need to be handel delete row
                 assignGlInfo(listGl);
-                //listGV.remove(listGV.size()-1);
-
                 try {
                     listGl = glService.saveBatchGL(listGl);
-                    /*for (Gl gl : listGl) {
-                if (gl.getTraderId() != null) {
-                Trader trader = traderService.findById(gl.getTraderId().intValue());
-                if (trader.getAppShortName().equals("INVENTORY")) {
-                //Need to sent to inventory
-                //msgService.sendPaymentToInv(gl, trader);
-                }
-                }
-                }*/
                     if (!listGl.isEmpty()) {
                         journalTablModel.clear();
                         JOptionPane.showMessageDialog(Global.parentForm, "Saved");
@@ -214,11 +197,18 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
     }
 
     private boolean isValidEntry() {
+        boolean status = true;
         if (autoCompleter.getCurrency() == null) {
             JOptionPane.showMessageDialog(Global.parentForm, "Invalid Entry");
             return false;
         }
-        return true;
+        for (VGl vgl : journalTablModel.getListGV()) {
+            if (vgl.getSourceAcId() == null) {
+                status = false;
+                JOptionPane.showMessageDialog(Global.parentForm, "Select Account.");
+            }
+        }
+        return status;
     }
 
     private void assignGlInfo(List<Gl> listGL) {

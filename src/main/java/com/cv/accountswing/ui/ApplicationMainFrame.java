@@ -936,7 +936,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         java.awt.Component[] components = menuBar.getComponents();
         for (java.awt.Component component : components) {
             JMenu menu = (JMenu) component;
-            menu.setBorder(BorderFactory.createCompoundBorder(menu.getBorder(), BorderFactory.createEmptyBorder(30, 0, 30, 30)));
+            menu.setBorder(BorderFactory.createCompoundBorder(menu.getBorder(), BorderFactory.createEmptyBorder(25, 0, 20, 25)));
         }
         revalidate();
         repaint();
@@ -979,13 +979,14 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
+        lblCompanyName = new javax.swing.JLabel();
+        jToolBar1 = new javax.swing.JToolBar();
+        btnSave = new javax.swing.JButton();
         btnPrint = new javax.swing.JButton();
         btnDelete = new javax.swing.JButton();
+        btnHistory = new javax.swing.JButton();
         btnClear = new javax.swing.JButton();
         btnLogout = new javax.swing.JButton();
-        btnHistory = new javax.swing.JButton();
-        btnSave = new javax.swing.JButton();
-        lblCompanyName = new javax.swing.JLabel();
         tabMain = new javax.swing.JTabbedPane();
         menuBar = new javax.swing.JMenuBar();
 
@@ -996,7 +997,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         addHierarchyBoundsListener(new java.awt.event.HierarchyBoundsListener() {
             public void ancestorMoved(java.awt.event.HierarchyEvent evt) {
             }
-
             public void ancestorResized(java.awt.event.HierarchyEvent evt) {
                 formAncestorResized(evt);
             }
@@ -1015,11 +1015,9 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             public void windowClosed(java.awt.event.WindowEvent evt) {
                 formWindowClosed(evt);
             }
-
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
             }
-
             public void windowOpened(java.awt.event.WindowEvent evt) {
                 formWindowOpened(evt);
             }
@@ -1027,103 +1025,95 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
 
         jPanel1.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(204, 204, 204), 1, true));
 
+        lblCompanyName.setFont(Global.lableFont);
+        lblCompanyName.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lblCompanyName.setText("Welcome     ");
+
+        jToolBar1.setOpaque(false);
+
+        btnSave.setFont(Global.lableFont);
+        btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save.png"))); // NOI18N
+        btnSave.setToolTipText("F5 - Save");
+        btnSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSaveActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(btnSave);
+
         btnPrint.setFont(Global.lableFont);
-        btnPrint.setText("F7 - Print");
+        btnPrint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/printer.png"))); // NOI18N
         btnPrint.setFocusable(false);
         btnPrint.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnPrintActionPerformed(evt);
             }
         });
+        jToolBar1.add(btnPrint);
 
         btnDelete.setFont(Global.lableFont);
-        btnDelete.setText("F8 - Delete");
+        btnDelete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/delete.png"))); // NOI18N
+        btnDelete.setToolTipText("F8 - Delete");
         btnDelete.setFocusable(false);
         btnDelete.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnDeleteActionPerformed(evt);
             }
         });
-
-        btnClear.setFont(Global.lableFont);
-        btnClear.setText("F10 - Clear");
-        btnClear.setFocusable(false);
-        btnClear.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnClearActionPerformed(evt);
-            }
-        });
-
-        btnLogout.setFont(Global.lableFont);
-        btnLogout.setText("Logout");
-        btnLogout.setFocusable(false);
-        btnLogout.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnLogoutActionPerformed(evt);
-            }
-        });
+        jToolBar1.add(btnDelete);
 
         btnHistory.setFont(Global.lableFont);
-        btnHistory.setText("F9-History");
+        btnHistory.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/history.png"))); // NOI18N
+        btnHistory.setToolTipText("F9-History");
         btnHistory.setFocusable(false);
         btnHistory.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnHistoryActionPerformed(evt);
             }
         });
+        jToolBar1.add(btnHistory);
 
-        btnSave.setFont(Global.lableFont);
-        btnSave.setText("F5-Save");
-        btnSave.setFocusable(false);
-        btnSave.addActionListener(new java.awt.event.ActionListener() {
+        btnClear.setFont(Global.lableFont);
+        btnClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/clean-code.png"))); // NOI18N
+        btnClear.setToolTipText("F10 - Clear");
+        btnClear.setFocusable(false);
+        btnClear.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSaveActionPerformed(evt);
+                btnClearActionPerformed(evt);
             }
         });
+        jToolBar1.add(btnClear);
 
-        lblCompanyName.setFont(Global.lableFont);
-        lblCompanyName.setText("Welcome");
+        btnLogout.setFont(Global.lableFont);
+        btnLogout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/logout.png"))); // NOI18N
+        btnLogout.setToolTipText("Logout");
+        btnLogout.setFocusable(false);
+        btnLogout.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLogoutActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(btnLogout);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
-                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(lblCompanyName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addGap(102, 102, 102)
-                                .addComponent(btnSave)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnPrint)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnDelete)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnHistory)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnClear)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnLogout)
-                                .addContainerGap())
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 364, Short.MAX_VALUE)
+                .addComponent(lblCompanyName, javax.swing.GroupLayout.PREFERRED_SIZE, 194, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
-
-        jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[]{btnClear, btnDelete, btnHistory, btnLogout, btnPrint, btnSave});
-
         jPanel1Layout.setVerticalGroup(
-                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(lblCompanyName, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                                        .addComponent(btnPrint, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                        .addComponent(btnSave))
-                                                .addComponent(btnDelete, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                                        .addComponent(btnClear, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                        .addComponent(btnHistory, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                                .addComponent(btnLogout, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(0, 0, 0)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblCompanyName, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(0, 0, 0))
         );
 
         tabMain.setTabPlacement(javax.swing.JTabbedPane.BOTTOM);
@@ -1141,19 +1131,17 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(tabMain)
-                                .addContainerGap())
-                        .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(tabMain, javax.swing.GroupLayout.Alignment.TRAILING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(tabMain, javax.swing.GroupLayout.DEFAULT_SIZE, 285, Short.MAX_VALUE)
-                                .addContainerGap())
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(tabMain, javax.swing.GroupLayout.DEFAULT_SIZE, 343, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pack();
@@ -1251,6 +1239,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private javax.swing.JButton btnPrint;
     private javax.swing.JButton btnSave;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JToolBar jToolBar1;
     private javax.swing.JLabel lblCompanyName;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JTabbedPane tabMain;

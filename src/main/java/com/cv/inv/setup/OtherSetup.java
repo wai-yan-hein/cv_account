@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class OtherSetup extends javax.swing.JPanel {
 
-    Image image = new ImageIcon(getClass().getResource("/images/setting.png")).getImage();
+    Image image = new ImageIcon(this.getClass().getResource("/images/date.png")).getImage();
     private LoadingObserver loadingObserver;
     @Autowired
     private LocationSetupDialog locationSetupDialog;

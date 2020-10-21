@@ -10,7 +10,6 @@ import com.cv.accountswing.entity.temp.TmpOpeningClosing;
 import com.cv.accountswing.entity.view.VAccOpeningD;
 import com.cv.accountswing.util.Util1;
 import java.util.List;
-import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;

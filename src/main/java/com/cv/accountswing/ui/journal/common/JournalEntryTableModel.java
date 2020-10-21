@@ -145,7 +145,7 @@ public class JournalEntryTableModel extends AbstractTableModel {
                     if (value instanceof ChartOfAccount) {
                         ChartOfAccount coa = (ChartOfAccount) value;
                         gv.setSourceAcId(coa.getCode());
-                        gv.setAccName(coa.getCoaNameEng());
+                        gv.setSrcAccName(coa.getCoaNameEng());
 
                     }
                 }
@@ -156,8 +156,8 @@ public class JournalEntryTableModel extends AbstractTableModel {
                 if (value != null) {
                     gv.setDrAmt(Util1.getDouble(value));
                     if (gv.getCrAmt() != null) {
-                        gv.setCrAmt(Double.NaN);
-                        parent.setColumnSelectionInterval(3, 3);
+                        gv.setCrAmt(0.0);
+                        parent.setColumnSelectionInterval(5, 5);
                         parent.setRowSelectionInterval(row + 1, row + 1);
                     }
                 }
@@ -166,7 +166,9 @@ public class JournalEntryTableModel extends AbstractTableModel {
                 if (value != null) {
                     gv.setCrAmt(Util1.getDouble(value));
                     if (gv.getDrAmt() != null) {
-                        gv.setDrAmt(Double.NaN);
+                        gv.setDrAmt(0.0);
+                        parent.setColumnSelectionInterval(4, 4);
+                        parent.setRowSelectionInterval(row + 1, row + 1);
                     }
                 }
                 break;

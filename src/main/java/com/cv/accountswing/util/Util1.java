@@ -325,7 +325,7 @@ public class Util1 {
 
     public static String addDateTo(String date, int ttlDay) {
         String output = null;
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
         Calendar c = Calendar.getInstance();
 
         try {
