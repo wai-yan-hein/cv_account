@@ -25,7 +25,8 @@ public class SaleHisDaoImpl extends AbstractDao<String, SaleHis> implements Sale
     }
 
     @Override
-    public List<SaleHis> search(String fromDate, String toDate, String cusId, String vouStatusId, String remark) {
+    public List<SaleHis> search(String fromDate, String toDate, String cusId,
+            String vouStatusId, String remark, String stockCode) {
         String strFilter = "";
 
         if (!fromDate.equals("-") && !toDate.equals("-")) {
@@ -81,6 +82,12 @@ public class SaleHisDaoImpl extends AbstractDao<String, SaleHis> implements Sale
 
         List<SaleHis> listSaleHis = findHSQL(strSql);
         return listSaleHis;
+    }
+
+    @Override
+    public SaleHis findById(String id) {
+        SaleHis sh = getByKey(id);
+        return sh;
     }
 
 }

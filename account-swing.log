@@ -132,3 +132,5 @@
 19 Oct 2020 04:47:17,825 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
 19 Oct 2020 04:47:17,825 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : null
 >>>>>>> 7fa91e6d01ebe7e3e4865da24b73cc35acb6e4a1
+20 Oct 2020 09:44:43,071 ERROR: com.cv.accountswing.util.StockUP - java.lang.NullPointerException
+20 Oct 2020 09:44:43,118 ERROR: com.cv.accountswing.util.StockUP - java.lang.NullPointerException

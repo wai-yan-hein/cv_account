@@ -30,8 +30,13 @@ public class SaleHisServiceImpl implements SaleHisService {
     }
 
     @Override
-    public List<SaleHis> search(String fromDate, String toDate, String cusId, String vouStatusId, String remark) {
-        return hisDao.search(fromDate, toDate, cusId, vouStatusId, remark);
+    public List<SaleHis> search(String fromDate, String toDate, String cusId, String vouStatusId, String remark, String stockCode) {
+        return hisDao.search(fromDate, toDate, cusId, vouStatusId, remark, stockCode);
+    }
+
+    @Override
+    public SaleHis findById(String id) {
+        return hisDao.findById(id);
     }
 
 }

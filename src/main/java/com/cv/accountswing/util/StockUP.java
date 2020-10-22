@@ -6,10 +6,8 @@
 package com.cv.accountswing.util;
 
 import com.cv.inv.entity.Stock;
-import com.cv.inv.entity.StockUnit;
 import com.cv.inv.entry.common.StockPriceList;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import com.cv.accountswing.common.Global;
 import org.apache.log4j.Logger;
@@ -29,7 +27,7 @@ public class StockUP {
 
     public void add(Stock stock) {
         if (!Global.hasUnit.containsKey(stock.getStockCode())) {
-            String key = stock.getStockCode();
+            String stockCode = stock.getStockCode();
 
             List<StockPriceList> listPrice = new ArrayList();
             listPrice.add(new StockPriceList("N", stock.getSalePriceN()));
@@ -38,21 +36,21 @@ public class StockUP {
             listPrice.add(new StockPriceList("C", stock.getSalePriceC()));
             listPrice.add(new StockPriceList("D", stock.getSalePriceD()));
 
-            Global.hasPrice.put(key, listPrice);
+            Global.hasPrice.put(stockCode, listPrice);
         }
     }
 
-    public List<StockPriceList> getPriceList(String key) {
-        if (Global.hasPrice.containsKey(key)) {
-            return Global.hasPrice.get(key);
+    public List<StockPriceList> getPriceList(String stockCode) {
+        if (Global.hasPrice.containsKey(stockCode)) {
+            return Global.hasPrice.get(stockCode);
         } else {
             return null;
         }
     }
 
-    public Double getPrice(String key, String priceType) {
+    public Double getPrice(String stockCode, String priceType) {
         Double price = new Double(0);
-        List<StockPriceList> priceList = getPriceList(key);
+        List<StockPriceList> priceList = getPriceList(stockCode);
         int index = -1;
 
         switch (priceType) {

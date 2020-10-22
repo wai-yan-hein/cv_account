@@ -7,6 +7,7 @@ package com.cv.inv.entry.common;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.SelectionObserver;
+import com.cv.accountswing.entity.Department;
 import com.cv.accountswing.util.NumberUtil;
 import com.cv.accountswing.util.StockUP;
 import com.cv.accountswing.util.Util1;
@@ -17,11 +18,11 @@ import com.cv.inv.entity.Stock;
 import com.cv.inv.entity.StockUnit;
 import com.cv.inv.entity.UnitRelation;
 import com.cv.inv.service.RelationService;
-import com.cv.inv.service.StockUnitService;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.table.AbstractTableModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,21 +42,19 @@ public class SaleEntryTableModel1 extends AbstractTableModel {
 
     private JTable parent;
     private List<SaleDetailHis1> listDetail = new ArrayList();
+    @Autowired
+    private RelationService relationService;
     private String sourceName;
     private SelectionObserver selectionObserver;
     private StockUP stockUp;
     private Location location;
     private String sourceAccId;
-    private StockInfo stockInfo;
     private String cusType;
-    @Autowired
-    private StockUnitService unitService;
-    @Autowired
-    private RelationService relationService;
+    private Department department;
+    private JTextField txtTotalItem;
 
-    public SaleEntryTableModel1(List<SaleDetailHis1> listDetail, StockInfo stockInfo, StockUP stockUp) {
+    public SaleEntryTableModel1(List<SaleDetailHis1> listDetail, StockUP stockUp) {
         this.listDetail = listDetail;
-        this.stockInfo = stockInfo;
         this.stockUp = stockUp;
     }
 
@@ -241,14 +240,22 @@ public class SaleEntryTableModel1 extends AbstractTableModel {
                 case 0://Code
                     if (value != null) {
                         Stock stock = (Stock) value;
-                        String stockCode = stock.getStockCode();
-                        String[] strList = stockCode.split("@");
-                        stockInfo.getStockInfo(strList[0]);
-                        if (listDetail.get(parent.getSelectedRow()).getStock() != null) {
+                        record.setStock(stock);
+                        record.setQuantity(1.0f);
+                        record.setStdWeight(stock.getSaleMeasure());
+                        record.setItemUnit(stock.getSaleUnit());
+                        record.setUniqueId(row + 1);
+                        record.setDepartment(department);
+                        record.setLocation(location);
+                        stockUp.add(stock);
+                        if (stock.getStockCode() != null) {
+                            String stockCode = stock.getStockCode();
                             record.setPrice(stockUp.getPrice(stockCode, getCusType()));
                         }
                     }
-                    parent.setColumnSelectionInterval(3, 3);
+                    txtTotalItem.setText(Integer.toString(listDetail.size()));
+                    addEmptyRow();
+                    parent.setColumnSelectionInterval(4, 4);
                     break;
                 case 2://Exp Date
                     if (value != null) {
@@ -535,5 +542,17 @@ public class SaleEntryTableModel1 extends AbstractTableModel {
 
     public List<SaleDetailHis1> getListSaleDetail() {
         return listDetail;
+    }
+
+    public Department getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(Department dept) {
+        this.department = dept;
+    }
+    
+    public void setTxtTotalItem(JTextField txtTtlItem) {
+        this.txtTotalItem = txtTtlItem;
     }
 }

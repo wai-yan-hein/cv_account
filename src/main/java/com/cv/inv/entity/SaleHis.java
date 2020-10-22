@@ -27,8 +27,9 @@ public class SaleHis implements java.io.Serializable {
     @Id
     @Column(name = "voucher_no", unique = true, nullable = false, length = 15)
     private String vouNo;
-    @Column(name = "cus_id")
-    private String traderId;
+    @ManyToOne
+    @JoinColumn(name = "cus_id")
+    private Trader traderId;
     @Column(name = "saleman_id")
     private String saleManId;
     @Temporal(TemporalType.TIMESTAMP)
@@ -72,11 +73,11 @@ public class SaleHis implements java.io.Serializable {
         this.vouNo = vouNo;
     }
 
-    public String getTraderId() {
+    public Trader getTraderId() {
         return traderId;
     }
 
-    public void setTraderId(String traderId) {
+    public void setTraderId(Trader traderId) {
         this.traderId = traderId;
     }
 

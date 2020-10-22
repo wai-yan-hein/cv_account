@@ -5,6 +5,7 @@
  */
 package com.cv.inv.entry.common;
 
+import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.SaleHis;
 import java.util.ArrayList;
 import java.util.Date;
@@ -87,7 +88,7 @@ public class SaleVouSearchTableModel extends AbstractTableModel {
                 case 2://remark
                     return his.getRemark();
                 case 3://customer
-                    return his.getTraderId();
+                    return his.getTraderId().getTraderName();
                 case 4://user
                     return his.getCreatedBy();
                 case 5://v-total
@@ -106,5 +107,14 @@ public class SaleVouSearchTableModel extends AbstractTableModel {
     public void setListSaleHis(List<SaleHis> listSaleHis) {
         this.listSaleHis = listSaleHis;
         fireTableDataChanged();
+    }
+
+    public SaleHis getSelectVou(int row) {
+        if (listSaleHis != null) {
+            if (!listSaleHis.isEmpty()) {
+                return listSaleHis.get(row);
+            }
+        }
+        return null;
     }
 }
