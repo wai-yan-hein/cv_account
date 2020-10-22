@@ -3,16 +3,22 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.cv.inv.entry;
+package com.cv.inv.entry.dialog;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.entity.Trader;
 import com.cv.accountswing.service.TraderService;
+<<<<<<< HEAD:src/main/java/com/cv/inv/entry/dialog/SaleVouSearch.java
+import com.cv.accountswing.ui.cash.common.TableCellRender;
+=======
 import com.cv.accountswing.ui.ApplicationMainFrame;
+>>>>>>> 01c3b472b265d316ea53f23bda0ffef84054aab0:src/main/java/com/cv/inv/entry/SaleVouSearch.java
 import com.cv.accountswing.ui.editor.TraderAutoCompleter;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.SaleHis;
+import com.cv.inv.entity.Stock;
 import com.cv.inv.entity.VouStatus;
+import com.cv.inv.entry.SaleEntry;
 import com.cv.inv.entry.common.CodeTableModel;
 import com.cv.inv.entry.common.SaleVouSearchTableModel;
 import com.cv.inv.entry.editor.StockCellEditor;
@@ -56,7 +62,11 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
     @Autowired
     private SaleHisService saleHisService;
     @Autowired
+<<<<<<< HEAD:src/main/java/com/cv/inv/entry/dialog/SaleVouSearch.java
+    private SaleEntry saleEntry;
+=======
     private ApplicationMainFrame mainFrame;
+>>>>>>> 01c3b472b265d316ea53f23bda0ffef84054aab0:src/main/java/com/cv/inv/entry/SaleVouSearch.java
     private VouStatusAutoCompleter vouCompleter;
     private TraderAutoCompleter traderAutoCompleter;
 
@@ -98,6 +108,7 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
         tblStock.getColumnModel().getColumn(1).setPreferredWidth(200);
 
         tblStock.getColumnModel().getColumn(0).setCellEditor(new StockCellEditor());
+        tblStock.setDefaultRenderer(Object.class, new TableCellRender());
     }
 
     private void assignDefaultValue() {
@@ -123,15 +134,39 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
     }
 
     private void search() {
+        //btnSearch.setEnabled(false);
         String fromDate = Util1.toDateStr(txtFromDate.getDate(), "dd/MM/yyyy");
         String toDate = Util1.toDateStr(txtToDate.getDate(), "dd/MM/yyyy");
-        String customerId = traderAutoCompleter.getTrader().getTraderId();
+        String customerId = traderAutoCompleter.getTrader().getId().toString();
         String vouStatusId = vouCompleter.getVouStatus().getVouStatusId().toString();
         String remark = txtRemark.getText();
+        String stockId = codeTableModel.getFilterCodeStr();
 
-        List<SaleHis> listHis = saleHisService.search(fromDate, toDate, customerId, vouStatusId, remark);
+        List<SaleHis> listHis = saleHisService.search(fromDate, toDate, customerId, vouStatusId, remark, stockId);
         saleVouTableModel.setListSaleHis(listHis);
+        lblTtlRecord.setText("Total Records : " + saleVouTableModel.getRowCount());
+        if (saleVouTableModel.getRowCount() > 0) {
+            double iAmount = 0;
+            for (int i = 0; i < saleVouTableModel.getRowCount(); i++) {
+                iAmount += Util1.getDouble(saleVouTableModel.getValueAt(i, 5).toString());
+            }
+            lblTtlAmount.setText("Total Amount : " + iAmount);
+        }
+        //tblVoucher.requestFocus();
+    }
 
+    private void select() {
+        int row = tblVoucher.convertRowIndexToModel(tblVoucher.getSelectedRow());
+        SaleHis his = saleVouTableModel.getSelectVou(row);
+        if (his != null) {
+            String vouNo = his.getVouNo();
+            SaleHis saleHis = saleHisService.findById(vouNo);
+            this.dispose();
+            saleEntry.setSaleVoucher(saleHis);
+        } else {
+            JOptionPane.showMessageDialog(this, "Please select the voucher.",
+                    "No Voucher Selected", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private void initKeyListener() {
@@ -346,6 +381,11 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
 
         btnSelect.setFont(Global.lableFont);
         btnSelect.setText("Select");
+        btnSelect.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSelectActionPerformed(evt);
+            }
+        });
 
         btnSearch.setFont(Global.lableFont);
         btnSearch.setText("Search");
@@ -366,7 +406,7 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblTtlRecord, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(lblTtlAmount, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblTtlAmount, javax.swing.GroupLayout.PREFERRED_SIZE, 257, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btnSearch)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -394,7 +434,15 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
 
     private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
         search();
+        tblVoucher.requestFocus();
+        if (saleVouTableModel.getListSaleHis().size() > 0) {
+            tblVoucher.setRowSelectionInterval(0, 0);
+        }
     }//GEN-LAST:event_btnSearchActionPerformed
+
+    private void btnSelectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectActionPerformed
+        select();
+    }//GEN-LAST:event_btnSelectActionPerformed
 
     /**
      * @param args the command line arguments
@@ -525,7 +573,7 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
                     txtUser.requestFocus();
                 }
                 if (e.getKeyCode() == KeyEvent.VK_DOWN || e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    txtFromDate.requestFocus();
+                    txtFromDate.getDateEditor().getUiComponent().requestFocusInWindow();
                 }
                 tabToTable(e);
                 break;
