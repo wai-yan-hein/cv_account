@@ -57,6 +57,7 @@ public class MessagingServiceImpl implements MessagingService {
                     mm.setInt("locationId", locationId);
                     mm.setString("currency", "MMK");
                     mm.setLong("glId", gl.getGlId());
+                    mm.setString("accId", gl.getSourceAcId());
                     double paid = 0;
                     if (trader instanceof Customer) {
                         if (gl.getDrAmt() != null) {
@@ -64,10 +65,10 @@ public class MessagingServiceImpl implements MessagingService {
                         } else if (gl.getCrAmt() != null) {
                             paid = gl.getCrAmt() * -1;
                         }
-                    }else if(trader instanceof Supplier){
-                        if(gl.getDrAmt() != null){
+                    } else if (trader instanceof Supplier) {
+                        if (gl.getDrAmt() != null) {
                             paid = gl.getDrAmt() * -1;
-                        }else if(gl.getCrAmt() != null){
+                        } else if (gl.getCrAmt() != null) {
                             paid = gl.getCrAmt();
                         }
                     }
@@ -100,7 +101,7 @@ public class MessagingServiceImpl implements MessagingService {
             });
         }
     }
-    
+
     @Override
     public void sendPaymentToInvGV(final Gl gl, final Trader trader) {
         if (jmsTemplate != null) {
@@ -127,10 +128,10 @@ public class MessagingServiceImpl implements MessagingService {
                         } else if (gl.getCrAmt() != null) {
                             paid = gl.getCrAmt();
                         }
-                    }else if(trader instanceof Supplier){
-                        if(gl.getDrAmt() != null){
+                    } else if (trader instanceof Supplier) {
+                        if (gl.getDrAmt() != null) {
                             paid = gl.getDrAmt();
-                        }else if(gl.getCrAmt() != null){
+                        } else if (gl.getCrAmt() != null) {
                             paid = gl.getCrAmt() * -1;
                         }
                     }

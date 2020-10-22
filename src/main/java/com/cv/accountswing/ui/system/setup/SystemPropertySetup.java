@@ -7,9 +7,11 @@ package com.cv.accountswing.ui.system.setup;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
+import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.entity.SystemProperty;
 import com.cv.accountswing.entity.SystemPropertyKey;
 import com.cv.accountswing.service.SystemPropertyService;
+import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.system.setup.common.SystemPropertyTableModel;
 import java.awt.event.KeyEvent;
@@ -32,7 +34,7 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-public class SystemPropertySetup extends javax.swing.JPanel implements KeyListener {
+public class SystemPropertySetup extends javax.swing.JPanel implements KeyListener, PanelControl {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SystemPropertySetup.class);
     private int selectRow = -1;
@@ -43,6 +45,8 @@ public class SystemPropertySetup extends javax.swing.JPanel implements KeyListen
     private SystemPropertyTableModel systemPropertyTableModel;
     @Autowired
     private TaskExecutor taskExecutor;
+    @Autowired
+    private ApplicationMainFrame mainFrame;
     private LoadingObserver loadingObserver;
     private boolean isShown = false;
 
@@ -112,7 +116,7 @@ public class SystemPropertySetup extends javax.swing.JPanel implements KeyListen
 
     }
 
-    private void save() {
+    private void saveSysProperty() {
         if (isValidEntry()) {
             SystemProperty save = spService.save(systemProperty);
             if (save != null) {
@@ -339,6 +343,7 @@ public class SystemPropertySetup extends javax.swing.JPanel implements KeyListen
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
+        mainFrame.setControl(this);
         if (!isShown) {
             initTable();
         }
@@ -448,6 +453,27 @@ public class SystemPropertySetup extends javax.swing.JPanel implements KeyListen
                 tblSystemProper.setRowSelectionInterval(0, 0);
             }
         }
+    }
+
+    @Override
+    public void delete() {
+    }
+
+    @Override
+    public void newForm() {
+    }
+
+    @Override
+    public void history() {
+    }
+
+    @Override
+    public void print() {
+    }
+
+    @Override
+    public void save() {
+        saveSysProperty();
     }
 
 }

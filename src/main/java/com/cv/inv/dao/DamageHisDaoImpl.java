@@ -6,8 +6,6 @@
 package com.cv.inv.dao;
 
 import com.cv.accountswing.dao.AbstractDao;
-import com.cv.accountswing.util.Util1;
-import com.cv.inv.entity.DamageDetailHis;
 import com.cv.inv.entity.DamageHis;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,35 +30,35 @@ public class DamageHisDaoImpl extends AbstractDao<String, DamageHis> implements 
     @Override
     public DamageHis findById(String id) {
         DamageHis ph = getByKey(id);
-        String dmgId=ph.getDmgVouId();
-        List<DamageDetailHis> listDetail=detaildao.search(dmgId);
-      //  ph.setListDetail(listDetail);
+//        String dmgId = ph.getDmgVouId();
+//        List<DamageDetailHis> listDetail = detaildao.search(dmgId);
+        //  ph.setListDetail(listDetail);
         return ph;
     }
 
     @Override
-    public List<DamageHis> search(String from, String to, String location, String session, String remark, String vouNo) {
+    public List<DamageHis> search(String from, String to, String location, String remark, String vouNo) {
         String strFilter = "";
 
         if (!from.equals("-") && !to.equals("-")) {
             if (strFilter.isEmpty()) {
-                strFilter = "v.dmgDate between '" + Util1.toDateStr(from, "dd/MM/yyyy", "yyyy-MM-dd")
-                        + "' and '" + Util1.toDateStr(to, "dd/MM/yyyy", "yyyy-MM-dd") + "'";
+                strFilter = "v.dmgDate between '" + from
+                        + "' and '" + to + "'";
             } else {
-                strFilter = strFilter + " and v.dmgDate between '" + Util1.toDateStr(from, "dd/MM/yyyy", "yyyy-MM-dd")
-                        + "' and '" + Util1.toDateStr(to, "dd/MM/yyyy", "yyyy-MM-dd") + "'";
+                strFilter = strFilter + " and v.dmgDate between '" + from
+                        + "' and '" + to + "'";
             }
         } else if (!from.equals("-")) {
             if (strFilter.isEmpty()) {
-                strFilter = "v.dmgDate >= '" + Util1.toDateStr(from, "dd/MM/yyyy", "yyyy-MM-dd") + "'";
+                strFilter = "v.dmgDate >= '" + from + "'";
             } else {
-                strFilter = strFilter + " and v.dmgDate >= '" + Util1.toDateStr(from, "dd/MM/yyyy", "yyyy-MM-dd") + "'";
+                strFilter = strFilter + " and v.dmgDate >= '" + from + "'";
             }
         } else if (!to.equals("-")) {
             if (strFilter.isEmpty()) {
-                strFilter = "v.dmgDate <= '" + Util1.toDateStr(to, "dd/MM/yyyy", "yyyy-MM-dd") + "'";
+                strFilter = "v.dmgDate <= '" + to + "'";
             } else {
-                strFilter = strFilter + " and v.dmgDate <= '" + Util1.toDateStr(to, "dd/MM/yyyy", "yyyy-MM-dd") + "'";
+                strFilter = strFilter + " and v.dmgDate <= '" + to + "'";
             }
         }
 
@@ -69,14 +67,6 @@ public class DamageHisDaoImpl extends AbstractDao<String, DamageHis> implements 
                 strFilter = "v.location = " + location;
             } else {
                 strFilter = strFilter + " and v.location = " + location;
-            }
-        }
-
-        if (!session.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "v.session = " + session;
-            } else {
-                strFilter = strFilter + " and v.session = " + session;
             }
         }
 

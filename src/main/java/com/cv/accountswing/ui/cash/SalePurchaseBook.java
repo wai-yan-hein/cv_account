@@ -7,10 +7,11 @@ package com.cv.accountswing.ui.cash;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
+import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.view.VGl;
-import com.cv.accountswing.service.ReportService;
 import com.cv.accountswing.service.VGlService;
+import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.editor.CurrencyEditor;
 import com.cv.accountswing.ui.editor.DepartmentCellEditor;
 import com.cv.accountswing.ui.editor.TraderCellEditor;
@@ -50,7 +51,7 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObserver {
+public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObserver, PanelControl {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SalePurchaseBook.class);
     String stDate;
@@ -107,6 +108,9 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
      * Creates new form CashBook
      *
      */
+    @Autowired
+    private ApplicationMainFrame mainFrame;
+
     public SalePurchaseBook() {
         initComponents();
         initPopup();
@@ -488,6 +492,7 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
+        mainFrame.setControl(this);
         if (!isShown) {
             initMain();
         } else {
@@ -586,6 +591,22 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
     private void searchValidation(String str) {
 
         searchCash();
+    }
+
+    @Override
+    public void save() {
+    }
+
+    @Override
+    public void delete() {
+    }
+
+    @Override
+    public void newForm() {
+    }
+
+    @Override
+    public void history() {
     }
 
 }

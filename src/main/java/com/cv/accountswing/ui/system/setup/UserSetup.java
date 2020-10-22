@@ -7,8 +7,10 @@ package com.cv.accountswing.ui.system.setup;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
+import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.entity.AppUser;
 import com.cv.accountswing.service.UserService;
+import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.setup.common.UserTableModel;
 import com.cv.accountswing.util.Util1;
@@ -34,7 +36,7 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-public class UserSetup extends javax.swing.JPanel implements KeyListener {
+public class UserSetup extends javax.swing.JPanel implements KeyListener, PanelControl {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserSetup.class);
     private int selectRow = -1;
@@ -45,6 +47,8 @@ public class UserSetup extends javax.swing.JPanel implements KeyListener {
     private UserTableModel userTableModel;
     @Autowired
     private TaskExecutor taskExecutor;
+    @Autowired
+    private ApplicationMainFrame mainFrame;
     private LoadingObserver loadingObserver;
     private boolean isShown = false;
 
@@ -360,6 +364,7 @@ public class UserSetup extends javax.swing.JPanel implements KeyListener {
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
+        mainFrame.setControl(this);
         if (!isShown) {
             initTable();
         }
@@ -539,6 +544,28 @@ public class UserSetup extends javax.swing.JPanel implements KeyListener {
                 tblUser.setRowSelectionInterval(0, 0);
             }
         }
+    }
+
+    @Override
+    public void save() {
+        saveUser();
+    }
+
+    @Override
+    public void delete() {
+    }
+
+    @Override
+    public void newForm() {
+
+    }
+
+    @Override
+    public void history() {
+    }
+
+    @Override
+    public void print() {
     }
 
 }

@@ -8,7 +8,11 @@ package com.cv.inv.entry.dialog;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.entity.Trader;
 import com.cv.accountswing.service.TraderService;
+<<<<<<< HEAD:src/main/java/com/cv/inv/entry/dialog/SaleVouSearch.java
 import com.cv.accountswing.ui.cash.common.TableCellRender;
+=======
+import com.cv.accountswing.ui.ApplicationMainFrame;
+>>>>>>> 01c3b472b265d316ea53f23bda0ffef84054aab0:src/main/java/com/cv/inv/entry/SaleVouSearch.java
 import com.cv.accountswing.ui.editor.TraderAutoCompleter;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.SaleHis;
@@ -58,7 +62,11 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
     @Autowired
     private SaleHisService saleHisService;
     @Autowired
+<<<<<<< HEAD:src/main/java/com/cv/inv/entry/dialog/SaleVouSearch.java
     private SaleEntry saleEntry;
+=======
+    private ApplicationMainFrame mainFrame;
+>>>>>>> 01c3b472b265d316ea53f23bda0ffef84054aab0:src/main/java/com/cv/inv/entry/SaleVouSearch.java
     private VouStatusAutoCompleter vouCompleter;
     private TraderAutoCompleter traderAutoCompleter;
 

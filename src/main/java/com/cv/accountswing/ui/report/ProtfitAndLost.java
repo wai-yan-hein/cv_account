@@ -41,6 +41,7 @@ public class ProtfitAndLost extends javax.swing.JPanel implements SelectionObser
     private String enDate;
     private String depId;
     private String currency;
+    private boolean isShown = false;
     @Autowired
     private SystemPropertyService spService;
     @Autowired
@@ -273,7 +274,9 @@ public class ProtfitAndLost extends javax.swing.JPanel implements SelectionObser
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
-        initMain();
+        if (!isShown) {
+            initMain();
+        }
     }//GEN-LAST:event_formComponentShown
 
     private void btnPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintActionPerformed

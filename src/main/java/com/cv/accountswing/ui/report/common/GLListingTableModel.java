@@ -7,6 +7,7 @@ package com.cv.accountswing.ui.report.common;
 import com.cv.accountswing.entity.view.VTriBalance;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 import javax.swing.table.AbstractTableModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,6 +108,7 @@ public class GLListingTableModel extends AbstractTableModel {
     }
 
     public void setListTBAL(List<VTriBalance> listTBal) {
+        listTBal.removeIf(gl -> gl.getDrAmt() + gl.getCrAmt() == 0);
         this.listTBal = listTBal;
         fireTableDataChanged();
     }

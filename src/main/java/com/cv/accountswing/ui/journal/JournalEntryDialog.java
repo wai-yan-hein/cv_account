@@ -7,14 +7,13 @@ package com.cv.accountswing.ui.journal;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.SelectionObserver;
-import com.cv.accountswing.entity.Currency;
-import com.cv.accountswing.entity.CurrencyKey;
 import com.cv.accountswing.entity.Gl;
 import com.cv.accountswing.entity.view.VGl;
 import com.cv.accountswing.service.CurrencyService;
 import com.cv.accountswing.service.GlService;
 import com.cv.accountswing.service.SeqTableService;
 import com.cv.accountswing.service.VGlService;
+import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.editor.COACellEditor;
@@ -37,6 +36,8 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,7 @@ import org.springframework.stereotype.Component;
 public class JournalEntryDialog extends javax.swing.JDialog implements KeyListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JournalEntryDialog.class);
+    private Gson gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
 
     @Autowired
     private JournalEntryTableModel journalTablModel;
@@ -61,15 +63,21 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
     private GlService glService;
     @Autowired
     private VGlService vGlService;
-
+    @Autowired
+    private ApplicationMainFrame mainFrame;
+    private SelectionObserver selectionObserver;
+    private TableRowSorter<TableModel> sorter;
     private String glVouId = null;
-    CurrencyAutoCompleter autoCompleter;
+    private CurrencyAutoCompleter autoCompleter;
+    private boolean isShown = false;
 
     public void setGlVouId(String glVouId) {
         this.glVouId = glVouId;
     }
 
-    Gson gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
+    public void setSelectionObserver(SelectionObserver selectionObserver) {
+        this.selectionObserver = selectionObserver;
+    }
 
     /**
      * Creates new form JournalEntryDialog
@@ -90,12 +98,7 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
 
     private void initCombo() {
         autoCompleter = new CurrencyAutoCompleter(txtCurrency, Global.listCurrency, null);
-        String cuId = Global.sysProperties.get("system.default.currency");
-        CurrencyKey key = new CurrencyKey();
-        key.setCode(cuId);
-        key.setCompCode(Global.compId);
-        Currency currency = currencyService.findById(key);
-        autoCompleter.setCurrency(currency);
+        autoCompleter.setCurrency(Global.defalutCurrency);
 
     }
 
@@ -116,15 +119,16 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
         tblJournal.getColumnModel().getColumn(4).setCellEditor(new AutoClearEditor());
         tblJournal.getColumnModel().getColumn(5).setCellEditor(new AutoClearEditor());
         tblJournal.getColumnModel().getColumn(0).setPreferredWidth(10);//dep
-        tblJournal.getColumnModel().getColumn(1).setPreferredWidth(300);//Desp
-        tblJournal.getColumnModel().getColumn(2).setPreferredWidth(300);//cus
-        tblJournal.getColumnModel().getColumn(3).setPreferredWidth(300);//acc
-        tblJournal.getColumnModel().getColumn(4).setPreferredWidth(20);//dr
-        tblJournal.getColumnModel().getColumn(5).setPreferredWidth(20);//cr
+        tblJournal.getColumnModel().getColumn(1).setPreferredWidth(250);//Desp
+        tblJournal.getColumnModel().getColumn(2).setPreferredWidth(250);//cus
+        tblJournal.getColumnModel().getColumn(3).setPreferredWidth(250);//acc
+        tblJournal.getColumnModel().getColumn(4).setPreferredWidth(50);//dr
+        tblJournal.getColumnModel().getColumn(5).setPreferredWidth(50);//cr
 
         tblJournal.setDefaultRenderer(Double.class, new TableCellRender());
         tblJournal.setDefaultRenderer(Object.class, new TableCellRender());
-
+        sorter = new TableRowSorter<>(tblJournal.getModel());
+        tblJournal.setRowSorter(sorter);
         journalTablModel.addEmptyRow();
         tblJournal.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                 .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
@@ -161,25 +165,16 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
             if (glVouId.equals("-")) {
                 glVouId = getVouNo("GV", strDate, Global.compId.toString());
             }
-
             if (isGeneralVoucher(listGl, glVouId, vouNo, refrence, strDate)) {
-                //Need to be handel delete row
                 assignGlInfo(listGl);
-                //listGV.remove(listGV.size()-1);
-
                 try {
                     listGl = glService.saveBatchGL(listGl);
-                    /*for (Gl gl : listGl) {
-                if (gl.getTraderId() != null) {
-                Trader trader = traderService.findById(gl.getTraderId().intValue());
-                if (trader.getAppShortName().equals("INVENTORY")) {
-                //Need to sent to inventory
-                //msgService.sendPaymentToInv(gl, trader);
-                }
-                }
-                }*/
                     if (!listGl.isEmpty()) {
+                        journalTablModel.clear();
                         JOptionPane.showMessageDialog(Global.parentForm, "Saved");
+                        if (selectionObserver != null) {
+                            selectionObserver.selected("SEARCHVOUCHER", "-");
+                        }
                     }
                     //Delete row
                     /* if (!strDeleteIds.equals("-")) {
@@ -202,11 +197,18 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
     }
 
     private boolean isValidEntry() {
+        boolean status = true;
         if (autoCompleter.getCurrency() == null) {
             JOptionPane.showMessageDialog(Global.parentForm, "Invalid Entry");
             return false;
         }
-        return true;
+        for (VGl vgl : journalTablModel.getListGV()) {
+            if (vgl.getSourceAcId() == null) {
+                status = false;
+                JOptionPane.showMessageDialog(Global.parentForm, "Select Account.");
+            }
+        }
+        return status;
     }
 
     private void assignGlInfo(List<Gl> listGL) {
@@ -306,6 +308,7 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
         btnSave = new javax.swing.JButton();
         jLabel7 = new javax.swing.JLabel();
         txtCurrency = new javax.swing.JTextField();
+        btnPrint = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblJournal = new javax.swing.JTable();
         jPanel1 = new javax.swing.JPanel();
@@ -317,7 +320,7 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
         jLabel3.setText("jLabel3");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Journal Entry");
+        setTitle("Journal Voucher");
         setFont(Global.textFont);
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentShown(java.awt.event.ComponentEvent evt) {
@@ -365,11 +368,21 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
         jLabel7.setFont(Global.lableFont);
         jLabel7.setText("Currency");
 
+        txtCurrency.setEditable(false);
         txtCurrency.setFont(Global.textFont);
         txtCurrency.setName("txtRefrence"); // NOI18N
         txtCurrency.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtCurrencyActionPerformed(evt);
+            }
+        });
+
+        btnPrint.setFont(Global.textFont);
+        btnPrint.setText("Print");
+        btnPrint.setName("btnSave"); // NOI18N
+        btnPrint.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPrintActionPerformed(evt);
             }
         });
 
@@ -381,21 +394,23 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
                 .addContainerGap()
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(txtDate, javax.swing.GroupLayout.DEFAULT_SIZE, 163, Short.MAX_VALUE)
+                .addComponent(txtDate, javax.swing.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(txtVouNo, javax.swing.GroupLayout.DEFAULT_SIZE, 163, Short.MAX_VALUE)
+                .addComponent(txtVouNo, javax.swing.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(txtRefrence, javax.swing.GroupLayout.DEFAULT_SIZE, 163, Short.MAX_VALUE)
+                .addComponent(txtRefrence, javax.swing.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel7)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(txtCurrency, javax.swing.GroupLayout.DEFAULT_SIZE, 161, Short.MAX_VALUE)
-                .addGap(18, 18, 18)
+                .addComponent(txtCurrency, javax.swing.GroupLayout.DEFAULT_SIZE, 138, Short.MAX_VALUE)
+                .addGap(30, 30, 30)
                 .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnPrint, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
@@ -410,7 +425,8 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
                         .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jLabel4)
                         .addComponent(jLabel7)
-                        .addComponent(txtCurrency, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(txtCurrency, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnPrint))
                     .addComponent(txtDate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -526,7 +542,9 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
-        initMain();
+        if (!isShown) {
+            initMain();
+        }
     }//GEN-LAST:event_formComponentShown
 
     private void txtFCrdAmtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtFCrdAmtActionPerformed
@@ -546,11 +564,15 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
         // TODO add your handling code here:
     }//GEN-LAST:event_txtCurrencyActionPerformed
 
+    private void btnPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnPrintActionPerformed
+
     /**
      * @param args the command line arguments
      */
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnPrint;
     private javax.swing.JButton btnSave;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -617,7 +639,10 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
                 break;
             case "txtRefrence":
                 if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_RIGHT) {
-                    btnSave.requestFocus();
+                    tblJournal.requestFocus();
+                    if (tblJournal.getRowCount() >= 0) {
+                        tblJournal.setRowSelectionInterval(0, 0);
+                    }
                 }
                 if (e.getKeyCode() == KeyEvent.VK_LEFT) {
                     txtVouNo.requestFocus();

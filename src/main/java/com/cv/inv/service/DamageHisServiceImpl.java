@@ -37,10 +37,13 @@ public class DamageHisServiceImpl implements DamageHisService {
     }
 
     @Override
-    public void save(DamageHis sdh, List<DamageDetailHis> listDamageDetail, String vouStatus) {
+    public void save(DamageHis sdh, List<DamageDetailHis> listDamageDetail, String vouStatus, List<String> delList) {
         if (vouStatus.equals("EDIT")) {
-            String vouNo = sdh.getDmgVouId();
-            dao.delete(vouNo);
+            if (delList != null) {
+                for (String detailId : delList) {
+                    detailDao.delete(detailId);
+                }
+            }
         }
         dao.save(sdh);
         for (DamageDetailHis dh : listDamageDetail) {
@@ -52,13 +55,18 @@ public class DamageHisServiceImpl implements DamageHisService {
     }
 
     @Override
-    public List<DamageHis> search(String from, String to, String location, String session, String remark, String vouNo) {
-        return dao.search(from, to, location, session, remark, vouNo);
+    public List<DamageHis> search(String from, String to, String location, String remark, String vouNo) {
+        return dao.search(from, to, location, remark, vouNo);
     }
 
     @Override
     public DamageHis findById(String id) {
         return dao.findById(id);
+    }
+
+    @Override
+    public int delete(String vouNo) {
+        return dao.delete(vouNo);
     }
 
 }

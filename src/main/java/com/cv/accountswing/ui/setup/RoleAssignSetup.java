@@ -7,6 +7,7 @@ package com.cv.accountswing.ui.setup;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
+import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.entity.AppUser;
 import com.cv.accountswing.entity.CompanyInfo;
 import com.cv.accountswing.entity.UserRole;
@@ -17,6 +18,7 @@ import com.cv.accountswing.service.CompanyInfoService;
 import com.cv.accountswing.service.UserRoleService;
 import com.cv.accountswing.service.UserService;
 import com.cv.accountswing.service.UsrCompRoleService;
+import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.setup.common.UserTableModel;
 import com.cv.accountswing.ui.setup.common.UsrCompRoleTableModel;
@@ -42,7 +44,7 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-public class RoleAssignSetup extends javax.swing.JPanel implements KeyListener {
+public class RoleAssignSetup extends javax.swing.JPanel implements KeyListener, PanelControl {
 
     private int selectRow = -1;
     private static final Logger LOGGER = LoggerFactory.getLogger(RoleAssignSetup.class);
@@ -59,6 +61,8 @@ public class RoleAssignSetup extends javax.swing.JPanel implements KeyListener {
     private UsrCompRoleService usrCompRoleService;
     @Autowired
     private UserRoleService userRoleService;
+    @Autowired
+    private ApplicationMainFrame mainFrame;
     private LoadingObserver loadingObserver;
     private boolean isShown = false;
 
@@ -158,7 +162,7 @@ public class RoleAssignSetup extends javax.swing.JPanel implements KeyListener {
         btnAdd.setEnabled(true);
     }
 
-    private void save() {
+    private void saveRoleAssign() {
         AppUser user = userTableModel.getUser(selectRow);
         CompanyInfo cInfo = (CompanyInfo) cboComInfo.getSelectedItem();
         UserRole uRole = (UserRole) cboRole.getSelectedItem();
@@ -325,7 +329,7 @@ public class RoleAssignSetup extends javax.swing.JPanel implements KeyListener {
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
         // TODO add your handling code here:
         try {
-            save();
+            saveRoleAssign();
         } catch (Exception e) {
             LOGGER.error("Save RoleAssign :" + e.getMessage());
             JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Save RoleAssign", JOptionPane.ERROR_MESSAGE);
@@ -334,6 +338,7 @@ public class RoleAssignSetup extends javax.swing.JPanel implements KeyListener {
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
+        mainFrame.setControl(this);
         if (!isShown) {
             initMain();
         }
@@ -413,5 +418,26 @@ public class RoleAssignSetup extends javax.swing.JPanel implements KeyListener {
                 tblRoleAssign.setRowSelectionInterval(0, 0);
             }
         }
+    }
+
+    @Override
+    public void delete() {
+    }
+
+    @Override
+    public void newForm() {
+    }
+
+    @Override
+    public void history() {
+    }
+
+    @Override
+    public void print() {
+    }
+
+    @Override
+    public void save() {
+        saveRoleAssign();
     }
 }

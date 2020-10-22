@@ -7,12 +7,15 @@ package com.cv.accountswing.ui.setup;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
+import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.Currency;
-import com.cv.accountswing.entity.Department;
+import com.cv.accountswing.entity.CurrencyKey;
 import com.cv.accountswing.entity.view.VGl;
 import com.cv.accountswing.service.COAOpeningService;
+import com.cv.accountswing.service.CurrencyService;
 import com.cv.accountswing.service.VGlService;
+import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.editor.CurrencyAutoCompleter;
@@ -40,7 +43,7 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObserver, KeyListener {
+public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObserver, KeyListener, PanelControl {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(COAOpeningSetup.class);
 
@@ -52,9 +55,11 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
     private COAOpeningService cOAOpeningService;
     @Autowired
     private TaskExecutor taskExecutor;
+    @Autowired
+    private CurrencyService currencyService;
+    @Autowired
+    private ApplicationMainFrame mainFrame;
     private LoadingObserver loadingObserver;
-    private DepartmentAutoCompleter departmentAutoCompleter;
-    private CurrencyAutoCompleter currencyAutoCompleter;
     private boolean isShown = false;
     private String stDate;
     private String endDate;
@@ -85,9 +90,15 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
     }
 
     private void initCombo() {
-
-        departmentAutoCompleter = new DepartmentAutoCompleter(txtDep, Global.listDepartment, null);
-        currencyAutoCompleter = new CurrencyAutoCompleter(txtCurrency, Global.listCurrency, null);
+        DepartmentAutoCompleter departmentAutoCompleter = new DepartmentAutoCompleter(txtDep, Global.listDepartment, null);
+        departmentAutoCompleter.setSelectionObserver(this);
+        CurrencyAutoCompleter currencyAutoCompleter = new CurrencyAutoCompleter(txtCurrency, Global.listCurrency, null);
+        String cuId = Global.sysProperties.get("system.default.currency");
+        CurrencyKey key = new CurrencyKey();
+        key.setCode(cuId);
+        key.setCompCode(Global.compId);
+        Currency currency = currencyService.findById(key);
+        currencyAutoCompleter.setCurrency(currency);
     }
 
     private void initTable() {
@@ -98,8 +109,8 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
         tblOpening.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblOpening.getColumnModel().getColumn(0).setPreferredWidth(10);
         tblOpening.getColumnModel().getColumn(1).setPreferredWidth(250);
-        tblOpening.getColumnModel().getColumn(2).setPreferredWidth(250);
-        tblOpening.getColumnModel().getColumn(3).setPreferredWidth(10);
+        tblOpening.getColumnModel().getColumn(2).setPreferredWidth(20);
+        tblOpening.getColumnModel().getColumn(3).setPreferredWidth(250);
         tblOpening.getColumnModel().getColumn(4).setPreferredWidth(5);
         tblOpening.getColumnModel().getColumn(5).setPreferredWidth(10);
         tblOpening.getColumnModel().getColumn(6).setPreferredWidth(20);
@@ -120,6 +131,7 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
         taskExecutor.execute(() -> {
             List<VGl> listVGl = vGlService.search(stDate, endDate, "-", "-", "-", curId, "-", "-", depCode,
                     "-", "-", "-", Global.compId.toString(), "OPENING", "-", "-", "-", "-", "-", "-", "-");
+            btnGen.setEnabled(listVGl.isEmpty());
             cOAOpeningTableModel.setListVGl(listVGl);
             calTotalAmt(listVGl);
             //btnGen.setEnabled(false);
@@ -130,22 +142,15 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
     private void initializeParameter() {
         stDate = Util1.toDateStr(Global.finicialPeriodFrom, "yyyy-MM-dd", "dd/MM/yyyy");
         endDate = Util1.toDateStr(txtDate.getDate(), "dd/MM/yyyy");
-        if (departmentAutoCompleter.getDepartment() != null) {
-            depCode = departmentAutoCompleter.getDepartment().getDeptCode();
-        } else {
-            depCode = "-";
-        }
-        if (currencyAutoCompleter.getCurrency() != null) {
-            curId = currencyAutoCompleter.getCurrency().getKey().getCode();
-        } else {
-            curId = "-";
-        }
+        depCode = Util1.isNull(depCode, "-");
+        curId = Util1.isNull(curId, "-");
         if (txtCurrency.getText().isEmpty()) {
             curId = "-";
         }
         if (txtDep.getText().isEmpty()) {
             depCode = "-";
         }
+        btnGen.setEnabled(false);
     }
 
     private void calTotalAmt(List<VGl> listVGl) {
@@ -164,14 +169,14 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
 
     private boolean isValidGen() {
         boolean status = true;
-        Department department = departmentAutoCompleter.getDepartment();
-        Currency currency = currencyAutoCompleter.getCurrency();
-        if (department == null) {
+        if (txtDep.getText().isEmpty() || depCode == null) {
             JOptionPane.showMessageDialog(Global.parentForm, "Select Department.");
+            txtDep.requestFocus();
             status = false;
         }
-        if (currency == null) {
+        if (txtCurrency.getText().isEmpty() || curId == null) {
             JOptionPane.showMessageDialog(Global.parentForm, "Select Currency.");
+            txtCurrency.requestFocus();
             status = false;
         }
         return status;
@@ -179,19 +184,29 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
 
     private void generate() {
         if (isValidGen()) {
-            try {
-                String curId = currencyAutoCompleter.getCurrency().getKey().getCode();
-                String depCode = departmentAutoCompleter.getDepartment().getDeptCode();
-                String userId = Global.loginUser.getUserId().toString();
+            loadingObserver.load(this.getName(), "Start");
+            taskExecutor.execute(() -> {
                 btnGen.setEnabled(false);
-                cOAOpeningService.GenerateZeroGL(Util1.toDateStr(txtDate.getDate(), "dd/MM/yyyy"),
-                        userId, Global.compId.toString(), curId, depCode);
-                searchOpening();
-                btnGen.setEnabled(true);
-            } catch (Exception ex) {
-                LOGGER.error("GENERATE  :" + ex.getMessage());
-            }
+                try {
+                    String userId = Global.loginUser.getUserId().toString();
+                    String coaGroup = Global.sysProperties.get("system.opening.coa.group");
+                    if (coaGroup != null) {
+                        cOAOpeningService.GenerateZeroGL(Util1.toDateStr(txtDate.getDate(), "dd/MM/yyyy"),
+                                userId, Global.compId.toString(), curId, depCode, coaGroup);
+                        searchOpening();
+                        btnGen.setEnabled(true);
+                    } else {
+                        JOptionPane.showMessageDialog(Global.parentForm, "COA Group Openning in System Property.");
+                    }
+                } catch (Exception ex) {
+                    LOGGER.error("GENERATE  :" + ex.getMessage());
+                    JOptionPane.showMessageDialog(Global.parentForm, ex.getMessage(), "GENERATE OPENING", JOptionPane.ERROR_MESSAGE);
+                    btnGen.setEnabled(true);
+                }
+
+            });
         }
+
     }
 
     private void initKeyListener() {
@@ -254,7 +269,10 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
         jLabel3.setFont(Global.lableFont);
         jLabel3.setText("Currency");
 
+        txtCurrency.setEditable(false);
         txtCurrency.setFont(Global.textFont);
+        txtCurrency.setDisabledTextColor(new java.awt.Color(0, 0, 0));
+        txtCurrency.setEnabled(false);
         txtCurrency.setName("txtCurrency"); // NOI18N
         txtCurrency.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -264,6 +282,7 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
 
         btnGen.setFont(Global.lableFont);
         btnGen.setText("Genearte Zero");
+        btnGen.setEnabled(false);
         btnGen.setName("btnGen"); // NOI18N
         btnGen.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -272,7 +291,7 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
         });
 
         txtDate.setDateFormatString("dd/MM/yyyy");
-        txtDate.setFont(Global.lableFont);
+        txtDate.setFont(Global.shortCutFont);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -337,12 +356,14 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
         jLabel5.setText("Dr-Amt");
 
         txtFDrAmt.setEditable(false);
+        txtFDrAmt.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         txtFDrAmt.setFont(Global.amtFont);
 
         jLabel6.setFont(Global.lableFont);
         jLabel6.setText("Cr-Amt");
 
         txtFCrAmt.setEditable(false);
+        txtFCrAmt.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         txtFCrAmt.setFont(Global.amtFont);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -405,6 +426,7 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
+        mainFrame.setControl(this);
         if (!isShown) {
             initMain();
         }
@@ -448,9 +470,22 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
 
     @Override
     public void selected(Object source, Object selectObj) {
-        if (source.toString().equals("CAL-TOTAL")) {
-            calTotalAmt(cOAOpeningTableModel.getListVGl());
+        LOGGER.info("COA OPENING INTERFACE " + source.toString());
+        String name = source.toString();
+        switch (name) {
+            case "Department":
+                depCode = selectObj.toString();
+                searchOpening();
+                break;
+            case "Currency":
+                curId = selectObj.toString();
+                searchOpening();
+                break;
+            case "CAL-TOTAL":
+                calTotalAmt(cOAOpeningTableModel.getListVGl());
+                break;
         }
+
     }
 
     @Override
@@ -533,5 +568,25 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
                 tblOpening.setRowSelectionInterval(0, 0);
             }
         }
+    }
+
+    @Override
+    public void save() {
+    }
+
+    @Override
+    public void delete() {
+    }
+
+    @Override
+    public void newForm() {
+    }
+
+    @Override
+    public void history() {
+    }
+
+    @Override
+    public void print() {
     }
 }

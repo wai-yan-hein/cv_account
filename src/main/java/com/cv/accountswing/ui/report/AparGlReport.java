@@ -7,6 +7,7 @@ package com.cv.accountswing.ui.report;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
+import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.CompanyInfo;
 import com.cv.accountswing.entity.SystemProperty;
@@ -17,14 +18,12 @@ import com.cv.accountswing.entity.view.VGl;
 import com.cv.accountswing.entity.view.VTriBalance;
 import com.cv.accountswing.service.COAOpeningDService;
 import com.cv.accountswing.service.CompanyInfoService;
-import com.cv.accountswing.service.CurrencyService;
-import com.cv.accountswing.service.DepartmentService;
 import com.cv.accountswing.service.ReportService;
 import com.cv.accountswing.service.SystemPropertyService;
-import com.cv.accountswing.service.TraderService;
 import com.cv.accountswing.service.VAParService;
 import com.cv.accountswing.service.VGlService;
 import com.cv.accountswing.service.VTriBalanceService;
+import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.editor.CurrencyAutoCompleter;
 import com.cv.accountswing.ui.editor.DateAutoCompleter;
@@ -43,6 +42,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
@@ -53,7 +54,7 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-public class AparGlReport extends javax.swing.JPanel implements SelectionObserver {
+public class AparGlReport extends javax.swing.JPanel implements SelectionObserver, PanelControl {
 
     private int selectRow = -1;
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(AparGlReport.class);
@@ -61,12 +62,6 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
     /**
      * Creates new form AparGlReport
      */
-    @Autowired
-    private TraderService tradeService;
-    @Autowired
-    private DepartmentService departmentService;
-    @Autowired
-    private CurrencyService currencyService;
     @Autowired
     private APARTableModel aPARTableModel;
     @Autowired
@@ -89,6 +84,9 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
     private VTriBalanceService vTriBalanceService;
     @Autowired
     private TrialBalanceDetailDialog trialBalanceDetailDialog;
+    @Autowired
+    private ApplicationMainFrame mainFrame;
+    private TableRowSorter<TableModel> sorter;
     private boolean isShown = false;
     private LoadingObserver loadingObserver;
     private JPopupMenu popup;
@@ -116,6 +114,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
 
     private void initMain() {
         panelName = this.getName();
+        assingDefaultValue();
         initCombo();
         initTable();
         isShown = true;
@@ -131,6 +130,12 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
             } else if (panelName.equals("G/L Listing")) {
             }
         });
+    }
+
+    private void assingDefaultValue() {
+        stDate = Util1.toDateStr(Util1.getTodayDate(), "dd/MM/yyyy");
+        enDate = stDate;
+        txtDate.setText("Today");
     }
 
     private void initTable() {
@@ -151,6 +156,8 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         tblAPAR.getColumnModel().getColumn(5).setPreferredWidth(50);
         tblAPAR.setDefaultRenderer(Double.class, new TableCellRender());
         tblAPAR.setDefaultRenderer(Object.class, new TableCellRender());
+        sorter = new TableRowSorter<>(tblAPAR.getModel());
+        tblAPAR.setRowSorter(sorter);
 
         tblAPAR.addMouseListener(new MouseAdapter() {
             @Override
@@ -198,8 +205,8 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
     }
 
     private void searchAPAR() {
-        cleaTable();
         loadingObserver.load(this.getName(), "Start");
+        clearTable();
         initializeParameter();
         taskExecutor.execute(() -> {
             try {
@@ -221,18 +228,19 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
     }
 
     private void searchGLListing() {
-        cleaTable();
         loadingObserver.load(this.getName(), "Start");
+        clearTable();
         initializeParameter();
         taskExecutor.execute(() -> {
             try {
+                LOGGER.info("START DATE :" + stDate + "---" + "END DATE :" + enDate);
                 coaOpDService.genTriBalance(Global.compId.toString(),
                         Util1.toDateStrMYSQL(stDate, "dd/MM/yyyy"),
                         Global.finicialPeriodFrom, Util1.toDateStrMYSQL(enDate, "dd/MM/yyyy"),
                         "-", currency, dept, cvId, userId);
                 List<VTriBalance> listVTB = vTriBalanceService.getTriBalance(userId, Global.compId.toString());
                 glListingTableModel.setListTBAL(listVTB);
-                calGLTotlaAmount(listVTB);
+                calGLTotlaAmount(listVTB); 
                 loadingObserver.load(this.getName(), "Stop");
             } catch (Exception ex) {
                 LOGGER.error("searchGLListing -----" + ex.getMessage());
@@ -256,8 +264,9 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
     private void calculateOpening() {
         List<TmpOpeningClosing> opBalanceGL;
         try {
+            String minuStDate = Util1.addDateTo(stDate, -1);
             opBalanceGL = coaOpDService.getOpBalanceGL(getTarget(),
-                    Util1.toDateStrMYSQL(stDate, "dd/MM/yyyy"),
+                    minuStDate,
                     enDate, 3, "MMK",
                     Global.loginUser.getUserId().toString(),
                     Util1.isNull(dept, "-"));
@@ -285,7 +294,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
     private void swapDrCrAmt(List<VGl> listVGL, String targetId) {
         listVGL.forEach(vgl -> {
             String sourceAcId = Util1.isNull(vgl.getSourceAcId(), "-");
-            String accId = Util1.isNull(vgl.getAccountId(), "-");
+            //String accId = Util1.isNull(vgl.getAccountId(), "-");
             /*if (sourceAcId.equals(targetId)) {
             double tmpAmt;
             if (Util1.isNullZero(vgl.getSplitId()) == 8) { //Credit Voucher
@@ -298,7 +307,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
             vgl.setDrAmt(tmpAmt);
             }
             } else */
-            if (accId.equals(targetId)) {
+            if (!sourceAcId.equals(targetId)) {
                 double tmpDrAmt = 0.0;
                 if (vgl.getDrAmt() != null) {
                     tmpDrAmt = vgl.getDrAmt();
@@ -310,8 +319,8 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                 vgl.setAccName(vgl.getSrcAccName());
                 vgl.setSrcAccName(tmpStr);
             } else {
-                vgl.setDrAmt(0.0);
-                vgl.setCrAmt(0.0);
+                vgl.setCrAmt(Util1.getDouble(vgl.getCrAmt()));
+                vgl.setDrAmt((Util1.getDouble(vgl.getDrAmt())));
             }
         });
     }
@@ -349,8 +358,8 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
     private void initializeParameter() {
         dept = Util1.isNull(txtDep.getText(), "-");
         cvId = Util1.isNull(txtPerson.getText(), "-1");
-        currency = Util1.isNull(txtCurrency.getText(), "-");
-        stDate = Util1.isNull(stDate, Global.finicialPeriodFrom);
+        currency = Global.sysProperties.get("system.default.currency");
+        stDate = Util1.isNull(stDate, Util1.toDateStr(Util1.getTodayDate(), "dd/MM/yyyy"));
         enDate = Util1.isNull(enDate, Util1.toDateStr(Util1.getTodayDate(), "dd/MM/yyyy"));
         userId = Global.loginUser.getUserId().toString();
     }
@@ -370,6 +379,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         CurrencyAutoCompleter currencyAutoCompleter = new CurrencyAutoCompleter(txtCurrency,
                 Global.listCurrency, null);
         currencyAutoCompleter.setSelectionObserver(this);
+        currencyAutoCompleter.setCurrency(Global.defalutCurrency);
     }
 
     public void printApar() {
@@ -422,7 +432,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         }
     }
 
-    private void cleaTable() {
+    private void clearTable() {
         if (panelName.equals("AP/AR")) {
             aPARTableModel.clear();
         } else if (panelName.equals("G/L Listing")) {
@@ -495,6 +505,8 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         jLabel3.setText("Person");
 
         txtCurrency.setFont(Global.lableFont);
+        txtCurrency.setToolTipText("");
+        txtCurrency.setEnabled(false);
         txtCurrency.setName("txtCurrency"); // NOI18N
         txtCurrency.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -656,6 +668,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
+        mainFrame.setControl(this);
         if (!isShown) {
             initMain();
         }
@@ -725,5 +738,27 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
             search();
 
         }
+    }
+
+    @Override
+    public void save() {
+    }
+
+    @Override
+    public void delete() {
+    }
+
+    @Override
+    public void newForm() {
+        assingDefaultValue();
+        search();
+    }
+
+    @Override
+    public void history() {
+    }
+
+    @Override
+    public void print() {
     }
 }

@@ -18,7 +18,7 @@ public interface DamageHisDao {
 
     public DamageHis findById(String id);
 
-    public List<DamageHis> search(String from, String to, String location, String session,
+    public List<DamageHis> search(String from, String to, String location,
             String remark, String vouNo);
 
     public int delete(String vouNo);

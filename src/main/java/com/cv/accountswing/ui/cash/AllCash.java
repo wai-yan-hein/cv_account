@@ -135,6 +135,8 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
      * Creates new form CashBook
      *
      */
+    
+
     public AllCash() {
         initComponents();
         initPopup();
@@ -167,15 +169,11 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
     }
 
     private void initTable() {
-        if (this.getName().equals("Daily Cash")) {
-            allCashTableModel.setColumnName(7, "Cash In / Dr");
-            allCashTableModel.setColumnName(8, "Cash Out / Cr");
-        }
         allCashTableModel.setSelectionObserver(this);
         allCashTableModel.setReloadData(reloadData);
         tblCash.setModel(allCashTableModel);
         tblCash.getTableHeader().setFont(Global.tblHeaderFont);
-        tblCash.getTableHeader().setPreferredSize(new Dimension(40, 40));
+        tblCash.getTableHeader().setPreferredSize(new Dimension(30, 30));
         //tblCash.getTableHeader().setBackground(Global.tblHeaderColor);
         sorter = new TableRowSorter<>(tblCash.getModel());
         tblCash.setRowSorter(sorter);
@@ -184,10 +182,10 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
         allCashTableModel.setParent(tblCash);
         allCashTableModel.addNewRow();
         tblCash.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        tblCash.getColumnModel().getColumn(0).setPreferredWidth(7);// Date
+        tblCash.getColumnModel().getColumn(0).setPreferredWidth(15);// Date
         tblCash.getColumnModel().getColumn(1).setPreferredWidth(13);// Department
-        tblCash.getColumnModel().getColumn(2).setPreferredWidth(200);// Description      
-        tblCash.getColumnModel().getColumn(3).setPreferredWidth(200);// Ref  
+        tblCash.getColumnModel().getColumn(2).setPreferredWidth(195);// Description      
+        tblCash.getColumnModel().getColumn(3).setPreferredWidth(195);// Ref  
         tblCash.getColumnModel().getColumn(4).setPreferredWidth(90);// Person
         tblCash.getColumnModel().getColumn(5).setPreferredWidth(150);// Account
         tblCash.getColumnModel().getColumn(6).setPreferredWidth(1);// Curr      
@@ -372,7 +370,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
         accId = Util1.isNull(accId, "-");
         currency = Util1.isNull(currency, "-");
         ref = Util1.isNull(ref, "-");
-        depId = Util1.isNull(depId, Global.sysProperties.get("system.default.department"));
+        depId = Util1.isNull(depId, Util1.isNull(Global.sysProperties.get("system.default.department"), "-"));
         traderName = Util1.isNull(traderName, "-");
         debAmt = Util1.isNull(debAmt, "-");
         crdAmt = Util1.isNull(crdAmt, "-");
@@ -737,7 +735,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
 
     @Override
     public void save() {
-        
+
     }
 
     @Override

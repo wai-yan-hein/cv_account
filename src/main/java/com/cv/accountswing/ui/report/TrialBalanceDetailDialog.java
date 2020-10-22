@@ -6,7 +6,9 @@
 package com.cv.accountswing.ui.report;
 
 import com.cv.accountswing.common.Global;
+import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.entity.view.VGl;
+import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.report.common.CrAmtTableModel;
 import com.cv.accountswing.ui.report.common.DrAmtTableModel;
@@ -14,6 +16,8 @@ import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.ListSelectionModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +29,7 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-public class TrialBalanceDetailDialog extends javax.swing.JDialog {
+public class TrialBalanceDetailDialog extends javax.swing.JDialog implements PanelControl {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TrialBalanceDetailDialog.class);
 
@@ -35,11 +39,14 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog {
     private DrAmtTableModel drAmtTableModel;
     @Autowired
     private TaskExecutor taskExecutor;
-
+    @Autowired
+    private ApplicationMainFrame mainFrame;
+    private TableRowSorter<TableModel> sorter;
     private String desp;
     private Double netChange;
     private List<VGl> listVGl;
     private Double openingAmt = 0.0;
+    private boolean isShown = false;
 
     public Double getOpeningAmt() {
         return openingAmt;
@@ -118,6 +125,8 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog {
         tblCr.getColumnModel().getColumn(0).setPreferredWidth(20);
         tblCr.setDefaultRenderer(Double.class, new TableCellRender());
         tblCr.setDefaultRenderer(Object.class, new TableCellRender());
+        sorter = new TableRowSorter<>(tblCr.getModel());
+        tblCr.setRowSorter(sorter);
 
     }
 
@@ -132,6 +141,8 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog {
         tblDr.getColumnModel().getColumn(0).setPreferredWidth(20);
         tblDr.setDefaultRenderer(Double.class, new TableCellRender());
         tblDr.setDefaultRenderer(Object.class, new TableCellRender());
+        sorter = new TableRowSorter<>(tblDr.getModel());
+        tblDr.setRowSorter(sorter);
 
     }
 
@@ -365,7 +376,10 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog {
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
-        initMain();
+        mainFrame.setControl(this);
+        if (!isShown) {
+            initMain();
+        }
     }//GEN-LAST:event_formComponentShown
 
     private void formFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_formFocusLost
@@ -397,4 +411,24 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog {
     private javax.swing.JTextField txtName;
     private javax.swing.JFormattedTextField txtOpening;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void save() {
+    }
+
+    @Override
+    public void delete() {
+    }
+
+    @Override
+    public void newForm() {
+    }
+
+    @Override
+    public void history() {
+    }
+
+    @Override
+    public void print() {
+    }
 }

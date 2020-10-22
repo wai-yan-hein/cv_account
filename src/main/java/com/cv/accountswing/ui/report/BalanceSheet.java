@@ -7,6 +7,7 @@ package com.cv.accountswing.ui.report;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
+import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.CompanyInfo;
 import com.cv.accountswing.entity.SystemProperty;
@@ -15,6 +16,7 @@ import com.cv.accountswing.entity.helper.ProfitAndLostRetObj;
 import com.cv.accountswing.service.CompanyInfoService;
 import com.cv.accountswing.service.ReportService;
 import com.cv.accountswing.service.SystemPropertyService;
+import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.editor.CurrencyAutoCompleter;
 import com.cv.accountswing.ui.editor.DateAutoCompleter;
 import com.cv.accountswing.ui.editor.DepartmentAutoCompleter;
@@ -31,7 +33,7 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-public class BalanceSheet extends javax.swing.JPanel implements SelectionObserver {
+public class BalanceSheet extends javax.swing.JPanel implements SelectionObserver, PanelControl {
 
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(BalanceSheet.class);
 
@@ -40,6 +42,7 @@ public class BalanceSheet extends javax.swing.JPanel implements SelectionObserve
     private String enDate;
     private String depId;
     private String currency;
+    private boolean isShown = false;
     @Autowired
     private SystemPropertyService spService;
     @Autowired
@@ -48,6 +51,8 @@ public class BalanceSheet extends javax.swing.JPanel implements SelectionObserve
     private CompanyInfoService ciService;
     @Autowired
     private TaskExecutor taskExecutor;
+    @Autowired
+    private ApplicationMainFrame mainFrame;
 
     public void setLoadingObserver(LoadingObserver loadingObserver) {
         this.loadingObserver = loadingObserver;
@@ -120,7 +125,7 @@ public class BalanceSheet extends javax.swing.JPanel implements SelectionObserve
 
     }
 
-    private void print() {
+    private void printBalSheet() {
         loadingObserver.load(this.getName(), "Start");
         taskExecutor.execute(() -> {
             String userId = Global.loginUser.getUserId().toString();
@@ -282,7 +287,10 @@ public class BalanceSheet extends javax.swing.JPanel implements SelectionObserve
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
-        initMain();
+        mainFrame.setControl(this);
+        if (!isShown) {
+            initMain();
+        }
     }//GEN-LAST:event_formComponentShown
 
     private void btnPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintActionPerformed
@@ -329,5 +337,26 @@ public class BalanceSheet extends javax.swing.JPanel implements SelectionObserve
             }
 
         }
+    }
+
+    @Override
+    public void save() {
+    }
+
+    @Override
+    public void delete() {
+    }
+
+    @Override
+    public void newForm() {
+    }
+
+    @Override
+    public void history() {
+    }
+
+    @Override
+    public void print() {
+        printBalSheet();
     }
 }

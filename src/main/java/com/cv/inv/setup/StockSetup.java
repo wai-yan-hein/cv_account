@@ -7,7 +7,9 @@ package com.cv.inv.setup;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
+import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.StartWithRowFilter;
+import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.util.BindingUtil;
 import com.cv.accountswing.util.Util1;
@@ -55,10 +57,10 @@ import com.cv.inv.service.StockTypeService;
  * @author Lenovo
  */
 @Component
-public class StockSetup extends javax.swing.JPanel implements KeyListener {
+public class StockSetup extends javax.swing.JPanel implements KeyListener, PanelControl {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StockSetup.class);
-    Image image = new ImageIcon(getClass().getResource("/images/setting.png")).getImage();
+    Image image = new ImageIcon(getClass().getResource("/images/date.png")).getImage();
     private int selectRow = -1;
     @Autowired
     private StockTypeSetupDialog itemTypeSetupDialog;
@@ -86,6 +88,8 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener {
     private TaskExecutor taskExecutor;
     @Autowired
     private StockTableModel stockTableModel;
+    @Autowired
+    private ApplicationMainFrame mainFrame;
     private Stock stock;
     private LoadingObserver loadingObserver;
     private TableRowSorter<TableModel> sorter;
@@ -267,7 +271,7 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener {
         return status;
     }
 
-    private void save() {
+    private void saveStock() {
         if (isValidEntry()) {
             StockType sType = (StockType) cboStockType.getSelectedItem();
             Stock saveStock = stockService.save(stock, sType, lblStatus.getText());
@@ -997,6 +1001,7 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener {
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
+        mainFrame.setControl(this);
         if (!isShown) {
             initMain();
         }
@@ -1043,7 +1048,7 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener {
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         // TODO add your handling code here:
         try {
-            save();
+            saveStock();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(Global.parentForm, e.getMessage());
             LOGGER.error("Save Stock :" + e.getMessage());
@@ -1803,5 +1808,27 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener {
                 tblStock.setRowSelectionInterval(0, 0);
             }
         }
+    }
+
+    @Override
+    public void save() {
+        saveStock();
+    }
+
+    @Override
+    public void delete() {
+    }
+
+    @Override
+    public void newForm() {
+        clear();
+    }
+
+    @Override
+    public void history() {
+    }
+
+    @Override
+    public void print() {
     }
 }

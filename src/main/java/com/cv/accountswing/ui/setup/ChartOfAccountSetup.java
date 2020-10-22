@@ -7,20 +7,22 @@ package com.cv.accountswing.ui.setup;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
+import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.entity.ChartOfAccount;
 import com.cv.accountswing.entity.Menu;
+import com.cv.accountswing.entity.Privilege;
+import com.cv.accountswing.entity.PrivilegeKey;
 import com.cv.accountswing.service.COAService;
 import com.cv.accountswing.service.MenuService;
+import com.cv.accountswing.ui.ApplicationMainFrame;
+import com.cv.accountswing.service.PrivilegeService;
 import com.cv.accountswing.util.BindingUtil;
 import com.cv.accountswing.util.Util1;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import javax.swing.JButton;
@@ -45,7 +47,10 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-public class ChartOfAccountSetup extends javax.swing.JPanel implements MouseListener, TreeSelectionListener, KeyListener {
+public class ChartOfAccountSetup extends javax.swing.JPanel implements 
+        MouseListener,
+        TreeSelectionListener, KeyListener,
+        PanelControl {
 
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(ChartOfAccountSetup.class);
     private int count = 0;
@@ -59,6 +64,9 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements MouseList
     private TaskExecutor taskExecutor;
     @Autowired
     private MenuService menuService;
+    @Autowired
+    private ApplicationMainFrame mainFrame;
+    private PrivilegeService privilegeService;
     JPopupMenu popupmenu;
     private LoadingObserver loadingObserver;
     private HashMap<String, Menu> hmMenu = new HashMap<>();
@@ -129,7 +137,7 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements MouseList
         }
     }
 
-    private void save() {
+    private void saveChartAcc() {
         String parentCode;
         String option;
         DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) selectedNode.getParent();
@@ -244,6 +252,7 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements MouseList
         txtUsrCode.setText(null);
         chkActive.setSelected(false);
         treeCOA.requestFocus();
+        isShown = false;
     }
 
     private void initKeyListener() {
@@ -269,7 +278,6 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements MouseList
     }
 
     private void saveMenu() {
-        LOGGER.info("Save Menu Method Start...");
         try {
             if (cboMenu.getSelectedItem() != null) {
                 if (cboMenu.getSelectedItem() instanceof Menu) {
@@ -280,7 +288,15 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements MouseList
                     menu.setMenuClass(selectMenu.getMenuClass());
                     menu.setParent(selectMenu.getId().toString());
                     menu.setSoureAccCode(coa.getCode());
-                    menuService.saveMenu(menu);
+                    Menu saveMenu = menuService.saveMenu(menu);
+                    if (saveMenu != null) {
+                        Integer menuId = saveMenu.getId();
+                        Privilege p = new Privilege();
+                        PrivilegeKey key = new PrivilegeKey(Global.roleId, menuId);
+                        p.setKey(key);
+                        p.setIsAllow(Boolean.FALSE);
+                        privilegeService.save(p);
+                    }
                 }
             }
         } catch (Exception e) {
@@ -534,6 +550,7 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements MouseList
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
+        mainFrame.setControl(this);
         if (!isShown) {
             initMain();
         }
@@ -741,6 +758,28 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements MouseList
         if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_RIGHT) {
             treeCOA.requestFocus();
         }
+    }
+
+    @Override
+    public void delete() {
+    }
+
+    @Override
+    public void newForm() {
+        clear();
+    }
+
+    @Override
+    public void history() {
+    }
+
+    @Override
+    public void print() {
+    }
+
+    @Override
+    public void save() {
+        saveChartAcc();
     }
 
 }

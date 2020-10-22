@@ -7,8 +7,11 @@ package com.cv.accountswing.ui.journal;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
+import com.cv.accountswing.common.PanelControl;
+import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.view.VGeneralVoucher;
 import com.cv.accountswing.service.VGvService;
+import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.journal.common.JournalTableModel;
 import com.cv.accountswing.util.Util1;
@@ -18,6 +21,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -33,8 +37,7 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-public class Journal extends javax.swing.JPanel implements KeyListener {
-
+public class Journal extends javax.swing.JPanel implements KeyListener, SelectionObserver, PanelControl {
     private static final Logger LOGGER = LoggerFactory.getLogger(Journal.class);
     private int selectRow = -1;
     @Autowired
@@ -45,13 +48,15 @@ public class Journal extends javax.swing.JPanel implements KeyListener {
     private JournalEntryDialog journalEntryDialog;
     @Autowired
     private TaskExecutor taskExecutor;
+    @Autowired
+    private ApplicationMainFrame mainFrame;
     private LoadingObserver loadingObserver;
     private boolean isShown = false;
-
+    
     public void setIsShown(boolean isShown) {
         this.isShown = isShown;
     }
-
+    
     public void setLoadingObserver(LoadingObserver loadingObserver) {
         this.loadingObserver = loadingObserver;
     }
@@ -64,14 +69,14 @@ public class Journal extends javax.swing.JPanel implements KeyListener {
         initKeyListener();
         txtFromDate.requestFocusInWindow();
     }
-
+    
     private void initMain() {
         setTodayDate();
         initTable();
         searchGV();
         isShown = true;
     }
-
+    
     private void initTable() {
         tblJournal.setModel(journalTableModel);
         tblJournal.getTableHeader().setFont(Global.lableFont);
@@ -91,16 +96,16 @@ public class Journal extends javax.swing.JPanel implements KeyListener {
                     }
                 }
             }
-
+            
         });
-
+        
     }
-
+    
     private void setTodayDate() {
         txtFromDate.setDate(Util1.getTodayDate());
         txtToDate.setDate(Util1.getTodayDate());
     }
-
+    
     private void searchGV() {
         LOGGER.info("searchGV");
         loadingObserver.load(this.getName(), "Start");
@@ -114,11 +119,11 @@ public class Journal extends javax.swing.JPanel implements KeyListener {
                     "-");
             journalTableModel.setListGV(listGV);
             loadingObserver.load(this.getName(), "Stop");
-
+            
         });
-
+        
     }
-
+    
     private void initKeyListener() {
         txtFromDate.getDateEditor().getUiComponent().setName("txtFromDate");
         txtToDate.getDateEditor().getUiComponent().setName("txtToDate");
@@ -158,24 +163,22 @@ public class Journal extends javax.swing.JPanel implements KeyListener {
     });
     }*/
     private void openJournalEntryDialog(String gvId) {
-        loadingObserver.load(this.getName(), "Start");
-        taskExecutor.execute(() -> {
-            journalEntryDialog.clear();
-            journalEntryDialog.setGlVouId(gvId);
-            journalEntryDialog.setSize(Global.width - 40, Global.height - 200);
-            journalEntryDialog.setResizable(false);
-            journalEntryDialog.setLocationRelativeTo(null);
-            journalEntryDialog.setVisible(true);
-            loadingObserver.load(this.getName(), "Stop");
-        });
-
+        journalEntryDialog.setIconImage(new ImageIcon(this.getClass().getResource("/images/voucher.png")).getImage());
+        journalEntryDialog.setSelectionObserver(this);
+        journalEntryDialog.clear();
+        journalEntryDialog.setGlVouId(gvId);
+        journalEntryDialog.setSize(Global.width - 200, Global.height - 200);
+        journalEntryDialog.setResizable(false);
+        journalEntryDialog.setLocationRelativeTo(null);
+        journalEntryDialog.setVisible(true);
+        
     }
-
+    
     public void clear() {
         setTodayDate();
         txtVouNo.setText(null);
         txtRefrence.setText(null);
-
+        
     }
 
     /**
@@ -207,21 +210,25 @@ public class Journal extends javax.swing.JPanel implements KeyListener {
         });
 
         jLabel1.setFont(Global.lableFont);
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("From");
 
         jLabel2.setFont(Global.lableFont);
+        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel2.setText("To");
 
-        txtVouNo.setFont(Global.textFont);
+        txtVouNo.setFont(Global.shortCutFont);
         txtVouNo.setName("txtVouNo"); // NOI18N
 
         jLabel3.setFont(Global.lableFont);
+        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel3.setText("Vou");
 
         jLabel4.setFont(Global.lableFont);
+        jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel4.setText("Refrence");
 
-        txtRefrence.setFont(Global.textFont);
+        txtRefrence.setFont(Global.shortCutFont);
         txtRefrence.setName("txtRefrence"); // NOI18N
         txtRefrence.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -239,10 +246,10 @@ public class Journal extends javax.swing.JPanel implements KeyListener {
         });
 
         txtFromDate.setDateFormatString("dd/MM/yyyy");
-        txtFromDate.setFont(Global.lableFont);
+        txtFromDate.setFont(Global.shortCutFont);
 
         txtToDate.setDateFormatString("dd/MM/yyyy");
-        txtToDate.setFont(Global.lableFont);
+        txtToDate.setFont(Global.shortCutFont);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -337,6 +344,7 @@ public class Journal extends javax.swing.JPanel implements KeyListener {
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
+        mainFrame.setControl(this);
         if (!isShown) {
             initMain();
         }
@@ -346,7 +354,6 @@ public class Journal extends javax.swing.JPanel implements KeyListener {
     private void txtRefrenceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtRefrenceActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtRefrenceActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnEntry;
@@ -366,16 +373,16 @@ public class Journal extends javax.swing.JPanel implements KeyListener {
     @Override
     public void keyTyped(KeyEvent e) {
     }
-
+    
     @Override
     public void keyPressed(KeyEvent e) {
     }
-
+    
     @Override
     public void keyReleased(KeyEvent e) {
         Object sourceObj = e.getSource();
         String ctrlName = "-";
-
+        
         if (sourceObj instanceof JButton) {
             ctrlName = ((JButton) sourceObj).getName();
         } else if (sourceObj instanceof JTextField) {
@@ -435,17 +442,17 @@ public class Journal extends javax.swing.JPanel implements KeyListener {
                     txtRefrence.requestFocus();
                 }
                 tabToTable(e);
-
+                
                 break;
             case "tblJournal":
                 if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_RIGHT) {
                     txtFromDate.getDateEditor().getUiComponent().requestFocusInWindow();
                 }
                 break;
-
+            
         }
     }
-
+    
     private void tabToTable(KeyEvent e) {
         if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_RIGHT) {
             tblJournal.requestFocus();
@@ -453,6 +460,35 @@ public class Journal extends javax.swing.JPanel implements KeyListener {
                 tblJournal.setRowSelectionInterval(0, 0);
             }
         }
+    }
+    
+    @Override
+    public void selected(Object source, Object selectObj) {
+        if (source.toString().equals("SEARCHVOUCHER")) {
+            searchGV();
+        }
+    }
+
+
+    @Override
+    public void save() {
+    }
+
+    @Override
+    public void delete() {
+    }
+
+    @Override
+    public void newForm() {
+        clear();
+    }
+
+    @Override
+    public void history() {
+    }
+
+    @Override
+    public void print() {
     }
 
 }

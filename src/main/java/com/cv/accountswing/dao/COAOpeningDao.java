@@ -21,7 +21,7 @@ public interface COAOpeningDao {
     public void deleteOpening(Long id) throws Exception;
     
     public void GenerateZeroGL(String opDate, String userId, String compCode, 
-            String currCode, String dept) throws Exception;
+            String currCode, String dept,String coaGroup) throws Exception;
     public void deleteOpeningGL(String opDate, String compCode, String currCode, String dept) throws Exception;
     
     public void insertCoaOpening(String opDate, String compCode, String currCode, 

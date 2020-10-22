@@ -8,10 +8,12 @@ package com.cv.inv.entry.dialog;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.util.Util1;
+import com.cv.inv.entity.DamageDetailHis;
 import com.cv.inv.entity.DamageHis;
 import com.cv.inv.entry.Damage;
 import com.cv.inv.entry.common.DamageSearchTableModel;
 import com.cv.inv.entry.editor.LocationAutoCompleter;
+import com.cv.inv.service.DamageDetailHisService;
 import com.cv.inv.service.DamageHisService;
 import java.awt.Frame;
 import java.util.List;
@@ -37,6 +39,8 @@ public class DamageSearchDialog extends javax.swing.JDialog implements Selection
     private DamageHisService dhService;
     @Autowired
     private Damage dmg;
+    @Autowired
+    private DamageDetailHisService ddhService;
 
     public DamageSearchDialog() {
         super(new Frame(), true);
@@ -60,8 +64,8 @@ public class DamageSearchDialog extends javax.swing.JDialog implements Selection
 
     private void search() {
         butSearch.setEnabled(false);
-        String from = Util1.toDateStr(txtFromDate.getDate(), "yyyy-MM-dd");
-        String to = Util1.toDateStr(txtToDate.getDate(), "yyyy-MM-dd");
+        String from = Util1.toDateStr(txtFromDate.getDate(), "yyyy-MM-dd HH:mm:ss");
+        String to = Util1.toDateStr(txtToDate.getDate(), "yyyy-MM-dd HH:mm:ss");
         String location = null;
         String session = null;
         String remark = null;
@@ -86,7 +90,7 @@ public class DamageSearchDialog extends javax.swing.JDialog implements Selection
         } else {
             remark = "-";
         }
-        List<DamageHis> listDamageHis = dhService.search(from, to, location, session, remark, vouNo);
+        List<DamageHis> listDamageHis = dhService.search(from, to, location, remark, vouNo);
         vouTableModel.setListDamageHis(listDamageHis);
         butSearch.setEnabled(true);
     }
@@ -98,8 +102,9 @@ public class DamageSearchDialog extends javax.swing.JDialog implements Selection
         if (vs != null) {
             String vouNo = vs.getDmgVouId();
             DamageHis dmgHis = dhService.findById(vouNo);
+            List<DamageDetailHis> listDetail=ddhService.search(vouNo);
             this.dispose();
-            dmg.setDamageVoucher(dmgHis);
+            dmg.setDamageVoucher(dmgHis,listDetail);
         } else {
             JOptionPane.showMessageDialog(this, "Please select the voucher.",
                     "No Voucher Selected", JOptionPane.ERROR_MESSAGE);

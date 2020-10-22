@@ -87,7 +87,7 @@ public class JournalEntryTableModel extends AbstractTableModel {
                 case 2://Cus Id
                     return gv.getTraderName();
                 case 3://accc
-                    return gv.getAccName();
+                    return gv.getSrcAccName();
 
                 case 4://dr
                     return gv.getDrAmt();
@@ -129,11 +129,9 @@ public class JournalEntryTableModel extends AbstractTableModel {
                         Trader trader = (Trader) value;
                         gv.setTraderId(Util1.getLong(trader.getId()));
                         gv.setTraderName(trader.getTraderName());
-                        String coaCode = trader.getAccount().getCode();
-                        ChartOfAccount account = cOAService.findById(coaCode);
-                        if (account != null) {
-                            gv.setAccountId(coaCode);
-                            gv.setAccName(account.getCoaNameEng());
+                        if (trader.getAccount() != null) {
+                            gv.setSourceAcId(trader.getAccount().getCode());
+                            gv.setSrcAccName(trader.getAccount().getCoaNameEng());
                             parent.setColumnSelectionInterval(3, 3);
                         } else {
                             parent.setColumnSelectionInterval(2, 3);
@@ -146,8 +144,8 @@ public class JournalEntryTableModel extends AbstractTableModel {
                 if (value != null) {
                     if (value instanceof ChartOfAccount) {
                         ChartOfAccount coa = (ChartOfAccount) value;
-                        gv.setAccountId(coa.getCode());
-                        gv.setAccName(coa.getCoaNameEng());
+                        gv.setSourceAcId(coa.getCode());
+                        gv.setSrcAccName(coa.getCoaNameEng());
 
                     }
                 }
@@ -157,25 +155,27 @@ public class JournalEntryTableModel extends AbstractTableModel {
             case 4:
                 if (value != null) {
                     gv.setDrAmt(Util1.getDouble(value));
-                    save(row);
+                    if (gv.getCrAmt() != null) {
+                        gv.setCrAmt(0.0);
+                        parent.setColumnSelectionInterval(5, 5);
+                        parent.setRowSelectionInterval(row + 1, row + 1);
+                    }
                 }
                 break;
             case 5:
                 if (value != null) {
                     gv.setCrAmt(Util1.getDouble(value));
-                    save(row);
+                    if (gv.getDrAmt() != null) {
+                        gv.setDrAmt(0.0);
+                        parent.setColumnSelectionInterval(4, 4);
+                        parent.setRowSelectionInterval(row + 1, row + 1);
+                    }
                 }
                 break;
         }
-        parent.requestFocusInWindow();
-    }
-
-    private void save(int row) {
-        addRow();
-        parent.setRowSelectionInterval(row + 1, row + 1);
-        parent.setColumnSelectionInterval(0, 0);
+        addEmptyRow();
         calTotalAmt();
-        // Save object ? List ?
+        parent.requestFocusInWindow();
     }
 
     public VGl getVGl(int row) {
@@ -252,7 +252,7 @@ public class JournalEntryTableModel extends AbstractTableModel {
             status = true;
         } else {
             VGl vgl = listGV.get(listGV.size() - 1);
-            if (vgl.getGlId() == null) {
+            if (vgl.getSourceAcId() == null) {
                 status = false;
             }
         }
@@ -282,6 +282,7 @@ public class JournalEntryTableModel extends AbstractTableModel {
     public void clear() {
         if (listGV != null) {
             listGV.clear();
+            fireTableDataChanged();
         }
     }
 
