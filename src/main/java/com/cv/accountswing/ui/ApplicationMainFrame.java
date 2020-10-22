@@ -261,7 +261,14 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         System.setProperty("java.awt.headless", "false");
         initComponents();
         initKeyFoucsManager();
+        initToolBar();
         this.context = context;
+
+    }
+
+    private void initToolBar() {
+        toolBar.addSeparator();
+        toolBar.setBorderPainted(true);
 
     }
 
@@ -983,7 +990,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
 
         jPanel1 = new javax.swing.JPanel();
         lblCompanyName = new javax.swing.JLabel();
-        jToolBar1 = new javax.swing.JToolBar();
+        toolBar = new javax.swing.JToolBar();
         btnSave = new javax.swing.JButton();
         btnPrint = new javax.swing.JButton();
         btnDelete = new javax.swing.JButton();
@@ -1032,7 +1039,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         lblCompanyName.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblCompanyName.setText("Welcome     ");
 
-        jToolBar1.setOpaque(false);
+        toolBar.setOpaque(false);
 
         btnSave.setFont(Global.lableFont);
         btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save.png"))); // NOI18N
@@ -1042,17 +1049,18 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                 btnSaveActionPerformed(evt);
             }
         });
-        jToolBar1.add(btnSave);
+        toolBar.add(btnSave);
 
         btnPrint.setFont(Global.lableFont);
         btnPrint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/printer.png"))); // NOI18N
+        btnPrint.setToolTipText("F6 - Print");
         btnPrint.setFocusable(false);
         btnPrint.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnPrintActionPerformed(evt);
             }
         });
-        jToolBar1.add(btnPrint);
+        toolBar.add(btnPrint);
 
         btnDelete.setFont(Global.lableFont);
         btnDelete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/delete.png"))); // NOI18N
@@ -1063,7 +1071,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                 btnDeleteActionPerformed(evt);
             }
         });
-        jToolBar1.add(btnDelete);
+        toolBar.add(btnDelete);
 
         btnHistory.setFont(Global.lableFont);
         btnHistory.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/history.png"))); // NOI18N
@@ -1074,7 +1082,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                 btnHistoryActionPerformed(evt);
             }
         });
-        jToolBar1.add(btnHistory);
+        toolBar.add(btnHistory);
 
         btnClear.setFont(Global.lableFont);
         btnClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/clean-code.png"))); // NOI18N
@@ -1085,7 +1093,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                 btnClearActionPerformed(evt);
             }
         });
-        jToolBar1.add(btnClear);
+        toolBar.add(btnClear);
 
         btnLogout.setFont(Global.lableFont);
         btnLogout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/logout.png"))); // NOI18N
@@ -1096,7 +1104,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                 btnLogoutActionPerformed(evt);
             }
         });
-        jToolBar1.add(btnLogout);
+        toolBar.add(btnLogout);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -1104,7 +1112,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(toolBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 364, Short.MAX_VALUE)
                 .addComponent(lblCompanyName, javax.swing.GroupLayout.PREFERRED_SIZE, 194, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -1115,7 +1123,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                 .addGap(0, 0, 0)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblCompanyName, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(toolBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(0, 0, 0))
         );
 
@@ -1242,10 +1250,10 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private javax.swing.JButton btnPrint;
     private javax.swing.JButton btnSave;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JToolBar jToolBar1;
     private javax.swing.JLabel lblCompanyName;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JTabbedPane tabMain;
+    private javax.swing.JToolBar toolBar;
     // End of variables declaration//GEN-END:variables
 
     @Override

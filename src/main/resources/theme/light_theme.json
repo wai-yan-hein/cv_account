@@ -22,6 +22,9 @@
             "separatorColor": "#d1d1d1",
             "separatorForeground": "#999999"
         },
+        "TabbedPane": {
+            "contentAreaColor": "#2675BF"
+        },
 
         "Borders": {
             "color": "#D1D1D1",
