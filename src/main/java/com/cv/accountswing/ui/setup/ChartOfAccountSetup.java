@@ -47,7 +47,7 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-public class ChartOfAccountSetup extends javax.swing.JPanel implements 
+public class ChartOfAccountSetup extends javax.swing.JPanel implements
         MouseListener,
         TreeSelectionListener, KeyListener,
         PanelControl {
@@ -252,7 +252,6 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
         txtUsrCode.setText(null);
         chkActive.setSelected(false);
         treeCOA.requestFocus();
-        isShown = false;
     }
 
     private void initKeyListener() {
@@ -767,6 +766,8 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
     @Override
     public void newForm() {
         clear();
+        isShown = false;
+
     }
 
     @Override

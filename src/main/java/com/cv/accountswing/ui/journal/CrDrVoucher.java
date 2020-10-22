@@ -766,6 +766,7 @@ public class CrDrVoucher extends javax.swing.JPanel implements KeyListener, Sele
 
     @Override
     public void newForm() {
+        isShown = false;
     }
 
     @Override

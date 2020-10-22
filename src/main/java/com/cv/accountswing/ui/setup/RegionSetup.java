@@ -578,6 +578,7 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
     @Override
     public void newForm() {
         clear();
+        isShown = false;
     }
 
     @Override

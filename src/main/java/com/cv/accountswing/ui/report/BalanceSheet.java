@@ -349,6 +349,7 @@ public class BalanceSheet extends javax.swing.JPanel implements SelectionObserve
 
     @Override
     public void newForm() {
+        isShown = false;
     }
 
     @Override

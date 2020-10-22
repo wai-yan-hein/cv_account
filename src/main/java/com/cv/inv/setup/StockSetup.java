@@ -1822,6 +1822,7 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
     @Override
     public void newForm() {
         clear();
+        isShown = false;
     }
 
     @Override

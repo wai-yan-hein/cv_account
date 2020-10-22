@@ -426,6 +426,7 @@ public class RoleAssignSetup extends javax.swing.JPanel implements KeyListener, 
 
     @Override
     public void newForm() {
+        isShown = false;
     }
 
     @Override

@@ -117,7 +117,8 @@
 
         "StatusBar.borderColor": "#D1D1D1",
 
-        "ToolWindow.Header.inactiveBackground": "#F2F2F2"
+        "ToolWindow.Header.inactiveBackground": "#F2F2F2",
+        "Panel.background": "#ffffff"
     },
 
     "icons": {

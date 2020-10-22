@@ -603,6 +603,7 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
 
     @Override
     public void newForm() {
+        isShown = false;
     }
 
     @Override
