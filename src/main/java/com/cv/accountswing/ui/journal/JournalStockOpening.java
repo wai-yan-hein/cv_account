@@ -497,6 +497,7 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
 
     @Override
     public void newForm() {
+        isShown = false;
     }
 
     @Override

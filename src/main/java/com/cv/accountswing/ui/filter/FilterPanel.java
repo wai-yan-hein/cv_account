@@ -160,7 +160,7 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
         txtCreditAmt = new javax.swing.JTextField();
         jLabel9 = new javax.swing.JLabel();
 
-        setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        setBorder(javax.swing.BorderFactory.createTitledBorder("Filter Bar"));
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentShown(java.awt.event.ComponentEvent evt) {
                 formComponentShown(evt);
@@ -368,8 +368,8 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
                     .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, 96, Short.MAX_VALUE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtDebitAmt, javax.swing.GroupLayout.DEFAULT_SIZE, 96, Short.MAX_VALUE)
-                    .addComponent(jLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, 96, Short.MAX_VALUE))
+                    .addComponent(txtDebitAmt, javax.swing.GroupLayout.DEFAULT_SIZE, 90, Short.MAX_VALUE)
+                    .addComponent(jLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, 90, Short.MAX_VALUE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(txtCreditAmt, javax.swing.GroupLayout.DEFAULT_SIZE, 92, Short.MAX_VALUE)

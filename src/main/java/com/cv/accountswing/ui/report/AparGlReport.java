@@ -752,6 +752,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
     public void newForm() {
         assingDefaultValue();
         search();
+        isShown = false;
     }
 
     @Override

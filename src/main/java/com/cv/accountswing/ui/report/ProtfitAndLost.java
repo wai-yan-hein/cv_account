@@ -7,6 +7,7 @@ package com.cv.accountswing.ui.report;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
+import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.CompanyInfo;
 import com.cv.accountswing.entity.SystemProperty;
@@ -32,7 +33,7 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-public class ProtfitAndLost extends javax.swing.JPanel implements SelectionObserver {
+public class ProtfitAndLost extends javax.swing.JPanel implements SelectionObserver, PanelControl {
 
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(ProtfitAndLost.class);
 
@@ -112,7 +113,7 @@ public class ProtfitAndLost extends javax.swing.JPanel implements SelectionObser
 
     }
 
-    private void print() {
+    private void printPL() {
         taskExecutor.execute(() -> {
             try {
                 loadingObserver.load(this.getName(), "Start");
@@ -281,7 +282,7 @@ public class ProtfitAndLost extends javax.swing.JPanel implements SelectionObser
 
     private void btnPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintActionPerformed
         // TODO add your handling code here:
-        print();
+        printPL();
     }//GEN-LAST:event_btnPrintActionPerformed
 
     private void btnCalculateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCalculateActionPerformed
@@ -323,5 +324,27 @@ public class ProtfitAndLost extends javax.swing.JPanel implements SelectionObser
             }
 
         }
+    }
+
+    @Override
+    public void save() {
+    }
+
+    @Override
+    public void delete() {
+    }
+
+    @Override
+    public void newForm() {
+        isShown = false;
+    }
+
+    @Override
+    public void history() {
+    }
+
+    @Override
+    public void print() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

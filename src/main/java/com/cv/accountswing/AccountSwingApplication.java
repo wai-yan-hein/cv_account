@@ -114,6 +114,7 @@ public class AccountSwingApplication {
                         //appMain.initGlobalData();
                         //appMain.initProperty();
                         //appMain.autoSyncStart();
+                        appMain.startNetworkDectector();
                         appMain.setIconImage(new ImageIcon(AccountSwingApplication.class.getResource("/images/logo.png")).getImage());
                         appMain.setExtendedState(JFrame.MAXIMIZED_BOTH);
                         appMain.setVisible(true);

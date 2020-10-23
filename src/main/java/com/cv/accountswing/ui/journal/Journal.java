@@ -38,6 +38,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class Journal extends javax.swing.JPanel implements KeyListener, SelectionObserver, PanelControl {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(Journal.class);
     private int selectRow = -1;
     @Autowired
@@ -52,11 +53,11 @@ public class Journal extends javax.swing.JPanel implements KeyListener, Selectio
     private ApplicationMainFrame mainFrame;
     private LoadingObserver loadingObserver;
     private boolean isShown = false;
-    
+
     public void setIsShown(boolean isShown) {
         this.isShown = isShown;
     }
-    
+
     public void setLoadingObserver(LoadingObserver loadingObserver) {
         this.loadingObserver = loadingObserver;
     }
@@ -69,14 +70,14 @@ public class Journal extends javax.swing.JPanel implements KeyListener, Selectio
         initKeyListener();
         txtFromDate.requestFocusInWindow();
     }
-    
+
     private void initMain() {
         setTodayDate();
         initTable();
         searchGV();
         isShown = true;
     }
-    
+
     private void initTable() {
         tblJournal.setModel(journalTableModel);
         tblJournal.getTableHeader().setFont(Global.lableFont);
@@ -96,16 +97,16 @@ public class Journal extends javax.swing.JPanel implements KeyListener, Selectio
                     }
                 }
             }
-            
+
         });
-        
+
     }
-    
+
     private void setTodayDate() {
         txtFromDate.setDate(Util1.getTodayDate());
         txtToDate.setDate(Util1.getTodayDate());
     }
-    
+
     private void searchGV() {
         LOGGER.info("searchGV");
         loadingObserver.load(this.getName(), "Start");
@@ -119,11 +120,11 @@ public class Journal extends javax.swing.JPanel implements KeyListener, Selectio
                     "-");
             journalTableModel.setListGV(listGV);
             loadingObserver.load(this.getName(), "Stop");
-            
+
         });
-        
+
     }
-    
+
     private void initKeyListener() {
         txtFromDate.getDateEditor().getUiComponent().setName("txtFromDate");
         txtToDate.getDateEditor().getUiComponent().setName("txtToDate");
@@ -171,14 +172,14 @@ public class Journal extends javax.swing.JPanel implements KeyListener, Selectio
         journalEntryDialog.setResizable(false);
         journalEntryDialog.setLocationRelativeTo(null);
         journalEntryDialog.setVisible(true);
-        
+
     }
-    
+
     public void clear() {
         setTodayDate();
         txtVouNo.setText(null);
         txtRefrence.setText(null);
-        
+
     }
 
     /**
@@ -373,16 +374,16 @@ public class Journal extends javax.swing.JPanel implements KeyListener, Selectio
     @Override
     public void keyTyped(KeyEvent e) {
     }
-    
+
     @Override
     public void keyPressed(KeyEvent e) {
     }
-    
+
     @Override
     public void keyReleased(KeyEvent e) {
         Object sourceObj = e.getSource();
         String ctrlName = "-";
-        
+
         if (sourceObj instanceof JButton) {
             ctrlName = ((JButton) sourceObj).getName();
         } else if (sourceObj instanceof JTextField) {
@@ -442,17 +443,17 @@ public class Journal extends javax.swing.JPanel implements KeyListener, Selectio
                     txtRefrence.requestFocus();
                 }
                 tabToTable(e);
-                
+
                 break;
             case "tblJournal":
                 if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_RIGHT) {
                     txtFromDate.getDateEditor().getUiComponent().requestFocusInWindow();
                 }
                 break;
-            
+
         }
     }
-    
+
     private void tabToTable(KeyEvent e) {
         if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_RIGHT) {
             tblJournal.requestFocus();
@@ -461,14 +462,13 @@ public class Journal extends javax.swing.JPanel implements KeyListener, Selectio
             }
         }
     }
-    
+
     @Override
     public void selected(Object source, Object selectObj) {
         if (source.toString().equals("SEARCHVOUCHER")) {
             searchGV();
         }
     }
-
 
     @Override
     public void save() {
@@ -481,6 +481,7 @@ public class Journal extends javax.swing.JPanel implements KeyListener, Selectio
     @Override
     public void newForm() {
         clear();
+        isShown = false;
     }
 
     @Override

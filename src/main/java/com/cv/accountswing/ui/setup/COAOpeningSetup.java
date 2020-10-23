@@ -580,6 +580,7 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
 
     @Override
     public void newForm() {
+        isShown = false;
     }
 
     @Override

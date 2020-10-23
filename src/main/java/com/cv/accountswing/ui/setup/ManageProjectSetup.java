@@ -912,6 +912,7 @@ public class ManageProjectSetup extends javax.swing.JPanel implements KeyListene
     @Override
     public void newForm() {
         clearProject();
+        isShown = false;
     }
 
     @Override

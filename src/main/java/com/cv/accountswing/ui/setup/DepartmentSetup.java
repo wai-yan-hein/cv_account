@@ -671,6 +671,7 @@ public class DepartmentSetup extends javax.swing.JPanel implements TreeSelection
     @Override
     public void newForm() {
         clear();
+        isShown = false;
     }
 
     @Override
