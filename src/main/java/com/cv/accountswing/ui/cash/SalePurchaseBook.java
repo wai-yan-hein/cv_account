@@ -318,6 +318,7 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
                 LOGGER.info(sourceAccId + "----- Finished...");
             });
         } else {
+            JOptionPane.showMessageDialog(Global.parentForm, "Source Account Missing.");
             loadingObserver.load(this.getName(), "Stop");
         }
 
@@ -330,7 +331,7 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
         accId = Util1.isNull(accId, "-");
         currency = Util1.isNull(currency, "-");
         ref = Util1.isNull(ref, "-");
-        depId = Util1.isNull(depId, Global.sysProperties.get("system.default.department"));
+        depId = Util1.isNull(depId, Util1.isNull(Global.sysProperties.get("system.default.department"), "-"));
         traderName = Util1.isNull(traderName, "-");
         debAmt = Util1.isNull(debAmt, "-");
         crdAmt = Util1.isNull(crdAmt, "-");
@@ -349,26 +350,25 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
         debAmt = null;
         crdAmt = null;
         txtFTotalAmt.setValue(0.0);
-
         filterPanel.clear();
         searchCash();
 
     }
 
     private void swapData(List<VGl> listVGL, String targetId) {
-        for (VGl vgl : listVGL) {
+        listVGL.forEach(vgl -> {
             String sourceAcId = Util1.isNull(vgl.getSourceAcId(), "-");
             String accId = Util1.isNull(vgl.getAccountId(), "-");
             if (sourceAcId.equals(targetId)) {
                 /*if(Util1.isNullZero(vgl.getSplitId()) == 8){ //Credit Voucher
-                 Double tmpAmt = vgl.getDrAmt();
-                 vgl.setDrAmt(vgl.getCrAmt());
-                 vgl.setCrAmt(tmpAmt);
-                 } else if(Util1.isNullZero(vgl.getSplitId()) == 9){ //Debit Voucher
-                 Double tmpAmt = vgl.getCrAmt();
-                 vgl.setCrAmt(vgl.getDrAmt());
-                 vgl.setDrAmt(tmpAmt);
-                 }*/
+                Double tmpAmt = vgl.getDrAmt();
+                vgl.setDrAmt(vgl.getCrAmt());
+                vgl.setCrAmt(tmpAmt);
+                } else if(Util1.isNullZero(vgl.getSplitId()) == 9){ //Debit Voucher
+                Double tmpAmt = vgl.getCrAmt();
+                vgl.setCrAmt(vgl.getDrAmt());
+                vgl.setDrAmt(tmpAmt);
+                }*/
             } else if (accId.equals(targetId)) {
                 double tmpDrAmt = 0;
                 if (vgl.getDrAmt() != null) {
@@ -384,7 +384,7 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
                 vgl.setDrAmt(0.0);
                 vgl.setCrAmt(0.0);
             }
-        }
+        });
     }
 
     /**
@@ -450,10 +450,10 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(638, 638, 638)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel4)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(txtFTotalAmt, javax.swing.GroupLayout.DEFAULT_SIZE, 257, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addComponent(txtFTotalAmt, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -461,8 +461,8 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
-                    .addComponent(txtFTotalAmt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtFTotalAmt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -603,6 +603,7 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
 
     @Override
     public void newForm() {
+        clearFilter();
         isShown = false;
     }
 

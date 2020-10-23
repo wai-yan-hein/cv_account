@@ -64,7 +64,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class AllCash extends javax.swing.JPanel implements SelectionObserver, PanelControl {
-
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(AllCash.class);
     String stDate;
     String enDate;
@@ -103,30 +103,30 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
     private String sourceAccId;
     private JPopupMenu popupmenu;
     private boolean isShown = false;
-
+    
     public void setIsShown(boolean isShown) {
         this.isShown = isShown;
         clearFilter();
     }
-
+    
     public void setLoadingObserver(LoadingObserver loadingObserver) {
         this.loadingObserver = loadingObserver;
     }
-
+    
     public String getSourceAccId() {
         return sourceAccId;
     }
-
+    
     public void setSourceAccId(String sourceAccId) {
         this.sourceAccId = sourceAccId;
         LOGGER.info("Source Id :" + sourceAccId);
-
+        
     }
-
+    
     public void setReloadData(ReloadData reloadData) {
         this.reloadData = reloadData;
     }
-
+    
     public void setSelectionObserver(SelectionObserver selectionObserver) {
         this.selectionObserver = selectionObserver;
     }
@@ -139,25 +139,25 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
         initComponents();
         initPopup();
     }
-
+    
     public AllCash newInstance() {
         return applicationContext.getBean(AllCash.class);
     }
-
+    
     private void initMain() {
         filterPanel();
         initTable();
         clearFilter();
         isShown = true;
     }
-
+    
     private void clearTextBox() {
         txtFClosing.setValue(0.0);
         txtFOpening.setValue(0.0);
         txtFCreditAmt.setValue(0.0);
         txtFDebitAmt.setValue(0.0);
     }
-
+    
     private void requestFoucsTable() {
         int row = allCashTableModel.getListSize() - 1;
         //tblCash.setCellSelectionEnabled(true);
@@ -165,7 +165,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
         tblCash.setColumnSelectionInterval(0, 0);
         tblCash.requestFocusInWindow();
     }
-
+    
     private void initTable() {
         allCashTableModel.setSelectionObserver(this);
         allCashTableModel.setReloadData(reloadData);
@@ -198,10 +198,10 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
         tblCash.getColumnModel().getColumn(6).setCellEditor(new CurrencyEditor());
         tblCash.getColumnModel().getColumn(7).setCellEditor(new AutoClearEditor());
         tblCash.getColumnModel().getColumn(8).setCellEditor(new AutoClearEditor());
-
+        
         tblCash.setDefaultRenderer(Double.class, new TableCellRender());
         tblCash.setDefaultRenderer(Object.class, new TableCellRender());
-
+        
         tblCash.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
@@ -212,7 +212,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
                     }
                 }
             }
-
+            
         });
         tblCash.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                 .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
@@ -221,7 +221,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
         tblCash.getInputMap().put(KeyStroke.getKeyStroke("F8"), "F8-Action");
         tblCash.getActionMap().put("F8-Action", actionItemDeleteExp);
     }
-
+    
     private void initPopup() {
         popupmenu = new JPopupMenu("Edit");
         JMenuItem closeAll = new JMenuItem("Print");
@@ -231,7 +231,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
         popupmenu.add(closeAll);
         initMouseLisener();
     }
-
+    
     private void initMouseLisener() {
         tblCash.addMouseListener(new MouseAdapter() {
             @Override
@@ -245,10 +245,10 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
                     tblCash.editCellAt(row, col);
                 }
             }
-
+            
         });
     }
-
+    
     private void filterPanel() {
         panelFilter.setLayout(new BorderLayout());
         filterPanel.setSelectionObserver(this);
@@ -256,23 +256,23 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
         panelFilter.add(filterPanel, BorderLayout.CENTER);
         panelFilter.revalidate();
         panelFilter.repaint();
-
+        
     }
-
+    
     private final Action actionItemDeleteExp = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
             deleteVoucher();
         }
     };
-
+    
     private void deleteVoucher() {
         VGl vgl;
         int yes_no;
-
+        
         if (tblCash.getSelectedRow() >= 0) {
             vgl = allCashTableModel.getVGl(tblCash.convertRowIndexToModel(tblCash.getSelectedRow()));
-
+            
             if (vgl.getGlId() != null) {
                 yes_no = JOptionPane.showConfirmDialog(Global.parentForm, "Are you sure to delete?",
                         "Expense item delete", JOptionPane.YES_NO_OPTION);
@@ -286,7 +286,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
             }
         }
     }
-
+    
     public void printVoucher() {
         loadingObserver.load(this.getName(), "Start");
         taskExecutor.execute(() -> {
@@ -301,14 +301,14 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
                 String reportPath = sp.getPropValue();
                 //String reportPath1 = reportPath;
                 String filePath = reportPath + "/temp/" + fileName;
-
+                
                 reportPath = reportPath + "/LedgerReport";
                 key = new SystemPropertyKey();
                 key.setCompCode(Global.compId);
                 key.setPropKey("system.font.path");
                 sp = spService.findById(key);
                 String fontPath = sp.getPropValue();
-
+                
                 Map<String, Object> parameters = new HashMap();
                 parameters.put("p_company_name", ci.getName());
                 parameters.put("p_comp_id", Global.compId);
@@ -332,35 +332,39 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
                 loadingObserver.load(this.getName(), "Stop");
             } catch (Exception ex) {
                 LOGGER.error("getLedgerReport : " + ex);
-
+                
             }
         });
-
+        
     }
-
+    
     private void searchCash() {
         initializeParameter();
         loadingObserver.load(this.getName(), "Start");
-        taskExecutor.execute(() -> {
-            LOGGER.info(sourceAccId + "----- Searching...");
-            List<VGl> listVGl = vGlService.search(stDate, enDate,
-                    desp, sourceAccId,
-                    accId, currency, "-",
-                    ref, depId, "-", "-",
-                    "-", "-", "-", "-", "-",
-                    traderName, "-", "-",
-                    debAmt,
-                    crdAmt);
-            swapData(listVGl, sourceAccId);
-            allCashTableModel.setListVGl(listVGl);
-            allCashTableModel.addNewRow();
-            requestFoucsTable();
-            LOGGER.info(sourceAccId + "----- Finished...");
-        });
-        calOpeningClosing();
-
+        if (sourceAccId != null) {
+            taskExecutor.execute(() -> {
+                LOGGER.info(sourceAccId + "----- Searching...");
+                List<VGl> listVGl = vGlService.search(stDate, enDate,
+                        desp, sourceAccId,
+                        accId, currency, "-",
+                        ref, depId, "-", "-",
+                        "-", "-", "-", "-", "-",
+                        traderName, "-", "-",
+                        debAmt,
+                        crdAmt);
+                swapData(listVGl, sourceAccId);
+                allCashTableModel.setListVGl(listVGl);
+                allCashTableModel.addNewRow();
+                requestFoucsTable();
+                LOGGER.info(sourceAccId + "----- Finished...");
+            });
+            calOpeningClosing();
+        }else{
+            JOptionPane.showMessageDialog(Global.parentForm, "Source Account Missing.");
+        }
+        
     }
-
+    
     private void initializeParameter() {
         stDate = Util1.isNull(stDate, Util1.toDateStr(Util1.getTodayDate(), "dd/MM/yyyy"));
         enDate = Util1.isNull(enDate, Util1.toDateStr(Util1.getTodayDate(), "dd/MM/yyyy"));
@@ -374,7 +378,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
         crdAmt = Util1.isNull(crdAmt, "-");
         clearTextBox();
     }
-
+    
     public void clearFilter() {
         stDate = null;
         enDate = null;
@@ -392,9 +396,9 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
         txtFOpening.setValue(0.0);
         filterPanel.clear();
         searchCash();
-
+        
     }
-
+    
     private void swapData(List<VGl> listVGL, String targetId) {
         listVGL.forEach(vgl -> {
             String sourceAcId = Util1.isNull(vgl.getSourceAcId(), "-");
@@ -416,7 +420,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
                 }
                 vgl.setDrAmt(vgl.getCrAmt());
                 vgl.setCrAmt(tmpDrAmt);
-
+                
                 String tmpStr = vgl.getAccName();
                 vgl.setAccName(vgl.getSrcAccName());
                 vgl.setSrcAccName(tmpStr);
@@ -480,8 +484,6 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
         ));
         tblCash.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
         tblCash.setRowHeight(Global.tblRowHeight);
-        tblCash.setShowHorizontalLines(true);
-        tblCash.setShowVerticalLines(true);
         jScrollPane2.setViewportView(tblCash);
 
         jLabel1.setFont(Global.lableFont);
@@ -583,8 +585,8 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -643,9 +645,9 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
         txtFCreditAmt.setValue(cdAmt);
         double closing = Util1.getDouble((Double) txtFOpening.getValue()) + dbAmt - cdAmt;
         txtFClosing.setValue(closing);
-
+        
     }
-
+    
     private void calOpeningClosing() {
         taskExecutor.execute(() -> {
             String opDate = Global.finicialPeriodFrom;
@@ -667,7 +669,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
             }
         });
     }
-
+    
     @Override
     public void selected(Object source, Object selectObj) {
         if (source != null) {
@@ -721,39 +723,39 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
                     calDebitCredit();
                     break;
             }
-
+            
         }
-
+        
     }
-
+    
     private void searchValidation(String str) {
-
+        
         searchCash();
     }
-
+    
     @Override
     public void save() {
-
+        
     }
-
+    
     @Override
     public void delete() {
         deleteVoucher();
     }
-
+    
     @Override
     public void newForm() {
         clearFilter();
         isShown = false;
     }
-
+    
     @Override
     public void history() {
     }
-
+    
     @Override
     public void print() {
         printVoucher();
     }
-
+    
 }

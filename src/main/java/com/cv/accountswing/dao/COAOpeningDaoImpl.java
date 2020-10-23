@@ -163,4 +163,36 @@ public class COAOpeningDaoImpl extends AbstractDao<Long, AccOpeningH> implements
                 + " and comp_code = " + compCode;
         execSQL(strSql);
     }
+
+    @Override
+    public void generateZeroOpening(String opDate, String userId, String compCode, String currCode, String dept, String coaGroup) throws Exception {
+        if (!dept.equals("-") && !currCode.equals("-")) {
+            String strSql = "insert into coa_opening(op_date, source_acc_id, cur_code, dr_amt, "
+                    + "cr_amt, user_id, comp_id, tran_source, created_date, dept_code) "
+                    + "select '" + opDate + "', child_coa_code, cur_code, 0, 0, '" + userId + "', '"
+                    + compCode + "', 'OPENING', sysdate(), '" + dept
+                    + "' from v_coa_tree where level2 >= 3 and cur_code = '" + currCode
+                    + "' and coa_code not in (select coa_code from coa_excludion where option_desp = 'COAOPENING')"
+                    + " and comp_code1 = '" + compCode + "' and coa_parent1 in (" + coaGroup + ")";
+            execSQL(strSql);
+
+            String strSql1 = "insert into coa_opening(op_date, source_acc_id, cur_code, dr_amt, "
+                    + "cr_amt, user_id, comp_id, tran_source, created_date, dept_code, cv_id) "
+                    + "select '" + opDate + "', coa_code, '" + currCode + "', 0, 0, '" + userId + "', '"
+                    + compCode + "', 'OPENING', sysdate(), '" + dept + "', cv_id"
+                    + " from v_cv_coa where comp_code = " + compCode;
+            execSQL(strSql1);
+        }
+    }
+
+    @Override
+    public void deleteOpening(String opDate, String compCode, String currCode, String dept) throws Exception {
+        String strSql = "delete from coa_opening where op_date = '" + opDate + "' and tran_source = 'OPENING' and "
+                + "comp_id = " + compCode + " and cur_code = '" + currCode + "'";
+
+        if (!dept.equals("-")) {
+            strSql = strSql + " and dept_code = '" + dept + "'";
+        }
+        execSQL(strSql);
+    }
 }

@@ -6,12 +6,13 @@ package com.cv.accountswing.ui.setup.common;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.SelectionObserver;
-import com.cv.accountswing.entity.Gl;
-import com.cv.accountswing.entity.view.VGl;
-import com.cv.accountswing.service.GlService;
+import com.cv.accountswing.entity.COAOpening;
+import com.cv.accountswing.entity.view.VCOAOpening;
+import com.cv.accountswing.service.OpeningService;
 import com.cv.accountswing.util.Util1;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import java.awt.HeadlessException;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,15 +29,15 @@ import org.springframework.stereotype.Component;
  * @author winswe
  */
 @Component
-public class COAOpeningTableModel extends AbstractTableModel {
+public class OpeningTableModel extends AbstractTableModel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(COAOpeningTableModel.class);
-    private List<VGl> listVGl = new ArrayList();
+    private static final Logger LOGGER = LoggerFactory.getLogger(OpeningTableModel.class);
+    private List<VCOAOpening> listOpening = new ArrayList();
     private String[] columnNames = {"Code", "Chart Of Account", "Person Id", "Person Name", "Dept", "Currency", "Dr-Amt", "Cr-Amt"};
     private JTable parent;
     Gson gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
     @Autowired
-    private GlService glService;
+    private OpeningService opService;
     private SelectionObserver selectionObserver;
 
     public void setSelectionObserver(SelectionObserver selectionObserver) {
@@ -75,21 +76,21 @@ public class COAOpeningTableModel extends AbstractTableModel {
     public Object getValueAt(int row, int column) {
 
         try {
-            VGl vgl = listVGl.get(row);
+            VCOAOpening vgl = listOpening.get(row);
 
             switch (column) {
                 case 0: //Id
-                    return vgl.getSrcAccCode();
+                    return vgl.getSourceAccId();
                 case 1: //Name
-                    return vgl.getSrcAccName();
+                    return vgl.getSourceAccName();
                 case 2:
                     return vgl.getTraderCode();
                 case 3:// trader Name
                     return vgl.getTraderName();
                 case 4:
-                    return vgl.getDeptUsrCode();
+                    return vgl.getDepUsrCode();
                 case 5:
-                    return vgl.getFromCurId();
+                    return vgl.getCurCode();
                 case 6:
                     return vgl.getDrAmt();
                 case 7:
@@ -106,7 +107,7 @@ public class COAOpeningTableModel extends AbstractTableModel {
 
     @Override
     public void setValueAt(Object value, int row, int column) {
-        VGl vgl = listVGl.get(row);
+        VCOAOpening vgl = listOpening.get(row);
         switch (column) {
             case 6:
                 if (value != null) {
@@ -125,45 +126,46 @@ public class COAOpeningTableModel extends AbstractTableModel {
         parent.requestFocusInWindow();
     }
 
-    private void save(VGl vgl, int row) {
+    private void save(VCOAOpening vgl, int row) {
 
         vgl.setCompId(Global.compId);
-        vgl.setCreatedBy(Global.loginUser.getUserId().toString());
+        vgl.setUserId(Global.loginUser.getUserId());
         String strVGL = gson.toJson(vgl);
-        Gl gl = gson.fromJson(strVGL, Gl.class);
+        COAOpening op = gson.fromJson(strVGL, COAOpening.class);
         try {
-            Gl save = glService.save(gl);
+            COAOpening save = opService.save(op);
             if (save != null) {
-                VGl saveVGl = listVGl.get(row);
-                saveVGl.setGlId(save.getGlId());
+                VCOAOpening saveOpening = listOpening.get(row);
+                saveOpening.setOpId(save.getOpId());
                 addNewRow();
                 parent.setRowSelectionInterval(row + 1, row + 1);
                 parent.setColumnSelectionInterval(6, 6);
+                JOptionPane.showMessageDialog(Global.parentForm, "Saved");
                 selectionObserver.selected("CAL-TOTAL", "-");
             }
-        } catch (Exception ex) {
+        } catch (HeadlessException ex) {
+            LOGGER.error("Save Opening :" + ex.getMessage());
             JOptionPane.showMessageDialog(Global.parentForm, ex.getMessage(), "Save Opening", JOptionPane.ERROR_MESSAGE);
-            LOGGER.error("Save Gl :" + ex.getMessage());
         }
     }
 
     public void addNewRow() {
         if (hasEmptyRow()) {
-            VGl vGl = new VGl();
-            vGl.setGlDate(Util1.getTodayDate());
-            vGl.setFromCurId(Global.sysProperties.get("system.default.currency"));
-            listVGl.add(vGl);
-            fireTableRowsInserted(listVGl.size() - 1, listVGl.size() - 1);
+            VCOAOpening vGl = new VCOAOpening();
+            vGl.setOpDate(Util1.getTodayDate());
+            vGl.setCurCode(Global.sysProperties.get("system.default.currency"));
+            listOpening.add(vGl);
+            fireTableRowsInserted(listOpening.size() - 1, listOpening.size() - 1);
         }
     }
 
     public boolean hasEmptyRow() {
         boolean status = true;
-        if (listVGl.isEmpty() || listVGl == null) {
+        if (listOpening.isEmpty() || listOpening == null) {
             status = true;
         } else {
-            VGl vgl = listVGl.get(listVGl.size() - 1);
-            if (vgl.getGlId() == null) {
+            VCOAOpening vgl = listOpening.get(listOpening.size() - 1);
+            if (vgl.getOpId() == null) {
                 status = false;
             }
         }
@@ -173,10 +175,10 @@ public class COAOpeningTableModel extends AbstractTableModel {
 
     @Override
     public int getRowCount() {
-        if (listVGl == null) {
+        if (listOpening == null) {
             return 0;
         }
-        return listVGl.size();
+        return listOpening.size();
     }
 
     @Override
@@ -192,41 +194,41 @@ public class COAOpeningTableModel extends AbstractTableModel {
         this.columnNames = columnNames;
     }
 
-    public List<VGl> getListVGl() {
-        return listVGl;
+    public List<VCOAOpening> getListOpening() {
+        return listOpening;
     }
 
-    public void setListVGl(List<VGl> listVGl) {
-        this.listVGl = listVGl;
+    public void setListOpening(List<VCOAOpening> listOpening) {
+        this.listOpening = listOpening;
         fireTableDataChanged();
     }
 
-    public VGl getVGl(int row) {
-        return listVGl.get(row);
+    public VCOAOpening getOpening(int row) {
+        return listOpening.get(row);
     }
 
-    public void deleteVGl(int row) {
-        if (!listVGl.isEmpty()) {
-            listVGl.remove(row);
-            fireTableRowsDeleted(0, listVGl.size());
+    public void deleteOpening(int row) {
+        if (!listOpening.isEmpty()) {
+            listOpening.remove(row);
+            fireTableRowsDeleted(0, listOpening.size());
         }
 
     }
 
-    public void addVGl(VGl vgl) {
-        listVGl.add(vgl);
-        fireTableRowsInserted(listVGl.size() - 1, listVGl.size() - 1);
+    public void addOpening(VCOAOpening vgl) {
+        listOpening.add(vgl);
+        fireTableRowsInserted(listOpening.size() - 1, listOpening.size() - 1);
     }
 
-    public void setVGl(int row, VGl vgl) {
-        if (!listVGl.isEmpty()) {
-            listVGl.set(row, vgl);
+    public void setOpening(int row, VCOAOpening vgl) {
+        if (!listOpening.isEmpty()) {
+            listOpening.set(row, vgl);
             fireTableRowsUpdated(row, row);
         }
     }
 
     public void clear() {
-        listVGl.clear();
+        listOpening.clear();
         fireTableDataChanged();
     }
 

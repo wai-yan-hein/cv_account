@@ -372,10 +372,12 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                     case "Purchase":
                         purchaseBook.setName(panelName);
                         purchaseBook.setLoadingObserver(this);
+                        purchaseBook.setSourceAccId(sourceId);
                         return purchaseBook;
                     case "Sale":
                         saleBook.setName(panelName);
                         saleBook.setLoadingObserver(this);
+                        saleBook.setSourceAccId(sourceId);
                         return saleBook;
                     default:
                         return null;
@@ -1063,7 +1065,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
 
         btnClear.setFont(Global.lableFont);
         btnClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/clean-code.png"))); // NOI18N
-        btnClear.setToolTipText("F10 - Clear");
+        btnClear.setToolTipText("F10 - Clear / Refresh");
         btnClear.setFocusable(false);
         btnClear.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1085,7 +1087,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
 
         lblNeworkImage.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/online-signal.png"))); // NOI18N
 
-        lblNeworkPing.setText("23ms");
+        lblNeworkPing.setText("2344ms");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);

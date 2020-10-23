@@ -241,86 +241,86 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
     }
 
     public void savePurchase() {
-        if (isValidEntry()) {
-            try {
-                purchaseDetailService.save(gl, purTableModel.getListPurDetail());
-                clear();
-                vouEngine.updateVouNo();
-                genVouNo();
-            } catch (Exception ex) {
-                LOGGER.error("Save Purchase :" + ex.getMessage());
-                JOptionPane.showMessageDialog(Global.parentForm, "Could'nt saved.");
-            }
+        /* if (isValidEntry()) {
+        try {
+        purchaseDetailService.save(gl, purTableModel.getListPurDetail());
+        clear();
+        vouEngine.updateVouNo();
+        genVouNo();
+        } catch (Exception ex) {
+        LOGGER.error("Save Purchase :" + ex.getMessage());
+        JOptionPane.showMessageDialog(Global.parentForm, "Could'nt saved.");
         }
+        }*/
     }
 
-    private boolean isValidEntry() {
-        boolean status = true;
-
-        if (txtVouNo.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(Global.parentForm, "Invalid voucher no.",
-                    "Invalid Voucher ID.", JOptionPane.ERROR_MESSAGE);
-            status = false;
-        } else if (traderAutoCompleter.getTrader() == null) {
-            JOptionPane.showMessageDialog(Global.parentForm, "Supplier cannot be blank.",
-                    "No supplier.", JOptionPane.ERROR_MESSAGE);
-            status = false;
-            txtSupplier.requestFocus();
-        } else if (locCompleter.getLocation() == null) {
-            JOptionPane.showMessageDialog(Global.parentForm, "Choose location.",
-                    "No location.", JOptionPane.ERROR_MESSAGE);
-            status = false;
-            txtLocation.requestFocus();
-        } else if (vouCompleter.getVouStatus() == null) {
-            JOptionPane.showMessageDialog(Global.parentForm, "Choose vou status.",
-                    "No vou status.", JOptionPane.ERROR_MESSAGE);
-            status = false;
-            txtVouStatus.requestFocus();
-        } else {
-            gl = new Gl();
-            gl.setVouNo(txtVouNo.getText());
-            gl.setDueDate(txtDueDate.getDate());
-            gl.setLocationId(locCompleter.getLocation().getLocationId());
-            gl.setVouStatusId(vouCompleter.getVouStatus().getVouStatusId());
-            gl.setRemark(txtRemark.getText());
-            gl.setVouTotal(NumberUtil.getDouble(txtVouTotal.getText()));
-            gl.setPaid(NumberUtil.getDouble(txtVouPaid.getText()));
-            gl.setBalance(NumberUtil.getDouble(txtVouBalance.getText()));
-            gl.setTaxAmt(NumberUtil.getDouble(txtTax.getText()));
-            gl.setRefernceNo(txtRefNo.getText());
-            gl.setIntgUpdStatus(null);
-
-            if (lblStatus.getText().equals("NEW")) {
-                gl.setPurDate(txtPurDate.getDate());
-            } else {
-                Date tmpDate = txtPurDate.getDate();
-                if (!Util1.isSameDate(tmpDate, gl.getPurDate())) {
-                    gl.setPurDate(txtPurDate.getDate());
-                }
-            }
-
-            gl.setFromCurId((currAutoCompleter.getCurrency().getKey().getCode())); //Need to change
-
-            if (lblStatus.getText().equals("NEW")) {
-                gl.setCreatedBy(Global.loginUser.getUserId().toString());
-                gl.setSessionId(Global.sessionId);
-            } else {
-                gl.setModifyBy(Global.loginUser.getUserId().toString());
-                gl.setModifyDate(Util1.getTodayDate());
-            }
-
-            try {
-                if (tblPurchase.getCellEditor() != null) {
-                    tblPurchase.getCellEditor().stopCellEditing();
-                }
-
-            } catch (Exception ex) {
-
-            }
-        }
-
-        return status;
+    /* private boolean isValidEntry() {
+    boolean status = true;
+    
+    if (txtVouNo.getText().isEmpty()) {
+    JOptionPane.showMessageDialog(Global.parentForm, "Invalid voucher no.",
+    "Invalid Voucher ID.", JOptionPane.ERROR_MESSAGE);
+    status = false;
+    } else if (traderAutoCompleter.getTrader() == null) {
+    JOptionPane.showMessageDialog(Global.parentForm, "Supplier cannot be blank.",
+    "No supplier.", JOptionPane.ERROR_MESSAGE);
+    status = false;
+    txtSupplier.requestFocus();
+    } else if (locCompleter.getLocation() == null) {
+    JOptionPane.showMessageDialog(Global.parentForm, "Choose location.",
+    "No location.", JOptionPane.ERROR_MESSAGE);
+    status = false;
+    txtLocation.requestFocus();
+    } else if (vouCompleter.getVouStatus() == null) {
+    JOptionPane.showMessageDialog(Global.parentForm, "Choose vou status.",
+    "No vou status.", JOptionPane.ERROR_MESSAGE);
+    status = false;
+    txtVouStatus.requestFocus();
+    } else {
+    gl = new Gl();
+    gl.setVouNo(txtVouNo.getText());
+    gl.setDueDate(txtDueDate.getDate());
+    gl.setLocationId(locCompleter.getLocation().getLocationId());
+    gl.setVouStatusId(vouCompleter.getVouStatus().getVouStatusId());
+    gl.setRemark(txtRemark.getText());
+    gl.setVouTotal(NumberUtil.getDouble(txtVouTotal.getText()));
+    gl.setPaid(NumberUtil.getDouble(txtVouPaid.getText()));
+    gl.setBalance(NumberUtil.getDouble(txtVouBalance.getText()));
+    gl.setTaxAmt(NumberUtil.getDouble(txtTax.getText()));
+    gl.setRefernceNo(txtRefNo.getText());
+    gl.setIntgUpdStatus(null);
+    
+    if (lblStatus.getText().equals("NEW")) {
+    gl.setPurDate(txtPurDate.getDate());
+    } else {
+    Date tmpDate = txtPurDate.getDate();
+    if (!Util1.isSameDate(tmpDate, gl.getPurDate())) {
+    gl.setPurDate(txtPurDate.getDate());
     }
+    }
+    
+    gl.setFromCurId((currAutoCompleter.getCurrency().getKey().getCode())); //Need to change
+    
+    if (lblStatus.getText().equals("NEW")) {
+    gl.setCreatedBy(Global.loginUser.getUserId().toString());
+    gl.setSessionId(Global.sessionId);
+    } else {
+    gl.setModifyBy(Global.loginUser.getUserId().toString());
+    gl.setModifyDate(Util1.getTodayDate());
+    }
+    
+    try {
+    if (tblPurchase.getCellEditor() != null) {
+    tblPurchase.getCellEditor().stopCellEditing();
+    }
+    
+    } catch (Exception ex) {
+    
+    }
+    }
+    
+    return status;
+    }*/
 
     /**
      * This method is called from within the constructor to initialize the form.

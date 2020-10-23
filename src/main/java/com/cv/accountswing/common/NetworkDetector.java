@@ -15,7 +15,7 @@ import java.util.GregorianCalendar;
  */
 public class NetworkDetector extends Thread {
 
-    private final long sleepTime = 3000;
+    private final long sleepTime = 5000;
     private NetworkObserver networkObserver;
     private boolean error = false;
 
