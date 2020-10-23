@@ -310,3 +310,14 @@
 21 Oct 2020 12:28:49,978 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.accountswing.entity.AppUser.getUserShort()" because the return value of "com.cv.inv.entity.DamageHis.getCreatedBy()" is null
 21 Oct 2020 12:35:38,056 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.accountswing.entity.AppUser.getUserShort()" because the return value of "com.cv.inv.entity.DamageHis.getCreatedBy()" is null
 >>>>>>> 01c3b472b265d316ea53f23bda0ffef84054aab0
+22 Oct 2020 15:35:25,335 ERROR: com.cv.accountswing.util.StockUP - java.lang.NullPointerException
+22 Oct 2020 15:35:36,041 ERROR: com.cv.accountswing.util.StockUP - java.lang.NullPointerException
+22 Oct 2020 15:36:06,026 ERROR: com.cv.accountswing.util.StockUP - java.lang.NullPointerException
+22 Oct 2020 15:36:44,011 ERROR: com.cv.accountswing.util.StockUP - java.lang.NullPointerException
+22 Oct 2020 15:37:16,964 ERROR: com.cv.accountswing.util.StockUP - java.lang.NullPointerException
+23 Oct 2020 03:51:35,684 ERROR: com.cv.accountswing.util.StockUP - java.lang.NullPointerException
+23 Oct 2020 03:51:45,679 ERROR: com.cv.accountswing.util.StockUP - java.lang.NullPointerException
+23 Oct 2020 03:51:58,961 ERROR: com.cv.accountswing.util.StockUP - java.lang.NullPointerException
+23 Oct 2020 03:55:15,148 ERROR: com.cv.accountswing.util.StockUP - java.lang.NullPointerException
+23 Oct 2020 04:17:17,504 ERROR: com.cv.accountswing.util.StockUP - java.lang.NullPointerException
+23 Oct 2020 04:17:17,504 ERROR: com.cv.accountswing.util.StockUP - java.lang.NullPointerException

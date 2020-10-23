@@ -15,8 +15,10 @@ import java.util.List;
 public interface SaleHisService {
 
     public SaleHis save(SaleHis saleHis) throws Exception;
-    
-    public List<SaleHis> search(String fromDate, String toDate, String cusId, String vouStatusId, String remark,String stockCode);
-    
+
+    public List<SaleHis> search(String fromDate, String toDate, String cusId, String vouStatusId, String remark, String stockCode);
+
     public SaleHis findById(String id);
+
+    public int delete(String vouNo);
 }

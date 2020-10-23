@@ -16,7 +16,9 @@ public interface SaleHisDao {
 
     public SaleHis save(SaleHis sh);
 
-    public List<SaleHis> search(String fromDate, String toDate, String cusId, String vouStatusId, String remark,String stockCode);
+    public List<SaleHis> search(String fromDate, String toDate, String cusId, String vouStatusId, String remark, String stockCode);
 
     public SaleHis findById(String id);
+
+    public int delete(String vouNo);
 }

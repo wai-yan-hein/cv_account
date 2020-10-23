@@ -402,9 +402,9 @@ public class SaleEntry1 extends javax.swing.JPanel implements SelectionObserver,
             //Need to add
             //saleHis.setDeptId(departmentAutoCompleter.getDepartment().getDeptCode());
             //saleHis.setTraderId(traderAutoCompleter.getTrader().getTraderId());
-            saleHis.setSaleManId(saleManCompleter.getSaleMan().getSaleManId());
+            saleHis.setSaleManId(saleManCompleter.getSaleMan());
             //saleHis.setLocationId(locCompleter.getLocation().getLocationId());//need to add
-            saleHis.setVouStatusId(vouCompleter.getVouStatus().getVouStatusId());
+            saleHis.setVouStatusId(vouCompleter.getVouStatus());
             saleHis.setRemark(txtRemark.getText());
             saleHis.setVouTotal(NumberUtil.getDouble(txtVouTotal.getText()));
             saleHis.setDiscP(NumberUtil.getDouble(txtDiscP.getText()));
@@ -465,7 +465,13 @@ public class SaleEntry1 extends javax.swing.JPanel implements SelectionObserver,
         Double totalAmount = new Double(0);
         listDetail = saleTableModel.getListSaleDetail();
 
+<<<<<<< HEAD
+        for (SaleDetailHis1 sdh : listDetail) {
+            totalAmount += NumberUtil.NZero(sdh.getAmount());
+        }
+=======
         totalAmount = listDetail.stream().map(sdh -> NumberUtil.NZero(sdh.getAmount())).reduce(totalAmount, (accumulator, _item) -> accumulator + _item);
+>>>>>>> bddce4600e033a428ef4d6cbe625a14a0f331b69
         txtVouTotal.setValue(totalAmount);
         //cal discAmt
         double discp = NumberUtil.NZero(txtDiscP.getText());
@@ -485,7 +491,11 @@ public class SaleEntry1 extends javax.swing.JPanel implements SelectionObserver,
         txtVouBalance.setValue(totalVouBalance);
     }
 
+<<<<<<< HEAD
+    public void history() {
+=======
     public void historySale() {
+>>>>>>> bddce4600e033a428ef4d6cbe625a14a0f331b69
         vouSearchDialog.initMain();
         //vouSearchDialog.setIconImage(image);
         vouSearchDialog.setSize(Global.width - 250, Global.height - 120);
@@ -510,21 +520,33 @@ public class SaleEntry1 extends javax.swing.JPanel implements SelectionObserver,
         formActionKeyMapping(txtVouBalance);
     }
 
+<<<<<<< HEAD
+    private Action actionSave = new AbstractAction() {
+=======
     private final Action actionSave = new AbstractAction() {
+>>>>>>> bddce4600e033a428ef4d6cbe625a14a0f331b69
         @Override
         public void actionPerformed(ActionEvent e) {
             saveSale();
         }
     };
 
+<<<<<<< HEAD
+    private Action actionNewForm = new AbstractAction() {
+=======
     private final Action actionNewForm = new AbstractAction() {
+>>>>>>> bddce4600e033a428ef4d6cbe625a14a0f331b69
         @Override
         public void actionPerformed(ActionEvent e) {
             clear();
         }
     };
 
+<<<<<<< HEAD
+    private Action actionHistory = new AbstractAction() {
+=======
     private final Action actionHistory = new AbstractAction() {
+>>>>>>> bddce4600e033a428ef4d6cbe625a14a0f331b69
         @Override
         public void actionPerformed(ActionEvent e) {
             historySale();
@@ -1102,15 +1124,35 @@ public class SaleEntry1 extends javax.swing.JPanel implements SelectionObserver,
         switch (source.toString()) {
             case "CustomerList":
                 try {
+<<<<<<< HEAD
+                    Trader cus = (Trader) selectObj;
+
+                    if (cus != null) {
+                        txtCus.setText(cus.getTraderName());
+
+                        if (cus.getTraderType() != null) {
+                            saleTableModel.setCusType(cus.getTraderType().getDescription());
+                        } else {
+                            saleTableModel.setCusType("N");
+                        }
+                        //calculateTotalAmount();
+=======
                 if (selectObj != null) {
                     Trader cus = (Trader) selectObj;
                     txtCus.setText(cus.getTraderName());
 
                     if (cus.getTraderType() != null) {
                         saleTableModel.setCusType(cus.getTraderType().getDescription());
+>>>>>>> bddce4600e033a428ef4d6cbe625a14a0f331b69
                     } else {
-                        saleTableModel.setCusType("N");
+                        txtCus.setText(null);
                     }
+<<<<<<< HEAD
+                } catch (Exception ex) {
+                    LOGGER.error("selected CustomerList : " + selectObj.toString() + " - " + ex.getMessage());
+                }
+                break;
+=======
                     //calculateTotalAmount();
                     txtCus.setText(cus.getTraderName());
 
@@ -1125,6 +1167,7 @@ public class SaleEntry1 extends javax.swing.JPanel implements SelectionObserver,
                 LOGGER.error("selected CustomerList : " + selectObj.toString() + " - " + ex.getMessage());
             }
             break;
+>>>>>>> bddce4600e033a428ef4d6cbe625a14a0f331b69
 
             case "StockList":
                 Stock stock = (Stock) selectObj;

@@ -24,15 +24,15 @@ public class SaleDetailDaoImpl extends AbstractDao<String, SaleDetailHis> implem
     }
 
     @Override
-    public List<SaleDetailHis> search(String glId) {
-        String strSql = "select o from PurchaseDetail o ";
+    public List<SaleDetailHis> search(String vouId) {
+        String strSql = "select o from SaleDetailHis o ";
         String strFilter = "";
 
-        if (!glId.equals("-")) {
+        if (!vouId.equals("-")) {
             if (strFilter.isEmpty()) {
-                strFilter = "o.glId = '" + glId + "'";
+                strFilter = "o.vouNo = '" + vouId + "'";
             } else {
-                strFilter = strFilter + " and o.glId = '" + glId + "'";
+                strFilter = strFilter + " and o.vouNo = '" + vouId + "'";
             }
         }
         if (!strFilter.isEmpty()) {
@@ -40,6 +40,13 @@ public class SaleDetailDaoImpl extends AbstractDao<String, SaleDetailHis> implem
         }
         List<SaleDetailHis> listSale = findHSQL(strSql);
         return listSale;
+    }
+
+    @Override
+    public int delete(String id) {
+        String strSql = "delete from SaleDetailHis o where o.saleDetailId = " + id;
+        int cnt = execUpdateOrDelete(strSql);
+        return cnt;
     }
 
 }

@@ -17,7 +17,8 @@ public interface SaleDetailService {
 
     public SaleDetailHis save(SaleDetailHis sdh);
 
-    public List<SaleDetailHis> search(String glId);
+    public List<SaleDetailHis> search(String vouId);
 
-    public void save(SaleHis saleHis, List<SaleDetailHis> listSaleDetail) throws Exception;
+    public void save(SaleHis saleHis, List<SaleDetailHis> listSaleDetail,
+            String vouStatus, List<String> deleteList) throws Exception;
 }

@@ -39,4 +39,9 @@ public class SaleHisServiceImpl implements SaleHisService {
         return hisDao.findById(id);
     }
 
+    @Override
+    public int delete(String vouNo) {
+        return hisDao.delete(vouNo);
+    }
+
 }

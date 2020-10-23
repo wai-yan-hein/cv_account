@@ -5,6 +5,7 @@
  */
 package com.cv.inv.entity;
 
+import com.cv.accountswing.entity.AppUser;
 import com.cv.accountswing.entity.Trader;
 import java.util.Date;
 import javax.persistence.Column;
@@ -30,8 +31,9 @@ public class SaleHis implements java.io.Serializable {
     @ManyToOne
     @JoinColumn(name = "cus_id")
     private Trader traderId;
-    @Column(name = "saleman_id")
-    private String saleManId;
+    @ManyToOne
+    @JoinColumn(name = "saleman_id")
+    private SaleMan saleManId;
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "sale_date")
     private Date saleDate;
@@ -40,8 +42,9 @@ public class SaleHis implements java.io.Serializable {
     private Date creditTerm;
     @Column(name = "from_cur_id")
     private String fromCurId;
-    @Column(name = "vou_status_id", length = 15)
-    private Integer vouStatusId;
+    @ManyToOne
+    @JoinColumn(name = "vou_status_id")
+    private VouStatus vouStatusId;
     @Column(name = "remark", length = 500)
     private String remark;
     @Column(name = "vou_total")
@@ -62,8 +65,17 @@ public class SaleHis implements java.io.Serializable {
     private Double paid;
     @Column(name = "vou_balance")
     private Double vouBalance;
-    @Column(name = "user_id", length = 15)
-    private String createdBy;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private AppUser createdBy;
+    @Column(name = "session_id")
+    private Integer session;
+    @ManyToOne
+    @JoinColumn(name = "updated_by")
+    private AppUser updatedBy;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "updated_date")
+    private Date updatedDate;
 
     public String getVouNo() {
         return vouNo;
@@ -71,6 +83,14 @@ public class SaleHis implements java.io.Serializable {
 
     public void setVouNo(String vouNo) {
         this.vouNo = vouNo;
+    }
+
+    public Integer getSession() {
+        return session;
+    }
+
+    public void setSession(Integer session) {
+        this.session = session;
     }
 
     public Trader getTraderId() {
@@ -81,11 +101,11 @@ public class SaleHis implements java.io.Serializable {
         this.traderId = traderId;
     }
 
-    public String getSaleManId() {
+    public SaleMan getSaleManId() {
         return saleManId;
     }
 
-    public void setSaleManId(String saleManId) {
+    public void setSaleManId(SaleMan saleManId) {
         this.saleManId = saleManId;
     }
 
@@ -113,11 +133,11 @@ public class SaleHis implements java.io.Serializable {
         this.fromCurId = fromCurId;
     }
 
-    public Integer getVouStatusId() {
+    public VouStatus getVouStatusId() {
         return vouStatusId;
     }
 
-    public void setVouStatusId(Integer vouStatusId) {
+    public void setVouStatusId(VouStatus vouStatusId) {
         this.vouStatusId = vouStatusId;
     }
 
@@ -201,12 +221,28 @@ public class SaleHis implements java.io.Serializable {
         this.vouBalance = vouBalance;
     }
 
-    public String getCreatedBy() {
+    public AppUser getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(String createdBy) {
+    public void setCreatedBy(AppUser createdBy) {
         this.createdBy = createdBy;
+    }
+
+    public AppUser getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(AppUser updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
+    public Date getUpdatedDate() {
+        return updatedDate;
+    }
+
+    public void setUpdatedDate(Date updatedDate) {
+        this.updatedDate = updatedDate;
     }
 
 }

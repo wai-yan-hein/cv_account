@@ -17,4 +17,5 @@ public interface UserService {
     public List<AppUser> search(String id, String userShort, String email, String owner);
     public int delete(String userId);
     public AppUser login(String userShort, String password);
+    public AppUser findById(String id);
 }
