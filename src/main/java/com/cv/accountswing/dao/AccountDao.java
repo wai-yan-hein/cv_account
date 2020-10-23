@@ -21,4 +21,5 @@ public interface AccountDao {
     public List<AppUser> search(String id, String userShort, String email, String owner);
     public AppUser login(String user, String password) throws AuthenticationException;
     public int delete(String userId);
+    public AppUser finfById(String id);
 }

@@ -42,18 +42,27 @@ public class SaleDetailServiceImpl implements SaleDetailService {
     }
 
     @Override
-    public List<SaleDetailHis> search(String glId) {
-        return dao.search(glId);
+    public List<SaleDetailHis> search(String vouId) {
+        return dao.search(vouId);
     }
 
     @Override
-    public void save(SaleHis saleHis, List<SaleDetailHis> listSaleDetail) throws Exception {
+    public void save(SaleHis saleHis, List<SaleDetailHis> listSaleDetail,
+            String vouStatus, List<String> deleteList) throws Exception {
 
-        SaleHis saveSaleHis = hisDao.save(saleHis);
+        if (vouStatus.equals("EDIT")) {
+            if (deleteList != null) {
+                for (String detailId : deleteList) {
+                    dao.delete(detailId);
+                }
+            }
+        }
+
+        hisDao.save(saleHis);
         try {
             for (SaleDetailHis sdh : listSaleDetail) {
                 if (sdh.getStock().getStockCode() != null) {
-                    String vouNo = saveSaleHis.getVouNo();
+                    String vouNo = saleHis.getVouNo();
                     sdh.setVouNo(vouNo);
                     dao.save(sdh);
                 }

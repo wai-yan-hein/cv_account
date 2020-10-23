@@ -19,4 +19,6 @@ public interface SaleManDao {
     public List<SaleMan> findAll();
 
     public int delete(String id);
+
+    public SaleMan findById(String id);
 }
