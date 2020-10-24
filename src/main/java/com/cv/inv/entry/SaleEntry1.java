@@ -48,17 +48,13 @@ import com.cv.inv.ui.commom.VouFormatFactory;
 import com.cv.inv.util.GenVouNoImpl;
 import com.toedter.calendar.JTextFieldDateEditor;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -156,7 +152,6 @@ public class SaleEntry1 extends javax.swing.JPanel implements SelectionObserver,
         assignDefaultValue();
         setTodayDate();
         genVouNo();
-        actionMapping();
     }
 
     private void initSaleTable() {
@@ -465,13 +460,10 @@ public class SaleEntry1 extends javax.swing.JPanel implements SelectionObserver,
         Double totalAmount = new Double(0);
         listDetail = saleTableModel.getListSaleDetail();
 
-<<<<<<< HEAD
         for (SaleDetailHis1 sdh : listDetail) {
             totalAmount += NumberUtil.NZero(sdh.getAmount());
         }
-=======
         totalAmount = listDetail.stream().map(sdh -> NumberUtil.NZero(sdh.getAmount())).reduce(totalAmount, (accumulator, _item) -> accumulator + _item);
->>>>>>> bddce4600e033a428ef4d6cbe625a14a0f331b69
         txtVouTotal.setValue(totalAmount);
         //cal discAmt
         double discp = NumberUtil.NZero(txtDiscP.getText());
@@ -491,78 +483,12 @@ public class SaleEntry1 extends javax.swing.JPanel implements SelectionObserver,
         txtVouBalance.setValue(totalVouBalance);
     }
 
-<<<<<<< HEAD
-    public void history() {
-=======
     public void historySale() {
->>>>>>> bddce4600e033a428ef4d6cbe625a14a0f331b69
         vouSearchDialog.initMain();
         //vouSearchDialog.setIconImage(image);
         vouSearchDialog.setSize(Global.width - 250, Global.height - 120);
         vouSearchDialog.setLocationRelativeTo(null);
         vouSearchDialog.setVisible(true);
-    }
-
-    private void actionMapping() {
-        formActionKeyMapping(txtVouNo);
-        formActionKeyMapping(txtRemark);
-        formActionKeyMapping(txtSaleDate);
-        formActionKeyMapping(txtDueDate);
-        formActionKeyMapping(tblSale);
-        formActionKeyMapping(chkPrintOption);
-        formActionKeyMapping(txtVouTotal);
-        formActionKeyMapping(txtDiscP);
-        formActionKeyMapping(txtVouDiscount);
-        formActionKeyMapping(txtTaxP);
-        formActionKeyMapping(txtTax);
-        formActionKeyMapping(txtGrandTotal);
-        formActionKeyMapping(txtVouPaid);
-        formActionKeyMapping(txtVouBalance);
-    }
-
-<<<<<<< HEAD
-    private Action actionSave = new AbstractAction() {
-=======
-    private final Action actionSave = new AbstractAction() {
->>>>>>> bddce4600e033a428ef4d6cbe625a14a0f331b69
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            saveSale();
-        }
-    };
-
-<<<<<<< HEAD
-    private Action actionNewForm = new AbstractAction() {
-=======
-    private final Action actionNewForm = new AbstractAction() {
->>>>>>> bddce4600e033a428ef4d6cbe625a14a0f331b69
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            clear();
-        }
-    };
-
-<<<<<<< HEAD
-    private Action actionHistory = new AbstractAction() {
-=======
-    private final Action actionHistory = new AbstractAction() {
->>>>>>> bddce4600e033a428ef4d6cbe625a14a0f331b69
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            historySale();
-        }
-    };
-
-    private void formActionKeyMapping(JComponent jc) {
-        //Save
-        jc.getInputMap().put(KeyStroke.getKeyStroke("F5"), "F5-Action");
-        jc.getActionMap().put("F5-Action", actionSave);
-        //Clear
-        jc.getInputMap().put(KeyStroke.getKeyStroke("F10"), "F10-Action");
-        jc.getActionMap().put("F10-Action", actionNewForm);
-        //His
-        jc.getInputMap().put(KeyStroke.getKeyStroke("F10"), "F10-Action");
-        jc.getActionMap().put("F10-Action", actionHistory);
     }
 
     /**
@@ -1124,55 +1050,27 @@ public class SaleEntry1 extends javax.swing.JPanel implements SelectionObserver,
         switch (source.toString()) {
             case "CustomerList":
                 try {
-<<<<<<< HEAD
-                    Trader cus = (Trader) selectObj;
 
-                    if (cus != null) {
+                    if (selectObj != null) {
+                        Trader cus = (Trader) selectObj;
                         txtCus.setText(cus.getTraderName());
 
                         if (cus.getTraderType() != null) {
                             saleTableModel.setCusType(cus.getTraderType().getDescription());
                         } else {
-                            saleTableModel.setCusType("N");
+                            txtCus.setText(null);
                         }
-                        //calculateTotalAmount();
-=======
-                if (selectObj != null) {
-                    Trader cus = (Trader) selectObj;
-                    txtCus.setText(cus.getTraderName());
-
-                    if (cus.getTraderType() != null) {
-                        saleTableModel.setCusType(cus.getTraderType().getDescription());
->>>>>>> bddce4600e033a428ef4d6cbe625a14a0f331b69
-                    } else {
-                        txtCus.setText(null);
                     }
-<<<<<<< HEAD
                 } catch (Exception ex) {
                     LOGGER.error("selected CustomerList : " + selectObj.toString() + " - " + ex.getMessage());
                 }
                 break;
-=======
-                    //calculateTotalAmount();
-                    txtCus.setText(cus.getTraderName());
-
-                    if (cus.getTraderType() != null) {
-                        saleTableModel.setCusType(cus.getTraderType().getDescription());
-                    } else {
-                        saleTableModel.setCusType("N");
-                    }
-                    //calculateTotalAmount();
-                }
-            } catch (Exception ex) {
-                LOGGER.error("selected CustomerList : " + selectObj.toString() + " - " + ex.getMessage());
-            }
-            break;
->>>>>>> bddce4600e033a428ef4d6cbe625a14a0f331b69
-
             case "StockList":
                 Stock stock = (Stock) selectObj;
                 int selectRow = tblSale.getSelectedRow();
+
                 saleTableModel.setStock(stock, selectRow);
+
                 stockUp.add(stock);
                 List<SaleDetailHis1> list = saleTableModel.getCurrentRow();
                 txtTotalItem.setText(Integer.toString((list.size() - 1)));
@@ -1444,7 +1342,6 @@ public class SaleEntry1 extends javax.swing.JPanel implements SelectionObserver,
 
     @Override
     public void history() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }
