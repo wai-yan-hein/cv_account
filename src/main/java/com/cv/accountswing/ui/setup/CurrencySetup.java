@@ -530,6 +530,7 @@ public class CurrencySetup extends javax.swing.JPanel implements KeyListener, Pa
     @Override
     public void newForm() {
         clear();
+        isShown = false;
     }
 
     @Override

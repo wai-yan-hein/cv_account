@@ -422,6 +422,7 @@ public class COASetup extends javax.swing.JPanel implements KeyListener, PanelCo
 
     @Override
     public void newForm() {
+        isShown = false;
     }
 
     @Override

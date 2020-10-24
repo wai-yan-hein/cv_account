@@ -8,7 +8,6 @@ package com.cv.inv.entity;
 import com.cv.accountswing.entity.Department;
 import java.util.Date;
 import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import static javax.persistence.GenerationType.IDENTITY;

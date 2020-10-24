@@ -16,5 +16,7 @@ public interface SaleDetailDao {
 
     public SaleDetailHis save(SaleDetailHis sdh);
 
-    public List<SaleDetailHis> search(String glId);
+    public List<SaleDetailHis> search(String vouId);
+    
+     public int delete(String id);
 }

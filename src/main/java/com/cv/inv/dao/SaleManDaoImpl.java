@@ -35,4 +35,9 @@ public class SaleManDaoImpl extends AbstractDao<String, SaleMan> implements Sale
         return execUpdateOrDelete(hsql);
     }
 
+    @Override
+    public SaleMan findById(String id) {
+        return getByKey(id);
+    }
+
 }

@@ -39,4 +39,9 @@ public class SaleManServiceImpl implements SaleManService {
         return dao.delete(id);
     }
 
+    @Override
+    public SaleMan findById(String id) {
+        return dao.findById(id);
+    }
+
 }

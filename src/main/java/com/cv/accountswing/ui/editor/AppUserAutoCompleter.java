@@ -310,6 +310,11 @@ public class AppUserAutoCompleter implements KeyListener {
         return appUser;
     }
 
+    public void setAppUser(AppUser appUser) {
+        this.appUser = appUser;
+        this.textComp.setText(appUser.getUserName());
+    }
+
     /*
      * KeyListener implementation
      */

@@ -47,7 +47,9 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-public class ChartOfAccountSetup extends javax.swing.JPanel implements MouseListener, TreeSelectionListener, KeyListener,
+public class ChartOfAccountSetup extends javax.swing.JPanel implements
+        MouseListener,
+        TreeSelectionListener, KeyListener,
         PanelControl {
 
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(ChartOfAccountSetup.class);
@@ -764,6 +766,8 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements MouseList
     @Override
     public void newForm() {
         clear();
+        isShown = false;
+
     }
 
     @Override

@@ -240,7 +240,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                         "-", currency, dept, cvId, userId);
                 List<VTriBalance> listVTB = vTriBalanceService.getTriBalance(userId, Global.compId.toString());
                 glListingTableModel.setListTBAL(listVTB);
-                calGLTotlaAmount(listVTB);
+                calGLTotlaAmount(listVTB); 
                 loadingObserver.load(this.getName(), "Stop");
             } catch (Exception ex) {
                 LOGGER.error("searchGLListing -----" + ex.getMessage());
@@ -752,6 +752,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
     public void newForm() {
         assingDefaultValue();
         search();
+        isShown = false;
     }
 
     @Override

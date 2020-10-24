@@ -139,10 +139,10 @@ public class COAOpeningTableModel extends AbstractTableModel {
                 addNewRow();
                 parent.setRowSelectionInterval(row + 1, row + 1);
                 parent.setColumnSelectionInterval(6, 6);
-                JOptionPane.showMessageDialog(Global.parentForm, "Saved");
                 selectionObserver.selected("CAL-TOTAL", "-");
             }
         } catch (Exception ex) {
+            JOptionPane.showMessageDialog(Global.parentForm, ex.getMessage(), "Save Opening", JOptionPane.ERROR_MESSAGE);
             LOGGER.error("Save Gl :" + ex.getMessage());
         }
     }
@@ -223,6 +223,11 @@ public class COAOpeningTableModel extends AbstractTableModel {
             listVGl.set(row, vgl);
             fireTableRowsUpdated(row, row);
         }
+    }
+
+    public void clear() {
+        listVGl.clear();
+        fireTableDataChanged();
     }
 
 }

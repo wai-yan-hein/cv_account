@@ -84,30 +84,22 @@ public class CodeTableModel extends AbstractTableModel {
         if (listStock.isEmpty()) {
             return;
         }
+        try {
+            Stock record = listStock.get(row);
 
-        Stock record = listStock.get(row);
-
-        switch (column) {
-            case 0: //Code
-                if (value != null) {
-                    Stock stock = (Stock) value;
-                    record.setStockCode(stock.getStockCode());
-                    record.setStockName(stock.getStockName());
-                    addEmptyRow();
-                }
-                break;
-            case 1: //Desp
-                //record.setMedName(value.toString());
-                break;
-            default:
-                System.out.println("invalid index");
+            switch (column) {
+                case 0: //Code
+                    if (value != null) {
+                        Stock stock = (Stock) value;
+                        record.setStockCode(stock.getStockCode());
+                        record.setStockName(stock.getStockName());
+                        addEmptyRow();
+                    }
+                    break;
+            }
+        } catch (Exception ex) {
+            log.error("setValueAt : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
         }
-        if ((row + 1) <= listStock.size()) {
-            parent.setRowSelectionInterval(row + 1, row + 1);
-
-        }
-        parent.setColumnSelectionInterval(0, 0);
-        fireTableRowsUpdated(row, row);
     }
 
     @Override
