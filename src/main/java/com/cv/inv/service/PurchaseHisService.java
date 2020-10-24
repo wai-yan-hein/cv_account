@@ -6,19 +6,17 @@
 package com.cv.inv.service;
 
 import com.cv.inv.entity.PurHis;
-import com.cv.inv.entity.PurchaseDetail;
 import java.util.List;
 
 /**
  *
- * @author Lenovo
+ * @author Mg Kyaw Thura Aung
  */
-public interface PurchaseDetailService {
+public interface PurchaseHisService {
 
-    public PurchaseDetail save(PurchaseDetail pd);
+    public PurHis save(PurHis purHis) throws Exception;
 
-    public List<PurchaseDetail> search(String glId);
+    public List<PurHis> search(String fromDate, String toDate, String cusId, String vouStatusId, String remark);
 
-    public void save(PurHis gl, List<PurchaseDetail> pd,List<String> delList);
-
+    public PurHis findById(String id);
 }

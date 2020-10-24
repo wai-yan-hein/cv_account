@@ -7,6 +7,7 @@ package com.cv.inv.entry.dialog;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.SelectionObserver;
+import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.DamageDetailHis;
 import com.cv.inv.entity.DamageHis;
@@ -90,15 +91,15 @@ public class DamageSearchDialog extends javax.swing.JDialog implements Selection
     }
 
     private void select() {
-    
+
         int row = tblVoucher.convertRowIndexToModel(tblVoucher.getSelectedRow());
         DamageHis vs = vouTableModel.getSelectVou(row);
         if (vs != null) {
             String vouNo = vs.getDmgVouId();
             DamageHis dmgHis = dhService.findById(vouNo);
-            List<DamageDetailHis> listDetail=ddhService.search(vouNo);
+            List<DamageDetailHis> listDetail = ddhService.search(vouNo);
             this.dispose();
-            dmg.setDamageVoucher(dmgHis,listDetail);
+            dmg.setDamageVoucher(dmgHis, listDetail);
         } else {
             JOptionPane.showMessageDialog(this, "Please select the voucher.",
                     "No Voucher Selected", JOptionPane.ERROR_MESSAGE);

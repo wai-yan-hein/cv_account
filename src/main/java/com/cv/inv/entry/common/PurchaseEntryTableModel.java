@@ -39,7 +39,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
         "Qty", "Std-Wt", "Unit", "Avg-Wt", "Pur Price", "Amount", "Location"};
     private JTable parent;
     private List<PurchaseDetail> listPurDetail = new ArrayList();
-
+    private List<String> delList = new ArrayList();
     private LocationAutoCompleter locationCompleter;
     private JFormattedTextField txtTotalAmt;
 
@@ -378,15 +378,83 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
     }
 
     public List<PurchaseDetail> getListPurDetail() {
-        return listPurDetail;
+        List<PurchaseDetail> listRetInDetail = new ArrayList();
+        for (PurchaseDetail pdh2 : listPurDetail) {
+            if (pdh2.getStock() != null) {
+                if (pdh2.getStock().getStockCode() != null) {
+                    listRetInDetail.add(pdh2);
+                }
+            }
+        }
+
+        return listRetInDetail;
     }
 
     public void setListPurDetail(List<PurchaseDetail> listPurDetail) {
         this.listPurDetail = listPurDetail;
+        addNewRow();
+        fireTableDataChanged();
     }
 
     private void showMessageBox(String text) {
         JOptionPane.showMessageDialog(Global.parentForm, text);
     }
 
+    public boolean isValidEntry() {
+        boolean status = true;
+        int uniqueId = 1;
+        for (PurchaseDetail sdh2 : listPurDetail) {
+            if (uniqueId != listPurDetail.size()) {
+                if (Util1.NZeroDouble(sdh2.getAvgWeight()) > Util1.NZeroDouble(sdh2.getStdWeight())) {
+                    JOptionPane.showMessageDialog(Global.parentForm, "Avg cannot greater than Std.",
+                            "Invalid.", JOptionPane.ERROR_MESSAGE);
+                    status = false;
+                    parent.requestFocus();
+                    break;
+                } else {
+                    sdh2.setUniqueId(uniqueId);
+                    uniqueId++;
+                }
+            }
+        }
+
+        if (uniqueId == 1) {
+            status = false;
+        }
+
+        return status;
+    }
+
+    public List<String> getDelList() {
+        return delList;
+    }
+
+    public void delete(int row) {
+        if (listPurDetail == null) {
+            return;
+        }
+
+        if (listPurDetail.isEmpty()) {
+            return;
+        }
+
+        PurchaseDetail sdh = listPurDetail.get(row);
+        if (sdh.getPurDetailKey().getPurDetailId() != null) {
+            delList.add(sdh.getPurDetailKey().getPurDetailId());
+        }
+
+        listPurDetail.remove(row);
+
+        if (!hasEmptyRow()) {
+            addNewRow();
+        }
+
+        //  callBack.selected("STM-TOTAL", "STM-TOTAL");
+        fireTableRowsDeleted(row, row);
+        if (row - 1 >= 0) {
+            parent.setRowSelectionInterval(row - 1, row - 1);
+        } else {
+            parent.setRowSelectionInterval(0, 0);
+        }
+    }
 }

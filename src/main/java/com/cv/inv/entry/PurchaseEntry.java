@@ -12,7 +12,7 @@ import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.Currency;
 import com.cv.accountswing.entity.CurrencyKey;
 import com.cv.accountswing.entity.Department;
-import com.cv.accountswing.entity.Gl;
+import com.cv.accountswing.entity.Trader;
 import com.cv.accountswing.service.CurrencyService;
 import com.cv.accountswing.service.DepartmentService;
 import com.cv.accountswing.ui.ApplicationMainFrame;
@@ -24,8 +24,11 @@ import com.cv.accountswing.ui.editor.TraderAutoCompleter;
 import com.cv.accountswing.util.NumberUtil;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.Location;
+import com.cv.inv.entity.PurHis;
+import com.cv.inv.entity.PurchaseDetail;
 import com.cv.inv.entity.VouStatus;
 import com.cv.inv.entry.common.PurchaseEntryTableModel;
+import com.cv.inv.entry.dialog.PurchaseVouSearch;
 import com.cv.inv.entry.editor.LocationAutoCompleter;
 import com.cv.inv.entry.editor.LocationCellEditor;
 import com.cv.inv.entry.editor.StockCellEditor;
@@ -37,9 +40,13 @@ import com.cv.inv.service.VouIdService;
 import com.cv.inv.service.VouStatusService;
 import com.cv.inv.util.GenVouNoImpl;
 import com.toedter.calendar.JTextFieldDateEditor;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Date;
+import java.util.List;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -87,8 +94,11 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
     private TraderAutoCompleter traderAutoCompleter;
     private DepartmentAutoCompleter departmentAutoCompleter;
     private LoadingObserver loadingObserver;
-    private Gl gl;
+    private PurHis gl = new PurHis();
+    //private Gl gl;
     private GenVouNoImpl vouEngine;
+    @Autowired
+    private PurchaseVouSearch pvSearchDialog;
 
     public void setIsShown(boolean isShown) {
         this.isShown = isShown;
@@ -109,6 +119,7 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
     private void initMain() {
         loadingObserver.load(this.getName(), "Start");
         initCombo();
+        actionMapping();
         assignDefalutValue();
         initPurTable();
         loadingObserver.load(this.getName(), "Stop");
@@ -241,9 +252,10 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
     }
 
     public void savePurchase() {
-        if (isValidEntry()) {
+        if (isValidEntry() && purTableModel.isValidEntry()) {
+            List<String> delList = purTableModel.getDelList();
             try {
-                purchaseDetailService.save(gl, purTableModel.getListPurDetail());
+                purchaseDetailService.save(gl, purTableModel.getListPurDetail(),delList);
                 clear();
                 vouEngine.updateVouNo();
                 genVouNo();
@@ -277,19 +289,18 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
             status = false;
             txtVouStatus.requestFocus();
         } else {
-            gl = new Gl();
-            gl.setVouNo(txtVouNo.getText());
+            gl.setPurInvId(txtVouNo.getText());
             gl.setDueDate(txtDueDate.getDate());
-            gl.setLocationId(locCompleter.getLocation().getLocationId());
-            gl.setVouStatusId(vouCompleter.getVouStatus().getVouStatusId());
+            gl.setLocationId(locCompleter.getLocation());
+            gl.setVouStatus(vouCompleter.getVouStatus());
             gl.setRemark(txtRemark.getText());
             gl.setVouTotal(NumberUtil.getDouble(txtVouTotal.getText()));
             gl.setPaid(NumberUtil.getDouble(txtVouPaid.getText()));
             gl.setBalance(NumberUtil.getDouble(txtVouBalance.getText()));
             gl.setTaxAmt(NumberUtil.getDouble(txtTax.getText()));
-            gl.setRefernceNo(txtRefNo.getText());
+            gl.setRefNo(txtRefNo.getText());
             gl.setIntgUpdStatus(null);
-
+            gl.setDeleted(Util1.getNullTo(gl.getDeleted()));
             if (lblStatus.getText().equals("NEW")) {
                 gl.setPurDate(txtPurDate.getDate());
             } else {
@@ -298,15 +309,15 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
                     gl.setPurDate(txtPurDate.getDate());
                 }
             }
+            //gl.setCurrency((currAutoCompleter.getCurrency())); //Need to change
 
-            gl.setFromCurId((currAutoCompleter.getCurrency().getKey().getCode())); //Need to change
-
+            gl.setCustomerId(traderAutoCompleter.getTrader());
             if (lblStatus.getText().equals("NEW")) {
                 gl.setCreatedBy(Global.loginUser.getUserId().toString());
-                gl.setSessionId(Global.sessionId);
+                gl.setSession(Global.sessionId);
             } else {
-                gl.setModifyBy(Global.loginUser.getUserId().toString());
-                gl.setModifyDate(Util1.getTodayDate());
+                gl.setUpdatedBy(Global.loginUser.getUserId().toString());
+                gl.setUpdatedDate(Util1.getTodayDate());
             }
 
             try {
@@ -321,6 +332,85 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
 
         return status;
     }
+
+    public void setPurchaseVoucher(PurHis purHis, List<PurchaseDetail> listDetailHis) {
+        if (!lblStatus.getText().equals("NEW")) {
+            clear();
+        }
+        if (purHis != null) {
+            if (purHis.getDeleted()) {
+                lblStatus.setText("DELETED");
+            } else {
+                lblStatus.setText("EDIT");
+            }
+            txtVouNo.setText(purHis.getPurInvId());
+            txtRemark.setText(purHis.getRemark());
+            Trader t = purHis.getCustomerId();
+            txtSupplier.setText(t.getTraderName());
+            txtPurDate.setDate(purHis.getPurDate());
+            txtDueDate.setDate(purHis.getDueDate());
+            locCompleter.setLocation(purHis.getLocationId());
+            vouCompleter.setVouStatus(purHis.getVouStatus());
+//            departmentAutoCompleter.setDepartment(purHis.get);
+//            currAutoCompleter.setCurrency(purHis.get);
+
+            txtVouTotal.setText(purHis.getVouTotal().toString());
+            txtVouPaid.setText(purHis.getPaid().toString());
+            if (purHis.getDiscount() == null) {
+                txtVouDiscount.setText("0.0");
+            } else {
+                txtVouDiscount.setText(purHis.getDiscount().toString());
+            }
+            txtVouBalance.setText(purHis.getBalance().toString());
+            if (purHis.getDiscP() == null) {
+                txtDiscP.setText("0.0");
+            } else {
+                txtDiscP.setText(purHis.getDiscP().toString());
+            }
+            if (purHis.getTaxP() == null) {
+                txtTaxP.setText("0.0");
+            } else {
+                txtTaxP.setText(purHis.getTaxP().toString());
+            }
+            if (purHis.getTaxAmt() == null) {
+                txtTax.setText("0.0");
+            } else {
+                txtTax.setText(purHis.getTaxAmt().toString());
+            }
+            purTableModel.setListPurDetail(listDetailHis);
+        }
+    }
+
+    private void actionMapping() {
+        //F8 event on tblSale
+        tblPurchase.getInputMap().put(KeyStroke.getKeyStroke("F6"), "F6-Action");
+        tblPurchase.getActionMap().put("F6-Action", actionItemDelete);
+
+        //Enter event on tblSale
+        tblPurchase.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "ENTER-Action");
+        tblPurchase.getActionMap().put("ENTER-Action", actionTblPurEnterKey);
+    }
+    private final Action actionItemDelete = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (tblPurchase.getSelectedRow() >= 0) {
+                int yes_no = JOptionPane.showConfirmDialog(Global.parentForm,
+                        "Are you sure to delete?", "Damage item delete", JOptionPane.YES_NO_OPTION);
+                if (yes_no == 0) {
+                    purTableModel.delete(tblPurchase.getSelectedRow());
+                }
+            }
+        }
+    };
+    private final Action actionTblPurEnterKey = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                tblPurchase.getCellEditor().stopCellEditing();
+            } catch (Exception ex) {
+            }
+        }
+    };
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -945,7 +1035,10 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
 
     @Override
     public void history() {
-
+        pvSearchDialog.initMain();
+        pvSearchDialog.setSize(Global.width - 500, Global.height - 300);
+        pvSearchDialog.setLocationRelativeTo(null);
+        pvSearchDialog.setVisible(true);
     }
 
     @Override

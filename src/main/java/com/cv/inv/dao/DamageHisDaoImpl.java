@@ -30,9 +30,6 @@ public class DamageHisDaoImpl extends AbstractDao<String, DamageHis> implements 
     @Override
     public DamageHis findById(String id) {
         DamageHis ph = getByKey(id);
-//        String dmgId = ph.getDmgVouId();
-//        List<DamageDetailHis> listDetail = detaildao.search(dmgId);
-        //  ph.setListDetail(listDetail);
         return ph;
     }
 
