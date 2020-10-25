@@ -92,6 +92,10 @@ public class COASetup extends javax.swing.JPanel implements KeyListener, PanelCo
         tblCoaHead.setDefaultRenderer(Object.class, new TableCellRender());
         tblCoaHead.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                 .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
+        searchHead();
+    }
+
+    private void searchHead() {
         List<ChartOfAccount> listCOA = coaService.getParent(Global.compId.toString());
         coaHeadTableModel.setlistCoaHead(listCOA);
 
@@ -431,6 +435,11 @@ public class COASetup extends javax.swing.JPanel implements KeyListener, PanelCo
 
     @Override
     public void print() {
+    }
+
+    @Override
+    public void refresh() {
+        searchHead();
     }
 
 }

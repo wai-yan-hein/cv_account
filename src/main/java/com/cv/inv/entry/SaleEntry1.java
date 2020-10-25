@@ -1344,4 +1344,9 @@ public class SaleEntry1 extends javax.swing.JPanel implements SelectionObserver,
     public void history() {
     }
 
+    @Override
+    public void refresh() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

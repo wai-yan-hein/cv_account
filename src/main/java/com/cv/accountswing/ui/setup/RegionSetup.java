@@ -124,14 +124,14 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
 
     private void createTreeNode(String parentMenuID, DefaultMutableTreeNode treeRoot) {
         List<Region> regions = regionService.search("-", "-", Global.compId.toString(), parentMenuID);
-        for (Region region : regions) {
+        regions.forEach(region -> {
             DefaultMutableTreeNode regRoot = new DefaultMutableTreeNode(region);
             treeRoot.add(regRoot);
             createTreeNode(region.getRegId().toString(), regRoot);
 
             /*if (!child.getCode().isEmpty()) {
             }*/
-        }
+        });
 
     }
 
@@ -587,5 +587,10 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
 
     @Override
     public void print() {
+    }
+
+    @Override
+    public void refresh() {
+        initTree();
     }
 }

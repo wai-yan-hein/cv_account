@@ -931,4 +931,9 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
         historyReturnOut();
     }
 
+    @Override
+    public void refresh() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

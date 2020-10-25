@@ -1051,4 +1051,9 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
         savePurchase();
     }
 
+    @Override
+    public void refresh() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

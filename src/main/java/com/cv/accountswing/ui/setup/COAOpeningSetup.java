@@ -52,10 +52,6 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
     @Autowired
     private COAOpeningTableModel cOAOpeningTableModel;
     @Autowired
-    private OpeningTableModel openingTableModel;
-    @Autowired
-    private VOpeningService openingService;
-    @Autowired
     private VGlService vGlService;
     @Autowired
     private COAOpeningService cOAOpeningService;
@@ -600,5 +596,10 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
 
     @Override
     public void print() {
+    }
+
+    @Override
+    public void refresh() {
+        searchOpening();
     }
 }

@@ -334,4 +334,9 @@ public class StockReceiving extends javax.swing.JPanel implements KeyListener, P
     @Override
     public void print() {
     }
+
+    @Override
+    public void refresh() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }
