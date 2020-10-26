@@ -360,4 +360,9 @@ public class BalanceSheet extends javax.swing.JPanel implements SelectionObserve
     public void print() {
         printBalSheet();
     }
+
+    @Override
+    public void refresh() {
+        calBalanceSheet();
+    }
 }

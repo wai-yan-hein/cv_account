@@ -27,4 +27,7 @@ public interface COAOpeningService {
 
     public void GenerateZeroGL(String opDate, String userId, String compCode,
             String currCode, String dept, String coaGroup) throws Exception;
+
+    public void generateZeroOpening(String opDate, String userId, String compCode,
+            String currCode, String dept, String coaGroup) throws Exception;
 }

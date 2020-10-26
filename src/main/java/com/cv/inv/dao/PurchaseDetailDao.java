@@ -19,4 +19,6 @@ public interface PurchaseDetailDao {
 
     public List<PurchaseDetail> search(String glId);
 
+    public int delete(String id);
+
 }

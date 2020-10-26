@@ -6,6 +6,7 @@
 package com.cv.accountswing.ui.system.setup;
 
 import com.cv.accountswing.common.Global;
+import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.entity.BusinessType;
 import com.cv.accountswing.entity.CompanyInfo;
@@ -15,6 +16,7 @@ import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.system.setup.common.CompanyTableModel;
 import com.cv.accountswing.util.BindingUtil;
 import com.cv.accountswing.util.Util1;
+import java.awt.HeadlessException;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -52,6 +54,11 @@ public class Company extends javax.swing.JPanel implements KeyListener, PanelCon
     private TaskExecutor taskExecutor;
     @Autowired
     private ApplicationMainFrame mainFrame;
+    private LoadingObserver loadingObserver;
+
+    public void setLoadingObserver(LoadingObserver loadingObserver) {
+        this.loadingObserver = loadingObserver;
+    }
 
     /**
      * Creates new form Company
@@ -61,24 +68,36 @@ public class Company extends javax.swing.JPanel implements KeyListener, PanelCon
     }
 
     public void initTable() {
-        taskExecutor.execute(() -> {
-            initCombo();
-            initKeyListener();
-            tblCompany.setModel(companyTableModel);
-            tblCompany.getTableHeader().setFont(Global.textFont);
-            tblCompany.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            companyTableModel.setListCompany(compInfoService.search("-", "-", "-", "-", "-", "-"));
-            tblCompany.getSelectionModel().addListSelectionListener((ListSelectionEvent e) -> {
-                if (e.getValueIsAdjusting()) {
-                    if (tblCompany.getSelectedRow() >= 0) {
-                        selectRow = tblCompany.convertRowIndexToModel(tblCompany.getSelectedRow());
-                        CompanyInfo com = companyTableModel.getCompany(selectRow);
-                        setCompanyInfo(com);
-                    }
-
+        initCombo();
+        initKeyListener();
+        tblCompany.setModel(companyTableModel);
+        tblCompany.getTableHeader().setFont(Global.textFont);
+        tblCompany.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tblCompany.getSelectionModel().addListSelectionListener((ListSelectionEvent e) -> {
+            if (e.getValueIsAdjusting()) {
+                if (tblCompany.getSelectedRow() >= 0) {
+                    selectRow = tblCompany.convertRowIndexToModel(tblCompany.getSelectedRow());
+                    CompanyInfo com = companyTableModel.getCompany(selectRow);
+                    setCompanyInfo(com);
                 }
-            });
-            txtCode.requestFocus();
+
+            }
+        });
+        searchCompany();
+        txtCode.requestFocus();
+    }
+
+    private void searchCompany() {
+        loadingObserver.load(this.getName(), "Start");
+        taskExecutor.execute(() -> {
+            try {
+                companyTableModel.setListCompany(compInfoService.search("-", "-", "-", "-", "-", "-"));
+                loadingObserver.load(this.getName(), "Stop");
+            } catch (Exception e) {
+                LOGGER.error("search Company " + e.getMessage());
+                JOptionPane.showMessageDialog(Global.parentForm, btnSave);
+                loadingObserver.load(this.getName(), "Stop");
+            }
         });
 
     }
@@ -117,7 +136,7 @@ public class Company extends javax.swing.JPanel implements KeyListener, PanelCon
                     companyTableModel.setCompany(selectRow, saveCom);
                 }
                 clear();
-            } catch (Exception e) {
+            } catch (HeadlessException e) {
                 LOGGER.error("Save Company :" + e.getMessage());
                 JOptionPane.showMessageDialog(Global.parentForm, "Could'nt saved.");
             }
@@ -690,6 +709,11 @@ public class Company extends javax.swing.JPanel implements KeyListener, PanelCon
     @Override
     public void save() {
         saveCompany();
+    }
+
+    @Override
+    public void refresh() {
+        searchCompany();
     }
 
 }

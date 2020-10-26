@@ -26,20 +26,29 @@ public class PurchaseDetailDaoImpl extends AbstractDao<String, PurchaseDetail> i
 
     @Override
     public List<PurchaseDetail> search(String glId) {
-        String strSql = "select o from PurchaseDetail o ";
         String strFilter = "";
-
         if (!glId.equals("-")) {
             if (strFilter.isEmpty()) {
-                strFilter = "o.glId = '" + glId + "'";
+                strFilter = "v.purDetailKey.vouId = '" + glId + "'";
             } else {
-                strFilter = strFilter + " and o.glId = '" + glId + "'";
+                strFilter = strFilter + " and v.purDetailKey.vouId = '" + glId + "'";
             }
         }
+        String strSql = "select v from PurchaseDetail v";
+
+        List<PurchaseDetail> listDH = null;
         if (!strFilter.isEmpty()) {
             strSql = strSql + " where " + strFilter;
+            listDH = findHSQL(strSql);
         }
-        List<PurchaseDetail> listPurchase = findHSQL(strSql);
-        return listPurchase;
+
+        return listDH;
+    }
+
+    @Override
+    public int delete(String id) {
+        String strSql = "delete from PurchaseDetail o where o.purDetailKey.purDetailId = '" + id + "'";
+        int cnt = execUpdateOrDelete(strSql);
+        return cnt;
     }
 }

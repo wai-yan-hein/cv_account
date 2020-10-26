@@ -12,7 +12,6 @@ import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.Gl;
 import com.cv.accountswing.entity.Currency;
 import com.cv.accountswing.entity.CurrencyKey;
-import com.cv.accountswing.entity.Trader;
 import com.cv.accountswing.service.CurrencyService;
 import com.cv.accountswing.service.GlService;
 import com.cv.accountswing.service.TraderService;
@@ -25,7 +24,6 @@ import com.cv.accountswing.util.NumberUtil;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.Location;
 import com.cv.inv.entity.RetInDetailHis;
-import com.cv.inv.entity.view.VRetIn;
 import com.cv.inv.entry.common.ReturnInTableModel;
 import com.cv.inv.entry.editor.LocationAutoCompleter;
 import com.cv.inv.entry.editor.StockCellEditor;
@@ -572,42 +570,42 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
 
     @Override
     public void selected(Object source, Object selectObj) {
-        switch (source.toString()) {
-            case "RetInVouList":
-                try {
-                VRetIn vRetIn = (VRetIn) selectObj;
-                gl = glService.findById(vRetIn.getKey().getGlId());
-                glId = gl.getGlId();
-
-                if (Util1.getNullTo(gl.getDeleted())) {
-                    lblStatus.setText("DELETED");
-                } else {
-                    lblStatus.setText("EDIT");
-                }
-
-                txtVouNo.setText(gl.getVouNo());
-                txtVouTotal.setText(gl.getVouTotal().toString());
-                txtVouPaid.setText(gl.getPaid().toString());
-                txtVouBalance.setText(gl.getBalance().toString());
-                txtRemark.setText(gl.getRemark());
-                txtRetInDate.setDate(gl.getGlDate());
-                Trader trader = traderService.findById(Integer.parseInt(gl.getTraderId().toString()));
-                traderAutoCompleter.setTrader(trader);
-                Location location = locationService.findById(gl.getLocationId().toString());
-                locationAutoCompleter.setLocation(location);
-                Currency currency = currencyService.findById(new CurrencyKey(gl.getFromCurId(), Global.compId));
-                currencyAutoCompleter.setCurrency(currency);
-
-                List<RetInDetailHis> listRetIn = retInService.search(gl.getGlId().toString(), gl.getVouNo());
-                returnInTableModel.setRetInDetailList(listRetIn);
-
-            } catch (Exception ex) {
-                LOGGER.error("selected : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.toString());
-
-            }
-
-            break;
+        /*switch (source.toString()) {
+        case "RetInVouList":
+        try {
+        VRetIn vRetIn = (VRetIn) selectObj;
+        gl = glService.findById(vRetIn.getKey().getGlId());
+        glId = gl.getGlId();
+        
+        if (Util1.getNullTo(gl.getDeleted())) {
+        lblStatus.setText("DELETED");
+        } else {
+        lblStatus.setText("EDIT");
         }
+        
+        txtVouNo.setText(gl.getVouNo());
+        txtVouTotal.setText(gl.getVouTotal().toString());
+        txtVouPaid.setText(gl.getPaid().toString());
+        txtVouBalance.setText(gl.getBalance().toString());
+        txtRemark.setText(gl.getRemark());
+        txtRetInDate.setDate(gl.getGlDate());
+        Trader trader = traderService.findById(Integer.parseInt(gl.getTraderId().toString()));
+        traderAutoCompleter.setTrader(trader);
+        Location location = locationService.findById(gl.getLocationId().toString());
+        locationAutoCompleter.setLocation(location);
+        Currency currency = currencyService.findById(new CurrencyKey(gl.getFromCurId(), Global.compId));
+        currencyAutoCompleter.setCurrency(currency);
+        
+        List<RetInDetailHis> listRetIn = retInService.search(gl.getGlId().toString(), gl.getVouNo());
+        returnInTableModel.setRetInDetailList(listRetIn);
+        
+        } catch (Exception ex) {
+        LOGGER.error("selected : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.toString());
+        
+        }
+        
+        break;
+        }*/
 
     }
 
@@ -837,36 +835,35 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
     }
 
     public void saveReturnIn() {
-        if (isValidEntry()) {
-            try {
-                retInService.save(gl, listDetail);
-                if (lblStatus.getText().equals("NEW")) {
-                    vouEngine.updateVouNo();
-                }
-            } catch (Exception ex) {
-                LOGGER.error("saveRetIN : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
-            }
-
-            newForm();
+        /*if (isValidEntry()) {
+        try {
+        retInService.save(gl, listDetail);
+        if (lblStatus.getText().equals("NEW")) {
+        vouEngine.updateVouNo();
         }
+        } catch (Exception ex) {
+        LOGGER.error("saveRetIN : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
+        }
+        
+        newForm();
+        }*/
 
     }
 
     public void deleteReturnIn() {
 
-        if (Util1.getNullTo(gl.getDeleted())) {
-            JOptionPane.showConfirmDialog(Global.parentForm, "Voucher already deleted.",
-                    "Return In voucher delete", JOptionPane.ERROR);
+        /*if (Util1.getNullTo(gl.getDeleted())) {
+        JOptionPane.showConfirmDialog(Global.parentForm, "Voucher already deleted.",
+        "Return In voucher delete", JOptionPane.ERROR);
         } else {
-            int yes_no = JOptionPane.showConfirmDialog(Global.parentForm, "Are you sure to delete?",
-                    "Return In voucher delete", JOptionPane.YES_NO_OPTION);
-
-            if (yes_no == 0) {
-                gl.setDeleted(true);
-                saveReturnIn();
-            }
+        int yes_no = JOptionPane.showConfirmDialog(Global.parentForm, "Are you sure to delete?",
+        "Return In voucher delete", JOptionPane.YES_NO_OPTION);
+        
+        if (yes_no == 0) {
+        gl.setDeleted(true);
+        saveReturnIn();
         }
-
+        }*/
     }
 
     public void historyReturnIn() {
@@ -881,110 +878,109 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
         retInVouSearch.setVisible(true);
     }
 
-    private boolean isValidEntry() {
-        boolean status = true;
-        Location location = null;
-        Currency currency = null;
-        Trader trader = null;
-        try {
-            if (locationAutoCompleter.getLocation() != null) {
-                location = locationAutoCompleter.getLocation();
-            }
-            if (currencyAutoCompleter.getCurrency() != null) {
-                currency = currencyAutoCompleter.getCurrency();
-            }
-            if (traderAutoCompleter.getTrader() != null) {
-                trader = traderAutoCompleter.getTrader();
-            }
-            if (txtVouNo.getText().isEmpty()) {
-                JOptionPane.showMessageDialog(Global.parentForm, "Invalid voucher no.",
-                        "Invalid Voucher ID", JOptionPane.ERROR_MESSAGE);
-                status = false;
-            } else if (txtCus.getText() == null) {
-                JOptionPane.showMessageDialog(Global.parentForm, "Customer cannot be blank.",
-                        "No customer.", JOptionPane.ERROR_MESSAGE);
-                status = false;
-                txtCus.requestFocusInWindow();
-            } else if (location.getLocationId() == null) {
-                JOptionPane.showMessageDialog(Global.parentForm, "Location cannot be blank.",
-                        "Select Location.", JOptionPane.ERROR_MESSAGE);
-                status = false;
-                txtLocation.requestFocusInWindow();
-            } else if (currency.getKey().getCode() == null) {
-                JOptionPane.showMessageDialog(Global.parentForm, "Currency cannot be blank.",
-                        "Select Currency", JOptionPane.ERROR_MESSAGE);
-                status = false;
-                txtCurrency.requestFocusInWindow();
-            } else if (listDetail.size() == 1) {
-                JOptionPane.showMessageDialog(Global.parentForm, "No Sale record.",
-                        "No data.", JOptionPane.ERROR_MESSAGE);
-                status = false;
-            } else {
-
-                if (glId != null) {
-                    gl.setGlId(glId);
-                }
-                gl.setVouNo(txtVouNo.getText());
-                gl.setTraderId(NumberUtil.NZeroL(trader.getId()));
-                gl.setRemark(txtRemark.getText());
-                gl.setGlDate(txtRetInDate.getDate());
-                gl.setCreatedDate(Util1.getTodayDate());
-                gl.setFromCurId(currency.getKey().getCode());
-                gl.setCompId(Global.compId);
-                gl.setSplitId(6);
-                gl.setTranSource("ÄCCOUNT-RETIN");
-                gl.setLocationId(location.getLocationId());
-                gl.setVouTotal(NumberUtil.getDouble(txtVouTotal.getText()));
-                gl.setPaid(NumberUtil.getDouble(txtVouPaid.getText()));
-                gl.setBalance(NumberUtil.getDouble(txtVouBalance.getText()));
-                gl.setCreatedBy(Global.loginUser.getUserId().toString());
-                gl.setDeleted(Util1.getNullTo(gl.getDeleted()));
-            }
-            if (txtVouNo.getText().isEmpty()) {
-                JOptionPane.showMessageDialog(Global.parentForm, "Invalid voucher no.",
-                        "Invalid Voucher ID", JOptionPane.ERROR_MESSAGE);
-                status = false;
-            } else if (txtCus.getText() == null) {
-                JOptionPane.showMessageDialog(Global.parentForm, "Customer cannot be blank.",
-                        "No customer.", JOptionPane.ERROR_MESSAGE);
-                status = false;
-                txtCus.requestFocusInWindow();
-            } else if (location.getLocationId() == null) {
-                JOptionPane.showMessageDialog(Global.parentForm, "Location cannot be blank.",
-                        "Select Location.", JOptionPane.ERROR_MESSAGE);
-                status = false;
-                txtLocation.requestFocusInWindow();
-            } else if (currency.getKey().getCode() == null) {
-                JOptionPane.showMessageDialog(Global.parentForm, "Currency cannot be blank.",
-                        "Select Currency", JOptionPane.ERROR_MESSAGE);
-                status = false;
-                txtCurrency.requestFocusInWindow();
-            } else {
-                gl = new Gl();
-                gl.setVouNo(txtVouNo.getText());
-                gl.setTraderId(NumberUtil.NZeroL(trader.getId()));
-                gl.setRemark(txtRemark.getText());
-                gl.setGlDate(txtRetInDate.getDate());
-                gl.setCreatedDate(Util1.getTodayDate());
-                gl.setFromCurId(currency.getKey().getCode());
-                gl.setCompId(Global.compId);
-                gl.setSplitId(6);
-                gl.setTranSource("ÄCCOUNT-RETOUT");
-                gl.setLocationId(location.getLocationId());
-                gl.setCreatedBy(Global.loginUser.getUserId().toString());
-                gl.setVouTotal(NumberUtil.getDouble(txtVouTotal.getText()));
-                gl.setPaid(NumberUtil.getDouble(txtVouPaid.getText()));
-                gl.setBalance(NumberUtil.getDouble(txtVouBalance.getText()));
-
-            }
-        } catch (Exception ex) {
-            LOGGER.error("isValidEntry : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
-
-        }
-
-        return status;
+    /* private boolean isValidEntry() {
+    boolean status = true;
+    Location location = null;
+    Currency currency = null;
+    Trader trader = null;
+    try {
+    if (locationAutoCompleter.getLocation() != null) {
+    location = locationAutoCompleter.getLocation();
     }
-
+    if (currencyAutoCompleter.getCurrency() != null) {
+    currency = currencyAutoCompleter.getCurrency();
+    }
+    if (traderAutoCompleter.getTrader() != null) {
+    trader = traderAutoCompleter.getTrader();
+    }
+    if (txtVouNo.getText().isEmpty()) {
+    JOptionPane.showMessageDialog(Global.parentForm, "Invalid voucher no.",
+    "Invalid Voucher ID", JOptionPane.ERROR_MESSAGE);
+    status = false;
+    } else if (txtCus.getText() == null) {
+    JOptionPane.showMessageDialog(Global.parentForm, "Customer cannot be blank.",
+    "No customer.", JOptionPane.ERROR_MESSAGE);
+    status = false;
+    txtCus.requestFocusInWindow();
+    } else if (location.getLocationId() == null) {
+    JOptionPane.showMessageDialog(Global.parentForm, "Location cannot be blank.",
+    "Select Location.", JOptionPane.ERROR_MESSAGE);
+    status = false;
+    txtLocation.requestFocusInWindow();
+    } else if (currency.getKey().getCode() == null) {
+    JOptionPane.showMessageDialog(Global.parentForm, "Currency cannot be blank.",
+    "Select Currency", JOptionPane.ERROR_MESSAGE);
+    status = false;
+    txtCurrency.requestFocusInWindow();
+    } else if (listDetail.size() == 1) {
+    JOptionPane.showMessageDialog(Global.parentForm, "No Sale record.",
+    "No data.", JOptionPane.ERROR_MESSAGE);
+    status = false;
+    } else {
+    
+    if (glId != null) {
+    gl.setGlId(glId);
+    }
+    gl.setVouNo(txtVouNo.getText());
+    gl.setTraderId(NumberUtil.NZeroL(trader.getId()));
+    gl.setRemark(txtRemark.getText());
+    gl.setGlDate(txtRetInDate.getDate());
+    gl.setCreatedDate(Util1.getTodayDate());
+    gl.setFromCurId(currency.getKey().getCode());
+    gl.setCompId(Global.compId);
+    gl.setSplitId(6);
+    gl.setTranSource("ÄCCOUNT-RETIN");
+    gl.setLocationId(location.getLocationId());
+    gl.setVouTotal(NumberUtil.getDouble(txtVouTotal.getText()));
+    gl.setPaid(NumberUtil.getDouble(txtVouPaid.getText()));
+    gl.setBalance(NumberUtil.getDouble(txtVouBalance.getText()));
+    gl.setCreatedBy(Global.loginUser.getUserId().toString());
+    gl.setDeleted(Util1.getNullTo(gl.getDeleted()));
+    }
+    if (txtVouNo.getText().isEmpty()) {
+    JOptionPane.showMessageDialog(Global.parentForm, "Invalid voucher no.",
+    "Invalid Voucher ID", JOptionPane.ERROR_MESSAGE);
+    status = false;
+    } else if (txtCus.getText() == null) {
+    JOptionPane.showMessageDialog(Global.parentForm, "Customer cannot be blank.",
+    "No customer.", JOptionPane.ERROR_MESSAGE);
+    status = false;
+    txtCus.requestFocusInWindow();
+    } else if (location.getLocationId() == null) {
+    JOptionPane.showMessageDialog(Global.parentForm, "Location cannot be blank.",
+    "Select Location.", JOptionPane.ERROR_MESSAGE);
+    status = false;
+    txtLocation.requestFocusInWindow();
+    } else if (currency.getKey().getCode() == null) {
+    JOptionPane.showMessageDialog(Global.parentForm, "Currency cannot be blank.",
+    "Select Currency", JOptionPane.ERROR_MESSAGE);
+    status = false;
+    txtCurrency.requestFocusInWindow();
+    } else {
+    gl = new Gl();
+    gl.setVouNo(txtVouNo.getText());
+    gl.setTraderId(NumberUtil.NZeroL(trader.getId()));
+    gl.setRemark(txtRemark.getText());
+    gl.setGlDate(txtRetInDate.getDate());
+    gl.setCreatedDate(Util1.getTodayDate());
+    gl.setFromCurId(currency.getKey().getCode());
+    gl.setCompId(Global.compId);
+    gl.setSplitId(6);
+    gl.setTranSource("ÄCCOUNT-RETOUT");
+    gl.setLocationId(location.getLocationId());
+    gl.setCreatedBy(Global.loginUser.getUserId().toString());
+    gl.setVouTotal(NumberUtil.getDouble(txtVouTotal.getText()));
+    gl.setPaid(NumberUtil.getDouble(txtVouPaid.getText()));
+    gl.setBalance(NumberUtil.getDouble(txtVouBalance.getText()));
+    
+    }
+    } catch (Exception ex) {
+    LOGGER.error("isValidEntry : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
+    
+    }
+    
+    return status;
+    }*/
     private void genVouNo() {
         vouEngine = new GenVouNoImpl(voudIdService, "RetIn", Util1.getPeriod(txtRetInDate.getDate()));
         txtVouNo.setText(vouEngine.genVouNo());
@@ -1020,6 +1016,11 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
     @Override
     public void history() {
         historyReturnIn();
+    }
+
+    @Override
+    public void refresh() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

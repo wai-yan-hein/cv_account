@@ -37,6 +37,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
+import com.cv.accountswing.service.VOpeningService;
+import com.cv.accountswing.ui.setup.common.OpeningTableModel;
 
 /**
  *
@@ -93,9 +95,9 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
         DepartmentAutoCompleter departmentAutoCompleter = new DepartmentAutoCompleter(txtDep, Global.listDepartment, null);
         departmentAutoCompleter.setSelectionObserver(this);
         CurrencyAutoCompleter currencyAutoCompleter = new CurrencyAutoCompleter(txtCurrency, Global.listCurrency, null);
-        String cuId = Global.sysProperties.get("system.default.currency");
+        curId = Global.sysProperties.get("system.default.currency");
         CurrencyKey key = new CurrencyKey();
-        key.setCode(cuId);
+        key.setCode(curId);
         key.setCompCode(Global.compId);
         Currency currency = currencyService.findById(key);
         currencyAutoCompleter.setCurrency(currency);
@@ -129,18 +131,23 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
         initializeParameter();
         loadingObserver.load(this.getName(), "Start");
         taskExecutor.execute(() -> {
+            cOAOpeningTableModel.clear();
             List<VGl> listVGl = vGlService.search(stDate, endDate, "-", "-", "-", curId, "-", "-", depCode,
                     "-", "-", "-", Global.compId.toString(), "OPENING", "-", "-", "-", "-", "-", "-", "-");
             btnGen.setEnabled(listVGl.isEmpty());
             cOAOpeningTableModel.setListVGl(listVGl);
-            calTotalAmt(listVGl);
+
+            /*List<VCOAOpening> listOpening = openingService.search(stDate, "-", "-", Global.compId.toString(), depCode,curId);
+            openingTableModel.setListOpening(listOpening);*/
+            btnGen.setEnabled(listVGl.isEmpty());
+            //calTotalAmt(listVGl);
             //btnGen.setEnabled(false);
             loadingObserver.load(this.getName(), "Stop");
         });
     }
 
     private void initializeParameter() {
-        stDate = Util1.toDateStr(Global.finicialPeriodFrom, "yyyy-MM-dd", "dd/MM/yyyy");
+        stDate = Global.finicialPeriodFrom;
         endDate = Util1.toDateStr(txtDate.getDate(), "dd/MM/yyyy");
         depCode = Util1.isNull(depCode, "-");
         curId = Util1.isNull(curId, "-");
@@ -191,7 +198,7 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
                     String userId = Global.loginUser.getUserId().toString();
                     String coaGroup = Global.sysProperties.get("system.opening.coa.group");
                     if (coaGroup != null) {
-                        cOAOpeningService.GenerateZeroGL(Util1.toDateStr(txtDate.getDate(), "dd/MM/yyyy"),
+                        cOAOpeningService.generateZeroOpening(Util1.toDateStr(txtDate.getDate(), "dd/MM/yyyy"),
                                 userId, Global.compId.toString(), curId, depCode, coaGroup);
                         searchOpening();
                         btnGen.setEnabled(true);
@@ -589,5 +596,10 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
 
     @Override
     public void print() {
+    }
+
+    @Override
+    public void refresh() {
+        searchOpening();
     }
 }

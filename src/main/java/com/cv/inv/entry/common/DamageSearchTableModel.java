@@ -39,7 +39,7 @@ public class DamageSearchTableModel extends AbstractTableModel {
     public Class getColumnClass(int column) {
         switch (column) {
             case 0: //Date
-                return Date.class;
+                return String.class;
             case 1: //Vou No
                 return String.class;
             case 2: //Location
@@ -68,8 +68,9 @@ public class DamageSearchTableModel extends AbstractTableModel {
 
             switch (column) {
                 case 0: //Date
-                     return Util1.toDate(dmgh.getDmgDate(), "yyyy/MM/dd HH:mm:ss");
-                //    return Util1.toDateStr(dmgh.getDmgDate(), "yyyy/MM/dd");
+                    // if (dmgh.getDmgDate() != null) {
+                    return Util1.toDateStr(dmgh.getDmgDate(), "dd/MM/yyyy");
+                // }
                 case 1: //Vou No
                     if (Util1.getNullTo(dmgh.isDeleted())) {
                         return dmgh.getDmgVouId() + "**";

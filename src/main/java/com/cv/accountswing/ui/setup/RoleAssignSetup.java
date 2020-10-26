@@ -120,10 +120,22 @@ public class RoleAssignSetup extends javax.swing.JPanel implements KeyListener, 
 
             }
         });
+        searchUser();
+
+    }
+
+    private void searchUser() {
+        loadingObserver.load(this.getName(), "Start");
         taskExecutor.execute(() -> {
-            List<AppUser> listUser = userService.search("-", "-", "-", "-");
-            userTableModel.setListUser(listUser);
-            loadingObserver.load(this.getName(), "Stop");
+            try {
+                List<AppUser> listUser = userService.search("-", "-", "-", "-");
+                userTableModel.setListUser(listUser);
+                loadingObserver.load(this.getName(), "Stop");
+            } catch (Exception e) {
+                LOGGER.error("Search User :" + e.getMessage());
+                JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Search User", JOptionPane.ERROR_MESSAGE);
+                loadingObserver.load(this.getName(), "Stop");
+            }
         });
     }
 
@@ -440,5 +452,10 @@ public class RoleAssignSetup extends javax.swing.JPanel implements KeyListener, 
     @Override
     public void save() {
         saveRoleAssign();
+    }
+
+    @Override
+    public void refresh() {
+        searchUser();
     }
 }

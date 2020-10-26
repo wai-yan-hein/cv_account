@@ -57,7 +57,7 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
     private ApplicationMainFrame mainFrame;
     private LoadingObserver loadingObserver;
     private boolean isShown = false;
-    private String parentRootName = "Root Menu";
+    private final String parentRootName = "Root Menu";
 
     public void setIsShown(boolean isShown) {
         this.isShown = isShown;
@@ -475,5 +475,10 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
 
     @Override
     public void delete() {
+    }
+
+    @Override
+    public void refresh() {
+        initTree();
     }
 }

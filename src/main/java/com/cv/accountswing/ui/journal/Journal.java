@@ -492,4 +492,9 @@ public class Journal extends javax.swing.JPanel implements KeyListener, Selectio
     public void print() {
     }
 
+    @Override
+    public void refresh() {
+        searchGV();
+    }
+
 }

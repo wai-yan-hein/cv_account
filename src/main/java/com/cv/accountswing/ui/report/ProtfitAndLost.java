@@ -345,6 +345,10 @@ public class ProtfitAndLost extends javax.swing.JPanel implements SelectionObser
 
     @Override
     public void print() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void refresh() {
+        calProfitAndLost();
     }
 }

@@ -106,30 +106,41 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener, Pa
     }
 
     private void initTable() {
-        taskExecutor.execute(() -> {
-            tblCustomer.setModel(customerTabelModel);
-            tblCustomer.getTableHeader().setFont(Global.textFont);
-            tblCustomer.getColumnModel().getColumn(0).setPreferredWidth(40);// Code
-            tblCustomer.getColumnModel().getColumn(1).setPreferredWidth(320);// Name
-            tblCustomer.getColumnModel().getColumn(2).setPreferredWidth(40);// Active   
-            tblCustomer.setDefaultRenderer(Boolean.class, new TableCellRender());
-            tblCustomer.setDefaultRenderer(Object.class, new TableCellRender());
-            tblCustomer.getSelectionModel().addListSelectionListener((ListSelectionEvent e) -> {
-                if (e.getValueIsAdjusting()) {
-                    if (tblCustomer.getSelectedRow() >= 0) {
-                        selectRow = tblCustomer.convertRowIndexToModel(tblCustomer.getSelectedRow());
-                        setCustomer(customerTabelModel.getCustomer(selectRow));
-                    }
-
+        tblCustomer.setModel(customerTabelModel);
+        tblCustomer.getTableHeader().setFont(Global.textFont);
+        tblCustomer.getColumnModel().getColumn(0).setPreferredWidth(40);// Code
+        tblCustomer.getColumnModel().getColumn(1).setPreferredWidth(320);// Name
+        tblCustomer.getColumnModel().getColumn(2).setPreferredWidth(40);// Active   
+        tblCustomer.setDefaultRenderer(Boolean.class, new TableCellRender());
+        tblCustomer.setDefaultRenderer(Object.class, new TableCellRender());
+        tblCustomer.getSelectionModel().addListSelectionListener((ListSelectionEvent e) -> {
+            if (e.getValueIsAdjusting()) {
+                if (tblCustomer.getSelectedRow() >= 0) {
+                    selectRow = tblCustomer.convertRowIndexToModel(tblCustomer.getSelectedRow());
+                    setCustomer(customerTabelModel.getCustomer(selectRow));
                 }
-            });
-            swrf = new StartWithRowFilter(txtCusFilter);
-            sorter = new TableRowSorter(tblCustomer.getModel());
-            swrf = new StartWithRowFilter(txtCusFilter);
-            tblCustomer.setRowSorter(sorter);
-            List<Customer> listcustomer = customerService.search("-", "-", "-", "-", "-");
-            customerTabelModel.setListCustomer(listcustomer);
-            loadingObserver.load(this.getName(), "Stop");
+
+            }
+        });
+        swrf = new StartWithRowFilter(txtCusFilter);
+        sorter = new TableRowSorter(tblCustomer.getModel());
+        swrf = new StartWithRowFilter(txtCusFilter);
+        tblCustomer.setRowSorter(sorter);
+
+    }
+
+    private void searchCustomer() {
+        loadingObserver.load(this.getName(), "Stop");
+        taskExecutor.execute(() -> {
+            try {
+                List<Customer> listcustomer = customerService.search("-", "-", "-", "-", "-");
+                customerTabelModel.setListCustomer(listcustomer);
+                loadingObserver.load(this.getName(), "Stop");
+            } catch (Exception e) {
+                LOGGER.error("Search Customer :" + e.getMessage());
+                JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Search Customer ", JOptionPane.ERROR_MESSAGE);
+                loadingObserver.load(this.getName(), "Stop");
+            }
         });
 
     }
@@ -873,6 +884,11 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener, Pa
 
     @Override
     public void print() {
+    }
+
+    @Override
+    public void refresh() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

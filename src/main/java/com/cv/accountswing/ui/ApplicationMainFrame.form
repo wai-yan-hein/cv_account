@@ -158,6 +158,14 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnPrintActionPerformed"/>
               </Events>
             </Component>
+            <Component class="javax.swing.JButton" name="btnRefresh">
+              <Properties>
+                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/images/refresh.png"/>
+                </Property>
+                <Property name="toolTipText" type="java.lang.String" value="F7 - Refresh"/>
+              </Properties>
+            </Component>
             <Component class="javax.swing.JButton" name="btnDelete">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
@@ -196,7 +204,7 @@
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/images/clean-code.png"/>
                 </Property>
-                <Property name="toolTipText" type="java.lang.String" value="F10 - Clear"/>
+                <Property name="toolTipText" type="java.lang.String" value="F10 - Clear "/>
                 <Property name="focusable" type="boolean" value="false"/>
               </Properties>
               <Events>
@@ -212,7 +220,6 @@
                   <Image iconType="3" name="/images/logout.png"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="Logout"/>
-                <Property name="focusable" type="boolean" value="false"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnLogoutActionPerformed"/>
@@ -229,7 +236,7 @@
         </Component>
         <Component class="javax.swing.JLabel" name="lblNeworkPing">
           <Properties>
-            <Property name="text" type="java.lang.String" value="23ms"/>
+            <Property name="text" type="java.lang.String" value="2344ms"/>
           </Properties>
         </Component>
       </SubComponents>

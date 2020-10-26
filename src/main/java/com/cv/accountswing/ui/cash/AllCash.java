@@ -341,23 +341,27 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
     private void searchCash() {
         initializeParameter();
         loadingObserver.load(this.getName(), "Start");
-        taskExecutor.execute(() -> {
-            LOGGER.info(sourceAccId + "----- Searching...");
-            List<VGl> listVGl = vGlService.search(stDate, enDate,
-                    desp, sourceAccId,
-                    accId, currency, "-",
-                    ref, depId, "-", "-",
-                    "-", "-", "-", "-", "-",
-                    traderName, "-", "-",
-                    debAmt,
-                    crdAmt);
-            swapData(listVGl, sourceAccId);
-            allCashTableModel.setListVGl(listVGl);
-            allCashTableModel.addNewRow();
-            requestFoucsTable();
-            LOGGER.info(sourceAccId + "----- Finished...");
-        });
-        calOpeningClosing();
+        if (sourceAccId != null) {
+            taskExecutor.execute(() -> {
+                LOGGER.info(sourceAccId + "----- Searching...");
+                List<VGl> listVGl = vGlService.search(stDate, enDate,
+                        desp, sourceAccId,
+                        accId, currency, "-",
+                        ref, depId, "-", "-",
+                        "-", "-", "-", "-", "-",
+                        traderName, "-", "-",
+                        debAmt,
+                        crdAmt);
+                swapData(listVGl, sourceAccId);
+                allCashTableModel.setListVGl(listVGl);
+                allCashTableModel.addNewRow();
+                requestFoucsTable();
+                LOGGER.info(sourceAccId + "----- Finished...");
+            });
+            calOpeningClosing();
+        } else {
+            JOptionPane.showMessageDialog(Global.parentForm, "Source Account Missing.");
+        }
 
     }
 
@@ -480,8 +484,6 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
         ));
         tblCash.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
         tblCash.setRowHeight(Global.tblRowHeight);
-        tblCash.setShowHorizontalLines(true);
-        tblCash.setShowVerticalLines(true);
         jScrollPane2.setViewportView(tblCash);
 
         jLabel1.setFont(Global.lableFont);
@@ -583,8 +585,8 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -754,6 +756,11 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
     @Override
     public void print() {
         printVoucher();
+    }
+
+    @Override
+    public void refresh() {
+        searchCash();
     }
 
 }

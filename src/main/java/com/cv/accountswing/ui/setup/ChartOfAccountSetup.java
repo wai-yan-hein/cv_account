@@ -783,4 +783,9 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
         saveChartAcc();
     }
 
+    @Override
+    public void refresh() {
+        initTree();
+    }
+
 }

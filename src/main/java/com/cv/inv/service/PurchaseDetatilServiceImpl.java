@@ -5,13 +5,12 @@
  */
 package com.cv.inv.service;
 
-import com.cv.accountswing.dao.GlDao;
-import com.cv.accountswing.entity.Gl;
+import com.cv.inv.dao.PurchaseHisDao;
 import com.cv.inv.dao.PurchaseDetailDao;
 import com.cv.inv.entity.PurDetailKey;
+import com.cv.inv.entity.PurHis;
 import com.cv.inv.entity.PurchaseDetail;
 import java.util.List;
-import static org.hibernate.annotations.common.util.impl.LoggerFactory.logger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +30,7 @@ public class PurchaseDetatilServiceImpl implements PurchaseDetailService {
     @Autowired
     private PurchaseDetailDao dao;
     @Autowired
-    private GlDao glDao;
+    private PurchaseHisDao glDao;
 
     @Override
     public PurchaseDetail save(PurchaseDetail pd) {
@@ -45,17 +44,27 @@ public class PurchaseDetatilServiceImpl implements PurchaseDetailService {
     }
 
     @Override
-    public void save(Gl gl, List<PurchaseDetail> listPD) {
+    public void save(PurHis gl, List<PurchaseDetail> listPD, List<String> delList) {
         String retInDetailId;
 
         try {
-            Gl saveGL = glDao.save(gl);
-            String vouNo = gl.getVouNo();
+
+            if (delList != null) {
+                for (String detailId : delList) {
+                    dao.delete(detailId);
+                }
+            }
+            glDao.save(gl);
+            String vouNo = gl.getPurInvId();
             for (PurchaseDetail pd : listPD) {
                 if (pd.getStock() != null) {
-                    retInDetailId = vouNo + '-' + pd.getUniqueId();
-                    pd.setPurDetailKey(new PurDetailKey(vouNo, retInDetailId));
-                    pd.setGlId(saveGL.getGlId());
+                    if (pd.getPurDetailKey() != null) {
+                        pd.setPurDetailKey(pd.getPurDetailKey());
+                    } else {
+                        retInDetailId = vouNo + '-' + pd.getUniqueId();
+                        pd.setPurDetailKey(new PurDetailKey(vouNo, retInDetailId));
+                    }
+                    pd.setLocation(gl.getLocationId());
                     dao.save(pd);
                 }
             }

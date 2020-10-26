@@ -200,7 +200,7 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
             List<VStockOpValue> listVSO = new ArrayList();
             for (String tmpId : coaIds) {
                 List<ChartOfAccount> listCOA = coaService.getAllChild(tmpId, Global.compId.toString());
-                for (ChartOfAccount coa : listCOA) {
+                listCOA.stream().map(coa -> {
                     VStockOpValue tmpVSOV = new VStockOpValue();
                     tmpVSOV.getKey().setCoaCode(coa.getCode());
                     tmpVSOV.getKey().setCompId(Global.compId);
@@ -208,12 +208,23 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
                     tmpVSOV.getKey().setDeptCode(depId);
                     tmpVSOV.setCoaCodeUsr(coa.getCoaCodeUsr());
                     tmpVSOV.setCoaNameEng(coa.getCoaNameEng());
+                    return tmpVSOV;
+                }).map(tmpVSOV -> {
                     tmpVSOV.setCurrName(curr.getCurrencyName());
+                    return tmpVSOV;
+                }).map(tmpVSOV -> {
                     tmpVSOV.setDeptCodeUsr(oDept.getUsrCode());
+                    return tmpVSOV;
+                }).map(tmpVSOV -> {
                     tmpVSOV.setDeptName(oDept.getDeptName());
+                    return tmpVSOV;
+                }).map(tmpVSOV -> {
                     tmpVSOV.setCreatedBy(userId);
+                    return tmpVSOV;
+                }).map(tmpVSOV -> {
                     tmpVSOV.setAmount(0.0);
-
+                    return tmpVSOV;
+                }).map(tmpVSOV -> {
                     String strSOV = gson.toJson(tmpVSOV);
                     StockOpValue sov = gson.fromJson(strSOV, StockOpValue.class);
                     sov.getKey().setTranDate(Util1.toDate(stDate));
@@ -224,11 +235,14 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
                         LOGGER.error("Save StockOpening :" + e.getMessage());
                         JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Save StockOpening", JOptionPane.ERROR_MESSAGE);
                     }
-
                     tmpVSOV.getKey().setTranDate(Util1.toDate(stDate));
+                    return tmpVSOV;
+                }).map(tmpVSOV -> {
                     tmpVSOV.setCreatedDate(new Date());
+                    return tmpVSOV;
+                }).forEachOrdered(tmpVSOV -> {
                     listVSO.add(tmpVSOV);
-                }
+                });
             }
         }
     }
@@ -506,5 +520,10 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
 
     @Override
     public void print() {
+    }
+
+    @Override
+    public void refresh() {
+        searchOpening();
     }
 }

@@ -284,4 +284,9 @@ public class RoleSetup extends javax.swing.JPanel implements KeyListener, PanelC
     @Override
     public void print() {
     }
+
+    @Override
+    public void refresh() {
+        searchAllUsers();
+    }
 }

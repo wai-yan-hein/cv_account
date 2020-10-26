@@ -431,4 +431,8 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Pan
     @Override
     public void print() {
     }
+
+    @Override
+    public void refresh() {
+    }
 }
