@@ -54,6 +54,10 @@ import com.cv.inv.entry.Issue;
 import com.cv.inv.entry.PurchaseEntry;
 import com.cv.inv.entry.ReturnIn;
 import com.cv.inv.entry.ReturnOut;
+<<<<<<< HEAD
+//import com.cv.inv.entry.SaleEntry;
+=======
+>>>>>>> 254de39471e64b1c4162bcb13e8d1c205e7f47ba
 import com.cv.inv.entry.StockReceive;
 import com.cv.inv.entry.Transfer;
 import com.cv.inv.service.LocationService;
@@ -202,7 +206,12 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     //Inventory Setup
     @Autowired
     private StockSetup stockSetup;
+<<<<<<< HEAD
+//    @Autowired
+//    private SaleEntry saleEntry;
+=======
 
+>>>>>>> 254de39471e64b1c4162bcb13e8d1c205e7f47ba
     @Autowired
     private PurchaseEntry purchaseEntry;
     @Autowired
@@ -408,10 +417,17 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                 }
             case "Inventory":
                 switch (panelName) {
+<<<<<<< HEAD
+                    case "Sale Entry":
+//                        saleEntry.setName(panelName);
+//                        saleEntry.setLoadingObserver(this);
+//                        return saleEntry;
+=======
                     /*case "Sale Entry":
                     saleEntry.setName(panelName);
                     saleEntry.setLoadingObserver(this);
                     return saleEntry;*/
+>>>>>>> 254de39471e64b1c4162bcb13e8d1c205e7f47ba
                     case "Purchase Entry":
                         purchaseEntry.setName(panelName);
                         purchaseEntry.setLoadingObserver(this);
