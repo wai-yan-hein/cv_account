@@ -18,7 +18,7 @@ import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.SaleDetailHis;
 import com.cv.inv.entity.SaleHis;
 import com.cv.inv.entity.VouStatus;
-import com.cv.inv.entry.SaleEntry;
+//import com.cv.inv.entry.SaleEntry;
 import com.cv.inv.entry.common.CodeTableModel;
 import com.cv.inv.entry.common.SaleVouSearchTableModel;
 import com.cv.inv.entry.editor.StockCellEditor;
@@ -64,8 +64,8 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
     private CodeTableModel codeTableModel;
     @Autowired
     private SaleHisService saleHisService;
-    @Autowired
-    private SaleEntry saleEntry;
+//    @Autowired
+//    private SaleEntry saleEntry;
     @Autowired
     private SaleDetailService sdService;
     @Autowired

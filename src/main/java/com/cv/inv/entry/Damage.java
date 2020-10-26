@@ -251,8 +251,8 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
 
     private void actionMapping() {
         //F8 event on tblSale
-        tblDamage.getInputMap().put(KeyStroke.getKeyStroke("F6"), "F6-Action");
-        tblDamage.getActionMap().put("F6-Action", actionItemDelete);
+        tblDamage.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "DELETE");
+        tblDamage.getActionMap().put("DELETE", actionItemDelete);
 
         //Enter event on tblSale
         tblDamage.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "ENTER-Action");

@@ -5,6 +5,7 @@
 package com.cv.inv.entity;
 
 import com.cv.accountswing.entity.Currency;
+import com.cv.accountswing.entity.Department;
 import com.cv.accountswing.entity.PaymentType;
 import com.cv.accountswing.entity.Trader;
 import java.util.Date;
@@ -46,6 +47,7 @@ public class PurHis implements java.io.Serializable {
     private boolean cashOut; //for purchase expense
     private Double exRateP; //for parent currency
     private String migId;
+    private Department deptCode;
 
     private String promoDesp;
     private Date promoStartDate;
@@ -251,8 +253,8 @@ public class PurHis implements java.io.Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-        @JoinColumn(name = "code"),
-        @JoinColumn(name = "compCode")
+        @JoinColumn(name = "cur_code"),
+        @JoinColumn(name = "comp_code")
     })
     public Currency getCurrency() {
         return currency;
@@ -380,4 +382,15 @@ public class PurHis implements java.io.Serializable {
     public void setIntgUpdStatus(String intgUpdStatus) {
         this.intgUpdStatus = intgUpdStatus;
     }
+
+    @ManyToOne
+    @JoinColumn(name = "dept_code")
+    public Department getDeptCode() {
+        return deptCode;
+    }
+
+    public void setDeptCode(Department deptCode) {
+        this.deptCode = deptCode;
+    }
+
 }
