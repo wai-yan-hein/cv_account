@@ -15,15 +15,18 @@ import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.editor.TraderAutoCompleter;
 import com.cv.accountswing.util.Util1;
+import com.cv.inv.entity.MachineInfo;
 import com.cv.inv.entity.SaleDetailHis;
 import com.cv.inv.entity.SaleHis;
 import com.cv.inv.entity.VouStatus;
 //import com.cv.inv.entry.SaleEntry;
 import com.cv.inv.entry.common.CodeTableModel;
 import com.cv.inv.entry.common.SaleVouSearchTableModel;
+import com.cv.inv.entry.editor.MachineInfoAutoCompleter;
 import com.cv.inv.entry.editor.StockCellEditor;
 import com.cv.inv.entry.editor.VouStatusAutoCompleter;
 import com.cv.inv.service.LocationService;
+import com.cv.inv.service.MachineInfoService;
 import com.cv.inv.service.SaleDetailService;
 import com.cv.inv.service.SaleHisService;
 import com.cv.inv.service.VouStatusService;
@@ -43,8 +46,6 @@ import org.springframework.stereotype.Component;
  *
  * @author Mg Kyaw Thura Aung
  */
-
-
 @Component
 public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
 
@@ -70,10 +71,13 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
     private SaleDetailService sdService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private MachineInfoService machInfoService;
     private ApplicationMainFrame mainFrame;
     private VouStatusAutoCompleter vouCompleter;
     private TraderAutoCompleter traderAutoCompleter;
     private AppUserAutoCompleter appUserAutoCompleter;
+    private MachineInfoAutoCompleter machAutoCompleter;
 
     public SaleVouSearch() {
         super(new Frame(), true);
@@ -93,6 +97,7 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
         traderAutoCompleter = new TraderAutoCompleter(txtCus, Global.listTrader, null);
         vouCompleter = new VouStatusAutoCompleter(txtVouStatus, Global.listVou, null);
         appUserAutoCompleter = new AppUserAutoCompleter(txtUser, Global.listAppUser, null);
+        machAutoCompleter = new MachineInfoAutoCompleter(txtMachine, Global.listMachine, null);
     }
 
     private void initTableVoucher() {
@@ -131,6 +136,10 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
             String userId = Global.sysProperties.get("system.default.user");
             AppUser appUser = userService.findById(userId);
             appUserAutoCompleter.setAppUser(appUser);
+            String machineId = Global.sysProperties.get("system.default.machine");
+            MachineInfo machInfo = machInfoService.findById(machineId);
+            machAutoCompleter.setMachineInfo(machInfo);
+
         } catch (Exception e) {
             LOGGER.info("Assign Default Value :" + e.getMessage());
             JOptionPane.showMessageDialog(Global.parentForm, "Defalut Values are missing in System Property.");
@@ -150,8 +159,11 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
         String vouStatusId = vouCompleter.getVouStatus().getVouStatusId().toString();
         String remark = txtRemark.getText();
         String stockId = codeTableModel.getFilterCodeStr();
+        String userId = appUserAutoCompleter.getAppUser().getUserId().toString();
+        String machineId = machAutoCompleter.getManchineInfo().getMachineId().toString();
 
-        List<SaleHis> listHis = saleHisService.search(fromDate, toDate, customerId, vouStatusId, remark, stockId);
+        List<SaleHis> listHis = saleHisService.search(fromDate, toDate, customerId,
+                vouStatusId, remark, stockId, userId, machineId);
         saleVouTableModel.setListSaleHis(listHis);
         lblTtlRecord.setText("Total Records : " + saleVouTableModel.getRowCount());
         if (saleVouTableModel.getRowCount() > 0) {
@@ -172,7 +184,7 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
             SaleHis saleHis = saleHisService.findById(vouNo);
             List<SaleDetailHis> detailHis = sdService.search(vouNo);
             this.dispose();
-            //saleEntry.setSaleVoucher(saleHis, detailHis);
+            saleEntry.setSaleVoucher(saleHis, detailHis);
         } else {
             JOptionPane.showMessageDialog(this, "Please select the voucher.",
                     "No Voucher Selected", JOptionPane.ERROR_MESSAGE);

@@ -21,6 +21,7 @@ import com.cv.inv.entity.Category;
 import com.cv.inv.entity.CharacterNo;
 import com.cv.inv.entity.ChargeType;
 import com.cv.inv.entity.Location;
+import com.cv.inv.entity.MachineInfo;
 import com.cv.inv.entity.RelationKey;
 import com.cv.inv.entity.SaleMan;
 import com.cv.inv.entity.Stock;
@@ -84,6 +85,7 @@ public class Global {
     public static List<SaleMan> listSaleMan;
     public static List<ChargeType> listChargeType;
     public static List<UnitRelation> listRelation = new ArrayList<>();
+    public static List<MachineInfo> listMachine;
     public static HashMap<String, String> sysProperties;
     public static HashMap<String, String> hmCashFilter = new HashMap<>();
     public static HashMap<RelationKey, Float> hmRelation = new HashMap<>();
