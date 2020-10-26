@@ -513,10 +513,10 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                                 control.save();
                                 break;
                             case KeyEvent.VK_F6:
-                                control.refresh();
+                                control.print();
                                 break;
                             case KeyEvent.VK_F7:
-                                control.print();
+                                control.refresh();
                                 break;
                             case KeyEvent.VK_F8:
                                 control.delete();
@@ -1046,6 +1046,11 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
 
         btnRefresh.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/refresh.png"))); // NOI18N
         btnRefresh.setToolTipText("F7 - Refresh");
+        btnRefresh.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRefreshActionPerformed(evt);
+            }
+        });
         toolBar.add(btnRefresh);
 
         btnDelete.setFont(Global.lableFont);
@@ -1237,6 +1242,13 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
         // TODO add your handling code here:
     }//GEN-LAST:event_formComponentResized
+
+    private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
+        // TODO add your handling code here:
+        if (control != null) {
+            control.refresh();
+        }
+    }//GEN-LAST:event_btnRefreshActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClear;

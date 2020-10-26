@@ -198,7 +198,7 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
                     String userId = Global.loginUser.getUserId().toString();
                     String coaGroup = Global.sysProperties.get("system.opening.coa.group");
                     if (coaGroup != null) {
-                        cOAOpeningService.generateZeroOpening(Util1.toDateStr(txtDate.getDate(), "dd/MM/yyyy"),
+                        cOAOpeningService.GenerateZeroGL(Util1.toDateStr(txtDate.getDate(), "dd/MM/yyyy"),
                                 userId, Global.compId.toString(), curId, depCode, coaGroup);
                         searchOpening();
                         btnGen.setEnabled(true);

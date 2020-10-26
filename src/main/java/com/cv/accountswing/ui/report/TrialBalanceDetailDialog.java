@@ -8,7 +8,6 @@ package com.cv.accountswing.ui.report;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.entity.view.VGl;
-import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.report.common.CrAmtTableModel;
 import com.cv.accountswing.ui.report.common.DrAmtTableModel;
@@ -39,8 +38,6 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Pan
     private DrAmtTableModel drAmtTableModel;
     @Autowired
     private TaskExecutor taskExecutor;
-    @Autowired
-    private ApplicationMainFrame mainFrame;
     private TableRowSorter<TableModel> sorter;
     private String desp;
     private Double netChange;
@@ -376,7 +373,6 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Pan
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
-        mainFrame.setControl(this);
         if (!isShown) {
             initMain();
         }
