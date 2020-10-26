@@ -9,15 +9,10 @@ import com.cv.accountswing.common.Global;
 import com.cv.accountswing.entity.AppUser;
 import com.cv.accountswing.entity.Trader;
 import com.cv.accountswing.service.TraderService;
-<<<<<<< HEAD
 import com.cv.accountswing.service.UserService;
-import com.cv.accountswing.ui.cash.common.TableCellRender;
-import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.editor.AppUserAutoCompleter;
-=======
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.ApplicationMainFrame;
->>>>>>> bddce4600e033a428ef4d6cbe625a14a0f331b69
 import com.cv.accountswing.ui.editor.TraderAutoCompleter;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.SaleDetailHis;
@@ -69,13 +64,10 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
     private SaleHisService saleHisService;
     @Autowired
     private SaleEntry saleEntry;
-<<<<<<< HEAD
     @Autowired
     private SaleDetailService sdService;
     @Autowired
     private UserService userService;
-=======
->>>>>>> bddce4600e033a428ef4d6cbe625a14a0f331b69
     private ApplicationMainFrame mainFrame;
     private VouStatusAutoCompleter vouCompleter;
     private TraderAutoCompleter traderAutoCompleter;
@@ -178,7 +170,7 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
             SaleHis saleHis = saleHisService.findById(vouNo);
             List<SaleDetailHis> detailHis = sdService.search(vouNo);
             this.dispose();
-            saleEntry.setSaleVoucher(saleHis, detailHis);
+            //saleEntry.setSaleVoucher(saleHis, detailHis);
         } else {
             JOptionPane.showMessageDialog(this, "Please select the voucher.",
                     "No Voucher Selected", JOptionPane.ERROR_MESSAGE);

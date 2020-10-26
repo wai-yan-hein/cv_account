@@ -33,11 +33,8 @@ import com.cv.inv.entity.SaleHis;
 import com.cv.inv.entity.SaleMan;
 import com.cv.inv.entity.VouStatus;
 import com.cv.inv.entry.common.SaleEntryTableModel;
-<<<<<<< HEAD
-=======
 import com.cv.inv.entry.common.StockInfo;
 import com.cv.inv.entry.editor.LocationAutoCompleter;
->>>>>>> bddce4600e033a428ef4d6cbe625a14a0f331b69
 import com.cv.inv.entry.editor.SaleManAutoCompleter;
 import com.cv.inv.entry.editor.StockUnitEditor;
 import com.cv.inv.entry.editor.StockCellEditor;
@@ -79,11 +76,8 @@ import org.springframework.stereotype.Component;
  * @author Mg Kyaw Thura Aung
  */
 @Component
-<<<<<<< HEAD
-public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, KeyListener, KeyPropagate, PanelControl {
-=======
+
 public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, KeyListener, KeyPropagate, StockInfo, PanelControl {
->>>>>>> bddce4600e033a428ef4d6cbe625a14a0f331b69
 
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(SaleEntry.class.getName());
 
@@ -320,15 +314,16 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
         if (isValidEntry() && saleTableModel.isValidEntry()) {
             List<String> deleteList = saleTableModel.getDelList();
             try {
-<<<<<<< HEAD
+                 << << << < HEAD
+                
                 String vouStatus = lblStatus.getText();
                 saleDetailService.save(saleHis, saleTableModel.getListSaleDetail(), vouStatus, deleteList);
-=======
-                saleDetailService.save(saleHis, saleTableModel.getListSaleDetail());
+                 == == ==
+                        = saleDetailService.save(saleHis, saleTableModel.getListSaleDetail());
                 newForm();
                 //Need to add
                 //saleDetailService.save(saleHis, saleTableModel.getListSaleDetail());
->>>>>>> bddce4600e033a428ef4d6cbe625a14a0f331b69
+                 >>> >>> > bddce4600e033a428ef4d6cbe625a14a0f331b69
                 clear();
                 vouEngine.updateVouNo();
                 genVouNo();
@@ -434,7 +429,8 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
     };
 
     private void addSaleTableModelListener() {
-<<<<<<< HEAD
+         << << << < HEAD
+        
         tblSale.getModel().addTableModelListener(new TableModelListener() {
             @Override
             public void tableChanged(TableModelEvent e) {
@@ -450,122 +446,127 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
                             calculateTotalAmount();
                             break;
                     }
-=======
-        tblSale.getModel().addTableModelListener((TableModelEvent e) -> {
-            int column = e.getColumn();
+                     == == ==
+                            = tblSale.getModel().addTableModelListener((TableModelEvent e) -> {
+                                int column = e.getColumn();
 
-            if (column >= 0) {
-                switch (column) {
-                    case 0: //Code
-                    case 3: //Qty
-                    case 4://Std-Wt
-                    case 5: //Unit
-                    case 6: //Sale price
-                        calculateTotalAmount();
-                        break;
->>>>>>> bddce4600e033a428ef4d6cbe625a14a0f331b69
+                                if (column >= 0) {
+                                    switch (column) {
+                                        case 0: //Code
+                                        case 3: //Qty
+                                        case 4://Std-Wt
+                                        case 5: //Unit
+                                        case 6: //Sale price
+                                            calculateTotalAmount();
+                                            break;
+                                             >>> >>> > bddce4600e033a428ef4d6cbe625a14a0f331b69
+                                    }
+                                }
+                            });
+                }
+
+    
+
+            private void calculateTotalAmount() {
+                double totalVouBalance;
+                Double totalAmount = new Double(0);
+                listDetail = saleTableModel.getListSaleDetail();
+
+                totalAmount = listDetail.stream().map(sdh -> NumberUtil.NZero(sdh.getAmount())).reduce(totalAmount, (accumulator, _item) -> accumulator + _item);
+                txtVouTotal.setValue(totalAmount);
+                //cal discAmt
+                double discp = NumberUtil.NZero(txtDiscP.getText());
+                double discountAmt = (totalAmount * (discp / 100));
+                txtVouDiscount.setValue(discountAmt);
+                //calculate taxAmt
+                double taxp = NumberUtil.NZero(txtTaxP.getText());
+                double afterDiscountAmt = totalAmount - discountAmt;
+                double totalTax = (afterDiscountAmt * taxp) / 100;
+                txtTax.setValue(totalTax);
+
+                txtGrandTotal.setValue(NumberUtil.NZero(txtVouTotal.getValue())
+                        + NumberUtil.NZero(txtTax.getValue())
+                        - NumberUtil.NZero(txtVouDiscount.getValue()));
+
+                totalVouBalance = NumberUtil.NZero(txtGrandTotal.getValue()) - (NumberUtil.NZero(txtVouPaid.getValue()));
+                txtVouBalance.setValue(totalVouBalance);
+            }
+
+            public void historySale() {
+                vouSearchDialog.initMain();
+                vouSearchDialog.setSize(Global.width - 250, Global.height - 120);
+                vouSearchDialog.setLocationRelativeTo(null);
+                vouSearchDialog.setVisible(true);
+            }
+
+            <<<<<<< HEAD
+
+            public void setSaleVoucher(SaleHis saleHis, List<SaleDetailHis> listSaleDetail) {
+                 == == == =
+
+            public void setSaleVoucher(SaleHis saleHis) {
+                 >>> >>> > bddce4600e033a428ef4d6cbe625a14a0f331b69
+                if (!lblStatus.getText().equals("NEW")) {
+                    clear();
+                }
+                if (saleHis != null) {
+                    if (saleHis.getDeleted()) {
+                        lblStatus.setText("DELETED");
+                    } else {
+                        lblStatus.setText("EDIT");
+                    }
+                    txtVouNo.setText(saleHis.getVouNo());
+                    txtVouStatus.setText(saleHis.getVouStatusId().getStatusDesp());
+                    txtCus.setText(saleHis.getTraderId().getTraderName());
+                    txtSaleman.setText(saleHis.getSaleManId().getSaleManName());
+                    txtDueDate.setDate(saleHis.getCreditTerm());
+                    txtCurrency.setText(saleHis.getFromCurId());
+                    txtRemark.setText(saleHis.getRemark());
+                    txtSaleDate.setDate(saleHis.getSaleDate());
+                     << << << < HEAD
+            
+                    txtVouTotal.setValue(saleHis.getVouTotal());
+                    txtDiscP.setText(Util1.getString(saleHis.getDiscP()));
+                    txtVouDiscount.setValue(saleHis.getDiscount());
+                    txtTaxP.setText(Util1.getString(saleHis.getTaxP()));
+                    txtTax.setValue(saleHis.getTaxAmt());
+                    txtGrandTotal.setValue(saleHis.getGrandTotal());
+                    txtVouPaid.setValue(saleHis.getPaid());
+                    txtVouBalance.setValue(saleHis.getVouBalance());
+                    saleTableModel.setListDetail(listSaleDetail);
+                    txtTotalItem.setText(Integer.toString(listSaleDetail.size() - 1));
+                     == == == =
                 }
             }
-        });
-    }
 
-    private void calculateTotalAmount() {
-        double totalVouBalance;
-        Double totalAmount = new Double(0);
-        listDetail = saleTableModel.getListSaleDetail();
+            private final Action actionSave = new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    saveSale();
+                }
+            };
 
-        totalAmount = listDetail.stream().map(sdh -> NumberUtil.NZero(sdh.getAmount())).reduce(totalAmount, (accumulator, _item) -> accumulator + _item);
-        txtVouTotal.setValue(totalAmount);
-        //cal discAmt
-        double discp = NumberUtil.NZero(txtDiscP.getText());
-        double discountAmt = (totalAmount * (discp / 100));
-        txtVouDiscount.setValue(discountAmt);
-        //calculate taxAmt
-        double taxp = NumberUtil.NZero(txtTaxP.getText());
-        double afterDiscountAmt = totalAmount - discountAmt;
-        double totalTax = (afterDiscountAmt * taxp) / 100;
-        txtTax.setValue(totalTax);
+            private final Action actionNewForm = new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    clear();
+                }
+            };
 
-        txtGrandTotal.setValue(NumberUtil.NZero(txtVouTotal.getValue())
-                + NumberUtil.NZero(txtTax.getValue())
-                - NumberUtil.NZero(txtVouDiscount.getValue()));
+            private final Action actionHistory = new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    historySale();
+                     >>> >>> > bddce4600e033a428ef4d6cbe625a14a0f331b69
+                }
+            };
 
-        totalVouBalance = NumberUtil.NZero(txtGrandTotal.getValue()) - (NumberUtil.NZero(txtVouPaid.getValue()));
-        txtVouBalance.setValue(totalVouBalance);
-    }
-
-    public void historySale() {
-        vouSearchDialog.initMain();
-        vouSearchDialog.setSize(Global.width - 250, Global.height - 120);
-        vouSearchDialog.setLocationRelativeTo(null);
-        vouSearchDialog.setVisible(true);
-    }
-
-<<<<<<< HEAD
-    public void setSaleVoucher(SaleHis saleHis, List<SaleDetailHis> listSaleDetail) {
-=======
-    public void setSaleVoucher(SaleHis saleHis) {
->>>>>>> bddce4600e033a428ef4d6cbe625a14a0f331b69
-        if (!lblStatus.getText().equals("NEW")) {
-            clear();
-        }
-        if (saleHis != null) {
-            if (saleHis.getDeleted()) {
-                lblStatus.setText("DELETED");
-            } else {
-                lblStatus.setText("EDIT");
-            }
-            txtVouNo.setText(saleHis.getVouNo());
-            txtVouStatus.setText(saleHis.getVouStatusId().getStatusDesp());
-            txtCus.setText(saleHis.getTraderId().getTraderName());
-            txtSaleman.setText(saleHis.getSaleManId().getSaleManName());
-            txtDueDate.setDate(saleHis.getCreditTerm());
-            txtCurrency.setText(saleHis.getFromCurId());
-            txtRemark.setText(saleHis.getRemark());
-            txtSaleDate.setDate(saleHis.getSaleDate());
-<<<<<<< HEAD
-            txtVouTotal.setValue(saleHis.getVouTotal());
-            txtDiscP.setText(Util1.getString(saleHis.getDiscP()));
-            txtVouDiscount.setValue(saleHis.getDiscount());
-            txtTaxP.setText(Util1.getString(saleHis.getTaxP()));
-            txtTax.setValue(saleHis.getTaxAmt());
-            txtGrandTotal.setValue(saleHis.getGrandTotal());
-            txtVouPaid.setValue(saleHis.getPaid());
-            txtVouBalance.setValue(saleHis.getVouBalance());
-            saleTableModel.setListDetail(listSaleDetail);
-            txtTotalItem.setText(Integer.toString(listSaleDetail.size()-1));
-=======
-        }
-    }
-
-    private final Action actionSave = new AbstractAction() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            saveSale();
-        }
-    };
-
-    private final Action actionNewForm = new AbstractAction() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            clear();
-        }
-    };
-
-    private final Action actionHistory = new AbstractAction() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            historySale();
->>>>>>> bddce4600e033a428ef4d6cbe625a14a0f331b69
-        }
-    };
-
-    /**
-     * This method is called from within the constructor to initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is always
-     * regenerated by the Form Editor.
-     */
-    @SuppressWarnings("unchecked")
+            /**
+             * This method is called from within the constructor to initialize
+             * the form. WARNING: Do NOT modify this code. The content of this
+             * method is always regenerated by the Form Editor.
+             */
+            @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -1032,201 +1033,201 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
         //getCustomer();
     }//GEN-LAST:event_txtCusActionPerformed
 
-    private void tabToTable(KeyEvent e) {
-        if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_RIGHT) {
-            tblSale.requestFocus();
-            if (tblSale.getRowCount() >= 0) {
-                tblSale.setRowSelectionInterval(0, 0);
+            private void tabToTable(KeyEvent e) {
+                if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_RIGHT) {
+                    tblSale.requestFocus();
+                    if (tblSale.getRowCount() >= 0) {
+                        tblSale.setRowSelectionInterval(0, 0);
+                    }
+                }
             }
-        }
-    }
 
-    @Override
-    public void keyEvent(KeyEvent e) {
+            @Override
+            public void keyEvent(KeyEvent e) {
 
-    }
+            }
 
-    @Override
-    public void selected(Object source, Object selectObj) {
-        switch (source.toString()) {
-            case "CustomerList":
+            @Override
+            public void selected(Object source, Object selectObj) {
+                switch (source.toString()) {
+                    case "CustomerList":
                 try {
-                Trader cus = (Trader) selectObj;
+                        Trader cus = (Trader) selectObj;
 
-                if (cus != null) {
-                    txtCus.setText(cus.getTraderName());
+                        if (cus != null) {
+                            txtCus.setText(cus.getTraderName());
 
-                    if (cus.getTraderType() != null) {
-                        saleTableModel.setCusType(cus.getTraderType().getDescription());
-                    } else {
-                        saleTableModel.setCusType("N");
+                            if (cus.getTraderType() != null) {
+                                saleTableModel.setCusType(cus.getTraderType().getDescription());
+                            } else {
+                                saleTableModel.setCusType("N");
+                            }
+                        } else {
+                            txtCus.setText(null);
+                        }
+                    } catch (Exception ex) {
+                        LOGGER.error("selected CustomerList : " + selectObj.toString() + " - " + ex.getMessage());
                     }
-                } else {
-                    txtCus.setText(null);
+                    break;
                 }
-            } catch (Exception ex) {
-                LOGGER.error("selected CustomerList : " + selectObj.toString() + " - " + ex.getMessage());
             }
-            break;
-        }
-    }
 
-    @Override
-    public void keyTyped(KeyEvent e) {
+            @Override
+            public void keyTyped(KeyEvent e) {
 
-    }
+            }
 
-    @Override
-    public void keyPressed(KeyEvent e) {
+            @Override
+            public void keyPressed(KeyEvent e) {
 
-    }
+            }
 
-    @Override
-    public void keyReleased(KeyEvent e) {
-        Object sourceObj = e.getSource();
-        String ctrlName = "-";
-        if (sourceObj instanceof JTextField) {
-            ctrlName = ((JTextField) sourceObj).getName();
-        } else if (sourceObj instanceof JTextFieldDateEditor) {
-            ctrlName = ((JTextFieldDateEditor) sourceObj).getName();
-        }
-        switch (ctrlName) {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                Object sourceObj = e.getSource();
+                String ctrlName = "-";
+                if (sourceObj instanceof JTextField) {
+                    ctrlName = ((JTextField) sourceObj).getName();
+                } else if (sourceObj instanceof JTextFieldDateEditor) {
+                    ctrlName = ((JTextFieldDateEditor) sourceObj).getName();
+                }
+                switch (ctrlName) {
 
-            case "txtVouNo":
-                if (e.getKeyCode() == KeyEvent.VK_LEFT || e.getKeyCode() == KeyEvent.VK_UP) {
-                    txtRemark.requestFocus();
-                } else {
-                    txtVouStatus.requestFocus();
+                    case "txtVouNo":
+                        if (e.getKeyCode() == KeyEvent.VK_LEFT || e.getKeyCode() == KeyEvent.VK_UP) {
+                            txtRemark.requestFocus();
+                        } else {
+                            txtVouStatus.requestFocus();
+                        }
+                        tabToTable(e);
+                        break;
+                    case "txtCus":
+                        if (e.getKeyCode() == KeyEvent.VK_UP) {
+                            txtVouStatus.requestFocus();
+                        }
+                        if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+                            txtVouStatus.requestFocus();
+                        }
+                        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                            txtSaleman.requestFocus();
+                        }
+                        if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+                            txtDueDate.getDateEditor().getUiComponent().requestFocusInWindow();
+                        }
+                        tabToTable(e);
+                        break;
+                    case "txtSaleman":
+                        if (e.getKeyCode() == KeyEvent.VK_UP) {
+                            txtCus.requestFocus();
+                        }
+                        if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+                            txtVouStatus.requestFocus();
+                        }
+                        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                            txtSaleDate.getDateEditor().getUiComponent().requestFocusInWindow();
+                        }
+                        if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+                            txtCurrency.requestFocus();
+                        }
+                        tabToTable(e);
+                        break;
+                    case "txtVouStatus":
+                        if (e.getKeyCode() == KeyEvent.VK_UP || e.getKeyCode() == KeyEvent.VK_LEFT) {
+                            txtVouNo.requestFocus();
+                        }
+                        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                            txtCus.requestFocus();
+                        }
+                        if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+                            txtSaleDate.getDateEditor().getUiComponent().requestFocusInWindow();
+                        }
+                        tabToTable(e);
+                        break;
+                    case "txtRemark":
+                        if (e.getKeyCode() == KeyEvent.VK_UP) {
+                            txtCurrency.requestFocus();
+                        }
+                        if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+                            txtSaleDate.requestFocus();
+                        }
+                        if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_DOWN
+                                || e.getKeyCode() == KeyEvent.VK_RIGHT) {
+                            txtVouNo.requestFocus();
+                        }
+                        tabToTable(e);
+                        break;
+                    case "txtSaleDate":
+                        if (e.getKeyCode() == KeyEvent.VK_UP) {
+                            txtSaleman.requestFocus();
+                        }
+                        if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+                            //txtRemark.requestFocus();
+                        }
+                        if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_DOWN) {
+                            String date = ((JTextFieldDateEditor) sourceObj).getText();
+                            if (date.length() == 8) {
+                                String toFormatDate = Util1.toFormatDate(date);
+                                txtSaleDate.setDate(Util1.toDate(toFormatDate, "dd/MM/yyyy"));
+                            }
+                            txtDueDate.getDateEditor().getUiComponent().requestFocusInWindow();
+                        }
+                        if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+                            //txtLocation.requestFocus();
+                        }
+                        tabToTable(e);
+                        break;
+                    case "txtDueDate":
+                        if (e.getKeyCode() == KeyEvent.VK_UP) {
+                            txtSaleDate.getDateEditor().getUiComponent().requestFocusInWindow();
+                        }
+                        if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+                            //txtCus.requestFocus();
+                        }
+                        if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_DOWN) {
+                            String date = ((JTextFieldDateEditor) sourceObj).getText();
+                            if (date.length() == 8) {
+                                String toFormatDate = Util1.toFormatDate(date);
+                                txtDueDate.setDate(Util1.toDate(toFormatDate, "dd/MM/yyyy"));
+                            }
+                            txtCurrency.requestFocus();
+                        }
+                        if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+                            //txtVouStatus.requestFocus();
+                        }
+                        tabToTable(e);
+                        break;
+                    case "txtCurrency":
+                        if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+                            txtSaleman.requestFocus();
+                        }
+                        if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_RIGHT) {
+                            txtRemark.requestFocus();
+                        }
+                        if (e.getKeyCode() == KeyEvent.VK_UP) {
+                            txtDueDate.getDateEditor().getUiComponent().requestFocusInWindow();
+                        }
+                        tabToTable(e);
+                        break;
+                    case "txtDiscP":
+                        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                            calculateTotalAmount();
+                            txtTaxP.requestFocus();
+                        }
+                        break;
+                    case "txtTaxP":
+                        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                            calculateTotalAmount();
+                            txtVouBalance.requestFocus();
+                        }
+                        break;
+                    case "txtVouPaid":
+                        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                            calculateTotalAmount();
+                            txtVouBalance.requestFocus();
+                        }
+                        break;
                 }
-                tabToTable(e);
-                break;
-            case "txtCus":
-                if (e.getKeyCode() == KeyEvent.VK_UP) {
-                    txtVouStatus.requestFocus();
-                }
-                if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-                    txtVouStatus.requestFocus();
-                }
-                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    txtSaleman.requestFocus();
-                }
-                if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-                    txtDueDate.getDateEditor().getUiComponent().requestFocusInWindow();
-                }
-                tabToTable(e);
-                break;
-            case "txtSaleman":
-                if (e.getKeyCode() == KeyEvent.VK_UP) {
-                    txtCus.requestFocus();
-                }
-                if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-                    txtVouStatus.requestFocus();
-                }
-                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    txtSaleDate.getDateEditor().getUiComponent().requestFocusInWindow();
-                }
-                if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-                    txtCurrency.requestFocus();
-                }
-                tabToTable(e);
-                break;
-            case "txtVouStatus":
-                if (e.getKeyCode() == KeyEvent.VK_UP || e.getKeyCode() == KeyEvent.VK_LEFT) {
-                    txtVouNo.requestFocus();
-                }
-                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    txtCus.requestFocus();
-                }
-                if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-                    txtSaleDate.getDateEditor().getUiComponent().requestFocusInWindow();
-                }
-                tabToTable(e);
-                break;
-            case "txtRemark":
-                if (e.getKeyCode() == KeyEvent.VK_UP) {
-                    txtCurrency.requestFocus();
-                }
-                if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-                    txtSaleDate.requestFocus();
-                }
-                if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_DOWN
-                        || e.getKeyCode() == KeyEvent.VK_RIGHT) {
-                    txtVouNo.requestFocus();
-                }
-                tabToTable(e);
-                break;
-            case "txtSaleDate":
-                if (e.getKeyCode() == KeyEvent.VK_UP) {
-                    txtSaleman.requestFocus();
-                }
-                if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-                    //txtRemark.requestFocus();
-                }
-                if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_DOWN) {
-                    String date = ((JTextFieldDateEditor) sourceObj).getText();
-                    if (date.length() == 8) {
-                        String toFormatDate = Util1.toFormatDate(date);
-                        txtSaleDate.setDate(Util1.toDate(toFormatDate, "dd/MM/yyyy"));
-                    }
-                    txtDueDate.getDateEditor().getUiComponent().requestFocusInWindow();
-                }
-                if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-                    //txtLocation.requestFocus();
-                }
-                tabToTable(e);
-                break;
-            case "txtDueDate":
-                if (e.getKeyCode() == KeyEvent.VK_UP) {
-                    txtSaleDate.getDateEditor().getUiComponent().requestFocusInWindow();
-                }
-                if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-                    //txtCus.requestFocus();
-                }
-                if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_DOWN) {
-                    String date = ((JTextFieldDateEditor) sourceObj).getText();
-                    if (date.length() == 8) {
-                        String toFormatDate = Util1.toFormatDate(date);
-                        txtDueDate.setDate(Util1.toDate(toFormatDate, "dd/MM/yyyy"));
-                    }
-                    txtCurrency.requestFocus();
-                }
-                if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-                    //txtVouStatus.requestFocus();
-                }
-                tabToTable(e);
-                break;
-            case "txtCurrency":
-                if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-                    txtSaleman.requestFocus();
-                }
-                if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_RIGHT) {
-                    txtRemark.requestFocus();
-                }
-                if (e.getKeyCode() == KeyEvent.VK_UP) {
-                    txtDueDate.getDateEditor().getUiComponent().requestFocusInWindow();
-                }
-                tabToTable(e);
-                break;
-            case "txtDiscP":
-                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    calculateTotalAmount();
-                    txtTaxP.requestFocus();
-                }
-                break;
-            case "txtTaxP":
-                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    calculateTotalAmount();
-                    txtVouBalance.requestFocus();
-                }
-                break;
-            case "txtVouPaid":
-                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    calculateTotalAmount();
-                    txtVouBalance.requestFocus();
-                }
-                break;
-        }
-    }
+            }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnNew;
@@ -1278,32 +1279,32 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
     private javax.swing.JFormattedTextField txtVouTotal;
     // End of variables declaration//GEN-END:variables
 
-    @Override
-    public void delete() {
-        deleteSale();
-    }
+            @Override
+            public void delete() {
+                deleteSale();
+            }
 
-    @Override
-    public void print() {
-    }
+            @Override
+            public void print() {
+            }
 
-    @Override
-    public void save() {
-        saveSale();
-    }
+            @Override
+            public void save() {
+                saveSale();
+            }
 
-    @Override
-    public void newForm() {
-        clear();
-    }
+            @Override
+            public void newForm() {
+                clear();
+            }
 
-    @Override
-    public void history() {
-        historySale();
-    }
+            @Override
+            public void history() {
+                historySale();
+            }
 
-    @Override
-    public void getStockInfo(String stockCode) {
-    }
+            @Override
+            public void getStockInfo(String stockCode) {
+            }
 
-}
+        }

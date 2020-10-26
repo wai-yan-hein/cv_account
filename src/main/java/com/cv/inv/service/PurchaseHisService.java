@@ -19,4 +19,6 @@ public interface PurchaseHisService {
     public List<PurHis> search(String fromDate, String toDate, String cusId, String vouStatusId, String remark);
 
     public PurHis findById(String id);
+
+    public int delete(String vouNo);
 }

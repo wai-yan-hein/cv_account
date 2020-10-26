@@ -89,4 +89,13 @@ public class PurchaseHisDaoImpl extends AbstractDao<String, PurHis> implements P
         return ph;
     }
 
+    @Override
+    public int delete(String vouNo) {
+        String strSql1 = "delete from PurchaseDetail o where o.purDetailKey.vouId = '" + vouNo + "'";
+        execUpdateOrDelete(strSql1);
+        String strSql = "delete from PurHis o where o.purInvId = '" + vouNo + "'";
+        int cnt = execUpdateOrDelete(strSql);
+        return cnt;
+    }
+
 }
