@@ -1245,4 +1245,8 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
     public void history() {
         historySale();
     }
+
+    @Override
+    public void refresh() {
+    }
 }
