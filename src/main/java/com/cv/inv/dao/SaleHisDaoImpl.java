@@ -26,7 +26,7 @@ public class SaleHisDaoImpl extends AbstractDao<String, SaleHis> implements Sale
 
     @Override
     public List<SaleHis> search(String fromDate, String toDate, String cusId,
-            String vouStatusId, String remark, String stockCode) {
+            String vouStatusId, String remark, String stockCode, String userId,String machId) {
         String strFilter = "";
 
         if (!fromDate.equals("-") && !toDate.equals("-")) {
@@ -72,6 +72,22 @@ public class SaleHisDaoImpl extends AbstractDao<String, SaleHis> implements Sale
                 strFilter = "o.remark = '" + remark + "'";
             } else {
                 strFilter = strFilter + " and o.remark = '" + remark + "'";
+            }
+        }
+
+        if (!userId.equals("-")) {
+            if (strFilter.isEmpty()) {
+                strFilter = "o.createdBy = '" + userId + "'";
+            } else {
+                strFilter = strFilter + " and o.createdBy = '" + userId + "'";
+            }
+        }
+        
+        if (!machId.equals("-")) {
+            if (strFilter.isEmpty()) {
+            strFilter = "o.vouNo like '" + machId + "%'";
+            } else {
+                strFilter = strFilter + " and o.vouNo like '" + machId + "%'";
             }
         }
 

@@ -7,6 +7,7 @@ package com.cv.inv.service;
 
 import com.cv.inv.dao.MachineInfoDao;
 import com.cv.inv.entity.MachineInfo;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,13 +24,23 @@ public class MachineInfoServiceImpl implements MachineInfoService {
     private MachineInfoDao machineInfoDao;
 
     @Override
-    public MachineInfo save(MachineInfo machineInfo) throws Exception{
+    public MachineInfo save(MachineInfo machineInfo) throws Exception {
         return machineInfoDao.save(machineInfo);
     }
 
     @Override
     public int getMax(String machineName) throws Exception {
-       return machineInfoDao.getMax(machineName);
+        return machineInfoDao.getMax(machineName);
+    }
+
+    @Override
+    public List<MachineInfo> findAll() throws Exception {
+        return machineInfoDao.findAll();
+    }
+
+    @Override
+    public MachineInfo findById(String id) throws Exception{
+        return machineInfoDao.findById(id);
     }
 
 }

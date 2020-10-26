@@ -6,6 +6,7 @@
 package com.cv.inv.service;
 
 import com.cv.inv.entity.MachineInfo;
+import java.util.List;
 
 /**
  *
@@ -16,5 +17,9 @@ public interface MachineInfoService {
     public MachineInfo save(MachineInfo machineInfo) throws Exception;
 
     public int getMax(String machineName) throws Exception;
+
+    public List<MachineInfo> findAll() throws Exception;
+
+    public MachineInfo findById(String id) throws Exception;
 
 }

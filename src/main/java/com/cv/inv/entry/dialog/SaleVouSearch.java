@@ -9,26 +9,24 @@ import com.cv.accountswing.common.Global;
 import com.cv.accountswing.entity.AppUser;
 import com.cv.accountswing.entity.Trader;
 import com.cv.accountswing.service.TraderService;
-<<<<<<< HEAD
 import com.cv.accountswing.service.UserService;
-import com.cv.accountswing.ui.cash.common.TableCellRender;
-import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.editor.AppUserAutoCompleter;
-=======
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.ApplicationMainFrame;
->>>>>>> bddce4600e033a428ef4d6cbe625a14a0f331b69
 import com.cv.accountswing.ui.editor.TraderAutoCompleter;
 import com.cv.accountswing.util.Util1;
+import com.cv.inv.entity.MachineInfo;
 import com.cv.inv.entity.SaleDetailHis;
 import com.cv.inv.entity.SaleHis;
 import com.cv.inv.entity.VouStatus;
 import com.cv.inv.entry.SaleEntry;
 import com.cv.inv.entry.common.CodeTableModel;
 import com.cv.inv.entry.common.SaleVouSearchTableModel;
+import com.cv.inv.entry.editor.MachineInfoAutoCompleter;
 import com.cv.inv.entry.editor.StockCellEditor;
 import com.cv.inv.entry.editor.VouStatusAutoCompleter;
 import com.cv.inv.service.LocationService;
+import com.cv.inv.service.MachineInfoService;
 import com.cv.inv.service.SaleDetailService;
 import com.cv.inv.service.SaleHisService;
 import com.cv.inv.service.VouStatusService;
@@ -69,23 +67,23 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
     private SaleHisService saleHisService;
     @Autowired
     private SaleEntry saleEntry;
-<<<<<<< HEAD
     @Autowired
     private SaleDetailService sdService;
     @Autowired
     private UserService userService;
-=======
->>>>>>> bddce4600e033a428ef4d6cbe625a14a0f331b69
+    @Autowired
+    private MachineInfoService machInfoService;
     private ApplicationMainFrame mainFrame;
     private VouStatusAutoCompleter vouCompleter;
     private TraderAutoCompleter traderAutoCompleter;
     private AppUserAutoCompleter appUserAutoCompleter;
-    
+    private MachineInfoAutoCompleter machAutoCompleter;
+
     public SaleVouSearch() {
         super(new Frame(), true);
         initComponents();
     }
-    
+
     public void initMain() {
         initCombo();
         initTableVoucher();
@@ -94,13 +92,14 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
         setTodayDate();
         initKeyListener();
     }
-    
+
     private void initCombo() {
         traderAutoCompleter = new TraderAutoCompleter(txtCus, Global.listTrader, null);
         vouCompleter = new VouStatusAutoCompleter(txtVouStatus, Global.listVou, null);
         appUserAutoCompleter = new AppUserAutoCompleter(txtUser, Global.listAppUser, null);
+        machAutoCompleter = new MachineInfoAutoCompleter(txtMachine, Global.listMachine, null);
     }
-    
+
     private void initTableVoucher() {
         tblVoucher.setModel(saleVouTableModel);
         tblVoucher.getTableHeader().setFont(Global.tblHeaderFont);
@@ -111,18 +110,18 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
         tblVoucher.getColumnModel().getColumn(4).setPreferredWidth(15);
         tblVoucher.getColumnModel().getColumn(5).setPreferredWidth(30);
     }
-    
+
     private void initTableStock() {
         tblStock.setModel(codeTableModel);
         tblStock.getTableHeader().setFont(Global.tblHeaderFont);
         codeTableModel.addEmptyRow();
         tblStock.getColumnModel().getColumn(0).setPreferredWidth(50);
         tblStock.getColumnModel().getColumn(1).setPreferredWidth(200);
-        
+
         tblStock.getColumnModel().getColumn(0).setCellEditor(new StockCellEditor());
         tblStock.setDefaultRenderer(Object.class, new TableCellRender());
     }
-    
+
     private void assignDefaultValue() {
         try {
             String traderId;
@@ -137,17 +136,21 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
             String userId = Global.sysProperties.get("system.default.user");
             AppUser appUser = userService.findById(userId);
             appUserAutoCompleter.setAppUser(appUser);
+            String machineId = Global.sysProperties.get("system.default.machine");
+            MachineInfo machInfo = machInfoService.findById(machineId);
+            machAutoCompleter.setMachineInfo(machInfo);
+
         } catch (Exception e) {
             LOGGER.info("Assign Default Value :" + e.getMessage());
             JOptionPane.showMessageDialog(Global.parentForm, "Defalut Values are missing in System Property.");
         }
     }
-    
+
     private void setTodayDate() {
         txtFromDate.setDate(Util1.getTodayDate());
         txtToDate.setDate(Util1.getTodayDate());
     }
-    
+
     private void search() {
         btnSearch.setEnabled(false);
         String fromDate = Util1.toDateStr(txtFromDate.getDate(), "dd/MM/yyyy");
@@ -156,8 +159,11 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
         String vouStatusId = vouCompleter.getVouStatus().getVouStatusId().toString();
         String remark = txtRemark.getText();
         String stockId = codeTableModel.getFilterCodeStr();
-        
-        List<SaleHis> listHis = saleHisService.search(fromDate, toDate, customerId, vouStatusId, remark, stockId);
+        String userId = appUserAutoCompleter.getAppUser().getUserId().toString();
+        String machineId = machAutoCompleter.getManchineInfo().getMachineId().toString();
+
+        List<SaleHis> listHis = saleHisService.search(fromDate, toDate, customerId,
+                vouStatusId, remark, stockId, userId, machineId);
         saleVouTableModel.setListSaleHis(listHis);
         lblTtlRecord.setText("Total Records : " + saleVouTableModel.getRowCount());
         if (saleVouTableModel.getRowCount() > 0) {
@@ -169,7 +175,7 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
         }
         btnSearch.setEnabled(true);
     }
-    
+
     private void select() {
         int row = tblVoucher.convertRowIndexToModel(tblVoucher.getSelectedRow());
         SaleHis his = saleVouTableModel.getSelectVou(row);
@@ -184,7 +190,7 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
                     "No Voucher Selected", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
+
     private void initKeyListener() {
         txtFromDate.getDateEditor().getUiComponent().setName("txtFromDate");
         txtFromDate.getDateEditor().getUiComponent().addKeyListener(this);
@@ -508,11 +514,11 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
     @Override
     public void keyTyped(KeyEvent e) {
     }
-    
+
     @Override
     public void keyPressed(KeyEvent e) {
     }
-    
+
     @Override
     public void keyReleased(KeyEvent e) {
         Object sourceObj = e.getSource();
@@ -606,7 +612,7 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
                 break;
         }
     }
-    
+
     private void tabToTable(KeyEvent e) {
         if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_RIGHT) {
             tblStock.requestFocus();
