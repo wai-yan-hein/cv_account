@@ -7,6 +7,7 @@ package com.cv.inv.dao;
 
 import com.cv.accountswing.dao.AbstractDao;
 import com.cv.inv.entity.MachineInfo;
+import java.util.List;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Repository;
  * @author lenovo
  */
 @Repository
-public class MachineInfoDaoImpl extends AbstractDao<String, MachineInfo> implements MachineInfoDao {
+public class MachineInfoDaoImpl extends AbstractDao<Integer, MachineInfo> implements MachineInfoDao {
 
     @Override
     public MachineInfo save(MachineInfo machineInfo) throws Exception {
@@ -35,6 +36,17 @@ public class MachineInfoDaoImpl extends AbstractDao<String, MachineInfo> impleme
         }
 
         return maxId;
+    }
+
+    @Override
+    public List<MachineInfo> findAll() throws Exception {
+        String hsql = "select o from MachineInfo o";
+        return findHSQL(hsql);
+    }
+
+    @Override
+    public MachineInfo findById(String id) throws Exception {
+        return getByKey(Integer.parseInt(id));
     }
 
 }

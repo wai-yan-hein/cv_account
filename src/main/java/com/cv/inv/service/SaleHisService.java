@@ -16,7 +16,8 @@ public interface SaleHisService {
 
     public SaleHis save(SaleHis saleHis) throws Exception;
 
-    public List<SaleHis> search(String fromDate, String toDate, String cusId, String vouStatusId, String remark, String stockCode);
+    public List<SaleHis> search(String fromDate, String toDate, String cusId, 
+            String vouStatusId, String remark, String stockCode,String userId,String machId);
 
     public SaleHis findById(String id);
 

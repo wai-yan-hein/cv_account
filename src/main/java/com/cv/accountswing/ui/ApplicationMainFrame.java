@@ -671,6 +671,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                 Global.listStock = stockService.findAll();
                 Global.listStockUnit = stockUnitService.findAll();
                 Global.listRelation = relationService.findAll();
+                Global.listMachine = machineInfoService.findAll();
                 Global.listRelation.forEach(ur -> {
                     Global.hmRelation.put(ur.getUnitKey(), ur.getFactor());
                 });
