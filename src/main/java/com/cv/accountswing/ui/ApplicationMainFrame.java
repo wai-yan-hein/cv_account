@@ -54,10 +54,6 @@ import com.cv.inv.entry.Issue;
 import com.cv.inv.entry.PurchaseEntry;
 import com.cv.inv.entry.ReturnIn;
 import com.cv.inv.entry.ReturnOut;
-<<<<<<< HEAD
-//import com.cv.inv.entry.SaleEntry;
-=======
->>>>>>> 254de39471e64b1c4162bcb13e8d1c205e7f47ba
 import com.cv.inv.entry.StockReceive;
 import com.cv.inv.entry.Transfer;
 import com.cv.inv.service.LocationService;
@@ -65,6 +61,7 @@ import com.cv.inv.service.SaleManService;
 import com.cv.inv.service.VouStatusService;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.MachineInfo;
+import com.cv.inv.entry.SaleEntry;
 import com.cv.inv.service.ChargeTypeService;
 import com.cv.inv.service.MachineInfoService;
 import com.cv.inv.service.RelationService;
@@ -107,6 +104,8 @@ import org.springframework.stereotype.Component;
  *
  * @author winswe
  */
+
+
 @Component
 public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadData,
         SelectionObserver, LoadingObserver, KeyListener, NetworkObserver {
@@ -206,12 +205,8 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     //Inventory Setup
     @Autowired
     private StockSetup stockSetup;
-<<<<<<< HEAD
-//    @Autowired
-//    private SaleEntry saleEntry;
-=======
-
->>>>>>> 254de39471e64b1c4162bcb13e8d1c205e7f47ba
+    @Autowired
+    private SaleEntry saleEntry;
     @Autowired
     private PurchaseEntry purchaseEntry;
     @Autowired
@@ -417,17 +412,10 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                 }
             case "Inventory":
                 switch (panelName) {
-<<<<<<< HEAD
                     case "Sale Entry":
-//                        saleEntry.setName(panelName);
-//                        saleEntry.setLoadingObserver(this);
-//                        return saleEntry;
-=======
-                    /*case "Sale Entry":
-                    saleEntry.setName(panelName);
-                    saleEntry.setLoadingObserver(this);
-                    return saleEntry;*/
->>>>>>> 254de39471e64b1c4162bcb13e8d1c205e7f47ba
+                        saleEntry.setName(panelName);
+                        saleEntry.setLoadingObserver(this);
+                        return saleEntry;
                     case "Purchase Entry":
                         purchaseEntry.setName(panelName);
                         purchaseEntry.setLoadingObserver(this);
