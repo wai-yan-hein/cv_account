@@ -180,31 +180,11 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
     }
 
     private void initCombo() {
-        loadingObserver.load(this.getName(), "Start");
-        taskExecutor.execute(() -> {
-            if (Global.listStockType.isEmpty()) {
-                Global.listStockType = itemTypeService.findAll();
-            }
-            if (Global.listCategory.isEmpty()) {
-                Global.listCategory = categoryService.findAll();
-            }
-            if (Global.listStockBrand.isEmpty()) {
-                Global.listStockBrand = itemBrandService.findAll();
-            }
-            if (Global.listStockUnit.isEmpty()) {
-                Global.listStockUnit = itemUnitService.findAll();
-            }
-            if (Global.listCharNo.isEmpty()) {
-                Global.listCharNo = characterNoService.findAll();
-            }
-            BindingUtil.BindComboFilter(cboStockType, Global.listStockType, null, true, false);
-            BindingUtil.BindComboFilter(cboCategory, Global.listCategory, null, true, false);
-            BindingUtil.BindComboFilter(cboBrand, Global.listStockBrand, null, true, false);
-            BindingUtil.BindComboFilter(cboSaleUnit, Global.listStockUnit, null, true, false);
-            BindingUtil.BindComboFilter(cboPurPrice, Global.listStockUnit, null, true, false);
-
-        });
-        loadingObserver.load(this.getName(), "Stop");
+        BindingUtil.BindComboFilter(cboStockType, Global.listStockType, null, true, false);
+        BindingUtil.BindComboFilter(cboCategory, Global.listCategory, null, true, false);
+        BindingUtil.BindComboFilter(cboBrand, Global.listStockBrand, null, true, false);
+        BindingUtil.BindComboFilter(cboSaleUnit, Global.listStockUnit, null, true, false);
+        BindingUtil.BindComboFilter(cboPurPrice, Global.listStockUnit, null, true, false);
 
     }
 
@@ -292,8 +272,8 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
         String stockCode = txtStockCode.getText();
         if (!stockCode.isEmpty()) {
             if (lblStatus.getText().equals("NEW")) {
-                Stock stock = stockService.findById(stockCode);
-                if (stock != null) {
+                Stock s = stockService.findById(stockCode);
+                if (s != null) {
                     status = true;
                 }
             }
@@ -1831,5 +1811,10 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
 
     @Override
     public void print() {
+    }
+
+    @Override
+    public void refresh() {
+        searchStock();
     }
 }

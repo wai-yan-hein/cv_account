@@ -5,7 +5,6 @@
  */
 package com.cv.inv.entry;
 
-import ch.qos.logback.classic.pattern.Util;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
@@ -422,5 +421,10 @@ public class Adjustment extends javax.swing.JPanel implements SelectionObserver,
 
     @Override
     public void print() {
+    }
+
+    @Override
+    public void refresh() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

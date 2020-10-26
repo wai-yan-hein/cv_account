@@ -48,6 +48,7 @@ import javax.swing.event.ListSelectionEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
 
 /**
@@ -61,10 +62,6 @@ public class ManageProjectSetup extends javax.swing.JPanel implements KeyListene
 
     private int selectRow = -1;
     Long projectId;
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private TraderService traderService;
     @Autowired
     private ProjectService projectService;
     @Autowired
@@ -85,6 +82,8 @@ public class ManageProjectSetup extends javax.swing.JPanel implements KeyListene
     private ProjectTraderTableModel projectTraderTableModel;
     @Autowired
     private ApplicationMainFrame mainFrame;
+    @Autowired
+    private TaskExecutor taskExecutor;
 
     private LoadingObserver loadingObserver;
     private boolean isShown = false;
@@ -178,9 +177,22 @@ public class ManageProjectSetup extends javax.swing.JPanel implements KeyListene
         tblProject.getColumnModel().getColumn(2).setPreferredWidth(15);// Active    
         tblProject.setDefaultRenderer(Boolean.class, new TableCellRender());
         tblProject.setDefaultRenderer(Object.class, new TableCellRender());
-        List<Project> listProject = projectService.search("-", "-", "-", "-", "-", "-", "-");
-        projectTableModel.setlistProject(listProject);
-        loadingObserver.load(this.getName(), "Stop");
+        searchProject();
+    }
+
+    private void searchProject() {
+        loadingObserver.load(this.getName(), "Start");
+        taskExecutor.execute(() -> {
+            try {
+                List<Project> listProject = projectService.search("-", "-", "-", "-", "-", "-", "-");
+                projectTableModel.setlistProject(listProject);
+                loadingObserver.load(this.getName(), "Stop");
+            } catch (Exception e) {
+                LOGGER.error("Search Project :" + e.getMessage());
+                JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Search Project", JOptionPane.ERROR_MESSAGE);
+                loadingObserver.load(this.getName(), "Stop");
+            }
+        });
 
     }
 
@@ -921,6 +933,11 @@ public class ManageProjectSetup extends javax.swing.JPanel implements KeyListene
 
     @Override
     public void print() {
+    }
+
+    @Override
+    public void refresh() {
+        searchProject();
     }
 
 }

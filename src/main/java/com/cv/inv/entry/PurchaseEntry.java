@@ -258,7 +258,11 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
         if (isValidEntry() && purTableModel.isValidEntry()) {
             List<String> delList = purTableModel.getDelList();
             try {
+<<<<<<< HEAD
                 purchaseDetailService.save(ph, purTableModel.getListPurDetail(), delList);
+=======
+                purchaseDetailService.save(gl, purTableModel.getListPurDetail(), delList);
+>>>>>>> 6cbf54264f5dd6376a2d35aafde1647e2b8b6027
                 clear();
                 vouEngine.updateVouNo();
                 genVouNo();
@@ -1065,6 +1069,11 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
     @Override
     public void save() {
         savePurchase();
+    }
+
+    @Override
+    public void refresh() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

@@ -208,7 +208,6 @@ public class CrDrVoucher extends javax.swing.JPanel implements KeyListener, Sele
     }
 
     private void searchCreditVoucher() {
-        LOGGER.info(this.getName() + "Search...");
         loadingObserver.load(this.getName(), "Start");
         stDate = Util1.toDateStr(txtFromDate.getDate(), "dd/MM/yyyy");
         endDate = Util1.toDateStr(txtToDate.getDate(), "dd/MM/yyyy");
@@ -775,6 +774,11 @@ public class CrDrVoucher extends javax.swing.JPanel implements KeyListener, Sele
 
     @Override
     public void print() {
+    }
+
+    @Override
+    public void refresh() {
+        searchCreditVoucher();
     }
 
 }

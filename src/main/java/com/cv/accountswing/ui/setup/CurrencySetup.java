@@ -76,33 +76,44 @@ public class CurrencySetup extends javax.swing.JPanel implements KeyListener, Pa
     }
 
     private void initTable() {
-        taskExecutor.execute(() -> {
-            tblCurrency.setModel(currencyTabelModel);
-            tblCurrency.getTableHeader().setFont(Global.textFont);
-            List<Currency> listCurr = curService.search("-", "-", Global.compId.toString());
-            currencyTabelModel.setlistCurrency(listCurr);
-            tblCurrency.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            tblCurrency.getColumnModel().getColumn(0).setPreferredWidth(20);// Code
-            tblCurrency.getColumnModel().getColumn(1).setPreferredWidth(320);// Name
-            tblCurrency.getColumnModel().getColumn(2).setPreferredWidth(15);// Symbol      
-            tblCurrency.getColumnModel().getColumn(3).setPreferredWidth(10);// Symbol  
-            tblCurrency.setDefaultRenderer(Boolean.class, new TableCellRender());
-            tblCurrency.setDefaultRenderer(Object.class, new TableCellRender());
+        tblCurrency.setModel(currencyTabelModel);
+        tblCurrency.getTableHeader().setFont(Global.textFont);
+        tblCurrency.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tblCurrency.getColumnModel().getColumn(0).setPreferredWidth(20);// Code
+        tblCurrency.getColumnModel().getColumn(1).setPreferredWidth(320);// Name
+        tblCurrency.getColumnModel().getColumn(2).setPreferredWidth(15);// Symbol      
+        tblCurrency.getColumnModel().getColumn(3).setPreferredWidth(10);// Symbol  
+        tblCurrency.setDefaultRenderer(Boolean.class, new TableCellRender());
+        tblCurrency.setDefaultRenderer(Object.class, new TableCellRender());
+        tblCurrency.getSelectionModel().addListSelectionListener((ListSelectionEvent e) -> {
+            if (e.getValueIsAdjusting()) {
+                if (tblCurrency.getSelectedRow() >= 0) {
+                    selectRow = tblCurrency.convertRowIndexToModel(tblCurrency.getSelectedRow());
 
-            tblCurrency.getSelectionModel().addListSelectionListener((ListSelectionEvent e) -> {
-                if (e.getValueIsAdjusting()) {
-                    if (tblCurrency.getSelectedRow() >= 0) {
-                        selectRow = tblCurrency.convertRowIndexToModel(tblCurrency.getSelectedRow());
-
-                        if (selectRow >= 0) {
-                            Currency c = currencyTabelModel.getCurrency(selectRow);
-                            setCurrency(c);
-                        }
+                    if (selectRow >= 0) {
+                        Currency c = currencyTabelModel.getCurrency(selectRow);
+                        setCurrency(c);
                     }
-
                 }
-            });
-            loadingObserver.load(this.getName(), "Stop");
+
+            }
+        });
+        searchCurrency();
+
+    }
+
+    private void searchCurrency() {
+        loadingObserver.load(this.getName(), "Start");
+        taskExecutor.execute(() -> {
+            try {
+                List<Currency> listCurr = curService.search("-", "-", Global.compId.toString());
+                currencyTabelModel.setlistCurrency(listCurr);
+                loadingObserver.load(this.getName(), "Stop");
+            } catch (Exception e) {
+                LOGGER.error("Search Currency :" + e.getMessage());
+                JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Search Currency ", JOptionPane.ERROR_MESSAGE);
+                loadingObserver.load(this.getName(), "Stop");
+            }
         });
 
     }
@@ -544,5 +555,10 @@ public class CurrencySetup extends javax.swing.JPanel implements KeyListener, Pa
     @Override
     public void save() {
         saveCurrency();
+    }
+
+    @Override
+    public void refresh() {
+        searchCurrency();
     }
 }

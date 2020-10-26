@@ -246,7 +246,7 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
         }
     };
 
-    public void print() {
+    public void printSale() {
         /*loadingObserver.load(this.getName(), "Start");
         taskExecutor.execute(() -> {
         try {
@@ -609,6 +609,15 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
 
     @Override
     public void history() {
+    }
+
+    @Override
+    public void refresh() {
+        searchCash();
+    }
+
+    @Override
+    public void print() {
     }
 
 }

@@ -133,29 +133,6 @@ public class DepartmentSetup extends javax.swing.JPanel implements TreeSelection
         btnClear.setEnabled(status);
     }
 
-    /* public void initTree() {
-    initPopup();
-    treeModel = (DefaultTreeModel) treeDept.getModel();
-    try {
-    treeModel.setRoot(null);
-    } catch (Exception ex) {
-    
-    }
-    root = new DefaultMutableTreeNode("Department");
-    createTreeNode(root);
-    treeModel.setRoot(root);
-    treeDept.addTreeSelectionListener(this);
-    treeDept.addMouseListener(this);
-    //treMenu.addPropertyChangeListener(propertyChangeListener);
-    }
-    
-    private void createTreeNode(DefaultMutableTreeNode treeRoot) {
-    List<Department> listMenu = deptService.search("-", "-", "-", "-");
-    for (Department dep : listMenu) {
-    child = new DefaultMutableTreeNode(dep);
-    treeRoot.add(child);
-    }
-    }*/
     private void setDepartment(Department dep) {
         txtSystemCode.setText(dep.getDeptCode());
         txtUserCode.setText(dep.getUsrCode());
@@ -680,6 +657,11 @@ public class DepartmentSetup extends javax.swing.JPanel implements TreeSelection
 
     @Override
     public void print() {
+    }
+
+    @Override
+    public void refresh() {
+        initTree();
     }
 
 }

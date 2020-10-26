@@ -6,7 +6,6 @@
 package com.cv.accountswing.ui.journal;
 
 import com.cv.accountswing.common.Global;
-import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.entity.CompanyInfo;
 import com.cv.accountswing.entity.Gl;
 import com.cv.accountswing.entity.SystemProperty;
@@ -67,21 +66,13 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener, PanelControl {
+public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CrDrVoucherEntry.class);
     Gson gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
     private int selectRow = -1;
     @Autowired
-    private DepartmentService departmentService;
-    @Autowired
-    private CurrencyService currencyService;
-    @Autowired
-    private COAService cOAService;
-    @Autowired
     private CrDrVoucherEntryTableModel voucherEntryTableModel;
-    @Autowired
-    private TraderService traderService;
     @Autowired
     private GlService glService;
     @Autowired
@@ -96,8 +87,6 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
     private CompanyInfoService ciService;
     @Autowired
     private TaskExecutor taskExecutor;
-    @Autowired
-    private ApplicationMainFrame mainFrame;
     private JPopupMenu popupMenu;
     private String voucherType;
     private String depCode = "-";
@@ -108,7 +97,6 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
     private COAAutoCompleter cOAAutoCompleter;
     private DepartmentAutoCompleter departmentAutoCompleter;
     private CurrencyAutoCompleter currencyAutoCompleter;
-    private boolean isShown = false;
 
     public void setVoucherId(String voucherId) {
         this.voucherId = voucherId;
@@ -210,16 +198,6 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
     };
 
     private void initCombo() {
-
-        if (Global.listDepartment == null) {
-            Global.listDepartment = departmentService.search("-", "-", "-", "-", "-");
-        }
-        if (Global.listCurrency == null) {
-            Global.listCurrency = currencyService.search("-", "-", "-");
-        }
-        if (Global.listCOA == null) {
-            Global.listCOA = cOAService.search("-", "-", "-", "-", "-", "-", "-");
-        }
         cOAAutoCompleter = new COAAutoCompleter(txtAccount, Global.listCOA, null);
         departmentAutoCompleter = new DepartmentAutoCompleter(txtDep, Global.listDepartment, null);
         currencyAutoCompleter = new CurrencyAutoCompleter(txtCurrency, Global.listCurrency, null);
@@ -302,7 +280,7 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
     }
 
     private boolean isValidVoucher() {
-        boolean status = false;
+        boolean status;
         if (accCode.equals("-")) {
             status = false;
             JOptionPane.showMessageDialog(Global.parentForm, "Invalid Account");
@@ -319,16 +297,27 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
             String strVoucher;
             List<VGl> listVGl = voucherEntryTableModel.getListVGl();
             if (!listVGl.isEmpty()) {
-                for (VGl vgl : listVGl) {
+                listVGl.stream().map(vgl -> {
                     vgl.setGlDate(txtFromDate.getDate());
+                    return vgl;
+                }).map(vgl -> {
                     vgl.setSourceAcId(accCode);
+                    return vgl;
+                }).map(vgl -> {
                     vgl.setDeptId(depCode);
+                    return vgl;
+                }).map(vgl -> {
                     vgl.setFromCurId(currency);
+                    return vgl;
+                }).map(vgl -> {
                     vgl.setRemark(txtRemark.getText());
+                    return vgl;
+                }).map(vgl -> {
                     vgl.setDescription(txtFrom.getText());
+                    return vgl;
+                }).forEachOrdered(vgl -> {
                     vgl.setNaration(txtNaration.getText());
-
-                }
+                });
                 strVoucher = gson.toJson(listVGl);
                 java.lang.reflect.Type listType = new TypeToken<List<Gl>>() {
                 }.getType();
@@ -353,7 +342,7 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
 
                 assignGlInfo(listGV);
                 try {
-                    listGV = glService.saveBatchGL(listGV);
+                    glService.saveBatchGL(listGV);
                     //Delete row
                     if (!deleteIds.equals("-")) {
                         String[] ids = deleteIds.split(",");
@@ -387,9 +376,9 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
     }
 
     private void assignGlInfo(List<Gl> listGL) {
-        for (Gl gl : listGL) {
+        listGL.forEach(gl -> {
             assignGlInfo(gl);
-        }
+        });
     }
 
     public String getVouNo(String deptCodeUser, String strDate, String compCode, String deptCode, String type) {
@@ -659,10 +648,7 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
-        mainFrame.setControl(this);
-        if (!isShown) {
-            initMain();
-        }
+        initMain();
     }//GEN-LAST:event_formComponentShown
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
@@ -875,28 +861,5 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
                 tblCredit.setRowSelectionInterval(0, 0);
             }
         }
-    }
-
-    @Override
-    public void save() {
-        saveCreditVoucher();
-    }
-
-    @Override
-    public void delete() {
-    }
-
-    @Override
-    public void newForm() {
-        clear();
-    }
-
-    @Override
-    public void history() {
-    }
-
-    @Override
-    public void print() {
-        printCrDrVOu();
     }
 }

@@ -43,6 +43,8 @@ import org.springframework.stereotype.Component;
  *
  * @author Mg Kyaw Thura Aung
  */
+
+
 @Component
 public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
 
@@ -72,12 +74,12 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
     private VouStatusAutoCompleter vouCompleter;
     private TraderAutoCompleter traderAutoCompleter;
     private AppUserAutoCompleter appUserAutoCompleter;
-    
+
     public SaleVouSearch() {
         super(new Frame(), true);
         initComponents();
     }
-    
+
     public void initMain() {
         initCombo();
         initTableVoucher();
@@ -86,13 +88,13 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
         setTodayDate();
         initKeyListener();
     }
-    
+
     private void initCombo() {
         traderAutoCompleter = new TraderAutoCompleter(txtCus, Global.listTrader, null);
         vouCompleter = new VouStatusAutoCompleter(txtVouStatus, Global.listVou, null);
         appUserAutoCompleter = new AppUserAutoCompleter(txtUser, Global.listAppUser, null);
     }
-    
+
     private void initTableVoucher() {
         tblVoucher.setModel(saleVouTableModel);
         tblVoucher.getTableHeader().setFont(Global.tblHeaderFont);
@@ -103,18 +105,18 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
         tblVoucher.getColumnModel().getColumn(4).setPreferredWidth(15);
         tblVoucher.getColumnModel().getColumn(5).setPreferredWidth(30);
     }
-    
+
     private void initTableStock() {
         tblStock.setModel(codeTableModel);
         tblStock.getTableHeader().setFont(Global.tblHeaderFont);
         codeTableModel.addEmptyRow();
         tblStock.getColumnModel().getColumn(0).setPreferredWidth(50);
         tblStock.getColumnModel().getColumn(1).setPreferredWidth(200);
-        
+
         tblStock.getColumnModel().getColumn(0).setCellEditor(new StockCellEditor());
         tblStock.setDefaultRenderer(Object.class, new TableCellRender());
     }
-    
+
     private void assignDefaultValue() {
         try {
             String traderId;
@@ -134,12 +136,12 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
             JOptionPane.showMessageDialog(Global.parentForm, "Defalut Values are missing in System Property.");
         }
     }
-    
+
     private void setTodayDate() {
         txtFromDate.setDate(Util1.getTodayDate());
         txtToDate.setDate(Util1.getTodayDate());
     }
-    
+
     private void search() {
         btnSearch.setEnabled(false);
         String fromDate = Util1.toDateStr(txtFromDate.getDate(), "dd/MM/yyyy");
@@ -148,7 +150,7 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
         String vouStatusId = vouCompleter.getVouStatus().getVouStatusId().toString();
         String remark = txtRemark.getText();
         String stockId = codeTableModel.getFilterCodeStr();
-        
+
         List<SaleHis> listHis = saleHisService.search(fromDate, toDate, customerId, vouStatusId, remark, stockId);
         saleVouTableModel.setListSaleHis(listHis);
         lblTtlRecord.setText("Total Records : " + saleVouTableModel.getRowCount());
@@ -161,7 +163,7 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
         }
         btnSearch.setEnabled(true);
     }
-    
+
     private void select() {
         int row = tblVoucher.convertRowIndexToModel(tblVoucher.getSelectedRow());
         SaleHis his = saleVouTableModel.getSelectVou(row);
@@ -176,7 +178,7 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
                     "No Voucher Selected", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
+
     private void initKeyListener() {
         txtFromDate.getDateEditor().getUiComponent().setName("txtFromDate");
         txtFromDate.getDateEditor().getUiComponent().addKeyListener(this);
@@ -500,11 +502,11 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
     @Override
     public void keyTyped(KeyEvent e) {
     }
-    
+
     @Override
     public void keyPressed(KeyEvent e) {
     }
-    
+
     @Override
     public void keyReleased(KeyEvent e) {
         Object sourceObj = e.getSource();
@@ -598,7 +600,7 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
                 break;
         }
     }
-    
+
     private void tabToTable(KeyEvent e) {
         if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_RIGHT) {
             tblStock.requestFocus();

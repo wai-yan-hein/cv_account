@@ -15,4 +15,5 @@ public interface PanelControl {
     public void newForm();
     public void history();
     public void print();
+    public void refresh();
 }

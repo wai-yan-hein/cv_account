@@ -81,12 +81,20 @@ public class SystemPropertySetup extends javax.swing.JPanel implements KeyListen
                 }
             }
         });
+        searchSystemProperty();
+
+    }
+
+    private void searchSystemProperty() {
         loadingObserver.load(this.getName(), "Start");
         taskExecutor.execute(() -> {
-            systemPropertyTableModel.setListSP(spService.search("-", Global.compId.toString(), "-"));
-            loadingObserver.load(this.getName(), "Stop");
+            try {
+                systemPropertyTableModel.setListSP(spService.search("-", Global.compId.toString(), "-"));
+                loadingObserver.load(this.getName(), "Stop");
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Search System Propery", JOptionPane.ERROR_MESSAGE);
+            }
         });
-
     }
 
     private void initKeyListener() {
@@ -474,6 +482,11 @@ public class SystemPropertySetup extends javax.swing.JPanel implements KeyListen
     @Override
     public void save() {
         saveSysProperty();
+    }
+
+    @Override
+    public void refresh() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }
