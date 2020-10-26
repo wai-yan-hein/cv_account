@@ -54,7 +54,6 @@ import com.cv.inv.entry.Issue;
 import com.cv.inv.entry.PurchaseEntry;
 import com.cv.inv.entry.ReturnIn;
 import com.cv.inv.entry.ReturnOut;
-import com.cv.inv.entry.SaleEntry;
 import com.cv.inv.entry.StockReceive;
 import com.cv.inv.entry.Transfer;
 import com.cv.inv.service.LocationService;
@@ -203,8 +202,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     //Inventory Setup
     @Autowired
     private StockSetup stockSetup;
-    @Autowired
-    private SaleEntry saleEntry;
+
     @Autowired
     private PurchaseEntry purchaseEntry;
     @Autowired
@@ -372,10 +370,12 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                     case "Purchase":
                         purchaseBook.setName(panelName);
                         purchaseBook.setLoadingObserver(this);
+                        purchaseBook.setSourceAccId(sourceId);
                         return purchaseBook;
                     case "Sale":
                         saleBook.setName(panelName);
                         saleBook.setLoadingObserver(this);
+                        saleBook.setSourceAccId(sourceId);
                         return saleBook;
                     default:
                         return null;
@@ -408,10 +408,10 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                 }
             case "Inventory":
                 switch (panelName) {
-                    case "Sale Entry":
-                        saleEntry.setName(panelName);
-                        saleEntry.setLoadingObserver(this);
-                        return saleEntry;
+                    /*case "Sale Entry":
+                    saleEntry.setName(panelName);
+                    saleEntry.setLoadingObserver(this);
+                    return saleEntry;*/
                     case "Purchase Entry":
                         purchaseEntry.setName(panelName);
                         purchaseEntry.setLoadingObserver(this);
@@ -511,6 +511,10 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                         switch (ke.getKeyCode()) {
                             case KeyEvent.VK_F5:
                                 control.save();
+                                break;
+                            case KeyEvent.VK_F6:
+                                control.refresh();
+                                break;
                             case KeyEvent.VK_F7:
                                 control.print();
                                 break;
@@ -968,6 +972,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         toolBar = new javax.swing.JToolBar();
         btnSave = new javax.swing.JButton();
         btnPrint = new javax.swing.JButton();
+        btnRefresh = new javax.swing.JButton();
         btnDelete = new javax.swing.JButton();
         btnHistory = new javax.swing.JButton();
         btnClear = new javax.swing.JButton();
@@ -1040,6 +1045,10 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         });
         toolBar.add(btnPrint);
 
+        btnRefresh.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/refresh.png"))); // NOI18N
+        btnRefresh.setToolTipText("F7 - Refresh");
+        toolBar.add(btnRefresh);
+
         btnDelete.setFont(Global.lableFont);
         btnDelete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/delete.png"))); // NOI18N
         btnDelete.setToolTipText("F8 - Delete");
@@ -1064,7 +1073,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
 
         btnClear.setFont(Global.lableFont);
         btnClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/clean-code.png"))); // NOI18N
-        btnClear.setToolTipText("F10 - Clear");
+        btnClear.setToolTipText("F10 - Clear ");
         btnClear.setFocusable(false);
         btnClear.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1076,7 +1085,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         btnLogout.setFont(Global.lableFont);
         btnLogout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/logout.png"))); // NOI18N
         btnLogout.setToolTipText("Logout");
-        btnLogout.setFocusable(false);
         btnLogout.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnLogoutActionPerformed(evt);
@@ -1086,7 +1094,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
 
         lblNeworkImage.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/online-signal.png"))); // NOI18N
 
-        lblNeworkPing.setText("23ms");
+        lblNeworkPing.setText("2344ms");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -1237,6 +1245,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private javax.swing.JButton btnHistory;
     private javax.swing.JButton btnLogout;
     private javax.swing.JButton btnPrint;
+    private javax.swing.JButton btnRefresh;
     private javax.swing.JButton btnSave;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel lblCompanyName;
