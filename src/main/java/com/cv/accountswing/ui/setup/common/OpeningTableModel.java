@@ -137,10 +137,9 @@ public class OpeningTableModel extends AbstractTableModel {
             if (save != null) {
                 VCOAOpening saveOpening = listOpening.get(row);
                 saveOpening.setOpId(save.getOpId());
-                addNewRow();
                 parent.setRowSelectionInterval(row + 1, row + 1);
                 parent.setColumnSelectionInterval(6, 6);
-                JOptionPane.showMessageDialog(Global.parentForm, "Saved");
+                //JOptionPane.showMessageDialog(Global.parentForm, "Saved");
                 selectionObserver.selected("CAL-TOTAL", "-");
             }
         } catch (HeadlessException ex) {

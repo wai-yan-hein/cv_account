@@ -11,6 +11,7 @@ import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.Currency;
 import com.cv.accountswing.entity.CurrencyKey;
+import com.cv.accountswing.entity.view.VCOAOpening;
 import com.cv.accountswing.entity.view.VGl;
 import com.cv.accountswing.service.COAOpeningService;
 import com.cv.accountswing.service.CurrencyService;
@@ -51,6 +52,10 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
 
     @Autowired
     private COAOpeningTableModel cOAOpeningTableModel;
+    @Autowired
+    private OpeningTableModel openingTableModel;
+    @Autowired
+    private VOpeningService openingService;
     @Autowired
     private VGlService vGlService;
     @Autowired
@@ -104,9 +109,9 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
     }
 
     private void initTable() {
-        tblOpening.setModel(cOAOpeningTableModel);
-        cOAOpeningTableModel.setSelectionObserver(this);
-        cOAOpeningTableModel.setParent(tblOpening);
+        tblOpening.setModel(openingTableModel);
+        openingTableModel.setSelectionObserver(this);
+        openingTableModel.setParent(tblOpening);
         tblOpening.getTableHeader().setFont(Global.textFont);
         tblOpening.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblOpening.getColumnModel().getColumn(0).setPreferredWidth(10);
@@ -131,15 +136,14 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
         initializeParameter();
         loadingObserver.load(this.getName(), "Start");
         taskExecutor.execute(() -> {
-            cOAOpeningTableModel.clear();
-            List<VGl> listVGl = vGlService.search(stDate, endDate, "-", "-", "-", curId, "-", "-", depCode,
-                    "-", "-", "-", Global.compId.toString(), "OPENING", "-", "-", "-", "-", "-", "-", "-");
+            openingTableModel.clear();
+            /*List<VGl> listVGl = vGlService.search(stDate, endDate, "-", "-", "-", curId, "-", "-", depCode,
+            "-", "-", "-", Global.compId.toString(), "OPENING", "-", "-", "-", "-", "-", "-", "-");
             btnGen.setEnabled(listVGl.isEmpty());
-            cOAOpeningTableModel.setListVGl(listVGl);
-
-            /*List<VCOAOpening> listOpening = openingService.search(stDate, "-", "-", Global.compId.toString(), depCode,curId);
-            openingTableModel.setListOpening(listOpening);*/
-            btnGen.setEnabled(listVGl.isEmpty());
+            openingTableModel.setListVGl(listVGl);*/
+            List<VCOAOpening> listOpening = openingService.search(stDate, "-", "-", Global.compId.toString(), depCode, curId);
+            openingTableModel.setListOpening(listOpening);
+            btnGen.setEnabled(listOpening.isEmpty());
             //calTotalAmt(listVGl);
             //btnGen.setEnabled(false);
             loadingObserver.load(this.getName(), "Stop");
@@ -198,7 +202,7 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
                     String userId = Global.loginUser.getUserId().toString();
                     String coaGroup = Global.sysProperties.get("system.opening.coa.group");
                     if (coaGroup != null) {
-                        cOAOpeningService.GenerateZeroGL(Util1.toDateStr(txtDate.getDate(), "dd/MM/yyyy"),
+                        cOAOpeningService.generateZeroOpening(Util1.toDateStr(txtDate.getDate(), "dd/MM/yyyy"),
                                 userId, Global.compId.toString(), curId, depCode, coaGroup);
                         searchOpening();
                         btnGen.setEnabled(true);

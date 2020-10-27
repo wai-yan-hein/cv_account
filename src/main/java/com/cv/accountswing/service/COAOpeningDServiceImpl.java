@@ -25,7 +25,6 @@ public class COAOpeningDServiceImpl implements COAOpeningDService {
     @Autowired
     private COAOpeningDaoD dao;
 
-   
     @Override
     public AccOpeningD save(AccOpeningD aod) {
         return dao.save(aod);
@@ -93,5 +92,15 @@ public class COAOpeningDServiceImpl implements COAOpeningDService {
     public void genArAp(String compCode, String fromDate, String opDate, String tranDate,
             String coaCode, String currency, String dept, String cvId, String userId) throws Exception {
         dao.genArAp(compCode, fromDate, opDate, tranDate, coaCode, currency, dept, cvId, userId);
+    }
+
+    @Override
+    public void genArAp1(String compCode, String fromDate, String opDate, String tranDate, String coaCode, String currency, String dept, String cvId, String userId) throws Exception {
+        dao.genArAp1(compCode, fromDate, opDate, tranDate, coaCode, currency, dept, cvId, userId);
+    }
+
+    @Override
+    public void genTriBalance1(String compCode, String fromDate, String opDate, String tranDate, String coaCode, String currency, String dept, String cvId, String userId) throws Exception {
+        dao.genTriBalance1(compCode, fromDate, opDate, tranDate, coaCode, currency, dept, cvId, userId);
     }
 }

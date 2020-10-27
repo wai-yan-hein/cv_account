@@ -210,18 +210,21 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         initializeParameter();
         taskExecutor.execute(() -> {
             try {
-                coaOpDService.genArAp(Global.compId.toString(),
+                coaOpDService.genArAp1(Global.compId.toString(),
                         Util1.toDateStrMYSQL(stDate, "dd/MM/yyyy"), Global.finicialPeriodFrom,
                         Util1.toDateStrMYSQL(enDate, "dd/MM/yyyy"), "-",
                         currency, dept, cvId,
                         userId);
                 List<VApar> listApar = aParService.getApAr(userId,
                         Global.compId.toString());
-                aPARTableModel.setListAPAR(listApar);
-                calAPARTotalAmount(listApar);
+                if (!listApar.isEmpty()) {
+                    aPARTableModel.setListAPAR(listApar);
+                    calAPARTotalAmount(listApar);
+                }
                 loadingObserver.load(this.getName(), "Stop");
             } catch (Exception ex) {
                 LOGGER.error("SEARCH APAR -----" + ex.getMessage());
+                loadingObserver.load(this.getName(), "Stop");
             }
         });
 
@@ -234,7 +237,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         taskExecutor.execute(() -> {
             try {
                 LOGGER.info("START DATE :" + stDate + "---" + "END DATE :" + enDate);
-                coaOpDService.genTriBalance(Global.compId.toString(),
+                coaOpDService.genTriBalance1(Global.compId.toString(),
                         Util1.toDateStrMYSQL(stDate, "dd/MM/yyyy"),
                         Global.finicialPeriodFrom, Util1.toDateStrMYSQL(enDate, "dd/MM/yyyy"),
                         "-", currency, dept, cvId, userId);

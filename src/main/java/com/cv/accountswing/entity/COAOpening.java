@@ -47,7 +47,7 @@ public class COAOpening implements Serializable {
     private Date createdDate;
     @Column(name = "dept_code")
     private String depCode;
-    @Column(name = "trader_code")
+    @Column(name = "cv_id")
     private String traderCode;
 
     public Integer getOpId() {

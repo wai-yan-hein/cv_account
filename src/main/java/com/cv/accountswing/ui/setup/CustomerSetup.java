@@ -126,11 +126,12 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener, Pa
         sorter = new TableRowSorter(tblCustomer.getModel());
         swrf = new StartWithRowFilter(txtCusFilter);
         tblCustomer.setRowSorter(sorter);
+        searchCustomer();
 
     }
 
     private void searchCustomer() {
-        loadingObserver.load(this.getName(), "Stop");
+        loadingObserver.load(this.getName(), "Start");
         taskExecutor.execute(() -> {
             try {
                 List<Customer> listcustomer = customerService.search("-", "-", "-", "-", "-");
@@ -888,7 +889,7 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener, Pa
 
     @Override
     public void refresh() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        searchCustomer();
     }
 
 }

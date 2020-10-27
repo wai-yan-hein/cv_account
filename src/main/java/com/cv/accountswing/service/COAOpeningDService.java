@@ -31,6 +31,10 @@ public interface COAOpeningDService {
             String clDae, int level, String curr, String userId, String dept) throws Exception;
     public void genTriBalance(String compCode, String fromDate, String opDate, String tranDate, 
             String coaCode, String currency, String dept, String cvId, String userId) throws Exception;
+    public void genTriBalance1(String compCode, String fromDate, String opDate, String tranDate, 
+            String coaCode, String currency, String dept, String cvId, String userId) throws Exception;
     public void genArAp(String compCode, String fromDate, String opDate, String tranDate, 
+            String coaCode, String currency, String dept, String cvId, String userId) throws Exception;
+    public void genArAp1(String compCode, String fromDate, String opDate, String tranDate, 
             String coaCode, String currency, String dept, String cvId, String userId) throws Exception;
 }
