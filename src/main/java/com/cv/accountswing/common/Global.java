@@ -99,5 +99,7 @@ public class Global {
     public static final boolean useActiveMQ = false;
     //default currency
     public static Currency defalutCurrency;
+    //default department
+    public static Department defaultDepartment;
 
 }

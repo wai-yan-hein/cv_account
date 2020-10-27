@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
  * @author Lenovo
  */
 public class DepartmentAutoCompleter implements KeyListener {
-
+    
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(DepartmentAutoCompleter.class);
     private JTable table = new JTable();
     private JPopupMenu popup = new JPopupMenu();
@@ -57,21 +57,21 @@ public class DepartmentAutoCompleter implements KeyListener {
     private int x = 0;
     private boolean popupOpen = false;
     private SelectionObserver selectionObserver;
-
+    
     public void setSelectionObserver(SelectionObserver selectionObserver) {
         this.selectionObserver = selectionObserver;
     }
-
+    
     public DepartmentAutoCompleter() {
     }
-
+    
     public DepartmentAutoCompleter(JTextComponent comp, List<Department> list,
             AbstractCellEditor editor) {
         this.textComp = comp;
         this.editor = editor;
         textComp.putClientProperty(AUTOCOMPLETER, this);
         textComp.setFont(Global.textFont);
-
+        
         acTableModel = new DepartmentTableModel(list);
         table.setModel(acTableModel);
         table.setSize(50, 50);
@@ -82,7 +82,7 @@ public class DepartmentAutoCompleter implements KeyListener {
         sorter = new TableRowSorter(table.getModel());
         table.setRowSorter(sorter);
         JScrollPane scroll = new JScrollPane(table);
-
+        
         scroll.setBorder(null);
         table.setFocusable(false);
         table.getColumnModel().getColumn(0).setPreferredWidth(40);//Code
@@ -96,15 +96,15 @@ public class DepartmentAutoCompleter implements KeyListener {
                 }
             }
         });
-
+        
         scroll.getVerticalScrollBar().setFocusable(false);
         scroll.getHorizontalScrollBar().setFocusable(false);
-
+        
         popup.setBorder(BorderFactory.createLineBorder(Color.black));
         popup.setPopupSize(600, 300);
-
+        
         popup.add(scroll);
-
+        
         if (textComp instanceof JTextField) {
             textComp.registerKeyboardAction(showAction, KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0),
                     JComponent.WHEN_FOCUSED);
@@ -114,28 +114,30 @@ public class DepartmentAutoCompleter implements KeyListener {
                     popupOpen = true;
                     showPopup();
                 }
-
+                
             });
             textComp.getDocument().addDocumentListener(documentListener);
         }
-
+        
         textComp.registerKeyboardAction(upAction, KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0),
                 JComponent.WHEN_FOCUSED);
         textComp.registerKeyboardAction(hidePopupAction, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_FOCUSED);
-
+        textComp.registerKeyboardAction(unFoucsTable, KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0),
+                JComponent.WHEN_FOCUSED);
+        
         popup.addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
             }
-
+            
             @Override
             public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
                 textComp.unregisterKeyboardAction(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
                 popupOpen = false;
-
+                
             }
-
+            
             @Override
             public void popupMenuCanceled(PopupMenuEvent e) {
                 if (!popupOpen) {
@@ -145,14 +147,14 @@ public class DepartmentAutoCompleter implements KeyListener {
                 }
             }
         });
-
+        
         table.setRequestFocusEnabled(false);
-
+        
         if (list.size() > 0) {
             table.setRowSelectionInterval(0, 0);
         }
     }
-
+    
     public void mouseSelect() {
         if (table.getSelectedRow() != -1) {
             department = acTableModel.getDepatment(table.convertRowIndexToModel(
@@ -164,16 +166,16 @@ public class DepartmentAutoCompleter implements KeyListener {
                 }
             }
         }
-
+        
         popup.setVisible(false);
         popupOpen = false;
         if (editor != null) {
             editor.stopCellEditing();
-
+            
         }
-
+        
     }
-
+    
     private Action acceptAction = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -202,7 +204,7 @@ public class DepartmentAutoCompleter implements KeyListener {
                 showPopup();
             }
         }
-
+        
         @Override
         public void removeUpdate(DocumentEvent e) {
             if (editor != null) {
@@ -210,17 +212,17 @@ public class DepartmentAutoCompleter implements KeyListener {
                 showPopup();
             }
         }
-
+        
         @Override
         public void changedUpdate(DocumentEvent e) {
         }
     };
-
+    
     public void closePopup() {
         popup.setVisible(false);
         popupOpen = false;
     }
-
+    
     public void showPopup() {
         if (popupOpen) {
             if (!popup.isVisible()) {
@@ -242,7 +244,7 @@ public class DepartmentAutoCompleter implements KeyListener {
                     popup.setVisible(false);
                     popupOpen = false;
                 }
-
+                
             }
         }
         textComp.requestFocus();
@@ -287,18 +289,25 @@ public class DepartmentAutoCompleter implements KeyListener {
             }
         }
     };
-
+    Action unFoucsTable = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            log.info("UnFoucs table...");
+            table.requestFocus(false);
+        }
+    };
+    
     protected void selectNextPossibleValue() {
         int si = table.getSelectedRow();
-
+        
         if (si < table.getRowCount() - 1) {
             try {
                 table.setRowSelectionInterval(si + 1, si + 1);
             } catch (Exception ex) {
-
+                
             }
         }
-
+        
         Rectangle rect = table.getCellRect(table.getSelectedRow(), 0, true);
         table.scrollRectToVisible(rect);
     }
@@ -309,23 +318,23 @@ public class DepartmentAutoCompleter implements KeyListener {
      */
     protected void selectPreviousPossibleValue() {
         int si = table.getSelectedRow();
-
+        
         if (si > 0) {
             try {
                 table.setRowSelectionInterval(si - 1, si - 1);
             } catch (Exception ex) {
-
+                
             }
         }
-
+        
         Rectangle rect = table.getCellRect(table.getSelectedRow(), 0, true);
         table.scrollRectToVisible(rect);
     }
-
+    
     public Department getDepartment() {
         return department;
     }
-
+    
     public void setDepartment(Department department) {
         this.department = department;
         this.textComp.setText(this.department.getDeptName());
@@ -355,7 +364,7 @@ public class DepartmentAutoCompleter implements KeyListener {
     @Override
     public void keyReleased(KeyEvent e) {
         String filter = textComp.getText();
-
+        
         if (filter.length() == 0) {
             sorter.setRowFilter(null);
         } else {
@@ -391,13 +400,13 @@ public class DepartmentAutoCompleter implements KeyListener {
              * textComp.getText().toUpperCase())) { return true; }
              }
              */
-
+            
             String tmp1 = entry.getStringValue(0).toUpperCase();
             String tmp2 = entry.getStringValue(1).toUpperCase();
             String tmp3 = entry.getStringValue(3).toUpperCase();
             String tmp4 = entry.getStringValue(4).toUpperCase();
             String text = textComp.getText().toUpperCase();
-
+            
             if (tmp1.startsWith(text) || tmp2.startsWith(text) || tmp3.startsWith(text) || tmp4.startsWith(text)) {
                 return true;
             } else {

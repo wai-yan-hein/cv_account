@@ -12,7 +12,9 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.io.File;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -221,11 +223,11 @@ public class Util1 {
 
         try {
             date = formatter.parse(objDate.toString());
-        } catch (Exception ex) {
+        } catch (ParseException ex) {
             try {
                 formatter = new SimpleDateFormat("yyyy-MM-dd");
                 date = formatter.parse(objDate.toString());
-            } catch (Exception ex1) {
+            } catch (ParseException ex1) {
                 logger.info("toDateStr Error : " + ex1.getMessage());
             }
         }
@@ -636,7 +638,7 @@ public class Util1 {
 
         try {
             computerName = InetAddress.getLocalHost().getHostName();
-        } catch (Exception e) {
+        } catch (UnknownHostException e) {
             logger.info("getComputerName : " + e.toString());
         }
 
@@ -648,11 +650,19 @@ public class Util1 {
 
         try {
             iPAddress = InetAddress.getLocalHost().getHostAddress();
-        } catch (Exception e) {
+        } catch (UnknownHostException e) {
             logger.info("getIPAddress : " + e.toString());
         }
 
         return iPAddress;
+    }
+
+    public static String toFormatPattern(Double value) {
+        final String pattern = "#,##0.00;(#,##0.00)";
+        DecimalFormat df = (DecimalFormat) DecimalFormat.getInstance();
+        df.applyPattern(pattern);
+        return df.format(value);
+
     }
 
 }

@@ -80,6 +80,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import javax.swing.BorderFactory;
@@ -98,14 +99,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Component;
 
 /**
  *
  * @author winswe
  */
-
-
 @Component
 public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadData,
         SelectionObserver, LoadingObserver, KeyListener, NetworkObserver {
@@ -243,6 +244,8 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     @Autowired
     private SystemPropertyService systemPropertyService;
     private PanelControl control;
+    @Autowired
+    private ThreadPoolTaskScheduler scheduler;
 
     public PanelControl getControl() {
         return control;
@@ -266,12 +269,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         initToolBar();
         this.context = context;
 
-    }
-
-    public void startNetworkDectector() {
-        NetworkDetector detector = new NetworkDetector();
-        detector.setNetworkObserver(this);
-        detector.start();
     }
 
     private void initToolBar() {
@@ -467,7 +464,8 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                         systemPropertySetup.setLoadingObserver(this);
                         return systemPropertySetup;
                     case "Company":
-                        company.initTable();
+                        company.setName(panelName);
+                        company.setLoadingObserver(this);
                         return company;
                     case "User Setup":
                         user.setName(panelName);
@@ -565,7 +563,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         titlePanel.setOpaque(false);
         //loading
         JLabel loading = new JLabel();
-        ImageIcon icon = new ImageIcon(getClass().getResource("/images/loading_tab_20.gif"));
+        ImageIcon icon = new ImageIcon(this.getClass().getResource("/images/loading_tab.gif"));
         loading.setIcon(icon);
         loading.setVisible(false);
         titlePanel.add(loading);
@@ -686,6 +684,9 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                 key.setCode(cuId);
                 key.setCompCode(Global.compId);
                 Global.defalutCurrency = currencyService.findById(key);
+                //Default department
+                String depId = Global.sysProperties.get("system.default.department");
+                Global.defaultDepartment = departmentService.findById(depId);
                 getMachinceInfo();
             } catch (Exception e) {
                 LOGGER.error("Initialize Data :" + e.getMessage());
@@ -953,8 +954,10 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
          });*/
     }
 
-    public void autoSyncStart() {
-        //executor.scheduleAtFixedRate(periodicTask, 0, 3, TimeUnit.MINUTES);
+    public void startNetworkDetector() {
+        NetworkDetector detector = new NetworkDetector();
+        detector.setNetworkObserver(this);
+        scheduler.scheduleAtFixedRate(detector, Duration.ofSeconds(5));
     }
 
     private void addMargin() {

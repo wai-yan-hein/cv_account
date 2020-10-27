@@ -164,17 +164,17 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
         btnGen.setEnabled(false);
     }
 
-    private void calTotalAmt(List<VGl> listVGl) {
+    private void calTotalAmt(List<VCOAOpening> listVGl) {
         double drAmt = 0.0;
         double crAmt = 0.0;
-        for (VGl vgl : listVGl) {
+        for (VCOAOpening vgl : listVGl) {
             drAmt += Util1.getDouble(vgl.getDrAmt());
             crAmt += Util1.getDouble(vgl.getCrAmt());
         }
         txtFCrAmt.setValue(crAmt);
         txtFDrAmt.setValue(drAmt);
         if (!listVGl.isEmpty()) {
-            txtDisplayCur.setText(listVGl.get(0).getFromCurId());
+            txtDisplayCur.setText(listVGl.get(0).getCurCode());
         }
     }
 
@@ -493,7 +493,7 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
                 searchOpening();
                 break;
             case "CAL-TOTAL":
-                calTotalAmt(cOAOpeningTableModel.getListVGl());
+                calTotalAmt(openingTableModel.getListOpening());
                 break;
         }
 

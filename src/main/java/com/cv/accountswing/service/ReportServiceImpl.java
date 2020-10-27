@@ -54,8 +54,8 @@ public class ReportServiceImpl implements ReportService {
 
         from = Util1.toDateStrMYSQL(from, "dd/MM/yyyy");
         to = Util1.toDateStrMYSQL(to, "dd/MM/yyyy");
-        String tmpFrom = Util1.addDateTo(Util1.toDateStr(from, "yyyy-MM-dd", "dd/MM/yyyy"), -1);
-
+        String tmpFrom = Util1.addDateTo(from, -1);
+        tmpFrom = Util1.toDateStrMYSQL(tmpFrom, "dd/MM/yyyy");
         //Sales Income
         for (String tmp : process) {
             switch (tmp) {
