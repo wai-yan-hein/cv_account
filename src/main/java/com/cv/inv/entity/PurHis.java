@@ -251,7 +251,7 @@ public class PurHis implements java.io.Serializable {
         this.session = session;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumns({
         @JoinColumn(name = "cur_code"),
         @JoinColumn(name = "comp_code")
