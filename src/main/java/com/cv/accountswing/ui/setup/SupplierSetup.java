@@ -5,10 +5,10 @@
  */
 package com.cv.accountswing.ui.setup;
 
+import com.cv.accountswing.common.FilterObserver;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
-import com.cv.accountswing.common.StartWithRowFilter;
 import com.cv.accountswing.entity.ChartOfAccount;
 import com.cv.accountswing.entity.Region;
 import com.cv.accountswing.entity.Supplier;
@@ -33,6 +33,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.RowFilter;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
@@ -48,12 +49,11 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-public class SupplierSetup extends javax.swing.JPanel implements KeyListener, PanelControl {
+public class SupplierSetup extends javax.swing.JPanel implements KeyListener, PanelControl,FilterObserver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Supplier.class);
     private int selectRow = -1;
     private TableRowSorter<TableModel> sorter;
-    private StartWithRowFilter swrf;
     private Supplier customer;
     @Autowired
     private SupplierTabelModel supplierTabelModel;
@@ -122,7 +122,6 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener, Pa
 
             }
         });
-        swrf = new StartWithRowFilter(txtCusFilter);
         sorter = new TableRowSorter(tblCustomer.getModel());
         tblCustomer.setRowSorter(sorter);
         searchSupplier();
@@ -217,7 +216,6 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener, Pa
         //txtCreditLimit.setText(null);
         lblStatus.setText("NEW");
         txtCusName.requestFocus();
-        txtCusFilter.setText(null);
         cboAccount.setSelectedItem(null);
     }
 
@@ -240,6 +238,9 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener, Pa
         btnClear.addKeyListener(this);
         tblCustomer.addKeyListener(this);
 
+    }
+    private void setTableFilter(String filter) {
+        sorter.setRowFilter(RowFilter.regexFilter(filter));
     }
 
     /**
@@ -276,7 +277,6 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener, Pa
         cboPriceType = new javax.swing.JComboBox<>();
         jScrollPane2 = new javax.swing.JScrollPane();
         tblCustomer = new javax.swing.JTable();
-        txtCusFilter = new javax.swing.JTextField();
 
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentShown(java.awt.event.ComponentEvent evt) {
@@ -461,7 +461,7 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener, Pa
                     .addComponent(btnClear)
                     .addComponent(btnSave)
                     .addComponent(lblStatus))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(155, Short.MAX_VALUE))
         );
 
         panelEntryLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {txtCusAddress, txtCusCode, txtCusEmail, txtCusName, txtCusPhone, txtRemark});
@@ -487,22 +487,13 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener, Pa
         });
         jScrollPane2.setViewportView(tblCustomer);
 
-        txtCusFilter.setFont(Global.textFont);
-        txtCusFilter.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                txtCusFilterKeyReleased(evt);
-            }
-        });
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 451, Short.MAX_VALUE)
-                    .addComponent(txtCusFilter))
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 451, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(panelEntry, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
@@ -513,10 +504,7 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener, Pa
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(panelEntry, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(txtCusFilter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 439, Short.MAX_VALUE)))
+                    .addComponent(jScrollPane2))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -536,16 +524,6 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener, Pa
         clear();
     }//GEN-LAST:event_btnClearActionPerformed
 
-    private void txtCusFilterKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCusFilterKeyReleased
-        // TODO add your handling code here:
-
-        if (txtCusFilter.getText().length() == 0) {
-            sorter.setRowFilter(null);
-        } else {
-            sorter.setRowFilter(swrf);
-        }
-    }//GEN-LAST:event_txtCusFilterKeyReleased
-
     private void tblCustomerComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_tblCustomerComponentShown
         // TODO add your handling code here:
     }//GEN-LAST:event_tblCustomerComponentShown
@@ -557,6 +535,7 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener, Pa
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
         mainFrame.setControl(this);
+        mainFrame.setFilterObserver(this);
         if (!isShown) {
             initMain();
         }
@@ -589,7 +568,6 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener, Pa
     private javax.swing.JTextField txtCusAddress;
     private javax.swing.JTextField txtCusCode;
     private javax.swing.JTextField txtCusEmail;
-    private javax.swing.JTextField txtCusFilter;
     private javax.swing.JTextField txtCusName;
     private javax.swing.JTextField txtCusPhone;
     private javax.swing.JTextField txtRemark;
@@ -822,6 +800,11 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener, Pa
     @Override
     public void refresh() {
         searchSupplier();
+    }
+
+    @Override
+    public void sendFilter(String filter) {
+        setTableFilter(filter);
     }
 
 }
