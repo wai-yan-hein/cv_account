@@ -164,7 +164,7 @@ public class Journal extends javax.swing.JPanel implements KeyListener, Selectio
     });
     }*/
     private void openJournalEntryDialog(String gvId) {
-        journalEntryDialog.setIconImage(new ImageIcon(this.getClass().getResource("/images/voucher.png")).getImage());
+        //journalEntryDialog.setIconImage(new ImageIcon(this.getClass().getResource("/images/voucher.png")).getImage());
         journalEntryDialog.setSelectionObserver(this);
         journalEntryDialog.clear();
         journalEntryDialog.setGlVouId(gvId);

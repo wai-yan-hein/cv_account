@@ -33,6 +33,7 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.RowFilter;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
@@ -124,7 +125,6 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener, Pa
         });
         swrf = new StartWithRowFilter(txtCusFilter);
         sorter = new TableRowSorter(tblCustomer.getModel());
-        swrf = new StartWithRowFilter(txtCusFilter);
         tblCustomer.setRowSorter(sorter);
         searchCustomer();
 
@@ -552,7 +552,8 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener, Pa
         if (txtCusFilter.getText().length() == 0) {
             sorter.setRowFilter(null);
         } else {
-            sorter.setRowFilter(swrf);
+            sorter.setRowFilter(RowFilter.regexFilter(txtCusFilter.getText()));
+            //sorter.setRowFilter(swrf);
         }
     }//GEN-LAST:event_txtCusFilterKeyReleased
 

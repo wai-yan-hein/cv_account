@@ -5,6 +5,7 @@
  */
 package com.cv.accountswing.ui.setup;
 
+import com.cv.accountswing.common.FilterObserver;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
@@ -12,16 +13,13 @@ import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.Currency;
 import com.cv.accountswing.entity.CurrencyKey;
 import com.cv.accountswing.entity.view.VCOAOpening;
-import com.cv.accountswing.entity.view.VGl;
 import com.cv.accountswing.service.COAOpeningService;
 import com.cv.accountswing.service.CurrencyService;
-import com.cv.accountswing.service.VGlService;
 import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.editor.CurrencyAutoCompleter;
 import com.cv.accountswing.ui.editor.DepartmentAutoCompleter;
-import com.cv.accountswing.ui.setup.common.COAOpeningTableModel;
 import com.cv.accountswing.util.Util1;
 import com.toedter.calendar.JTextFieldDateEditor;
 import java.awt.event.KeyEvent;
@@ -40,24 +38,24 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
 import com.cv.accountswing.service.VOpeningService;
 import com.cv.accountswing.ui.setup.common.OpeningTableModel;
+import javax.swing.RowFilter;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 /**
  *
  * @author Lenovo
  */
 @Component
-public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObserver, KeyListener, PanelControl {
+public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObserver,
+        KeyListener, PanelControl, FilterObserver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(COAOpeningSetup.class);
 
     @Autowired
-    private COAOpeningTableModel cOAOpeningTableModel;
-    @Autowired
     private OpeningTableModel openingTableModel;
     @Autowired
     private VOpeningService openingService;
-    @Autowired
-    private VGlService vGlService;
     @Autowired
     private COAOpeningService cOAOpeningService;
     @Autowired
@@ -72,6 +70,7 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
     private String endDate;
     private String curId;
     private String depCode;
+    private TableRowSorter<TableModel> sorter;
 
     public void setIsShown(boolean isShown) {
         this.isShown = isShown;
@@ -129,6 +128,8 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
         tblOpening.setCellSelectionEnabled(true);
         tblOpening.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                 .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
+        sorter = new TableRowSorter(tblOpening.getModel());
+        tblOpening.setRowSorter(sorter);
 
     }
 
@@ -228,6 +229,10 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
         btnGen.addKeyListener(this);
         tblOpening.addKeyListener(this);
 
+    }
+
+    private void setTableFilter(String text) {
+        sorter.setRowFilter(RowFilter.regexFilter(text));
     }
 
     /**
@@ -438,6 +443,7 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
         mainFrame.setControl(this);
+        mainFrame.setFilterObserver(this);
         if (!isShown) {
             initMain();
         }
@@ -605,5 +611,10 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
     @Override
     public void refresh() {
         searchOpening();
+    }
+
+    @Override
+    public void sendFilter(String filter) {
+        setTableFilter(filter);
     }
 }

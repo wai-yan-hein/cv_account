@@ -123,7 +123,7 @@ public class DepartmentAutoCompleter implements KeyListener {
                 JComponent.WHEN_FOCUSED);
         textComp.registerKeyboardAction(hidePopupAction, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_FOCUSED);
-        textComp.registerKeyboardAction(unFoucsTable, KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0),
+        textComp.registerKeyboardAction(unFoucsTable, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0),
                 JComponent.WHEN_FOCUSED);
         
         popup.addPopupMenuListener(new PopupMenuListener() {

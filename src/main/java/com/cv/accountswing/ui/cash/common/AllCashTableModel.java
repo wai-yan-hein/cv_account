@@ -363,6 +363,7 @@ public class AllCashTableModel extends AbstractTableModel {
                 int delete = glService.delete(vgl.getGlId());
                 if (delete == 1) {
                     listVGl.remove(row);
+                    trader = traderService.findById(vgl.getTraderId().intValue());
                     sendDeletePaymentToInv(trader, vgl.getGlId());
                     fireTableRowsDeleted(0, listVGl.size());
                 }

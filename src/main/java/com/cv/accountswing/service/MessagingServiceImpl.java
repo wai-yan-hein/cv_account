@@ -89,15 +89,12 @@ public class MessagingServiceImpl implements MessagingService {
             String inventoryQueueName = environment.getRequiredProperty("activemq.inv.queue.name");
             jmsTemplate.setDefaultDestinationName(inventoryQueueName);
 
-            jmsTemplate.send(new MessageCreator() {
-                @Override
-                public Message createMessage(Session session) throws JMSException {
-                    MapMessage mm = session.createMapMessage();
-
-                    mm.setString("entity", "DELETE-PAYMENT");
-                    mm.setLong("glId", glId);
-                    return mm;
-                }
+            jmsTemplate.send((Session session) -> {
+                MapMessage mm = session.createMapMessage();
+                
+                mm.setString("entity", "DELETE-PAYMENT");
+                mm.setLong("glId", glId);
+                return mm;
             });
         }
     }

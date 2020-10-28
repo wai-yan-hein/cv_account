@@ -15,8 +15,9 @@ import javax.persistence.Table;
  * @author winswe
  */
 @Entity
-@Table(name="v_apar")
-public class VApar implements java.io.Serializable{
+@Table(name = "v_apar")
+public class VApar implements java.io.Serializable {
+
     private VAparKey key;
     private String traderId;
     private String traderName;
@@ -24,6 +25,7 @@ public class VApar implements java.io.Serializable{
     private Double drAmt;
     private Double crAmt;
     private Double closing;
+    private String accountCode;
 
     @EmbeddedId
     public VAparKey getKey() {
@@ -34,7 +36,7 @@ public class VApar implements java.io.Serializable{
         this.key = key;
     }
 
-    @Column(name="trader_id")
+    @Column(name = "trader_id")
     public String getTraderId() {
         return traderId;
     }
@@ -43,7 +45,7 @@ public class VApar implements java.io.Serializable{
         this.traderId = traderId;
     }
 
-    @Column(name="trader_name")
+    @Column(name = "trader_name")
     public String getTraderName() {
         return traderName;
     }
@@ -52,7 +54,7 @@ public class VApar implements java.io.Serializable{
         this.traderName = traderName;
     }
 
-    @Column(name="opening")
+    @Column(name = "opening")
     public Double getOpening() {
         return opening;
     }
@@ -61,7 +63,7 @@ public class VApar implements java.io.Serializable{
         this.opening = opening;
     }
 
-    @Column(name="dr_amt")
+    @Column(name = "dr_amt")
     public Double getDrAmt() {
         return drAmt;
     }
@@ -70,7 +72,7 @@ public class VApar implements java.io.Serializable{
         this.drAmt = drAmt;
     }
 
-    @Column(name="cr_amt")
+    @Column(name = "cr_amt")
     public Double getCrAmt() {
         return crAmt;
     }
@@ -79,7 +81,7 @@ public class VApar implements java.io.Serializable{
         this.crAmt = crAmt;
     }
 
-    @Column(name="closing")
+    @Column(name = "closing")
     public Double getClosing() {
         return closing;
     }
@@ -87,4 +89,14 @@ public class VApar implements java.io.Serializable{
     public void setClosing(Double closing) {
         this.closing = closing;
     }
+
+    @Column(name = "account_code")
+    public String getAccountCode() {
+        return accountCode;
+    }
+
+    public void setAccountCode(String accountCode) {
+        this.accountCode = accountCode;
+    }
+
 }

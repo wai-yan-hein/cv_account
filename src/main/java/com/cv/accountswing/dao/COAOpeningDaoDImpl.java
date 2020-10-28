@@ -527,11 +527,12 @@ public class COAOpeningDaoDImpl extends AbstractDao<Long, AccOpeningD> implement
         String strSql = "insert into tmp_op_cl(coa_id, curr_id, user_id, opening, dr_amt, cr_amt) \n"
                 + "select coa_code, curr_id, '" + userId + "', sum(balance), 0, 0 \n"
                 + "from (\n"
-                + "select tof.coa_code, tof.curr_id, ifnull(gl.dr_amt,0)-ifnull(gl.cr_amt,0) balance,\n"
-                + "ifnull(gl.dr_amt,0) dr_amt, ifnull(gl.cr_amt,0) cr_amt,tof.cv_id\n"
-                + "from tmp_op_filter tof, gl\n"
-                + "where tof.op_tran_id_d = gl.gl_id and tof.comp_code = gl.comp_id and tof.curr_id = gl.from_cur_id and \n"
-                + "tof.coa_code = gl.source_ac_id and tof.op_date = gl.gl_date and tof.user_id = '" + userId + "' and (gl.dept_id = '" + dept + "' or '-' = '" + dept + "')\n"
+                + "select tof.coa_code, tof.curr_id, ifnull(coa.dr_amt,0)-ifnull(coa.cr_amt,0) balance,\n"
+                + "ifnull(coa.dr_amt,0) dr_amt, ifnull(coa.cr_amt,0) cr_amt,tof.cv_id\n"
+                + "from tmp_op_filter tof, coa_opening coa\n"
+                + "where tof.op_tran_id_d = coa.coa_op_id and tof.comp_code = coa.comp_id and tof.curr_id = coa.cur_code and \n"
+                + "tof.coa_code = coa.source_acc_id and tof.op_date = coa.op_date\n"
+                + " and tof.user_id = '" + userId + "' and (coa.dept_code = '" + dept + "' or '-' = '" + dept + "')"
                 + "union all\n"
                 + "select tof.coa_code, tof.curr_id, get_dr_cr_amt(gl.source_ac_id, gl.account_id, tof.coa_code, ifnull(gl.dr_amt,0), ifnull(gl.cr_amt,0), 'DR')-\n"
                 + "get_dr_cr_amt(gl.source_ac_id, gl.account_id, tof.coa_code, ifnull(gl.dr_amt,0), ifnull(gl.cr_amt,0), 'CR') balance, \n"
@@ -541,7 +542,7 @@ public class COAOpeningDaoDImpl extends AbstractDao<Long, AccOpeningD> implement
                 + "and (tof.coa_code = gl.source_ac_id or tof.coa_code = gl.account_id) "
                 + "and ifnull(gl.tran_source,'-') <> 'OPENING' and \n"
                 + "tof.curr_id = gl.from_cur_id and gl.gl_date >= '" + opDate + "' and gl.gl_date < '"
-                + Util1.toDateStrMYSQL(clDate, "dd/MM/yyyy")
+                + opDate
                 + "' and tof.user_id = '" + userId + "' and (gl.dept_id = '" + dept + "' or '-' = '" + dept + "')) a \n"
                 + "group by coa_code, curr_id";
         execSQL(strSql);
