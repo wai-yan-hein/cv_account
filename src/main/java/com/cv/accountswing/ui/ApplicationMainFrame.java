@@ -61,6 +61,7 @@ import com.cv.inv.service.SaleManService;
 import com.cv.inv.service.VouStatusService;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.MachineInfo;
+import com.cv.inv.entry.SaleEntry;
 import com.cv.inv.service.ChargeTypeService;
 import com.cv.inv.service.MachineInfoService;
 import com.cv.inv.service.RelationService;
@@ -219,6 +220,8 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private Issue issue;
     @Autowired
     private StockReceive stockReceive;
+    @Autowired
+    private SaleEntry saleEntry;
 
     @Autowired
     private LocationService locationService;
@@ -408,10 +411,10 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                 }
             case "Inventory":
                 switch (panelName) {
-                    /*case "Sale Entry":
-                    saleEntry.setName(panelName);
-                    saleEntry.setLoadingObserver(this);
-                    return saleEntry;*/
+                    case "Sale Entry":
+                        saleEntry.setName(panelName);
+                        saleEntry.setLoadingObserver(this);
+                        return saleEntry;
                     case "Purchase Entry":
                         purchaseEntry.setName(panelName);
                         purchaseEntry.setLoadingObserver(this);

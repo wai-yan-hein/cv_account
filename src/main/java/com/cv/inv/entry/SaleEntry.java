@@ -162,14 +162,14 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
         tblSale.getTableHeader().setPreferredSize(new Dimension(30, 30));
         tblSale.setCellSelectionEnabled(true);
         tblSale.getColumnModel().getColumn(0).setPreferredWidth(50);//Code
-        tblSale.getColumnModel().getColumn(1).setPreferredWidth(380);//Name
-        tblSale.getColumnModel().getColumn(2).setPreferredWidth(65);//Dep
-        tblSale.getColumnModel().getColumn(3).setPreferredWidth(65);//Location
+        tblSale.getColumnModel().getColumn(1).setPreferredWidth(450);//Name
+        tblSale.getColumnModel().getColumn(2).setPreferredWidth(60);//Dep
+        tblSale.getColumnModel().getColumn(3).setPreferredWidth(60);//Location
         tblSale.getColumnModel().getColumn(4).setPreferredWidth(1);//Qty
         tblSale.getColumnModel().getColumn(5).setPreferredWidth(1);//Std-Wt
         tblSale.getColumnModel().getColumn(6).setPreferredWidth(1);//Unit
-        tblSale.getColumnModel().getColumn(7).setPreferredWidth(50);//Sale Price
-        tblSale.getColumnModel().getColumn(8).setPreferredWidth(50);//Amount
+        tblSale.getColumnModel().getColumn(7).setPreferredWidth(40);//Sale Price
+        tblSale.getColumnModel().getColumn(8).setPreferredWidth(40);//Amount
 
         addSaleTableModelListener();
 
