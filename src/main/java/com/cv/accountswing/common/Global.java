@@ -96,8 +96,10 @@ public class Global {
     public static String finicialPeriodTo;
     public static String dateFormat;
     //active messaging on / off
-    public static final boolean useActiveMQ = false;
+    public static  boolean useActiveMQ = true;
     //default currency
     public static Currency defalutCurrency;
+    //default department
+    public static Department defaultDepartment;
 
 }

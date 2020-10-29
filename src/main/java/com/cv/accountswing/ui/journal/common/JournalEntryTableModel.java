@@ -5,6 +5,7 @@
  */
 package com.cv.accountswing.ui.journal.common;
 
+import com.cv.accountswing.common.Global;
 import com.cv.accountswing.entity.ChartOfAccount;
 import com.cv.accountswing.entity.Currency;
 import com.cv.accountswing.entity.Department;
@@ -15,6 +16,7 @@ import com.cv.accountswing.util.Util1;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JFormattedTextField;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import org.slf4j.Logger;
@@ -173,7 +175,9 @@ public class JournalEntryTableModel extends AbstractTableModel {
                 }
                 break;
         }
-        addEmptyRow();
+        if (isValidEntry(gv, row, column)) {
+            addEmptyRow();
+        }
         calTotalAmt();
         parent.requestFocusInWindow();
     }
@@ -195,7 +199,6 @@ public class JournalEntryTableModel extends AbstractTableModel {
     }
 
     public List<VGl> getListGV() {
-        listGV.remove(listGV.size() - 1);
         return listGV;
     }
 
@@ -277,6 +280,19 @@ public class JournalEntryTableModel extends AbstractTableModel {
             }
         }
 
+    }
+
+    private boolean isValidEntry(VGl vgl, int row, int column) {
+        boolean status = true;
+        if (vgl.getSourceAcId() == null) {
+            status = false;
+            if (column > 3) {
+                JOptionPane.showMessageDialog(Global.parentForm, "Account Missing.");
+                parent.setRowSelectionInterval(row, row);
+                parent.setColumnSelectionInterval(3, 3);
+            }
+        }
+        return status;
     }
 
     public void clear() {

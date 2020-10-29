@@ -55,6 +55,7 @@ public class Company extends javax.swing.JPanel implements KeyListener, PanelCon
     @Autowired
     private ApplicationMainFrame mainFrame;
     private LoadingObserver loadingObserver;
+    private boolean isShown = false;
 
     public void setLoadingObserver(LoadingObserver loadingObserver) {
         this.loadingObserver = loadingObserver;
@@ -67,9 +68,14 @@ public class Company extends javax.swing.JPanel implements KeyListener, PanelCon
         initComponents();
     }
 
-    public void initTable() {
+    public void initMain() {
         initCombo();
         initKeyListener();
+        initTable();
+        isShown = true;
+    }
+
+    private void initTable() {
         tblCompany.setModel(companyTableModel);
         tblCompany.getTableHeader().setFont(Global.textFont);
         tblCompany.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -85,6 +91,7 @@ public class Company extends javax.swing.JPanel implements KeyListener, PanelCon
         });
         searchCompany();
         txtCode.requestFocus();
+
     }
 
     private void searchCompany() {
@@ -504,6 +511,9 @@ public class Company extends javax.swing.JPanel implements KeyListener, PanelCon
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
         mainFrame.setControl(this);
+        if (!isShown) {
+            initMain();
+        }
         txtCode.requestFocus();
     }//GEN-LAST:event_formComponentShown
 

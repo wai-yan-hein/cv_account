@@ -49,10 +49,10 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class JournalEntryDialog extends javax.swing.JDialog implements KeyListener {
-
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(JournalEntryDialog.class);
     private Gson gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
-
+    
     @Autowired
     private JournalEntryTableModel journalTablModel;
     @Autowired
@@ -70,11 +70,11 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
     private String glVouId = null;
     private CurrencyAutoCompleter autoCompleter;
     private boolean isShown = false;
-
+    
     public void setGlVouId(String glVouId) {
         this.glVouId = glVouId;
     }
-
+    
     public void setSelectionObserver(SelectionObserver selectionObserver) {
         this.selectionObserver = selectionObserver;
     }
@@ -87,7 +87,7 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
         initComponents();
         initKeyListener();
     }
-
+    
     private void initMain() {
         initCombo();
         initTable();
@@ -95,13 +95,13 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
             searchJournalByVouId();
         }
     }
-
+    
     private void initCombo() {
         autoCompleter = new CurrencyAutoCompleter(txtCurrency, Global.listCurrency, null);
         autoCompleter.setCurrency(Global.defalutCurrency);
-
+        
     }
-
+    
     private void initTable() {
         txtDate.setDate(Util1.getTodayDate());
         tblJournal.setModel(journalTablModel);
@@ -111,7 +111,7 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
         journalTablModel.setTtlDrAmt(txtFDrAmt);
         tblJournal.getTableHeader().setFont(Global.lableFont);
         tblJournal.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
+        
         tblJournal.getColumnModel().getColumn(0).setCellEditor(new DepartmentCellEditor());
         tblJournal.getColumnModel().getColumn(1).setCellEditor(new AutoClearEditor());
         tblJournal.getColumnModel().getColumn(2).setCellEditor(new TraderCellEditor());
@@ -133,7 +133,7 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
         tblJournal.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                 .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
     }
-
+    
     private void searchJournalByVouId() {
         List<VGl> listVGl = vGlService.search("-", "-", "-", "-", "-", "-",
                 "-", "-", "-", "-", "-", "-", "-", "GV", glVouId, "-", "-",
@@ -147,16 +147,16 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
             txtCurrency.setText(vgl.getfCurName());
             journalTablModel.addEmptyRow();
         }
-
+        
         tblJournal.requestFocusInWindow();
-
+        
     }
-
+    
     private void saveGeneralVoucher() {
         String vouNo = Util1.isNull(txtVouNo.getText(), "-");
         String strDate = Util1.toDateStr(txtDate.getDate(), "dd/MM/yyyy");
         String refrence = txtRefrence.getText();
-
+        
         if (isValidEntry()) {
             java.lang.reflect.Type type = new TypeToken<List<Gl>>() {
             }.getType();
@@ -168,7 +168,12 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
             if (isGeneralVoucher(listGl, glVouId, vouNo, refrence, strDate)) {
                 assignGlInfo(listGl);
                 try {
-                    listGl = glService.saveBatchGL(listGl);
+                    for (Gl gl : listGl) {
+                        if (gl.getSourceAcId() != null) {
+                            glService.save(gl);
+                        }
+                    }
+                    //listGl = glService.saveBatchGL(listGl);
                     if (!listGl.isEmpty()) {
                         journalTablModel.clear();
                         JOptionPane.showMessageDialog(Global.parentForm, "Saved");
@@ -184,7 +189,7 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
                 glService.delete(lid);
                 }
                 }*/
-
+                    
                 } catch (NumberFormatException ex) {
                     LOGGER.error("saveGeneralVoucher : " + ex);
                 } catch (Exception ex) {
@@ -193,9 +198,9 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
                 }
             }
         }
-
+        
     }
-
+    
     private boolean isValidEntry() {
         boolean status = true;
         if (autoCompleter.getCurrency() == null) {
@@ -203,24 +208,24 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
             return false;
         }
         for (VGl vgl : journalTablModel.getListGV()) {
-            if (vgl.getSourceAcId() == null) {
-                status = false;
-                JOptionPane.showMessageDialog(Global.parentForm, "Select Account.");
-            }
+            /*if (vgl.getSourceAcId() == null) {
+            status = false;
+            JOptionPane.showMessageDialog(Global.parentForm, "Select Account.");
+            }*/
         }
         return status;
     }
-
+    
     private void assignGlInfo(List<Gl> listGL) {
         listGL.forEach(gl -> {
             assignGlInfo(gl);
         });
     }
-
+    
     private void assignGlInfo(Gl gl) {
         String userId = Global.loginUser.getUserId().toString();
         String compCode = Global.compId.toString();
-
+        
         if (gl.getGlId() == null) {
             gl.setCompId(Integer.parseInt(compCode));
             gl.setCreatedBy(userId);
@@ -230,21 +235,21 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
             gl.setModifyDate(Util1.getTodayDate());
         }
     }
-
+    
     private String getVouNo(String type, String strDate, String compCode) {
         String period = Util1.getPeriod(strDate, "dd/MM/yyyy");
         int ttlLength = 9;
         int seqNo = seqService.getSequence(type, period, compCode);
         String tmpVouNo = type.toUpperCase()
                 + String.format("%0" + ttlLength + "d", seqNo) + period;
-
+        
         return tmpVouNo;
     }
-
+    
     private boolean isGeneralVoucher(List<Gl> listGV,
             String strGvId, String vouNo, String ref, String strGvDate) {
         boolean status = true;
-
+        
         if (!txtFCrdAmt.getValue().equals(txtFCrdAmt.getValue())) {
             JOptionPane.showMessageDialog(Global.parentForm, "Out of balance.");
             status = false;
@@ -268,7 +273,7 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
         }*/
         return status;
     }
-
+    
     private void initKeyListener() {
         txtDate.getDateEditor().getUiComponent().setName("txtDate");
         txtDate.getDateEditor().getUiComponent().addKeyListener(this);
@@ -277,7 +282,7 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
         tblJournal.addKeyListener(this);
         btnSave.addKeyListener(this);
     }
-
+    
     public void clear() {
         txtDate.setDate(Util1.getTodayDate());
         txtFCrdAmt.setValue(0.0);
@@ -285,7 +290,7 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
         txtRefrence.setText(null);
         txtVouNo.setText(null);
         journalTablModel.clear();
-
+        
     }
 
     /**
@@ -595,18 +600,18 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
 
     @Override
     public void keyTyped(KeyEvent e) {
-
+        
     }
-
+    
     @Override
     public void keyPressed(KeyEvent e) {
     }
-
+    
     @Override
     public void keyReleased(KeyEvent e) {
         Object sourceObj = e.getSource();
         String ctrlName = "-";
-
+        
         if (sourceObj instanceof JButton) {
             ctrlName = ((JButton) sourceObj).getName();
         } else if (sourceObj instanceof JTextField) {
@@ -662,10 +667,10 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
                     txtDate.getDateEditor().getUiComponent().requestFocusInWindow();
                 }
                 break;
-
+            
         }
     }
-
+    
     private void tabToTable(KeyEvent e) {
         if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_RIGHT) {
             tblJournal.requestFocus();
@@ -674,5 +679,5 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
             }
         }
     }
-
+    
 }

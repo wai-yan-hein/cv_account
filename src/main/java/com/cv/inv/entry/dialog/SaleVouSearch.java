@@ -20,6 +20,7 @@ import com.cv.inv.entity.SaleDetailHis;
 import com.cv.inv.entity.SaleHis;
 import com.cv.inv.entity.VouStatus;
 import com.cv.inv.entry.SaleEntry;
+//import com.cv.inv.entry.SaleEntry;
 import com.cv.inv.entry.common.CodeTableModel;
 import com.cv.inv.entry.common.SaleVouSearchTableModel;
 import com.cv.inv.entry.editor.MachineInfoAutoCompleter;

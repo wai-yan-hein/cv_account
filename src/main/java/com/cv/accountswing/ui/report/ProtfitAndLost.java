@@ -82,6 +82,7 @@ public class ProtfitAndLost extends javax.swing.JPanel implements SelectionObser
 
     private void calProfitAndLost() {
         loadingObserver.load(this.getName(), "Start");
+        btnCalculate.setEnabled(false);
         taskExecutor.execute(() -> {
             SystemPropertyKey key = new SystemPropertyKey();
             key.setCompCode(Global.compId);
@@ -96,9 +97,12 @@ public class ProtfitAndLost extends javax.swing.JPanel implements SelectionObser
                         try {
                             rService.getProfitLost(tmpValue, stDate, enDate, depId, currency, Global.compId.toString(), Global.loginUser.getUserId().toString());
                             //ro.setObj();
+                            btnCalculate.setEnabled(true);
                             loadingObserver.load(this.getName(), "Stop");
 
                         } catch (Exception ex) {
+                            btnCalculate.setEnabled(true);
+                            loadingObserver.load(this.getName(), "Stop");
                             LOGGER.error("searchProfitAndList ----" + ex.getMessage());
                         }
                     }

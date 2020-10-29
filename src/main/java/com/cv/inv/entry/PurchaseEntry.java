@@ -218,7 +218,9 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
                 txtPurDate.setDate(Util1.getTodayDate());
                 String depId = Global.sysProperties.get("system.default.department");
                 Department dep = departmentService.findById(depId);
-                departmentAutoCompleter.setDepartment(dep);
+                if (dep != null) {
+                    departmentAutoCompleter.setDepartment(dep);
+                }
                 String cuId = Global.sysProperties.get("system.default.currency");
                 CurrencyKey key = new CurrencyKey();
                 key.setCode(cuId);
@@ -308,8 +310,7 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
                     ph.setPurDate(txtPurDate.getDate());
                 }
             }
-            //ph.setCurrency((currAutoCompleter.getCurrency())); //Need to change
-
+            ph.setCurrency((currAutoCompleter.getCurrency())); //Need to change
             ph.setCustomerId(traderAutoCompleter.getTrader());
             if (lblStatus.getText().equals("NEW")) {
                 ph.setCreatedBy(Global.loginUser.getUserId().toString());
@@ -350,9 +351,10 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
             txtDueDate.setDate(purHis.getDueDate());
             locCompleter.setLocation(purHis.getLocationId());
             vouCompleter.setVouStatus(purHis.getVouStatus());
-//            departmentAutoCompleter.setDepartment(purHis.get);
-//            currAutoCompleter.setCurrency(purHis.get);
-
+            if (purHis.getDeptCode() != null) {
+                departmentAutoCompleter.setDepartment(purHis.getDeptCode());
+            }
+            currAutoCompleter.setCurrency(purHis.getCurrency());
             txtVouTotal.setText(purHis.getVouTotal().toString());
             txtVouPaid.setText(purHis.getPaid().toString());
             if (purHis.getDiscount() == null) {
@@ -381,9 +383,9 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
     }
 
     private void actionMapping() {
-        //F8 event on tblSale
-        tblPurchase.getInputMap().put(KeyStroke.getKeyStroke("F6"), "F6-Action");
-        tblPurchase.getActionMap().put("F6-Action", actionItemDelete);
+        //F8 event on tblSale    KeyEvent.getKeyCode() == KeyEvent.VK_DELETE
+        tblPurchase.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "DELETE");
+        tblPurchase.getActionMap().put("DELETE", actionItemDelete);
 
         //Enter event on tblSale
         tblPurchase.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "ENTER-Action");
