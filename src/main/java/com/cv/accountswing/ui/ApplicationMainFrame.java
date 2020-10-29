@@ -226,9 +226,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     @Autowired
     private StockReceive stockReceive;
     @Autowired
-    private SaleEntry saleEntry;
-
-    @Autowired
     private LocationService locationService;
     @Autowired
     private VouStatusService vouService;
