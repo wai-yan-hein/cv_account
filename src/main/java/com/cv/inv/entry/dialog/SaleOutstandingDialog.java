@@ -5,20 +5,41 @@
  */
 package com.cv.inv.entry.dialog;
 
+import com.cv.accountswing.common.Global;
+import com.cv.inv.entry.common.SaleOutstandTableModel;
 import java.awt.Frame;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author Mg Kyaw Thura Aung
  */
+@Component
 public class SaleOutstandingDialog extends javax.swing.JDialog {
 
     /**
      * Creates new form SaleOutstandingDialog
      */
+    @Autowired
+    private SaleOutstandTableModel saleOutTableModel;
+
     public SaleOutstandingDialog() {
         super(new Frame(), true);
         initComponents();
+    }
+
+    public void initMain() {
+        initSaleOutTable();
+    }
+
+    private void initSaleOutTable() {
+        tblSaleOutstand.setModel(saleOutTableModel);
+        tblSaleOutstand.getTableHeader().setFont(Global.tblHeaderFont);
+        tblSaleOutstand.getColumnModel().getColumn(0).setPreferredWidth(50);
+        tblSaleOutstand.getColumnModel().getColumn(1).setPreferredWidth(50);
+        tblSaleOutstand.getColumnModel().getColumn(2).setPreferredWidth(200);
+        tblSaleOutstand.getColumnModel().getColumn(3).setPreferredWidth(60);
     }
 
     /**
@@ -61,8 +82,8 @@ public class SaleOutstandingDialog extends javax.swing.JDialog {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(14, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
+                .addGap(14, 14, 14))
         );
 
         pack();
