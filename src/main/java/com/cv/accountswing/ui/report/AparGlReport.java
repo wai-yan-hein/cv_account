@@ -19,6 +19,7 @@ import com.cv.accountswing.entity.view.VGl;
 import com.cv.accountswing.entity.view.VTriBalance;
 import com.cv.accountswing.service.COAOpeningDService;
 import com.cv.accountswing.service.CompanyInfoService;
+import com.cv.accountswing.service.FirebaseService;
 import com.cv.accountswing.service.ReportService;
 import com.cv.accountswing.service.SystemPropertyService;
 import com.cv.accountswing.service.VAParService;
@@ -89,6 +90,8 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
     private TrialBalanceDetailDialog trialBalanceDetailDialog;
     @Autowired
     private ApplicationMainFrame mainFrame;
+    @Autowired
+    private FirebaseService firebaseService;
     private TableRowSorter<TableModel> sorter;
     private boolean isShown = false;
     private LoadingObserver loadingObserver;
@@ -230,7 +233,18 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                 loadingObserver.load(this.getName(), "Stop");
             }
         });
+        uploadToFirebase();
 
+    }
+
+    private void uploadToFirebase() {
+        taskExecutor.execute(() -> {
+            try {
+                firebaseService.save(aPARTableModel.getListAPAR());
+            } catch (Exception e) {
+                LOGGER.info("User Offline...");
+            }
+        });
     }
 
     private void searchGLListing() {
@@ -342,12 +356,15 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
     private void calAPARTotalAmount(List<VApar> listApar) {
         double ttlDrAmt = 0.0;
         double ttlCrAmt = 0.0;
+        double ttlNetChange = 0.0;
         for (VApar apar : listApar) {
             ttlDrAmt += Util1.getDouble(apar.getDrAmt());
             ttlCrAmt += Util1.getDouble(apar.getCrAmt());
+            ttlNetChange += Util1.getDouble(apar.getClosing());
         }
         txtFTotalCrAmt.setValue(ttlCrAmt);
         txtFTotalDrAmt.setValue(ttlDrAmt);
+        txtFNetChange.setValue(ttlNetChange);
         txtFOFB.setValue(ttlDrAmt - ttlCrAmt);
     }
 
@@ -609,6 +626,11 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         txtFNetChange.setDisabledTextColor(new java.awt.Color(0, 0, 0));
         txtFNetChange.setEnabled(false);
         txtFNetChange.setFont(Global.amtFont);
+        txtFNetChange.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtFNetChangeActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -687,6 +709,10 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         // TODO add your handling code here:
         search();
     }//GEN-LAST:event_txtCurrencyActionPerformed
+
+    private void txtFNetChangeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtFNetChangeActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtFNetChangeActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

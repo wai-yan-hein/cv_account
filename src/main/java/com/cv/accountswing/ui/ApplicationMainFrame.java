@@ -1302,18 +1302,21 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
 
     @Override
     public void load(Object source, Object selectObj) {
-        if (source != null) {
-            String parent = source.toString();
-            String status = selectObj.toString();
-            switch (status) {
-                case "Start":
-                    hmTabLoading.get(parent).setVisible(true);
-                    break;
-                case "Stop":
-                    hmTabLoading.get(parent).setVisible(false);
-                    break;
+        taskExecutor.execute(() -> {
+            if (source != null) {
+                String parent = source.toString();
+                String status = selectObj.toString();
+                switch (status) {
+                    case "Start":
+                        hmTabLoading.get(parent).setVisible(true);
+                        break;
+                    case "Stop":
+                        hmTabLoading.get(parent).setVisible(false);
+                        break;
+                }
             }
-        }
+        });
+
     }
 
     @Override
