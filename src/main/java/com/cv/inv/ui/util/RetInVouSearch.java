@@ -11,7 +11,7 @@ import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.editor.TraderAutoCompleter;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.Location;
-import com.cv.inv.entity.view.VRetIn;
+import com.cv.inv.entity.RetInHis;
 import com.cv.inv.entity.view.VRetOut;
 import com.cv.inv.entry.common.CodeTableModel;
 import com.cv.inv.entry.common.RetInVouSearchTableModel;
@@ -19,7 +19,7 @@ import com.cv.inv.entry.common.RetOutVouSearchTableModel;
 import com.cv.inv.entry.editor.LocationAutoCompleter;
 import com.cv.inv.entry.editor.StockCellEditor;
 import com.cv.inv.service.LocationService;
-import com.cv.inv.service.VRetInService;
+import com.cv.inv.service.RetInService;
 import com.cv.inv.service.VRetOutService;
 import com.toedter.calendar.JTextFieldDateEditor;
 import java.awt.Frame;
@@ -67,7 +67,7 @@ public class RetInVouSearch extends javax.swing.JDialog implements KeyListener, 
     @Autowired
     private LocationService locationService;
     @Autowired
-    private VRetInService vRetInService;
+    private RetInService retInService;
     @Autowired
     private VRetOutService vRetOutService;
 
@@ -196,8 +196,8 @@ public class RetInVouSearch extends javax.swing.JDialog implements KeyListener, 
         String cusId;
         String vouNo;
         String filterCodes = codeTableModel.getFilterCodeStr();
-        String fDate = Util1.toDateStr(txtFromDate.getDate(), "dd/MM/yyyy");
-        String tDate = Util1.toDateStr(txtToDate.getDate(), "dd/MM/yyyy");
+        String fDate = Util1.toDateStr(txtFromDate.getDate(), "yyyy-MM-dd HH:mm:ss");
+        String tDate = Util1.toDateStr(txtToDate.getDate(), "yyyy-MM-dd HH:mm:ss");
         if (locationAutoCompleter.getLocation() != null) {
             locId = locationAutoCompleter.getLocation().getLocationId().toString();
         } else {
@@ -220,9 +220,9 @@ public class RetInVouSearch extends javax.swing.JDialog implements KeyListener, 
         try {
             switch (panelName) {
                 case "Return In":
-                    List<VRetIn> listRetIn = vRetInService.search(fDate, tDate,
-                            cusId, locId, vouNo, filterCodes, String.valueOf(Global.compId));
-                    retInVouSearchTableModel.setListGl(listRetIn);
+                    List<RetInHis> listRetIn = retInService.search(fDate, tDate,
+                            cusId, locId, vouNo, filterCodes);
+                    retInVouSearchTableModel.setListRetInHis(listRetIn);
                     break;
                 case "Return Out":
                     List<VRetOut> listRetOut = vRetOutService.search(fDate, tDate,

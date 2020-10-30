@@ -19,17 +19,14 @@ public class RetInCompoundKey implements Serializable {
 
     @Column(name = "ret_in_detail_id", unique = true, nullable = false)
     private String retInDetailId;
-    @Column(name = "gl_id", unique = true, nullable = false)
-    private Long glId;
     @Column(name = "voucher_no")
     private String vouNo;
 
     public RetInCompoundKey() {
     }
 
-    public RetInCompoundKey(String retInDetailId, Long glId, String vouNo) {
+    public RetInCompoundKey(String retInDetailId,String vouNo) {
         this.retInDetailId = retInDetailId;
-        this.glId = glId;
         this.vouNo = vouNo;
     }
 
@@ -41,14 +38,7 @@ public class RetInCompoundKey implements Serializable {
         this.retInDetailId = retInDetailId;
     }
 
-    public Long getGlId() {
-        return glId;
-    }
-
-    public void setGlId(Long glId) {
-        this.glId = glId;
-    }
-
+   
     public String getVouNo() {
         return vouNo;
     }
@@ -61,7 +51,6 @@ public class RetInCompoundKey implements Serializable {
     public int hashCode() {
         int hash = 3;
         hash = 41 * hash + Objects.hashCode(this.retInDetailId);
-        hash = 41 * hash + Objects.hashCode(this.glId);
         hash = 41 * hash + Objects.hashCode(this.vouNo);
         return hash;
     }
@@ -84,9 +73,7 @@ public class RetInCompoundKey implements Serializable {
         if (!Objects.equals(this.vouNo, other.vouNo)) {
             return false;
         }
-        if (!Objects.equals(this.glId, other.glId)) {
-            return false;
-        }
+       
         return true;
     }
     

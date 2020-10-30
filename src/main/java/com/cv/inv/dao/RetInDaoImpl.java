@@ -6,7 +6,7 @@
 package com.cv.inv.dao;
 
 import com.cv.accountswing.dao.AbstractDao;
-import com.cv.inv.entity.RetInDetailHis;
+import com.cv.inv.entity.RetInHis;
 import java.util.List;
 import org.springframework.stereotype.Repository;
 
@@ -15,68 +15,83 @@ import org.springframework.stereotype.Repository;
  * @author lenovo
  */
 @Repository
-public class RetInDaoImpl extends AbstractDao<String, RetInDetailHis> implements RetInDao {
+public class RetInDaoImpl extends AbstractDao<String, RetInHis> implements RetInDao {
 
     @Override
-    public RetInDetailHis save(RetInDetailHis retInDetailHis) {
+    public RetInHis save(RetInHis retInDetailHis) {
         persist(retInDetailHis);
         return retInDetailHis;
     }
 
     @Override
-    public void delete(String retInId, String glId) {
-        String strSql = "delete from RetInDetailHis o";
+    public List<RetInHis> search(String fromDate, String toDate, String cusId, String locId, String vouNo, String filterCode) {
         String strFilter = "";
 
-        if (!retInId.equals("-")) {
+        if (!fromDate.equals("-") && !toDate.equals("-")) {
             if (strFilter.isEmpty()) {
-                strFilter = "o.inCompoundKey.retInDetailId in (" + retInId + ")";
+                strFilter = "o.retInDate between '" + fromDate
+                        + "' and '" + toDate + "'";
             } else {
-                strFilter = strFilter + " and o.inCompoundKey.retInDetailId in (" + retInId + ")";
+                strFilter = strFilter + " and o.retInDate between '"
+                        + fromDate + "' and '" + toDate + "'";
+            }
+        } else if (!fromDate.endsWith("-")) {
+            if (strFilter.isEmpty()) {
+                strFilter = "o.retInDate >= '" + fromDate + "'";
+            } else {
+                strFilter = strFilter + " and o.retInDate >= '" + fromDate + "'";
+            }
+        } else if (!toDate.equals("-")) {
+            if (strFilter.isEmpty()) {
+                strFilter = "o.retInDate <= '" + toDate + "'";
+            } else {
+                strFilter = strFilter + " and o.retInDate <= '" + toDate + "'";
             }
         }
 
-        if (!glId.equals("-")) {
+        if (!cusId.equals("-")) {
             if (strFilter.isEmpty()) {
-                strFilter = "o.inCompoundKey.glId = '" + glId + "'";
+                strFilter = "o.customer = '" + cusId + "'";
             } else {
-                strFilter = strFilter + " and o.inCompoundKey.glId = '" + glId + "'";
+                strFilter = strFilter + " and o.customer = '" + cusId + "'";
             }
         }
 
-        if (!strFilter.isEmpty()) {
-            strSql = strSql + " where " + strFilter;
-        }
-        execUpdateOrDelete(strSql);
-    }
-
-    @Override
-    public List<RetInDetailHis> search(String glId, String vouNo) {
-        String strSql = "select o from RetInDetailHis o";
-        String strFilter = "";
-
-        if (!glId.equals("-")) {
+        if (!locId.equals("-")) {
             if (strFilter.isEmpty()) {
-                strFilter = "o.inCompoundKey.glId = '" + glId + "'";
+                strFilter = "o.location = '" + locId + "'";
             } else {
-                strFilter = strFilter + " and o.inCompoundKey.glId = '" + glId + "'";
+                strFilter = strFilter + " and o.location = '" + locId + "'";
             }
         }
 
         if (!vouNo.equals("-")) {
             if (strFilter.isEmpty()) {
-                strFilter = "o.inCompoundKey.vouNo = '" + vouNo + "'";
+                strFilter = "o.retInId = '" + vouNo + "'";
             } else {
-                strFilter = strFilter + " and o.inCompoundKey.vouNo = '" + vouNo + "'";
+                strFilter = strFilter + " and o.retInId = '" + vouNo + "'";
             }
         }
+        if (!filterCode.equals("-")) {
+            if (strFilter.isEmpty()) {
+                strFilter = "o.remark = '" + filterCode + "'";
+            } else {
+                strFilter = strFilter + " and o.remark = '" + filterCode + "'";
+            }
+        }
+        String strSql = "select o from RetInHis o";
         if (!strFilter.isEmpty()) {
             strSql = strSql + " where " + strFilter;
         }
-        strSql = strSql + " order by o.uniqueId";
-        List<RetInDetailHis> list = findHSQL(strSql);
-        return list;
 
+        List<RetInHis> listPurHis = findHSQL(strSql);
+        return listPurHis;
+    }
+
+    @Override
+    public RetInHis findById(String id) {
+        RetInHis ph = getByKey(id);
+        return ph;
     }
 
 }

@@ -5,8 +5,8 @@
  */
 package com.cv.inv.service;
 
-import com.cv.accountswing.entity.Gl;
 import com.cv.inv.entity.RetInDetailHis;
+import com.cv.inv.entity.RetInHis;
 import java.util.List;
 
 /**
@@ -15,10 +15,11 @@ import java.util.List;
  */
 public interface RetInService {
 
-    public RetInDetailHis save(Gl gl, List<RetInDetailHis> listRetIn);
+    public void save(RetInHis retIn, List<RetInDetailHis> listRetIn, List<String> delList);
 
-    public void delete(String retInId,String glId);
+    public void delete(String retInId);
 
-    public List<RetInDetailHis> search(String glId, String vouNo);
+    public List<RetInHis> search(String fromDate, String toDate, String cusId, String locId, String vouNo, String filterCode);
 
+    public RetInHis findById(String id);
 }

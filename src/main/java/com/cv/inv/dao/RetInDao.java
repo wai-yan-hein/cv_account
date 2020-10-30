@@ -5,7 +5,7 @@
  */
 package com.cv.inv.dao;
 
-import com.cv.inv.entity.RetInDetailHis;
+import com.cv.inv.entity.RetInHis;
 import java.util.List;
 
 /**
@@ -14,10 +14,9 @@ import java.util.List;
  */
 public interface RetInDao {
 
-    public RetInDetailHis save(RetInDetailHis retInDetailHis);
+    public RetInHis save(RetInHis retInHis);
 
-    public List<RetInDetailHis> search(String glId, String vouNo);
+    public RetInHis findById(String id);
 
-    public void delete(String retInId, String glId);
-
+    public List<RetInHis> search(String fromDate, String toDate, String cusId, String locId, String vouNo, String filterCode);
 }
