@@ -33,6 +33,7 @@ import com.cv.inv.entity.SaleHis;
 import com.cv.inv.entity.SaleMan;
 import com.cv.inv.entity.VouStatus;
 import com.cv.inv.entry.common.SaleEntryTableModel;
+import com.cv.inv.entry.dialog.SaleOutstandingDialog;
 import com.cv.inv.entry.editor.SaleManAutoCompleter;
 import com.cv.inv.entry.editor.StockUnitEditor;
 import com.cv.inv.entry.editor.StockCellEditor;
@@ -104,6 +105,8 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
     private SaleHisService saleHisService;
     @Autowired
     private SaleManService saleManService;
+    @Autowired
+    private SaleOutstandingDialog saleOutDailog;
     private VouStatusAutoCompleter vouCompleter;
     private CurrencyAutoCompleter currAutoCompleter;
     private TraderAutoCompleter traderAutoCompleter;
@@ -162,14 +165,14 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
         tblSale.getTableHeader().setPreferredSize(new Dimension(30, 30));
         tblSale.setCellSelectionEnabled(true);
         tblSale.getColumnModel().getColumn(0).setPreferredWidth(50);//Code
-        tblSale.getColumnModel().getColumn(1).setPreferredWidth(380);//Name
-        tblSale.getColumnModel().getColumn(2).setPreferredWidth(65);//Dep
-        tblSale.getColumnModel().getColumn(3).setPreferredWidth(65);//Location
+        tblSale.getColumnModel().getColumn(1).setPreferredWidth(450);//Name
+        tblSale.getColumnModel().getColumn(2).setPreferredWidth(60);//Dep
+        tblSale.getColumnModel().getColumn(3).setPreferredWidth(60);//Location
         tblSale.getColumnModel().getColumn(4).setPreferredWidth(1);//Qty
         tblSale.getColumnModel().getColumn(5).setPreferredWidth(1);//Std-Wt
         tblSale.getColumnModel().getColumn(6).setPreferredWidth(1);//Unit
-        tblSale.getColumnModel().getColumn(7).setPreferredWidth(50);//Sale Price
-        tblSale.getColumnModel().getColumn(8).setPreferredWidth(50);//Amount
+        tblSale.getColumnModel().getColumn(7).setPreferredWidth(40);//Sale Price
+        tblSale.getColumnModel().getColumn(8).setPreferredWidth(40);//Amount
 
         addSaleTableModelListener();
 
@@ -522,6 +525,15 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
         }
     };
 
+    private void saleOutstand() {
+        if (listDetail.size() > 1) {
+            saleOutDailog.initMain();
+            saleOutDailog.setSize(Global.width / 2, Global.height / 2);
+            saleOutDailog.setLocationRelativeTo(null);
+            saleOutDailog.setVisible(true);
+        }
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -574,7 +586,7 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
         jLabel15 = new javax.swing.JLabel();
         txtDiscP = new javax.swing.JTextField();
         jPanel4 = new javax.swing.JPanel();
-        jButton6 = new javax.swing.JButton();
+        btnSaleOutStand = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblSale = new javax.swing.JTable();
 
@@ -897,8 +909,13 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jButton6.setFont(Global.lableFont);
-        jButton6.setText("Outstanding");
+        btnSaleOutStand.setFont(Global.lableFont);
+        btnSaleOutStand.setText("Outstanding");
+        btnSaleOutStand.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSaleOutStandActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -906,14 +923,14 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jButton6)
+                .addComponent(btnSaleOutStand)
                 .addContainerGap(207, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jButton6)
+                .addComponent(btnSaleOutStand)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -976,6 +993,10 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
     private void txtCusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCusActionPerformed
         //getCustomer();
     }//GEN-LAST:event_txtCusActionPerformed
+
+    private void btnSaleOutStandActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaleOutStandActionPerformed
+        saleOutstand();
+    }//GEN-LAST:event_btnSaleOutStandActionPerformed
 
     private void tabToTable(KeyEvent e) {
         if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_RIGHT) {
@@ -1174,9 +1195,9 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnSaleOutStand;
     private javax.swing.JCheckBox chkPrintOption;
     private javax.swing.JCheckBox chkVouComp;
-    private javax.swing.JButton jButton6;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;

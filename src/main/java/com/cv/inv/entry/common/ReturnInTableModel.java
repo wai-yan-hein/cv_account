@@ -8,6 +8,7 @@ package com.cv.inv.entry.common;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.util.NumberUtil;
 import com.cv.accountswing.util.Util1;
+import com.cv.inv.entity.PurchaseDetail;
 import com.cv.inv.entity.RelationKey;
 import com.cv.inv.entity.RetInDetailHis;
 import com.cv.inv.entity.Stock;
@@ -35,6 +36,7 @@ public class ReturnInTableModel extends AbstractTableModel {
     private String[] columnNames = {"Code", "Description", "Exp-Date",
         "Qty", "Std-W", "Unit", "Price", "Amount"};
     private JTable parent;
+    private List<String> delList = new ArrayList();
     private List<RetInDetailHis> listRetInDtail = new ArrayList();
     private String deletedList;
 
@@ -377,7 +379,7 @@ public class ReturnInTableModel extends AbstractTableModel {
             addEmptyRow();
         }
         fireTableCellUpdated(listDetail.size() - 1, listDetail.size() - 1);
-       
+
         fireTableDataChanged();
     }
 
@@ -393,11 +395,12 @@ public class ReturnInTableModel extends AbstractTableModel {
 
         if (record != null) {
             if (record.getInCompoundKey() != null) {
-                if (deletedList == null) {
-                    deletedList = "'" + record.getInCompoundKey().getRetInDetailId() + "'";
-                } else {
-                    deletedList = deletedList + "," + "'" + record.getInCompoundKey().getRetInDetailId() + "'";
-                }
+                delList.add(record.getInCompoundKey().getRetInDetailId());
+//                if (deletedList == null) {
+//                    deletedList = "'" + record.getInCompoundKey().getRetInDetailId() + "'";
+//                } else {
+//                    deletedList = deletedList + "," + "'" + record.getInCompoundKey().getRetInDetailId() + "'";
+//                }
             }
         }
 
@@ -420,4 +423,20 @@ public class ReturnInTableModel extends AbstractTableModel {
         return deletedListStr;
     }
 
+    public List<String> getDelList() {
+        return delList;
+    }
+
+    public List<RetInDetailHis> getListRetInDetail() {
+        List<RetInDetailHis> listRetInDetailhis = new ArrayList();
+        for (RetInDetailHis pdh2 : listRetInDtail) {
+            if (pdh2.getStock() != null) {
+                if (pdh2.getStock().getStockCode() != null) {
+                    listRetInDetailhis.add(pdh2);
+                }
+            }
+        }
+
+        return listRetInDetailhis;
+    }
 }

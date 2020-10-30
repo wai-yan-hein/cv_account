@@ -33,8 +33,8 @@ public class SaleDetailHis implements java.io.Serializable {
     private Float quantity;
     private Float saleSmallestQty;
     private StockUnit itemUnit;
-    private Double price;
-    private Double amount;
+    private Float price;
+    private Float amount;
     private Location location;
     private Integer uniqueId;
     private Float stdWeight;
@@ -112,20 +112,20 @@ public class SaleDetailHis implements java.io.Serializable {
     }
 
     @Column(name = "sale_price", nullable = false)
-    public Double getPrice() {
+    public Float getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(Float price) {
         this.price = price;
     }
 
     @Column(name = "sale_amount", nullable = false)
-    public Double getAmount() {
+    public Float getAmount() {
         return amount;
     }
 
-    public void setAmount(Double amount) {
+    public void setAmount(Float amount) {
         this.amount = amount;
     }
 

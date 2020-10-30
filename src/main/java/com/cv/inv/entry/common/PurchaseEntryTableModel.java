@@ -6,6 +6,7 @@
 package com.cv.inv.entry.common;
 
 import com.cv.accountswing.common.Global;
+import com.cv.accountswing.entity.Department;
 import com.cv.accountswing.util.NumberUtil;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.Location;
@@ -35,8 +36,8 @@ import org.springframework.stereotype.Component;
 public class PurchaseEntryTableModel extends AbstractTableModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PurchaseEntryTableModel.class);
-    private String[] columnNames = {"Code", "Description", "Exp-Date",
-        "Qty", "Std-Wt", "Unit", "Avg-Wt", "Pur Price", "Amount", "Location"};
+    private String[] columnNames = {"Code", "Description", "Department", "Location",
+        "Qty", "Std-Wt", "Unit", "Avg-Wt", "Pur Price", "Amount"};
     private JTable parent;
     private List<PurchaseDetail> listPurDetail = new ArrayList();
     private List<String> delList = new ArrayList();
@@ -85,7 +86,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
             case 2:
                 return String.class;
             case 3:
-                return Float.class;
+                return String.class;
             case 4:
                 return Float.class;
             case 5:
@@ -115,22 +116,27 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                 if (pur.getStock() != null) {
                     return pur.getStock().getStockName();
                 }
+            case 2:
+                if (pur.getDepartment() != null) {
+                    return pur.getDepartment().getDeptName();
+                }
             case 3:
-                return pur.getQty();
-            case 4:
-                return pur.getStdWeight();
-            case 5:
-                return pur.getPurUnit();
-            case 6:
-                return pur.getAvgWeight();
-            case 7:
-                return pur.getPurPrice();
-            case 8:
-                return pur.getPurAmt();
-            case 9:
                 if (pur.getLocation() != null) {
                     return pur.getLocation().getLocationName();
                 }
+            case 4:
+                return pur.getQty();
+            case 5:
+                return pur.getStdWeight();
+            case 6:
+                return pur.getPurUnit();
+            case 7:
+                return pur.getAvgWeight();
+            case 8:
+                return pur.getPurPrice();
+            case 9:
+                return pur.getPurAmt();
+
             default:
                 return null;
         }
@@ -152,17 +158,25 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                             pur.setStdWeight(stock.getPurPriceMeasure());
                             pur.setPurUnit(stock.getPurPriceUnit());
                             addNewRow();
-                            parent.setColumnSelectionInterval(3, 3);
+                            parent.setColumnSelectionInterval(4, 4);
                         }
-
+                    case 2:
+                        if (aValue instanceof Department) {
+                            Department dept = (Department) aValue;
+                            pur.setDepartment(dept);
+                            parent.setRowSelectionInterval(rowIndex + 1, rowIndex + 1);
+                            parent.setColumnSelectionInterval(0, 0);
+                        }
                         break;
-                    /*case 2://Exp Date
-                if (aValue != null) {
-                pur.setExpDate(Util1.toDate(aValue));
-                parent.setColumnSelectionInterval(3, 3);
-                }
-                break;*/
-                    case 3://Qty
+                    case 3:
+                        if (aValue instanceof Location) {
+                            Location loc = (Location) aValue;
+                            pur.setLocation(loc);
+                            parent.setRowSelectionInterval(rowIndex + 1, rowIndex + 1);
+                            parent.setColumnSelectionInterval(0, 0);
+                        }
+                        break;
+                    case 4://Qty
                         if (NumberUtil.isNumber(aValue)) {
                             if (NumberUtil.isPositive(aValue)) {
                                 pur.setQty(Util1.getFloat(aValue));
@@ -176,7 +190,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                         }
 
                         break;
-                    case 4://std wt
+                    case 5://std wt
                         if (NumberUtil.isNumber(aValue)) {
                             if (NumberUtil.isPositive(aValue)) {
                                 pur.setStdWeight(Util1.getFloat(aValue));
@@ -196,7 +210,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                         }
                         break;
 
-                    case 5:// unit
+                    case 6:// unit
                         if (aValue instanceof StockUnit) {
                             StockUnit st = (StockUnit) aValue;
                             pur.setPurUnit(st);
@@ -207,7 +221,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
 
                         }
                         break;
-                    case 6://avg-wt
+                    case 7://avg-wt
                         if (NumberUtil.isNumber(aValue)) {
                             if (NumberUtil.isPositive(aValue)) {
                                 Float avgWt = Util1.getFloat(aValue);
@@ -228,7 +242,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
 
                         break;
 
-                    case 7:
+                    case 8:
                         if (NumberUtil.isNumber(aValue)) {
                             if (NumberUtil.isPositive(aValue)) {
                                 pur.setPurPrice(Util1.getFloat(aValue));
@@ -242,15 +256,6 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                             parent.setColumnSelectionInterval(columnIndex, columnIndex);
                         }
 
-                        break;
-                    case 9:
-                        if (aValue instanceof Location) {
-                            Location loc = (Location) aValue;
-                            pur.setLocation(loc);
-                            parent.setRowSelectionInterval(rowIndex + 1, rowIndex + 1);
-                            parent.setColumnSelectionInterval(0, 0);
-
-                        }
                         break;
                 }
             }

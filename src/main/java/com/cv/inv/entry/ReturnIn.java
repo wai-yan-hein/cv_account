@@ -9,11 +9,10 @@ import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.SelectionObserver;
-import com.cv.accountswing.entity.Gl;
 import com.cv.accountswing.entity.Currency;
 import com.cv.accountswing.entity.CurrencyKey;
+import com.cv.accountswing.entity.Trader;
 import com.cv.accountswing.service.CurrencyService;
-import com.cv.accountswing.service.GlService;
 import com.cv.accountswing.service.TraderService;
 import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.inv.service.RetInService;
@@ -24,11 +23,13 @@ import com.cv.accountswing.util.NumberUtil;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.Location;
 import com.cv.inv.entity.RetInDetailHis;
+import com.cv.inv.entity.RetInHis;
 import com.cv.inv.entry.common.ReturnInTableModel;
 import com.cv.inv.entry.editor.LocationAutoCompleter;
 import com.cv.inv.entry.editor.StockCellEditor;
 import com.cv.inv.entry.editor.StockUnitEditor;
 import com.cv.inv.service.LocationService;
+import com.cv.inv.service.RetInDetailService;
 import com.cv.inv.service.VouIdService;
 import com.cv.inv.ui.commom.VouFormatFactory;
 import com.cv.inv.ui.util.RetInVouSearch;
@@ -71,7 +72,7 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
     private TraderAutoCompleter traderAutoCompleter;
     private LocationAutoCompleter locationAutoCompleter;
     private CurrencyAutoCompleter currencyAutoCompleter;
-    private Gl gl = new Gl();
+    private RetInHis retIn = new RetInHis();
     private GenVouNoImpl vouEngine = null;
     private boolean isShown = false;
     private Long glId;
@@ -81,19 +82,14 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
     }
     @Autowired
     private ReturnInTableModel returnInTableModel;
-
     @Autowired
     private RetInService retInService;
-
     @Autowired
     private LocationService locationService;
-
     @Autowired
     private CurrencyService currencyService;
-
     @Autowired
-    private GlService glService;
-
+    private RetInDetailService retInDetailService;
     @Autowired
     private VouIdService voudIdService;
     @Autowired
@@ -570,42 +566,40 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
 
     @Override
     public void selected(Object source, Object selectObj) {
-        /*switch (source.toString()) {
-        case "RetInVouList":
+        switch (source.toString()) {
+            case "RetInVouList":
         try {
-        VRetIn vRetIn = (VRetIn) selectObj;
-        gl = glService.findById(vRetIn.getKey().getGlId());
-        glId = gl.getGlId();
-        
-        if (Util1.getNullTo(gl.getDeleted())) {
-        lblStatus.setText("DELETED");
-        } else {
-        lblStatus.setText("EDIT");
+                RetInHis vRetIn = (RetInHis) selectObj;
+                retIn = retInService.findById(vRetIn.getRetInId());
+
+                if (Util1.getNullTo(retIn.isDeleted())) {
+                    lblStatus.setText("DELETED");
+                } else {
+                    lblStatus.setText("EDIT");
+                }
+
+                txtVouNo.setText(retIn.getRetInId());
+                txtVouTotal.setText(retIn.getVouTotal().toString());
+                txtVouPaid.setText(retIn.getPaid().toString());
+                txtVouBalance.setText(retIn.getBalance().toString());
+                txtRemark.setText(retIn.getRemark());
+                txtRetInDate.setDate(retIn.getRetInDate());
+                Trader t = retIn.getCustomer();
+                traderAutoCompleter.setTrader(t);
+//                Trader trader = traderService.findById(Integer.parseInt(retIn.getTraderId().toString()));
+//                traderAutoCompleter.setTrader(trader);
+                locationAutoCompleter.setLocation(retIn.getLocation());
+                currencyAutoCompleter.setCurrency(retIn.getCurrency());
+                List<RetInDetailHis> listDetail = retInDetailService.search(retIn.getRetInId());
+                returnInTableModel.setRetInDetailList(listDetail);
+
+            } catch (Exception ex) {
+                LOGGER.error("selected : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.toString());
+
+            }
+
+            break;
         }
-        
-        txtVouNo.setText(gl.getVouNo());
-        txtVouTotal.setText(gl.getVouTotal().toString());
-        txtVouPaid.setText(gl.getPaid().toString());
-        txtVouBalance.setText(gl.getBalance().toString());
-        txtRemark.setText(gl.getRemark());
-        txtRetInDate.setDate(gl.getGlDate());
-        Trader trader = traderService.findById(Integer.parseInt(gl.getTraderId().toString()));
-        traderAutoCompleter.setTrader(trader);
-        Location location = locationService.findById(gl.getLocationId().toString());
-        locationAutoCompleter.setLocation(location);
-        Currency currency = currencyService.findById(new CurrencyKey(gl.getFromCurId(), Global.compId));
-        currencyAutoCompleter.setCurrency(currency);
-        
-        List<RetInDetailHis> listRetIn = retInService.search(gl.getGlId().toString(), gl.getVouNo());
-        returnInTableModel.setRetInDetailList(listRetIn);
-        
-        } catch (Exception ex) {
-        LOGGER.error("selected : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.toString());
-        
-        }
-        
-        break;
-        }*/
 
     }
 
@@ -726,83 +720,103 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
 
     private void actionMapping() {
         //Enter event on tblSale
-        //tblReturnIn.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "ENTER-Action");
-        //tblReturnIn.getActionMap().put("ENTER-Action", actionTblRetInEnterKey);
+        tblReturnIn.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "ENTER-Action");
+        tblReturnIn.getActionMap().put("ENTER-Action", actionTblRetInEnterKey);
 
         //F8 event on tblRetIn
-        tblReturnIn.getInputMap().put(KeyStroke.getKeyStroke("F8"), "F8-Action");
-        tblReturnIn.getActionMap().put("F8-Action", actionItemDelete);
+        tblReturnIn.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "DELETE");
+        tblReturnIn.getActionMap().put("DELETE", actionItemDelete);
     }
 
-    private Action actionTblRetInEnterKey = new AbstractAction() {
+//    private Action actionTblRetInEnterKey = new AbstractAction() {
+//        @Override
+//        public void actionPerformed(ActionEvent e) {
+//            try {
+//                tblReturnIn.getCellEditor().stopCellEditing();
+//            } catch (Exception ex) {
+//            }
+//
+//            int row = tblReturnIn.getSelectedRow();
+//            int col = tblReturnIn.getSelectedColumn();
+//            listDetail = returnInTableModel.getCurrentRow();
+//            RetInDetailHis sdh = listDetail.get(row);
+//
+//            if (col == 0 && sdh.getStock().getStockCode() != null) {
+//                tblReturnIn.setColumnSelectionInterval(3, 3); //Move to Qty
+//                returnInTableModel.addNewRow();
+//            } else if (col == 1 && sdh.getStock().getStockCode() != null) {
+//                tblReturnIn.setColumnSelectionInterval(3, 3); //Move to Qty
+//            } else if (col == 2 && sdh.getStock().getStockCode() != null) {
+//                tblReturnIn.setColumnSelectionInterval(3, 3); //Move to Qty
+//            } else if (col == 3 && sdh.getQty() != null) {
+//                tblReturnIn.setColumnSelectionInterval(4, 4); //Move to Qty
+//            } else if (col == 4 && sdh.getStdWt() != null) {
+//                tblReturnIn.setColumnSelectionInterval(5, 5); //Move to Unit
+//            } else if (col == 5 && sdh.getStockUnit().getItemUnitName() != null) {
+//                tblReturnIn.setColumnSelectionInterval(6, 6); //Move to Sale Price
+//            } else if (col == 6 && sdh.getPrice() != null) {
+//                tblReturnIn.setColumnSelectionInterval(7, 7); //Move to Discount
+//            } else if (col == 7) {
+//                if ((row + 1) <= listDetail.size()) {
+//                    tblReturnIn.setRowSelectionInterval(row + 1, row + 1);
+//                }
+//                tblReturnIn.setColumnSelectionInterval(0, 0); //Move to Code
+//            }
+//
+//        }
+//    };
+    private final Action actionTblRetInEnterKey = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
                 tblReturnIn.getCellEditor().stopCellEditing();
             } catch (Exception ex) {
             }
-
-            int row = tblReturnIn.getSelectedRow();
-            int col = tblReturnIn.getSelectedColumn();
-            listDetail = returnInTableModel.getCurrentRow();
-            RetInDetailHis sdh = listDetail.get(row);
-
-            if (col == 0 && sdh.getStock().getStockCode() != null) {
-                tblReturnIn.setColumnSelectionInterval(3, 3); //Move to Qty
-                returnInTableModel.addNewRow();
-            } else if (col == 1 && sdh.getStock().getStockCode() != null) {
-                tblReturnIn.setColumnSelectionInterval(3, 3); //Move to Qty
-            } else if (col == 2 && sdh.getStock().getStockCode() != null) {
-                tblReturnIn.setColumnSelectionInterval(3, 3); //Move to Qty
-            } else if (col == 3 && sdh.getQty() != null) {
-                tblReturnIn.setColumnSelectionInterval(4, 4); //Move to Qty
-            } else if (col == 4 && sdh.getStdWt() != null) {
-                tblReturnIn.setColumnSelectionInterval(5, 5); //Move to Unit
-            } else if (col == 5 && sdh.getStockUnit().getItemUnitName() != null) {
-                tblReturnIn.setColumnSelectionInterval(6, 6); //Move to Sale Price
-            } else if (col == 6 && sdh.getPrice() != null) {
-                tblReturnIn.setColumnSelectionInterval(7, 7); //Move to Discount
-            } else if (col == 7) {
-                if ((row + 1) <= listDetail.size()) {
-                    tblReturnIn.setRowSelectionInterval(row + 1, row + 1);
-                }
-                tblReturnIn.setColumnSelectionInterval(0, 0); //Move to Code
-            }
-
         }
     };
-
-    private Action actionItemDelete = new AbstractAction() {
+    private final Action actionItemDelete = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            RetInDetailHis retdh;
-            int yes_no = -1;
-
             if (tblReturnIn.getSelectedRow() >= 0) {
-                retdh = listDetail.get(tblReturnIn.getSelectedRow());
-
-                if (retdh.getStock() != null) {
-                    if (retdh.getStock().getStockCode() != null) {
-                        try {
-                            yes_no = JOptionPane.showConfirmDialog(Global.parentForm, "Are you sure to delete?",
-                                    "Sale item delete", JOptionPane.YES_NO_OPTION);
-
-                        } catch (Exception ex) {
-                            LOGGER.error("actionItemDelete : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.toString());
-                        }
-
-                        if (yes_no == 0) {
-                            returnInTableModel.delete(tblReturnIn.getSelectedRow());
-                            calculateTotalAmount();
-                        }
-                    }
-
-                } else {
-                    JOptionPane.showMessageDialog(Global.parentForm, "Can't delete empty record");
+                int yes_no = JOptionPane.showConfirmDialog(Global.parentForm,
+                        "Are you sure to delete?", "Return in item delete", JOptionPane.YES_NO_OPTION);
+                if (yes_no == 0) {
+                    returnInTableModel.delete(tblReturnIn.getSelectedRow());
                 }
             }
         }
     };
+//    private Action actionItemDelete = new AbstractAction() {
+//        @Override
+//        public void actionPerformed(ActionEvent e) {
+//            RetInDetailHis retdh;
+//            int yes_no = -1;
+//
+//            if (tblReturnIn.getSelectedRow() >= 0) {
+//                retdh = listDetail.get(tblReturnIn.getSelectedRow());
+//
+//                if (retdh.getStock() != null) {
+//                    if (retdh.getStock().getStockCode() != null) {
+//                        try {
+//                            yes_no = JOptionPane.showConfirmDialog(Global.parentForm, "Are you sure to delete?",
+//                                    "Sale item delete", JOptionPane.YES_NO_OPTION);
+//
+//                        } catch (Exception ex) {
+//                            LOGGER.error("actionItemDelete : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.toString());
+//                        }
+//
+//                        if (yes_no == 0) {
+//                            returnInTableModel.delete(tblReturnIn.getSelectedRow());
+//                            calculateTotalAmount();
+//                        }
+//                    }
+//
+//                } else {
+//                    JOptionPane.showMessageDialog(Global.parentForm, "Can't delete empty record");
+//                }
+//            }
+//        }
+//    };
 
     private void assignDefaultValue() {
         String currCode = Global.sysProperties.get("system.parent.currency");
@@ -826,7 +840,7 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
         genVouNo();
         assignDefaultValue();
         returnInTableModel.clearRetInTable();
-        deleteRetInDetail();
+        // deleteRetInDetail();
     }
 
     @Override
@@ -835,35 +849,32 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
     }
 
     public void saveReturnIn() {
-        /*if (isValidEntry()) {
-        try {
-        retInService.save(gl, listDetail);
-        if (lblStatus.getText().equals("NEW")) {
-        vouEngine.updateVouNo();
-        }
-        } catch (Exception ex) {
-        LOGGER.error("saveRetIN : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
-        }
-        
-        newForm();
-        }*/
+        if (isValidEntry()) {
+            List<String> delList = returnInTableModel.getDelList();
+            try {
+                retInService.save(retIn, returnInTableModel.getListRetInDetail(), delList);
+                clear();
+                vouEngine.updateVouNo();
+                genVouNo();
+            } catch (Exception ex) {
+                LOGGER.error("Save Purchase :" + ex.getMessage());
+                JOptionPane.showMessageDialog(Global.parentForm, "Could'nt saved.");
+            }
 
+        }
     }
 
     public void deleteReturnIn() {
 
-        /*if (Util1.getNullTo(gl.getDeleted())) {
-        JOptionPane.showConfirmDialog(Global.parentForm, "Voucher already deleted.",
-        "Return In voucher delete", JOptionPane.ERROR);
-        } else {
-        int yes_no = JOptionPane.showConfirmDialog(Global.parentForm, "Are you sure to delete?",
-        "Return In voucher delete", JOptionPane.YES_NO_OPTION);
-        
+        int yes_no = JOptionPane.showConfirmDialog(Global.parentForm,
+                "Are you sure to delete?", "Return in item delete", JOptionPane.YES_NO_OPTION);
         if (yes_no == 0) {
-        gl.setDeleted(true);
-        saveReturnIn();
+            String vouNo = txtVouNo.getText();
+            if (lblStatus.getText().equals("EDIT")) {
+                //   phService.delete(vouNo);
+                clear();
+            }
         }
-        }*/
     }
 
     public void historyReturnIn() {
@@ -878,127 +889,104 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
         retInVouSearch.setVisible(true);
     }
 
-    /* private boolean isValidEntry() {
-    boolean status = true;
-    Location location = null;
-    Currency currency = null;
-    Trader trader = null;
-    try {
-    if (locationAutoCompleter.getLocation() != null) {
-    location = locationAutoCompleter.getLocation();
+    private boolean isValidEntry() {
+        boolean status = true;
+        Location location = null;
+        Currency currency = null;
+        Trader trader = null;
+        try {
+            if (locationAutoCompleter.getLocation() != null) {
+                location = locationAutoCompleter.getLocation();
+            }
+            if (currencyAutoCompleter.getCurrency() != null) {
+                currency = currencyAutoCompleter.getCurrency();
+            }
+            if (traderAutoCompleter.getTrader() != null) {
+                trader = traderAutoCompleter.getTrader();
+            }
+            if (txtVouNo.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(Global.parentForm, "Invalid voucher no.",
+                        "Invalid Voucher ID", JOptionPane.ERROR_MESSAGE);
+                status = false;
+            } else if (txtCus.getText() == null) {
+                JOptionPane.showMessageDialog(Global.parentForm, "Customer cannot be blank.",
+                        "No customer.", JOptionPane.ERROR_MESSAGE);
+                status = false;
+                txtCus.requestFocusInWindow();
+            } else if (location.getLocationId() == null) {
+                JOptionPane.showMessageDialog(Global.parentForm, "Location cannot be blank.",
+                        "Select Location.", JOptionPane.ERROR_MESSAGE);
+                status = false;
+                txtLocation.requestFocusInWindow();
+            } else if (currency.getKey().getCode() == null) {
+                JOptionPane.showMessageDialog(Global.parentForm, "Currency cannot be blank.",
+                        "Select Currency", JOptionPane.ERROR_MESSAGE);
+                status = false;
+                txtCurrency.requestFocusInWindow();
+            } else if (listDetail.size() == 1) {
+                JOptionPane.showMessageDialog(Global.parentForm, "No Sale record.",
+                        "No data.", JOptionPane.ERROR_MESSAGE);
+                status = false;
+            } else {
+
+                retIn.setRetInId(txtVouNo.getText());
+                retIn.setCustomer(traderAutoCompleter.getTrader());
+                retIn.setRemark(txtRemark.getText());
+                retIn.setRetInDate(txtRetInDate.getDate());
+                retIn.setCreatedDate(Util1.getTodayDate());
+                retIn.setCurrency((currencyAutoCompleter.getCurrency()));
+
+                retIn.setLocation(locationAutoCompleter.getLocation());
+                retIn.setVouTotal(NumberUtil.getDouble(txtVouTotal.getText()));
+                retIn.setPaid(NumberUtil.getDouble(txtVouPaid.getText()));
+                retIn.setBalance(NumberUtil.getDouble(txtVouBalance.getText()));
+                retIn.setCreatedBy(Global.loginUser.getUserId().toString());
+                retIn.setDeleted(Util1.getNullTo(retIn.isDeleted()));
+                retIn.setVouTotal(NumberUtil.getDouble(txtVouTotal.getText()));
+                retIn.setPaid(NumberUtil.getDouble(txtVouPaid.getText()));
+                retIn.setBalance(NumberUtil.getDouble(txtVouBalance.getText()));
+                if (lblStatus.getText().equals("NEW")) {
+                    retIn.setRetInDate(txtRetInDate.getDate());
+                } else {
+                    Date tmpDate = txtRetInDate.getDate();
+                    if (!Util1.isSameDate(tmpDate, retIn.getRetInDate())) {
+                        retIn.setRetInDate(txtRetInDate.getDate());
+                    }
+                }
+                if (lblStatus.getText().equals("NEW")) {
+                    retIn.setCreatedBy(Global.loginUser.getUserId().toString());
+                    retIn.setSession(Global.sessionId);
+                } else {
+                    retIn.setUpdatedBy(Global.loginUser.getUserId().toString());
+                    retIn.setUpdatedDate(Util1.getTodayDate());
+                }
+            }
+
+        } catch (Exception ex) {
+            LOGGER.error("isValidEntry : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
+
+        }
+
+        return status;
     }
-    if (currencyAutoCompleter.getCurrency() != null) {
-    currency = currencyAutoCompleter.getCurrency();
-    }
-    if (traderAutoCompleter.getTrader() != null) {
-    trader = traderAutoCompleter.getTrader();
-    }
-    if (txtVouNo.getText().isEmpty()) {
-    JOptionPane.showMessageDialog(Global.parentForm, "Invalid voucher no.",
-    "Invalid Voucher ID", JOptionPane.ERROR_MESSAGE);
-    status = false;
-    } else if (txtCus.getText() == null) {
-    JOptionPane.showMessageDialog(Global.parentForm, "Customer cannot be blank.",
-    "No customer.", JOptionPane.ERROR_MESSAGE);
-    status = false;
-    txtCus.requestFocusInWindow();
-    } else if (location.getLocationId() == null) {
-    JOptionPane.showMessageDialog(Global.parentForm, "Location cannot be blank.",
-    "Select Location.", JOptionPane.ERROR_MESSAGE);
-    status = false;
-    txtLocation.requestFocusInWindow();
-    } else if (currency.getKey().getCode() == null) {
-    JOptionPane.showMessageDialog(Global.parentForm, "Currency cannot be blank.",
-    "Select Currency", JOptionPane.ERROR_MESSAGE);
-    status = false;
-    txtCurrency.requestFocusInWindow();
-    } else if (listDetail.size() == 1) {
-    JOptionPane.showMessageDialog(Global.parentForm, "No Sale record.",
-    "No data.", JOptionPane.ERROR_MESSAGE);
-    status = false;
-    } else {
-    
-    if (glId != null) {
-    gl.setGlId(glId);
-    }
-    gl.setVouNo(txtVouNo.getText());
-    gl.setTraderId(NumberUtil.NZeroL(trader.getId()));
-    gl.setRemark(txtRemark.getText());
-    gl.setGlDate(txtRetInDate.getDate());
-    gl.setCreatedDate(Util1.getTodayDate());
-    gl.setFromCurId(currency.getKey().getCode());
-    gl.setCompId(Global.compId);
-    gl.setSplitId(6);
-    gl.setTranSource("ÄCCOUNT-RETIN");
-    gl.setLocationId(location.getLocationId());
-    gl.setVouTotal(NumberUtil.getDouble(txtVouTotal.getText()));
-    gl.setPaid(NumberUtil.getDouble(txtVouPaid.getText()));
-    gl.setBalance(NumberUtil.getDouble(txtVouBalance.getText()));
-    gl.setCreatedBy(Global.loginUser.getUserId().toString());
-    gl.setDeleted(Util1.getNullTo(gl.getDeleted()));
-    }
-    if (txtVouNo.getText().isEmpty()) {
-    JOptionPane.showMessageDialog(Global.parentForm, "Invalid voucher no.",
-    "Invalid Voucher ID", JOptionPane.ERROR_MESSAGE);
-    status = false;
-    } else if (txtCus.getText() == null) {
-    JOptionPane.showMessageDialog(Global.parentForm, "Customer cannot be blank.",
-    "No customer.", JOptionPane.ERROR_MESSAGE);
-    status = false;
-    txtCus.requestFocusInWindow();
-    } else if (location.getLocationId() == null) {
-    JOptionPane.showMessageDialog(Global.parentForm, "Location cannot be blank.",
-    "Select Location.", JOptionPane.ERROR_MESSAGE);
-    status = false;
-    txtLocation.requestFocusInWindow();
-    } else if (currency.getKey().getCode() == null) {
-    JOptionPane.showMessageDialog(Global.parentForm, "Currency cannot be blank.",
-    "Select Currency", JOptionPane.ERROR_MESSAGE);
-    status = false;
-    txtCurrency.requestFocusInWindow();
-    } else {
-    gl = new Gl();
-    gl.setVouNo(txtVouNo.getText());
-    gl.setTraderId(NumberUtil.NZeroL(trader.getId()));
-    gl.setRemark(txtRemark.getText());
-    gl.setGlDate(txtRetInDate.getDate());
-    gl.setCreatedDate(Util1.getTodayDate());
-    gl.setFromCurId(currency.getKey().getCode());
-    gl.setCompId(Global.compId);
-    gl.setSplitId(6);
-    gl.setTranSource("ÄCCOUNT-RETOUT");
-    gl.setLocationId(location.getLocationId());
-    gl.setCreatedBy(Global.loginUser.getUserId().toString());
-    gl.setVouTotal(NumberUtil.getDouble(txtVouTotal.getText()));
-    gl.setPaid(NumberUtil.getDouble(txtVouPaid.getText()));
-    gl.setBalance(NumberUtil.getDouble(txtVouBalance.getText()));
-    
-    }
-    } catch (Exception ex) {
-    LOGGER.error("isValidEntry : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
-    
-    }
-    
-    return status;
-    }*/
+
     private void genVouNo() {
         vouEngine = new GenVouNoImpl(voudIdService, "RetIn", Util1.getPeriod(txtRetInDate.getDate()));
         txtVouNo.setText(vouEngine.genVouNo());
     }
 
-    private void deleteRetInDetail() {
-        String retInIds = returnInTableModel.getDeleteListStr();
-        if (retInIds != null && glId != null) {
-            try {
-                retInService.delete(retInIds, glId.toString());
-            } catch (Exception ex) {
-                LOGGER.error("deleteRetInDetail : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
-
-            }
-
-        }
-    }
-
+//    private void deleteRetInDetail() {
+//        String retInIds = returnInTableModel.getDeleteListStr();
+//        if (retInIds != null && glId != null) {
+//            try {
+//                retInService.delete(retInIds, glId.toString());
+//            } catch (Exception ex) {
+//                LOGGER.error("deleteRetInDetail : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
+//
+//            }
+//
+//        }
+//    }
     @Override
     public void print() {
     }

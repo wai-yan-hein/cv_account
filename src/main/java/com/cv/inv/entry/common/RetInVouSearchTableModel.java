@@ -5,6 +5,7 @@
 package com.cv.inv.entry.common;
 
 import com.cv.accountswing.util.Util1;
+import com.cv.inv.entity.RetInHis;
 import com.cv.inv.entity.view.VRetIn;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +22,7 @@ import org.springframework.stereotype.Component;
 public class RetInVouSearchTableModel extends AbstractTableModel {
 
     static Logger log = Logger.getLogger(RetInVouSearchTableModel.class.getName());
-    private List<VRetIn> listVRetIns = new ArrayList();
+    private List<RetInHis> listVRetIns = new ArrayList();
     private final String[] columnNames = {"Date", "Vou No", "Customer", "User", "V-Total"};
     private JTable parent;
 
@@ -64,19 +65,19 @@ public class RetInVouSearchTableModel extends AbstractTableModel {
         }
 
         try {
-            VRetIn vRetIn = listVRetIns.get(row);
+            RetInHis vRetIn = listVRetIns.get(row);
 
             switch (column) {
                 case 0: //Date
-                    return Util1.toDateStr(vRetIn.getGlDate(), "dd/MM/yyyy");
+                    return Util1.toDateStr(vRetIn.getRetInDate(), "dd/MM/yyyy");
                 case 1: //Vou No
 
-                    return vRetIn.getKey().getVouNo();
+                    return vRetIn.getRetInId();
 
                 case 2: //Customer
-                    return vRetIn.getTraderName();
+                    return vRetIn.getCustomer();
                 case 3: //User
-                    return vRetIn.getUserName();
+                    return vRetIn.getCreatedBy();
                 case 4: //V-Total
                     return vRetIn.getVouTotal();
                 default:
@@ -91,39 +92,7 @@ public class RetInVouSearchTableModel extends AbstractTableModel {
 
     @Override
     public void setValueAt(Object value, int row, int column) {
-        if (listVRetIns == null) {
-            return;
-        }
-
-        if (listVRetIns.isEmpty()) {
-            return;
-        }
-
-        VRetIn record = listVRetIns.get(row);
-        VRetIn vRetIn = (VRetIn) value;
-        switch (column) {
-
-            case 0: //Date
-                if (value != null) {
-
-                    record.setGlDate(vRetIn.getGlDate());
-
-                }
-                break;
-            case 1: //VouNo
-                record.setKey(vRetIn.getKey());
-                break;
-            case 2://CusName
-                record.setTraderName(vRetIn.getTraderName());
-            case 3:
-                record.setUserName(vRetIn.getUserName());
-            case 4:
-                record.setVouTotal(vRetIn.getVouTotal());
-            default:
-                System.out.println("invalid index");
-        }
-        fireTableRowsUpdated(row, row);
-        parent.requestFocusInWindow();
+     
     }
 
     @Override
@@ -139,16 +108,16 @@ public class RetInVouSearchTableModel extends AbstractTableModel {
         return columnNames.length;
     }
 
-    public List<VRetIn> getListVRetIns() {
+    public List<RetInHis> getListVRetIns() {
         return listVRetIns;
     }
 
-    public void setListGl(List<VRetIn> listVRetIns) {
+   public void setListRetInHis(List<RetInHis> listVRetIns) {
         this.listVRetIns = listVRetIns;
         fireTableDataChanged();
     }
 
-    public VRetIn getSelectVou(int row) {
+    public RetInHis getSelectVou(int row) {
         if (listVRetIns != null) {
             if (!listVRetIns.isEmpty()) {
                 return listVRetIns.get(row);

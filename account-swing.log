@@ -1,0 +1,4 @@
+26 Oct 2020 08:00:43,011 ERROR: com.cv.inv.entry.common.SaleVouSearchTableModel - getValueAt : 598 - null
+26 Oct 2020 08:00:43,042 ERROR: com.cv.inv.entry.common.SaleVouSearchTableModel - getValueAt : 598 - null
+26 Oct 2020 08:00:49,730 ERROR: com.cv.inv.entry.common.SaleVouSearchTableModel - getValueAt : 598 - null
+26 Oct 2020 09:56:27,932 ERROR: com.cv.inv.entry.common.CodeTableModel - setValueAt : 93 - java.lang.String cannot be cast to com.cv.inv.entity.Stock

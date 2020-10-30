@@ -5,11 +5,11 @@
  */
 package com.cv.inv.service;
 
-import com.cv.accountswing.dao.GlDao;
 import com.cv.inv.dao.RetInDao;
-import com.cv.accountswing.entity.Gl;
+import com.cv.inv.dao.RetInDetailDao;
 import com.cv.inv.entity.RetInCompoundKey;
 import com.cv.inv.entity.RetInDetailHis;
+import com.cv.inv.entity.RetInHis;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,31 +32,31 @@ public class RetInServiceImpl implements RetInService {
     private RetInDao retInDao;
 
     @Autowired
-    private GlDao glDao;
+    private RetInDetailDao dao;
 
     @Override
-    public RetInDetailHis save(Gl saveGl, List<RetInDetailHis> listRetIn) {
+    public void save(RetInHis retIn, List<RetInDetailHis> listRetIn, List<String> delList) {
 
         String retInDetailId;
         RetInCompoundKey key;
 
         try {
-            Gl gl = glDao.save(saveGl);
-
-            for (RetInDetailHis detailHis : listRetIn) {
-                if (detailHis.getStock() != null) {
-                    if (detailHis.getInCompoundKey() == null) {
-                        retInDetailId = gl.getVouNo() + '-' + detailHis.getUniqueId();
-                        key = new RetInCompoundKey(retInDetailId, gl.getGlId(), gl.getVouNo());
+            if (delList != null) {
+                for (String detailId : delList) {
+                    dao.delete(detailId);
+                }
+            }
+            retInDao.save(retIn);
+            String vouNo = retIn.getRetInId();
+            for (RetInDetailHis rd : listRetIn) {
+                if (rd.getStock() != null) {
+                    if (rd.getInCompoundKey() != null) {
+                        rd.setInCompoundKey(rd.getInCompoundKey());
                     } else {
-                        retInDetailId = detailHis.getInCompoundKey().getRetInDetailId();
-                        key = new RetInCompoundKey(retInDetailId, gl.getGlId(), gl.getVouNo());
+                        retInDetailId = vouNo + '-' + rd.getUniqueId();
+                        rd.setInCompoundKey(new RetInCompoundKey(retInDetailId, vouNo));
                     }
-
-                    detailHis.setInCompoundKey(key);
-                    retInDao.save(detailHis);
-                    retInDetailHis = detailHis;
-                    //retInDetailHis = detailHis;
+                    dao.save(rd);
                 }
 
             }
@@ -65,18 +65,22 @@ public class RetInServiceImpl implements RetInService {
             logger.error("saveRetIn : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
 
         }
-        return retInDetailHis;
 
     }
 
     @Override
-    public void delete(String retInId,String glId) {
-        retInDao.delete(retInId, glId);
+    public void delete(String retInId) {
+        dao.delete(retInId);
     }
 
     @Override
-    public List<RetInDetailHis> search(String glId, String vouNo) {
-        return retInDao.search(glId, vouNo);
+    public List<RetInHis> search(String fromDate, String toDate, String cusId, String locId, String vouNo, String filterCode) {
+        return retInDao.search(fromDate, toDate, cusId, locId, vouNo, filterCode);
+    }
+
+    @Override
+    public RetInHis findById(String id) {
+        return retInDao.findById(id);
     }
 
 }

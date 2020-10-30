@@ -221,13 +221,13 @@ public class SaleEntryTableModel extends AbstractTableModel {
                         record.setQuantity(1.0f);
                         record.setStdWeight(stock.getSaleMeasure());
                         record.setItemUnit(stock.getSaleUnit());
-                        //record.setUniqueId(row + 1);
                         record.setDepartment(department);
                         record.setLocation(location);
                         stockUp.add(stock);
                         if (stock.getStockCode() != null) {
                             String stockCode = stock.getStockCode();
-                            record.setPrice(stockUp.getPrice(stockCode, getCusType()));
+                            Double salePrice = stockUp.getPrice(stockCode, getCusType());
+                            record.setPrice(Util1.getFloat(salePrice));
                         }
                         txtTotalItem.setText(Integer.toString(listDetail.size()));
                         addEmptyRow();
@@ -266,7 +266,7 @@ public class SaleEntryTableModel extends AbstractTableModel {
                         if (NumberUtil.isPositive(value)) {
                             record.setStdWeight(Util1.getFloat(value));
                             String toUnit = record.getItemUnit().getItemUnitCode();
-                            Double calAmount = calPrice(record, toUnit);
+                            Float calAmount = calPrice(record, toUnit);
                             record.setAmount(calAmount);
                         } else {
                             showMessageBox("Input value must be positive");
@@ -282,7 +282,7 @@ public class SaleEntryTableModel extends AbstractTableModel {
                     if (value != null) {
                         record.setItemUnit((StockUnit) value);
                         String toUnit = record.getItemUnit().getItemUnitCode();
-                        Double calAmount = calPrice(record, toUnit);
+                        Float calAmount = calPrice(record, toUnit);
                         record.setAmount(calAmount);
                     } else {
                         record.setItemUnit(null);
@@ -292,7 +292,7 @@ public class SaleEntryTableModel extends AbstractTableModel {
                 case 7://Sale Price
                     if (NumberUtil.isNumber(value)) {
                         if (NumberUtil.isPositive(value)) {
-                            record.setPrice(Util1.getDouble(value));
+                            record.setPrice(Util1.getFloat(value));
                             parent.setColumnSelectionInterval(8, 8);
                         } else {
                             showMessageBox("Input value must be positive");
@@ -305,7 +305,7 @@ public class SaleEntryTableModel extends AbstractTableModel {
                     break;
                 case 8: //Amount
                     if (value != null) {
-                        record.setAmount(Util1.getDouble(value));
+                        record.setAmount(Util1.getFloat(value));
                         isAmount = true;
                     }
                     break;
@@ -396,28 +396,28 @@ public class SaleEntryTableModel extends AbstractTableModel {
         if (sale.getStock() != null) {
             Stock stock = sale.getStock();
             float saleQty = sale.getQuantity();
-            double stdSalePrice = sale.getPrice();
-            double calAmount = Util1.getDouble(sale.getAmount());
+            float stdSalePrice = sale.getPrice();
+            float calAmount = Util1.getFloat(sale.getAmount());
             float userWt = sale.getStdWeight();
             float stdWt = stock.getSaleMeasure();
             sale.setSmallestWT(getSmallestUnit(userWt, sale.getItemUnit().getItemUnitCode()));
             sale.setSmallestUnit("oz");
 
             if (userWt != stdWt) {
-                double amount = (saleQty * calAmount);
+                float amount = (saleQty * calAmount);
                 sale.setAmount(amount);
             } else {
-                double amount = saleQty * stdSalePrice;
+                float amount = saleQty * stdSalePrice;
                 sale.setAmount(amount);
             }
         }
     }
 
-    private Double calPrice(SaleDetailHis sdh, String toUnit) {
+    private Float calPrice(SaleDetailHis sdh, String toUnit) {
         Stock stock = sdh.getStock();
-        double saleAmount = 0.0;
-        double stdSalePrice = sdh.getPrice();
-        double stdPrice = sdh.getPrice();
+        float saleAmount = 0.0f;
+        float stdSalePrice = sdh.getPrice();
+        float stdPrice = sdh.getPrice();
         float userWt = sdh.getStdWeight();
         float stdWt = stock.getSaleMeasure();
         String fromUnit = stock.getSaleUnit().getItemUnitCode();
