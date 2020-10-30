@@ -29,36 +29,34 @@ public class NetworkDetector extends Thread {
 
     @Override
     public void run() {
-        while (true) {
-            try {
-                String ipAddress = "www.google.com";
-                InetAddress inet = InetAddress.getByName(ipAddress);
+        try {
+            String ipAddress = "www.google.com";
+            InetAddress inet = InetAddress.getByName(ipAddress);
 
-                long start = new GregorianCalendar().getTimeInMillis();
+            long start = new GregorianCalendar().getTimeInMillis();
 
-                if (inet.isReachable(5000)) {
-                    long finish = new GregorianCalendar().getTimeInMillis();
-                    long time = finish - start;
-                    if (networkObserver != null) {
-                        networkObserver.sendPingTime(time);
-                    }
-                } else {
-                    if (networkObserver != null) {
-                        networkObserver.sendPingTime(-1);
-                    }
-                    //System.out.println(ipAddress + " NOT reachable.");
+            if (inet.isReachable(5000)) {
+                long finish = new GregorianCalendar().getTimeInMillis();
+                long time = finish - start;
+                if (networkObserver != null) {
+                    networkObserver.sendPingTime(time);
                 }
-                error = false;
-                Thread.sleep(sleepTime);
-            } catch (IOException | InterruptedException e) {
-                if (!error) {
+            } else {
+                if (networkObserver != null) {
                     networkObserver.sendPingTime(-1);
-                    error = true;
                 }
-                //System.out.println("Exception:" + e.getMessage());
+                //System.out.println(ipAddress + " NOT reachable.");
             }
-
+            error = false;
+            Thread.sleep(sleepTime);
+        } catch (IOException | InterruptedException e) {
+            if (!error) {
+                networkObserver.sendPingTime(-1);
+                error = true;
+            }
+            //System.out.println("Exception:" + e.getMessage());
         }
+
     }
 
 }

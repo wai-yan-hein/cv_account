@@ -22,6 +22,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -442,44 +443,45 @@ public class DateAutoCompleter implements KeyListener, SelectionObserver {
     }
 
     private List<DateModel> generateDate() {
-        LocalDate now = LocalDate.now();
+        Date finDate = Util1.toDate(Global.finicialPeriodFrom);
+        LocalDate now = finDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
         List<DateModel> listDateModel = new ArrayList<>();
         DateModel all = new DateModel();
         all.setText("All");
         listDateModel.add(all);
         listDateModel.add(new DateModel(getMonthShortName(now.getMonth()), now.getMonthValue(), now.getYear(), "Today"));
-        DateModel dateModel = new DateModel(getMonthShortName(now.getMonth()), now.getMonthValue(), now.getYear(), "Yesterday");
-        dateModel.setDay(now.getDayOfMonth() - 1);
-        listDateModel.add(dateModel);
+        DateModel date = new DateModel(getMonthShortName(now.getMonth()), now.getMonthValue(), now.getYear(), "Yesterday");
+        date.setDay(now.getDayOfMonth() - 1);
+        listDateModel.add(date);
         listDateModel.add(new DateModel(getMonthShortName(now.getMonth()), now.getMonthValue(), now.getYear(), "Custom"));
 
-        int minusMonth = 5;
-        int oddMonth = 5;
-        for (int i = 1; i < minusMonth; i++) {
-            LocalDate earlier = now.minusMonths(i);
-            LocalDate monthBegin = earlier.withDayOfMonth(1);
-            LocalDate monthEnd = earlier.plusMonths(1).withDayOfMonth(1).minusDays(1);
-            Month month = earlier.getMonth();
-            int value = earlier.getMonth().getValue();
-            int year = earlier.getYear();
-            DateModel date = new DateModel(getMonthShortName(month), value, year, "-");
-            date.setStartDate(monthBegin.toString());
-            date.setEndDate(monthEnd.toString());
-            listDateModel.add(date);
-        }
-        for (int i = 1; i < oddMonth; i++) {
+        int oddMonth = 12;
+        /*for (int i = 1; i < minusMonth; i++) {
+        LocalDate earlier = now.minusMonths(i);
+        LocalDate monthBegin = earlier.withDayOfMonth(1);
+        LocalDate monthEnd = earlier.plusMonths(1).withDayOfMonth(1).minusDays(1);
+        Month month = earlier.getMonth();
+        int value = earlier.getMonth().getValue();
+        int year = earlier.getYear();
+        DateModel date = new DateModel(getMonthShortName(month), value, year, "-");
+        date.setStartDate(monthBegin.toString());
+        date.setEndDate(monthEnd.toString());
+        listDateModel.add(date);
+        }*/
+        for (int i = 0; i < oddMonth; i++) {
             LocalDate next = now.plusMonths(i);
             LocalDate monthBegin = next.withDayOfMonth(1);
             LocalDate monthEnd = next.plusMonths(1).withDayOfMonth(1).minusDays(1);
             Month month = next.getMonth();
             int value = next.getMonth().getValue();
             int year = next.getYear();
-            DateModel date = new DateModel(getMonthShortName(month), value, year, "-");
-            date.setStartDate(monthBegin.toString());
-            date.setEndDate(monthEnd.toString());
-            listDateModel.add(date);
+            DateModel d = new DateModel(getMonthShortName(month), value, year, "-");
+            d.setStartDate(monthBegin.toString());
+            d.setEndDate(monthEnd.toString());
+            listDateModel.add(d);
         }
+        
         Global.listDateModel = listDateModel;
         return listDateModel;
     }

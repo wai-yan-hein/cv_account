@@ -35,9 +35,9 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="jScrollPane1" pref="210" max="32767" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <Component id="jScrollPane1" pref="370" max="32767" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="jPanel2" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
@@ -54,19 +54,19 @@
                   <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
-                  <Component id="txtDate" max="32767" attributes="0"/>
+                  <Component id="txtDate" pref="131" max="32767" attributes="0"/>
                   <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
-                  <Component id="txtDep" max="32767" attributes="0"/>
+                  <Component id="txtDep" pref="131" max="32767" attributes="0"/>
                   <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
-                  <Component id="txtPerson" max="32767" attributes="0"/>
+                  <Component id="txtPerson" pref="131" max="32767" attributes="0"/>
                   <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
-                  <Component id="txtCurrency" max="32767" attributes="0"/>
+                  <Component id="txtCurrency" pref="134" max="32767" attributes="0"/>
                   <EmptySpace min="-2" max="-2" attributes="0"/>
               </Group>
           </Group>
@@ -200,24 +200,19 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="0" attributes="0">
-                  <EmptySpace min="-2" max="-2" attributes="0"/>
-                  <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
-                  <Component id="txtDisplayCurr" max="32767" attributes="0"/>
-                  <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
-                  <Component id="jLabel7" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
-                  <Component id="txtFTotalDrAmt" max="32767" attributes="0"/>
-                  <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
-                  <Component id="jLabel8" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
-                  <Component id="txtFTotalCrAmt" max="32767" attributes="0"/>
-                  <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
-                  <Component id="jLabel9" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
-                  <Component id="txtFOFB" max="32767" attributes="0"/>
-                  <EmptySpace min="-2" max="-2" attributes="0"/>
+              <Group type="102" attributes="0">
+                  <EmptySpace max="32767" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="1" attributes="0">
+                          <Component id="txtFTotalDrAmt" min="-2" pref="150" max="-2" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Component id="txtFTotalCrAmt" min="-2" pref="150" max="-2" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Component id="txtFNetChange" min="-2" pref="150" max="-2" attributes="0"/>
+                      </Group>
+                      <Component id="txtFOFB" alignment="1" min="-2" pref="150" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -226,50 +221,27 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="jLabel5" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="txtDisplayCurr" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="jLabel7" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="txtFTotalDrAmt" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="jLabel8" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="txtFTotalCrAmt" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="jLabel9" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="txtFOFB" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="txtFNetChange" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="txtFOFB" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace pref="17" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Component class="javax.swing.JLabel" name="jLabel5">
-          <Properties>
-            <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="Global.lableFont" type="code"/>
-            </Property>
-            <Property name="text" type="java.lang.String" value="Currency"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JTextField" name="txtDisplayCurr">
-          <Properties>
-            <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="Global.lableFont" type="code"/>
-            </Property>
-            <Property name="disabledTextColor" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-              <Color blue="0" green="0" red="0" type="rgb"/>
-            </Property>
-            <Property name="enabled" type="boolean" value="false"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JLabel" name="jLabel7">
-          <Properties>
-            <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="Global.lableFont" type="code"/>
-            </Property>
-            <Property name="text" type="java.lang.String" value="Total Dr-Amt"/>
-          </Properties>
-        </Component>
         <Component class="javax.swing.JFormattedTextField" name="txtFTotalDrAmt">
           <Properties>
+            <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+              <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+                <TitledBorder title="Total Dr-Amt">
+                  <Connection PropertyName="font" code="Global.shortCutFont" type="code"/>
+                </TitledBorder>
+              </Border>
+            </Property>
             <Property name="horizontalAlignment" type="int" value="4"/>
             <Property name="disabledTextColor" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
               <Color blue="0" green="0" red="0" type="rgb"/>
@@ -278,18 +250,17 @@
             <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="Global.amtFont" type="code"/>
             </Property>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JLabel" name="jLabel8">
-          <Properties>
-            <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="Global.lableFont" type="code"/>
-            </Property>
-            <Property name="text" type="java.lang.String" value="Total Cr-Amt"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JFormattedTextField" name="txtFTotalCrAmt">
           <Properties>
+            <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+              <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+                <TitledBorder title="Total Crd-Amt">
+                  <Connection PropertyName="font" code="Global.shortCutFont" type="code"/>
+                </TitledBorder>
+              </Border>
+            </Property>
             <Property name="horizontalAlignment" type="int" value="4"/>
             <Property name="disabledTextColor" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
               <Color blue="0" green="0" red="0" type="rgb"/>
@@ -300,16 +271,34 @@
             </Property>
           </Properties>
         </Component>
-        <Component class="javax.swing.JLabel" name="jLabel9">
-          <Properties>
-            <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="Global.lableFont" type="code"/>
-            </Property>
-            <Property name="text" type="java.lang.String" value="Out of Balance"/>
-          </Properties>
-        </Component>
         <Component class="javax.swing.JFormattedTextField" name="txtFOFB">
           <Properties>
+            <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+              <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+                <TitledBorder title="Out of balance">
+                  <Connection PropertyName="font" code="Global.shortCutFont" type="code"/>
+                </TitledBorder>
+              </Border>
+            </Property>
+            <Property name="horizontalAlignment" type="int" value="4"/>
+            <Property name="disabledTextColor" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="0" green="0" red="0" type="rgb"/>
+            </Property>
+            <Property name="enabled" type="boolean" value="false"/>
+            <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="Global.amtFont" type="code"/>
+            </Property>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JFormattedTextField" name="txtFNetChange">
+          <Properties>
+            <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+              <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+                <TitledBorder title="Total Net-Change">
+                  <Connection PropertyName="font" code="Global.shortCutFont" type="code"/>
+                </TitledBorder>
+              </Border>
+            </Property>
             <Property name="horizontalAlignment" type="int" value="4"/>
             <Property name="disabledTextColor" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
               <Color blue="0" green="0" red="0" type="rgb"/>

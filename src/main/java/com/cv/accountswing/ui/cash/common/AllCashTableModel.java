@@ -13,7 +13,6 @@ import com.cv.accountswing.entity.Department;
 import com.cv.accountswing.entity.Gl;
 import com.cv.accountswing.entity.Trader;
 import com.cv.accountswing.entity.view.VGl;
-import com.cv.accountswing.service.COAService;
 import com.cv.accountswing.service.GlService;
 import com.cv.accountswing.service.MessagingService;
 import com.cv.accountswing.service.TraderService;
@@ -281,6 +280,12 @@ public class AllCashTableModel extends AbstractTableModel {
             parent.setColumnSelectionInterval(7, 7);
             parent.setRowSelectionInterval(row, row);*/
         }
+        if (vgl.getDeptId() == null) {
+            status = false;
+            JOptionPane.showMessageDialog(Global.parentForm, "Missing Department.");
+            parent.setColumnSelectionInterval(1, 1);
+            parent.setRowSelectionInterval(row, row);
+        }
 
         return status;
     }
@@ -358,6 +363,7 @@ public class AllCashTableModel extends AbstractTableModel {
                 int delete = glService.delete(vgl.getGlId());
                 if (delete == 1) {
                     listVGl.remove(row);
+                    trader = traderService.findById(vgl.getTraderId().intValue());
                     sendDeletePaymentToInv(trader, vgl.getGlId());
                     fireTableRowsDeleted(0, listVGl.size());
                 }
@@ -396,7 +402,11 @@ public class AllCashTableModel extends AbstractTableModel {
         if (hasEmptyRow()) {
             VGl vGl = new VGl();
             vGl.setGlDate(Util1.getTodayDate());
-            vGl.setFromCurId(Global.sysProperties.get("system.default.currency"));
+            vGl.setFromCurId(Global.defalutCurrency.getKey().getCode());
+            if (Global.defaultDepartment != null) {
+                vGl.setDeptId(Global.defaultDepartment.getDeptCode());
+                vGl.setDeptUsrCode(Global.defaultDepartment.getUsrCode());
+            }
             listVGl.add(vGl);
             fireTableRowsInserted(listVGl.size() - 1, listVGl.size() - 1);
         }

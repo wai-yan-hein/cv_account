@@ -5,16 +5,14 @@
  */
 package com.cv.inv.entity;
 
+import com.cv.accountswing.entity.Department;
 import java.io.Serializable;
-import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 /**
  *
@@ -29,9 +27,6 @@ public class PurchaseDetail implements Serializable {
     @ManyToOne
     @JoinColumn(name = "stock_code", nullable = false)
     private Stock stock;
-    @Temporal(TemporalType.DATE)
-    @Column(name = "exp_date")
-    private Date expDate;
     @Column(name = "qty", nullable = false)
     private Float qty;
     @Column(name = "std_wt", nullable = false)
@@ -58,6 +53,9 @@ public class PurchaseDetail implements Serializable {
     private Float smallestWT;
     @Column(name = "small_unit", nullable = false)
     private String smallestUnit;
+    @ManyToOne
+    @JoinColumn(name = "dept_id")
+    private Department department;
 
     public PurDetailKey getPurDetailKey() {
         return purDetailKey;
@@ -66,6 +64,8 @@ public class PurchaseDetail implements Serializable {
     public void setPurDetailKey(PurDetailKey purDetailKey) {
         this.purDetailKey = purDetailKey;
     }
+    
+    
 
     public Stock getStock() {
         return stock;
@@ -73,14 +73,6 @@ public class PurchaseDetail implements Serializable {
 
     public void setStock(Stock stock) {
         this.stock = stock;
-    }
-
-    public Date getExpDate() {
-        return expDate;
-    }
-
-    public void setExpDate(Date expDate) {
-        this.expDate = expDate;
     }
 
     public Float getQty() {
@@ -177,6 +169,14 @@ public class PurchaseDetail implements Serializable {
 
     public void setAvgPrice(Float avgPrice) {
         this.avgPrice = avgPrice;
+    }
+
+    public Department getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(Department department) {
+        this.department = department;
     }
 
 }

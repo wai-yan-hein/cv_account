@@ -26,7 +26,6 @@ import com.cv.inv.entry.common.SaleVouSearchTableModel;
 import com.cv.inv.entry.editor.MachineInfoAutoCompleter;
 import com.cv.inv.entry.editor.StockCellEditor;
 import com.cv.inv.entry.editor.VouStatusAutoCompleter;
-import com.cv.inv.service.LocationService;
 import com.cv.inv.service.MachineInfoService;
 import com.cv.inv.service.SaleDetailService;
 import com.cv.inv.service.SaleHisService;
@@ -54,8 +53,6 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
      * Creates new form SaleVouSearchDialog
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(SaleVouSearch.class);
-    @Autowired
-    private LocationService locationService;
     @Autowired
     private VouStatusService vouStatusService;
     @Autowired
@@ -153,7 +150,6 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
     }
 
     private void search() {
-        btnSearch.setEnabled(false);
         String fromDate = Util1.toDateStr(txtFromDate.getDate(), "dd/MM/yyyy");
         String toDate = Util1.toDateStr(txtToDate.getDate(), "dd/MM/yyyy");
         String customerId = traderAutoCompleter.getTrader().getId().toString();
@@ -174,7 +170,6 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
             }
             lblTtlAmount.setText("Total Amount : " + iAmount);
         }
-        btnSearch.setEnabled(true);
     }
 
     private void select() {

@@ -38,6 +38,9 @@ public interface COAOpeningDaoD {
     public void genOpBalanceGL(String coaCode, String opDate,
             String clDate, int level, String curr, String userId, String dept) throws Exception;
 
+    public void genOpBalanceGL1(String coaCode, String opDate,
+            String clDate, int level, String curr, String userId, String dept) throws Exception;
+
     public List<TmpOpeningClosing> getOpBalanceGL(String userId);
 
     public void genTriBalance(String compCode, String fromDate, String opDate, String tranDate, String coaCode,

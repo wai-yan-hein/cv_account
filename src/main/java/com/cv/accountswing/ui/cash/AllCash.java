@@ -32,6 +32,7 @@ import com.cv.accountswing.ui.filter.FilterPanel;
 import com.cv.accountswing.util.Util1;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -42,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
@@ -224,11 +226,13 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
 
     private void initPopup() {
         popupmenu = new JPopupMenu("Edit");
-        JMenuItem closeAll = new JMenuItem("Print");
-        closeAll.addActionListener((ActionEvent e) -> {
+        ImageIcon printIcon = new ImageIcon(this.getClass().getResource("/images/printer.png"));
+        JMenuItem print = new JMenuItem("Print");
+        print.setIcon(printIcon);
+        print.addActionListener((ActionEvent e) -> {
             printVoucher();
         });
-        popupmenu.add(closeAll);
+        popupmenu.add(print);
         initMouseLisener();
     }
 
@@ -339,28 +343,32 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
     }
 
     private void searchCash() {
-        initializeParameter();
-        loadingObserver.load(this.getName(), "Start");
-        if (sourceAccId != null) {
-            taskExecutor.execute(() -> {
-                LOGGER.info(sourceAccId + "----- Searching...");
-                List<VGl> listVGl = vGlService.search(stDate, enDate,
-                        desp, sourceAccId,
-                        accId, currency, "-",
-                        ref, depId, "-", "-",
-                        "-", "-", "-", "-", "-",
-                        traderName, "-", "-",
-                        debAmt,
-                        crdAmt);
-                swapData(listVGl, sourceAccId);
-                allCashTableModel.setListVGl(listVGl);
-                allCashTableModel.addNewRow();
-                requestFoucsTable();
-                LOGGER.info(sourceAccId + "----- Finished...");
-            });
-            calOpeningClosing();
-        } else {
-            JOptionPane.showMessageDialog(Global.parentForm, "Source Account Missing.");
+        try {
+            initializeParameter();
+            loadingObserver.load(this.getName(), "Start");
+            if (sourceAccId != null) {
+                taskExecutor.execute(() -> {
+                    LOGGER.info(this.getName() + "Start Date  :" + stDate + "-" + "End Date :" + enDate);
+                    List<VGl> listVGl = vGlService.search(stDate, enDate,
+                            desp, sourceAccId,
+                            accId, currency, "-",
+                            ref, depId, "-", "-",
+                            "-", "-", "-", "-", "-",
+                            traderName, "-", "-",
+                            debAmt,
+                            crdAmt);
+                    swapData(listVGl, sourceAccId);
+                    allCashTableModel.setListVGl(listVGl);
+                    allCashTableModel.addNewRow();
+                    requestFoucsTable();
+                    calOpeningClosing();
+                });
+            } else {
+                JOptionPane.showMessageDialog(Global.parentForm, "Source Account Missing.");
+            }
+        } catch (HeadlessException e) {
+            LOGGER.error("Search Cash :" + e.getMessage());
+            JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Searching Cash", JOptionPane.ERROR_MESSAGE);
         }
 
     }
@@ -400,11 +408,12 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
     }
 
     private void swapData(List<VGl> listVGL, String targetId) {
-        listVGL.forEach(vgl -> {
-            String sourceAcId = Util1.isNull(vgl.getSourceAcId(), "-");
-            String accId = Util1.isNull(vgl.getAccountId(), "-");
-            if (sourceAcId.equals(targetId)) {
-                /*if(Util1.isNullZero(vgl.getSplitId()) == 8){ //Credit Voucher
+        if (!listVGL.isEmpty()) {
+            listVGL.forEach(vgl -> {
+                String sourceAcId = Util1.isNull(vgl.getSourceAcId(), "-");
+                String accId = Util1.isNull(vgl.getAccountId(), "-");
+                if (sourceAcId.equals(targetId)) {
+                    /*if(Util1.isNullZero(vgl.getSplitId()) == 8){ //Credit Voucher
                 Double tmpAmt = vgl.getDrAmt();
                 vgl.setDrAmt(vgl.getCrAmt());
                 vgl.setCrAmt(tmpAmt);
@@ -413,22 +422,23 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
                 vgl.setCrAmt(vgl.getDrAmt());
                 vgl.setDrAmt(tmpAmt);
                 }*/
-            } else if (accId.equals(targetId)) {
-                double tmpDrAmt = 0;
-                if (vgl.getDrAmt() != null) {
-                    tmpDrAmt = vgl.getDrAmt();
-                }
-                vgl.setDrAmt(vgl.getCrAmt());
-                vgl.setCrAmt(tmpDrAmt);
+                } else if (accId.equals(targetId)) {
+                    double tmpDrAmt = 0;
+                    if (vgl.getDrAmt() != null) {
+                        tmpDrAmt = vgl.getDrAmt();
+                    }
+                    vgl.setDrAmt(vgl.getCrAmt());
+                    vgl.setCrAmt(tmpDrAmt);
 
-                String tmpStr = vgl.getAccName();
-                vgl.setAccName(vgl.getSrcAccName());
-                vgl.setSrcAccName(tmpStr);
-            } else {
-                vgl.setDrAmt(0.0);
-                vgl.setCrAmt(0.0);
-            }
-        });
+                    String tmpStr = vgl.getAccName();
+                    vgl.setAccName(vgl.getSrcAccName());
+                    vgl.setSrcAccName(tmpStr);
+                } else {
+                    vgl.setDrAmt(0.0);
+                    vgl.setCrAmt(0.0);
+                }
+            });
+        }
     }
 
     /**
@@ -444,14 +454,10 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
         jScrollPane2 = new javax.swing.JScrollPane();
         tblCash = new javax.swing.JTable();
         jPanel1 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
         txtFClosing = new javax.swing.JFormattedTextField();
         txtFOpening = new javax.swing.JFormattedTextField();
         txtFDebitAmt = new javax.swing.JFormattedTextField();
         txtFCreditAmt = new javax.swing.JFormattedTextField();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
 
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentShown(java.awt.event.ComponentEvent evt) {
@@ -486,22 +492,18 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
         tblCash.setRowHeight(Global.tblRowHeight);
         jScrollPane2.setViewportView(tblCash);
 
-        jLabel1.setFont(Global.lableFont);
-        jLabel1.setText("Opening Bal");
-
-        jLabel2.setFont(Global.lableFont);
-        jLabel2.setText("Closing Bal");
-
+        txtFClosing.setEditable(false);
+        txtFClosing.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Closing Balance", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, Global.shortCutFont));
         txtFClosing.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
         txtFClosing.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         txtFClosing.setDisabledTextColor(new java.awt.Color(0, 0, 0));
-        txtFClosing.setEnabled(false);
         txtFClosing.setFont(Global.amtFont);
 
+        txtFOpening.setEditable(false);
+        txtFOpening.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Opening Balance", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, Global.shortCutFont));
         txtFOpening.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
         txtFOpening.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         txtFOpening.setDisabledTextColor(new java.awt.Color(0, 0, 0));
-        txtFOpening.setEnabled(false);
         txtFOpening.setFont(Global.amtFont);
         txtFOpening.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -509,72 +511,50 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
             }
         });
 
+        txtFDebitAmt.setEditable(false);
+        txtFDebitAmt.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Total Dr-Amt", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, Global.shortCutFont));
         txtFDebitAmt.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
         txtFDebitAmt.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         txtFDebitAmt.setDisabledTextColor(new java.awt.Color(0, 0, 0));
-        txtFDebitAmt.setEnabled(false);
         txtFDebitAmt.setFont(Global.amtFont);
 
+        txtFCreditAmt.setEditable(false);
+        txtFCreditAmt.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Total Cr-Amt", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, Global.shortCutFont));
         txtFCreditAmt.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
         txtFCreditAmt.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         txtFCreditAmt.setDisabledTextColor(new java.awt.Color(0, 0, 0));
-        txtFCreditAmt.setEnabled(false);
         txtFCreditAmt.setFont(Global.amtFont);
-
-        jLabel3.setFont(Global.lableFont);
-        jLabel3.setText("Total Dr-Amt");
-
-        jLabel4.setFont(Global.lableFont);
-        jLabel4.setText("Total Cr-Amt");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap(387, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel1))
-                .addGap(18, 18, 18)
+                .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(txtFClosing, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtFOpening, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel3)
-                        .addGap(18, 18, 18)
-                        .addComponent(txtFDebitAmt, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel4)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(txtFCreditAmt, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 435, Short.MAX_VALUE)
+                .addComponent(txtFDebitAmt, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(txtFCreditAmt, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
-        jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {txtFClosing, txtFCreditAmt, txtFDebitAmt, txtFOpening});
-
-        jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jLabel3, jLabel4});
+        jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {txtFClosing, txtFOpening});
 
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(txtFOpening, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel1))
+                    .addComponent(txtFOpening, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(txtFDebitAmt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel3)))
+                        .addComponent(txtFCreditAmt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel2)
-                        .addComponent(txtFClosing, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(txtFCreditAmt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel4)))
+                .addComponent(txtFClosing, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -594,7 +574,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
             .addGroup(layout.createSequentialGroup()
                 .addComponent(panelFilter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 239, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 230, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -618,10 +598,6 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JPanel panelFilter;
@@ -649,25 +625,23 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
     }
 
     private void calOpeningClosing() {
-        taskExecutor.execute(() -> {
-            String opDate = Global.finicialPeriodFrom;
-            try {
-                if (stDate.equals("-")) {
-                    stDate = opDate;
-                }
-                List<TmpOpeningClosing> opBalanceGL = coaOpDService.getOpBalanceGL(sourceAccId, opDate, stDate, 3, "MMK",
-                        Global.loginUser.getUserId().toString(),
-                        Util1.isNull(depId, "-"));
-                if (!opBalanceGL.isEmpty()) {
-                    TmpOpeningClosing tmpOC = opBalanceGL.get(0);
-                    txtFOpening.setValue(tmpOC.getOpening());
-                }
-                calDebitCredit();
-                loadingObserver.load(this.getName(), "Stop");
-            } catch (Exception ex) {
-                LOGGER.error("TmpOpeningClosing" + ex.getMessage());
+        String opDate = Global.finicialPeriodFrom;
+        try {
+            if (stDate.equals("-")) {
+                stDate = opDate;
             }
-        });
+            List<TmpOpeningClosing> opBalanceGL = coaOpDService.getOpBalanceGL1(sourceAccId, opDate, stDate, 3, "MMK",
+                    Global.loginUser.getUserId().toString(),
+                    Util1.isNull(depId, "-"));
+            if (!opBalanceGL.isEmpty()) {
+                TmpOpeningClosing tmpOC = opBalanceGL.get(0);
+                txtFOpening.setValue(tmpOC.getOpening());
+            }
+            calDebitCredit();
+            loadingObserver.load(this.getName(), "Stop");
+        } catch (Exception ex) {
+            LOGGER.error("TmpOpeningClosing" + ex.getMessage());
+        }
     }
 
     @Override
