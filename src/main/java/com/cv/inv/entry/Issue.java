@@ -12,6 +12,7 @@ import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.util.Util1;
+import com.cv.inv.entity.StockOutstanding;
 import com.cv.inv.entry.common.IssueTableModel;
 import com.cv.inv.entry.editor.LocationAutoCompleter;
 import com.toedter.calendar.JTextFieldDateEditor;
@@ -69,12 +70,12 @@ public class Issue extends javax.swing.JPanel implements SelectionObserver, KeyL
         tblIssue.getColumnModel().getColumn(4).setPreferredWidth(30);
         tblIssue.getColumnModel().getColumn(5).setPreferredWidth(150);
         tblIssue.getColumnModel().getColumn(6).setPreferredWidth(40);
-        tblIssue.getColumnModel().getColumn(7).setPreferredWidth(10);
-        tblIssue.getColumnModel().getColumn(8).setPreferredWidth(2);
-        tblIssue.getColumnModel().getColumn(9).setPreferredWidth(10);
-        tblIssue.getColumnModel().getColumn(10).setPreferredWidth(30);
+        tblIssue.getColumnModel().getColumn(7).setPreferredWidth(2);
+        tblIssue.getColumnModel().getColumn(8).setPreferredWidth(10);
+        tblIssue.getColumnModel().getColumn(9).setPreferredWidth(30);
         tblIssue.setDefaultRenderer(Boolean.class, new TableCellRender());
         tblIssue.setDefaultRenderer(Object.class, new TableCellRender());
+        tblIssue.setDefaultRenderer(Float.class, new TableCellRender());
     }
 
     private void initKeyListener() {
@@ -104,6 +105,19 @@ public class Issue extends javax.swing.JPanel implements SelectionObserver, KeyL
     private void initCombo() {
         LocationAutoCompleter locAutoCompleter = new LocationAutoCompleter(txtLocation, Global.listLocation, null);
         locAutoCompleter.setSelectionObserver(this);
+    }
+
+    private void borrow() {
+        System.out.println("Borrow");
+        StockOutstanding outs = new StockOutstanding();
+        outs.setTranOption("Borrow");
+        outs.setInvId(txtIssueId.getText());
+        outs.setTranDate(txtDate.getDate());
+        issueTableModel.add(outs);
+    }
+
+    private void clear() {
+        issueTableModel.removeListDetail();
     }
 
     /**
@@ -158,6 +172,11 @@ public class Issue extends javax.swing.JPanel implements SelectionObserver, KeyL
         btnBorrow.setFont(Global.lableFont);
         btnBorrow.setText("Borrow");
         btnBorrow.setName("btnBorrow"); // NOI18N
+        btnBorrow.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBorrowActionPerformed(evt);
+            }
+        });
 
         btnOutstanding.setFont(Global.lableFont);
         btnOutstanding.setText("Oustanding");
@@ -272,6 +291,10 @@ public class Issue extends javax.swing.JPanel implements SelectionObserver, KeyL
     private void btnOutstandingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOutstandingActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_btnOutstandingActionPerformed
+
+    private void btnBorrowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBorrowActionPerformed
+        borrow();
+    }//GEN-LAST:event_btnBorrowActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -390,6 +413,7 @@ public class Issue extends javax.swing.JPanel implements SelectionObserver, KeyL
 
     @Override
     public void newForm() {
+        clear();
     }
 
     @Override
