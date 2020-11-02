@@ -12,7 +12,7 @@ import com.cv.accountswing.ui.editor.TraderAutoCompleter;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.Location;
 import com.cv.inv.entity.RetInHis;
-import com.cv.inv.entity.view.VRetOut;
+import com.cv.inv.entity.RetOutHis;
 import com.cv.inv.entry.common.CodeTableModel;
 import com.cv.inv.entry.common.RetInVouSearchTableModel;
 import com.cv.inv.entry.common.RetOutVouSearchTableModel;
@@ -20,7 +20,7 @@ import com.cv.inv.entry.editor.LocationAutoCompleter;
 import com.cv.inv.entry.editor.StockCellEditor;
 import com.cv.inv.service.LocationService;
 import com.cv.inv.service.RetInService;
-import com.cv.inv.service.VRetOutService;
+import com.cv.inv.service.RetOutService;
 import com.toedter.calendar.JTextFieldDateEditor;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
@@ -69,7 +69,7 @@ public class RetInVouSearch extends javax.swing.JDialog implements KeyListener, 
     @Autowired
     private RetInService retInService;
     @Autowired
-    private VRetOutService vRetOutService;
+    private RetOutService retOutService;
 
     /**
      * Creates new form ItemTypeSetupDialog
@@ -225,9 +225,9 @@ public class RetInVouSearch extends javax.swing.JDialog implements KeyListener, 
                     retInVouSearchTableModel.setListRetInHis(listRetIn);
                     break;
                 case "Return Out":
-                    List<VRetOut> listRetOut = vRetOutService.search(fDate, tDate,
-                            cusId, locId, vouNo, filterCodes, String.valueOf(Global.compId));
-                    retOutVouSearchTableModel.setListGl(listRetOut);
+                    List<RetOutHis> listRetOut = retOutService.search(fDate, tDate,
+                            cusId, locId, vouNo, filterCodes);
+                    retOutVouSearchTableModel.setListReturnHis(listRetOut);
                     break;
 
                 default:

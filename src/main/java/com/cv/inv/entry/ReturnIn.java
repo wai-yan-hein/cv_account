@@ -15,6 +15,7 @@ import com.cv.accountswing.entity.Trader;
 import com.cv.accountswing.service.CurrencyService;
 import com.cv.accountswing.service.TraderService;
 import com.cv.accountswing.ui.ApplicationMainFrame;
+import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.inv.service.RetInService;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.editor.CurrencyAutoCompleter;
@@ -129,6 +130,7 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
         tblReturnIn.getColumnModel().getColumn(5).setPreferredWidth(30);
         tblReturnIn.getColumnModel().getColumn(6).setPreferredWidth(60);
         tblReturnIn.getColumnModel().getColumn(7).setPreferredWidth(70);
+        tblReturnIn.getColumnModel().getColumn(3).setCellEditor(new AutoClearEditor());//qty
         tblReturnIn.setDefaultRenderer(Float.class, new TableCellRender());
         tblReturnIn.setDefaultRenderer(Double.class, new TableCellRender());
         tblReturnIn.setDefaultRenderer(Object.class, new TableCellRender());
@@ -871,7 +873,7 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
         if (yes_no == 0) {
             String vouNo = txtVouNo.getText();
             if (lblStatus.getText().equals("EDIT")) {
-                //   phService.delete(vouNo);
+                retInService.delete(vouNo);
                 clear();
             }
         }
@@ -937,14 +939,11 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
                 retIn.setCurrency((currencyAutoCompleter.getCurrency()));
 
                 retIn.setLocation(locationAutoCompleter.getLocation());
-                retIn.setVouTotal(NumberUtil.getDouble(txtVouTotal.getText()));
                 retIn.setPaid(NumberUtil.getDouble(txtVouPaid.getText()));
                 retIn.setBalance(NumberUtil.getDouble(txtVouBalance.getText()));
                 retIn.setCreatedBy(Global.loginUser.getUserId().toString());
                 retIn.setDeleted(Util1.getNullTo(retIn.isDeleted()));
                 retIn.setVouTotal(NumberUtil.getDouble(txtVouTotal.getText()));
-                retIn.setPaid(NumberUtil.getDouble(txtVouPaid.getText()));
-                retIn.setBalance(NumberUtil.getDouble(txtVouBalance.getText()));
                 if (lblStatus.getText().equals("NEW")) {
                     retIn.setRetInDate(txtRetInDate.getDate());
                 } else {

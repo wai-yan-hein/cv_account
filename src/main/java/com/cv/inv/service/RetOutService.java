@@ -5,8 +5,8 @@
  */
 package com.cv.inv.service;
 
-import com.cv.accountswing.entity.Gl;
 import com.cv.inv.entity.RetOutDetailHis;
+import com.cv.inv.entity.RetOutHis;
 import java.util.List;
 
 /**
@@ -14,10 +14,12 @@ import java.util.List;
  * @author lenovo
  */
 public interface RetOutService {
-    public RetOutDetailHis save(Gl saveGl,List<RetOutDetailHis> listRetOut);
 
-    public List<RetOutDetailHis> search(String glId, String vouNo);
+    public void save(RetOutHis retIn, List<RetOutDetailHis> listRetIn, List<String> delList);
 
-    public void delete(String retOutId, String glId);
-    
+    public void delete(String retInId);
+
+    public List<RetOutHis> search(String fromDate, String toDate, String cusId, String locId, String vouNo, String filterCode);
+
+    public RetOutHis findById(String id);
 }
