@@ -394,17 +394,15 @@ public class SaleEntryTableModel extends AbstractTableModel {
 
     private void calculateAmount(SaleDetailHis sale) {
         if (sale.getStock() != null) {
-            Stock stock = sale.getStock();
             float saleQty = sale.getQuantity();
             float stdSalePrice = sale.getPrice();
             float calAmount = Util1.getFloat(sale.getAmount());
             float userWt = sale.getStdWeight();
-            float stdWt = stock.getSaleMeasure();
             sale.setSmallestWT(getSmallestUnit(userWt, sale.getItemUnit().getItemUnitCode()));
             sale.setSmallestUnit("oz");
 
-            if (userWt != stdWt) {
-                float amount = (saleQty * calAmount);
+            if (calAmount != 0) {
+                float amount = saleQty * calAmount;
                 sale.setAmount(amount);
             } else {
                 float amount = saleQty * stdSalePrice;
