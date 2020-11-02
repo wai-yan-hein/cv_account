@@ -27,7 +27,7 @@ public interface COAOpeningDaoD {
     public void insertFilter(String coaCode, int level, String opDate,
             String curr, String userId) throws Exception;
 
-    public void deleteTmp(String userId) throws Exception;
+    public void deleteTmp(String coaCode, String userId) throws Exception;
 
     public List<TmpOpeningClosing> getOpBalance(String coaCode, int level, String opDate,
             String curr, String userId) throws Exception;
@@ -41,7 +41,7 @@ public interface COAOpeningDaoD {
     public void genOpBalanceGL1(String coaCode, String opDate,
             String clDate, int level, String curr, String userId, String dept) throws Exception;
 
-    public List<TmpOpeningClosing> getOpBalanceGL(String userId);
+    public List<TmpOpeningClosing> getOpBalanceGL(String userId, String coaCode);
 
     public void genTriBalance(String compCode, String fromDate, String opDate, String tranDate, String coaCode,
             String currency, String dept, String cvId, String userId) throws Exception;

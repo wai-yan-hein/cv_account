@@ -30,7 +30,7 @@ public interface COAOpeningDService {
     public List<TmpOpeningClosing> getOpBalance(String coaCode, int level, String opDate,
             String curr, String userId) throws Exception;
 
-    public void deleteTmp(String userId) throws Exception;
+    public void deleteTmp(String coaCode, String userId) throws Exception;
 
     public void insertFilterGL(String coaCode, String opDate, int level,
             String curr, String userId) throws Exception;
@@ -40,6 +40,7 @@ public interface COAOpeningDService {
 
     public List<TmpOpeningClosing> getOpBalanceGL1(String coaCode, String opDate,
             String clDae, int level, String curr, String userId, String dept) throws Exception;
+
     public void genTriBalance(String compCode, String fromDate, String opDate, String tranDate,
             String coaCode, String currency, String dept, String cvId, String userId) throws Exception;
 

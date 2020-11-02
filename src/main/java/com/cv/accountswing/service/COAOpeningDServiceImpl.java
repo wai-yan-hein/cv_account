@@ -63,8 +63,8 @@ public class COAOpeningDServiceImpl implements COAOpeningDService {
     }
 
     @Override
-    public void deleteTmp(String userId) throws Exception {
-        dao.deleteTmp(userId);
+    public void deleteTmp(String coaCode, String userId) throws Exception {
+        dao.deleteTmp(coaCode, userId);
     }
 
     @Override
@@ -77,7 +77,7 @@ public class COAOpeningDServiceImpl implements COAOpeningDService {
     public List<TmpOpeningClosing> getOpBalanceGL(String coaCode, String opDate,
             String clDae, int level, String curr, String userId, String dept) throws Exception {
         dao.genOpBalanceGL(coaCode, opDate, clDae, level, curr, userId, dept);
-        List<TmpOpeningClosing> listTOC = dao.getOpBalanceGL(userId);
+        List<TmpOpeningClosing> listTOC = dao.getOpBalanceGL(userId, coaCode);
         return listTOC;
     }
 
@@ -107,7 +107,7 @@ public class COAOpeningDServiceImpl implements COAOpeningDService {
     @Override
     public List<TmpOpeningClosing> getOpBalanceGL1(String coaCode, String opDate, String clDae, int level, String curr, String userId, String dept) throws Exception {
         dao.genOpBalanceGL1(coaCode, opDate, clDae, level, curr, userId, dept);
-        List<TmpOpeningClosing> listTOC = dao.getOpBalanceGL(userId);
+        List<TmpOpeningClosing> listTOC = dao.getOpBalanceGL(userId, coaCode);
         return listTOC;
     }
 }

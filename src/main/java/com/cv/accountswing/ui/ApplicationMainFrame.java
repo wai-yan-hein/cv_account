@@ -100,7 +100,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.task.TaskExecutor;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Component;
 
@@ -120,7 +119,8 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private final ImageIcon onlineIcon = new ImageIcon(this.getClass().getResource("/images/online-signal.png"));
     private final ImageIcon lowIcon = new ImageIcon(this.getClass().getResource("/images/low-signal.png"));
     private final ImageIcon offlineIcon = new ImageIcon(this.getClass().getResource("/images/offline-signal.png"));
-
+    private final ImageIcon loadingIcon = new ImageIcon(this.getClass().getResource("/images/dual-loading.gif"));
+    private int count = 0;
     private final ActionListener menuListener = (java.awt.event.ActionEvent evt) -> {
         JMenuItem actionMenu = (JMenuItem) evt.getSource();
         String className = actionMenu.getName();
@@ -543,7 +543,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
 
     private void addTabMain(JPanel panel, String menuName) {
         Integer tabIndex = tabMain.getTabCount() - 1;
-        tabMain.setSelectedIndex(tabIndex);
+        //tabMain.setSelectedIndex(tabIndex);
         tabMain.add(panel);
         tabMain.setTabComponentAt(tabMain.indexOfComponent(panel), setTitlePanel(tabMain, panel, menuName));
         tabMain.setSelectedComponent(panel);
@@ -566,12 +566,11 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         titlePanel.setOpaque(false);
         //loading
-        JLabel loading = new JLabel();
-        ImageIcon icon = new ImageIcon(this.getClass().getResource("/images/dual-loading.gif"));
-        loading.setIcon(icon);
-        loading.setVisible(false);
+        JLabel loading = new JLabel(loadingIcon);
         titlePanel.add(loading);
+        loading.setVisible(false);
         hmTabLoading.put(title, loading);
+
         // title button
         JLabel titleLbl = new JLabel(title);
         titleLbl.setFont(Global.menuFont);
@@ -789,160 +788,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                 break;
             default:
                 break;
-
         }
-        /*threadPoolTaskExecutor.execute(() -> {
-            try {
-                LOGGER.info("msg : " + msg);
-                switch (msg) {
-                    case "NEW-INIT":
-                        break;
-                    case "NEW-SYSPROP":
-                        for (Map.Entry<String, Integer> entry : hmTabIndex.entrySet()) {
-                            switch (entry.getKey()) {
-                                case "Sale":
-                                    Sale sale1 = (Sale) tabMain.getComponent(entry.getValue());
-                                    sale1.initLabelDesp();
-                                    break;
-                            }
-                        }
-                        break;
-                    case "SYNC-MEDICINE":
-                        Medicine med = (Medicine) data;
-                        LOGGER.info("call syncMedicineH2");
-                        syncMedicineH2(med);
-                        break;
-                    case "SALE-VOUSEARCH":
-                        ReloadData rd = Global.hmReloadData.get(msg);
-                        if (rd != null) {
-                            rd.reload(msg, data);
-                        }
-                        break;
-                    case "SEARCH-SessionCheck":
-                        rd = Global.hmReloadData.get(msg);
-                        if (rd != null) {
-                            rd.reload(msg, data);
-                          
-                        }
-                        break;
-                          case "SessionCheckTtl":
-                        rd = Global.hmReloadData.get(msg);
-                        if (rd != null) {
-                            rd.reload(msg, data);
-                          
-                        }
-                        break;
-                    case "GET-SALEVOUCHER":
-                        int index = hmTabIndex.get("Sale");
-                        Sale sale2 = (Sale) tabMain.getComponent(index);
-                        //SaleHis sh = (SaleHis)data;
-                        if (sale2 != null) {
-                            sale2.setSaleVoucher(data.toString());
-                        }
-                        break;
-                    case "GET-PaymentVoucher":
-                        index = hmTabIndex.get("Payment");
-                        CustomerPayment cp = (CustomerPayment) tabMain.getComponent(index);
-                        if (cp != null) {
-                            cp.assignData(data.toString());
-                        }
-                        break;
-                    case "SAVE-CustomerPayment":
-                        index = hmTabIndex.get("Payment");
-                        CustomerPayment cp1 = (CustomerPayment) tabMain.getComponent(index);
-                        if (cp1 != null) {
-                            cp1.setAckData(data.toString());
-                        }
-                        break;
-                    case "SEARCH-SaleVoucherPayment":
-                        index = hmTabIndex.get("Payment Search");
-                        SearchCustomerPayment scp = (SearchCustomerPayment) tabMain.getComponent(index);
-                        if (scp != null) {
-                            scp.assignData(data.toString());
-                        }
-                        break;
-                    case "PUR-VOUSEARCH":
-                        rd = Global.hmReloadData.get(msg);
-                        if (rd != null) {
-                            rd.reload(msg, data);
-                        }
-                        break;
-                    case "RETURNOUT-VOUSEARCH":
-                        rd = Global.hmReloadData.get(msg);
-                        if (rd != null) {
-                            rd.reload(msg, data);
-                        }
-                        break;
-                    case "GET-PURVOUCHER":
-                        index = hmTabIndex.get("Purchase");
-                        Purchase pur = (Purchase) tabMain.getComponent(index);
-                        //SaleHis sh = (SaleHis)data;
-                        if (pur != null) {
-                            pur.setPurVoucher(data.toString());
-                        }
-                        break;
-                    case "GET-RETURNOUTVOUCHER":
-                        index = hmTabIndex.get("Return Out");
-                        ReturnOut retOutS1 = (ReturnOut) tabMain.getComponent(index);
-                        //SaleHis sh = (SaleHis)data;
-                        if (retOutS1 != null) {
-                            retOutS1.setRetOutVoucher(data.toString());
-                        }
-                        break;
-                case "RETURNIN-VOUSEARCH":
-                            rd = Global.hmReloadData.get(msg);
-                            if (rd != null) {
-                                rd.reload(msg, data);
-                            }
-                            break;
-                case "GET-RETURNINVOUCHER":
-                    index = hmTabIndex.get("Return In");
-                    ReturnIn retInS = (ReturnIn) tabMain.getComponent(index);
-                    //SaleHis sh = (SaleHis)data;
-                    if (retInS != null) {
-                        retInS.setReturnInVoucher(data.toString());
-                    }
-                    break;
-                case "DAMAGE-VOUSEARCH":
-                    rd = Global.hmReloadData.get(msg);
-                    if (rd != null) {
-                        rd.reload(msg, data);
-                            }
-                    break;
-                case "GET-DAMAGEVOUCHER":
-                    index = hmTabIndex.get("Damage");
-                    Damage dmg = (Damage) tabMain.getComponent(index);
-                    //SaleHis sh = (SaleHis)data;
-                            if (dmg != null) {
-                                dmg.setDamageVoucher(data.toString());
-                            }
-                            break;
-                case "TRANSFER-VOUSEARCH":
-                    rd = Global.hmReloadData.get(msg);
-                    if (rd != null) {
-                        rd.reload(msg, data);
-                    }
-                    break;
-                    
-                case "GET-TRANSFERVOUCHER":
-                    index = hmTabIndex.get("Transfer");
-                    Transfer tran = (Transfer) tabMain.getComponent(index);
-                    //SaleHis sh = (SaleHis)data;
-                    if (tran != null) {
-                    tran.setTranVoucher(data.toString());
-                    }
-                    break;
-                case "ACK":
-                    ReloadData rd1 = Global.hmReloadData.get(data.toString());
-                    if (rd1 != null) {
-                        rd1.reload(msg, data);
-                    }
-                    break;
-                }
-            }catch (Exception ex) {
-                LOGGER.error("reloadData " + msg + " : " + ex.getMessage());
-            }
-         });*/
     }
 
     public void startNetworkDetector() {
@@ -1301,15 +1147,30 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
 
     @Override
     public void load(Object source, Object selectObj) {
+
         if (source != null) {
             String parent = source.toString();
             String status = selectObj.toString();
             switch (status) {
                 case "Start":
-                    hmTabLoading.get(parent).setVisible(true);
+                    JLabel sLoading = hmTabLoading.get(parent);
+                    if (!sLoading.isShowing()) {
+                        taskExecutor.execute(() -> {
+                            LOGGER.info("Loading Visible Start");
+                            sLoading.setVisible(true);
+                            LOGGER.info("Loading Visible End");
+                        });
+                    }
                     break;
                 case "Stop":
-                    hmTabLoading.get(parent).setVisible(false);
+                    JLabel eLoading = hmTabLoading.get(parent);
+                    if (eLoading.isShowing()) {
+                        taskExecutor.execute(() -> {
+                            LOGGER.info("Loading Invisbile Start");
+                            eLoading.setVisible(false);
+                            LOGGER.info("Loading Invisbile End");
+                        });
+                    }
                     break;
             }
         }

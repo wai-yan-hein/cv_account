@@ -103,10 +103,10 @@ public class COAOpeningDaoDImpl extends AbstractDao<Long, AccOpeningD> implement
     }
 
     @Override
-    public void deleteTmp(String userId) throws Exception {
-        String strDeleteSql1 = "delete from tmp_op_filter where user_id = '"
-                + userId + "'";
-        String strDeleteSql2 = "delete from tmp_op_cl where user_id = '" + userId + "'";
+    public void deleteTmp(String coaCode, String userId) throws Exception {
+        String strDeleteSql1 = "delete from tmp_op_filter where coa_code= '"
+                + coaCode + "' and user_id ='" + userId + "'";
+        String strDeleteSql2 = "delete from tmp_op_cl where coa_id = '" + coaCode + "' and user_id ='" + userId + "'";
 
         execSQL(strDeleteSql1, strDeleteSql2);
     }
@@ -201,7 +201,7 @@ public class COAOpeningDaoDImpl extends AbstractDao<Long, AccOpeningD> implement
     @Override
     public void genOpBalanceGL(String coaCode, String opDate,
             String clDate, int level, String curr, String userId, String dept) throws Exception {
-        deleteTmp(userId);
+        deleteTmp(coaCode, userId);
         insertFilterGL(coaCode, opDate, level, curr, userId);
         String strSql = "insert into tmp_op_cl(coa_id, curr_id, user_id, opening, dr_amt, cr_amt) \n"
                 + "select coa_code, curr_id, '" + userId + "', sum(balance), 0, 0 \n"
@@ -227,8 +227,8 @@ public class COAOpeningDaoDImpl extends AbstractDao<Long, AccOpeningD> implement
     }
 
     @Override
-    public List<TmpOpeningClosing> getOpBalanceGL(String userId) {
-        String strHSql = "select o from TmpOpeningClosing o where o.key.userId = '" + userId + "'";
+    public List<TmpOpeningClosing> getOpBalanceGL(String userId, String coaCode) {
+        String strHSql = "select o from TmpOpeningClosing o where o.key.userId = '" + userId + "' and o.key.coaId ='" + coaCode + "'";
         List<TmpOpeningClosing> listTOC = findHSQLList(strHSql);
         return listTOC;
     }
@@ -236,7 +236,7 @@ public class COAOpeningDaoDImpl extends AbstractDao<Long, AccOpeningD> implement
     @Override
     public void genTriBalance(String compCode, String fromDate, String opDate, String tranDate,
             String coaCode, String currency, String dept, String cvId, String userId) throws Exception {
-        deleteTmp(userId);
+        deleteTmp(coaCode, userId);
 
         String strSqlFilter = "insert into tmp_op_filter(comp_code, coa_code, dept_id, curr_id, "
                 + "tran_source, op_date, user_id)\n"
@@ -326,7 +326,7 @@ public class COAOpeningDaoDImpl extends AbstractDao<Long, AccOpeningD> implement
     public void genArAp(String compCode, String fromDate, String opDate, String tranDate,
             String coaCode, String currency, String dept, String cvId, String userId) throws Exception {
         logger.info("Delete : Start");
-        deleteTmp(userId);
+        deleteTmp(coaCode, userId);
         logger.info("Delete : End");
 
         logger.info("tmp_op_filter : Start");
@@ -468,7 +468,7 @@ public class COAOpeningDaoDImpl extends AbstractDao<Long, AccOpeningD> implement
             logger.info("delete tmp op filter.");
             execSQL("delete from tmp_op_filter where user_id = '" + userId + "' and cv_id <> " + cvId);
         }
-        deleteTmp(userId);
+        deleteTmp(coaCode, userId);
         String strSqlFilter = "insert into tmp_op_filter(comp_code, coa_code, dept_id, curr_id, tran_source, op_date, user_id)"
                 + "select vcc.comp_code, vcc.coa_code, ifnull(a.dept_id, '-') dept_id, vcc.cur_code, 'OPENING' as tran_source, ifnull(a.op_date, '1900-01-01') op_date,\n"
                 + "'" + userId + "' from v_coa_curr vcc left join (\n"
@@ -517,7 +517,7 @@ public class COAOpeningDaoDImpl extends AbstractDao<Long, AccOpeningD> implement
 
     @Override
     public void genOpBalanceGL1(String coaCode, String opDate, String clDate, int level, String curr, String userId, String dept) throws Exception {
-        deleteTmp(userId);
+        deleteTmp(coaCode, userId);
         String insertSql = "insert into tmp_op_filter(comp_code, coa_code, op_tran_id_d, curr_id, op_date, user_id) \n"
                 + "select coa.comp_code,coa.coa_code,op.coa_op_id,ifnull(op.cur_code,'" + curr + "'),op.op_date,'1'\n"
                 + "from chart_of_account coa left join coa_opening op \n"
@@ -532,7 +532,8 @@ public class COAOpeningDaoDImpl extends AbstractDao<Long, AccOpeningD> implement
                 + "from tmp_op_filter tof, coa_opening coa\n"
                 + "where tof.op_tran_id_d = coa.coa_op_id and tof.comp_code = coa.comp_id and tof.curr_id = coa.cur_code and \n"
                 + "tof.coa_code = coa.source_acc_id and tof.op_date = coa.op_date\n"
-                + " and tof.user_id = '" + userId + "' and (coa.dept_code = '" + dept + "' or '-' = '" + dept + "')"
+                + " and tof.user_id = '" + userId + "' and (coa.dept_code = '" + dept + "' or '-' = '" + dept + "'"
+                + "and tof.coa_code = '" + coaCode + "')"
                 + "union all\n"
                 + "select tof.coa_code, tof.curr_id, get_dr_cr_amt(gl.source_ac_id, gl.account_id, tof.coa_code, ifnull(gl.dr_amt,0), ifnull(gl.cr_amt,0), 'DR')-\n"
                 + "get_dr_cr_amt(gl.source_ac_id, gl.account_id, tof.coa_code, ifnull(gl.dr_amt,0), ifnull(gl.cr_amt,0), 'CR') balance, \n"
@@ -542,8 +543,9 @@ public class COAOpeningDaoDImpl extends AbstractDao<Long, AccOpeningD> implement
                 + "and (tof.coa_code = gl.source_ac_id or tof.coa_code = gl.account_id) "
                 + "and ifnull(gl.tran_source,'-') <> 'OPENING' and \n"
                 + "tof.curr_id = gl.from_cur_id and gl.gl_date >= '" + opDate + "' and gl.gl_date < '"
-                + opDate
-                + "' and tof.user_id = '" + userId + "' and (gl.dept_id = '" + dept + "' or '-' = '" + dept + "')) a \n"
+                + Util1.toDateStrMYSQL(clDate, "dd/MM/yyyy")
+                + "' and tof.user_id = '" + userId + "' and (gl.dept_id = '" + dept + "' or '-' = '" + dept + "')"
+                + "and tof.coa_code = '" + coaCode + "') a \n"
                 + "group by coa_code, curr_id";
         execSQL(strSql);
     }
