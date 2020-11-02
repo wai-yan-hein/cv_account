@@ -295,7 +295,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         try {
             opBalanceGL = coaOpDService.getOpBalanceGL1(getTarget(),
                     Global.finicialPeriodFrom,
-                    enDate, 3, "MMK",
+                    stDate, 3, "MMK",
                     Global.loginUser.getUserId().toString(),
                     Util1.isNull(dept, "-"));
             if (!opBalanceGL.isEmpty()) {

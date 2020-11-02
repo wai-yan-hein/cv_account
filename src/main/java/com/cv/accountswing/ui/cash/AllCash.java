@@ -344,10 +344,10 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
 
     private void searchCash() {
         try {
-            initializeParameter();
-            loadingObserver.load(this.getName(), "Start");
             if (sourceAccId != null) {
+                loadingObserver.load(this.getName(), "Start");
                 taskExecutor.execute(() -> {
+                    initializeParameter();
                     LOGGER.info(this.getName() + "Start Date  :" + stDate + "-" + "End Date :" + enDate);
                     List<VGl> listVGl = vGlService.search(stDate, enDate,
                             desp, sourceAccId,
@@ -357,11 +357,13 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
                             traderName, "-", "-",
                             debAmt,
                             crdAmt);
+                    LOGGER.info("Search Cash Book End ...");
                     swapData(listVGl, sourceAccId);
                     allCashTableModel.setListVGl(listVGl);
                     allCashTableModel.addNewRow();
                     requestFoucsTable();
                     calOpeningClosing();
+                    loadingObserver.load(this.getName(), "Stop");
                 });
             } else {
                 JOptionPane.showMessageDialog(Global.parentForm, "Source Account Missing.");
@@ -587,7 +589,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
         if (!isShown) {
             initMain();
         } else {
-            requestFoucsTable();
+            //requestFoucsTable();
         }
 
     }//GEN-LAST:event_formComponentShown
@@ -625,6 +627,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
     }
 
     private void calOpeningClosing() {
+        LOGGER.info("Start calculate opening.");
         String opDate = Global.finicialPeriodFrom;
         try {
             if (stDate.equals("-")) {
@@ -633,12 +636,12 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
             List<TmpOpeningClosing> opBalanceGL = coaOpDService.getOpBalanceGL1(sourceAccId, opDate, stDate, 3, "MMK",
                     Global.loginUser.getUserId().toString(),
                     Util1.isNull(depId, "-"));
+            LOGGER.info("End calculate opening.");
             if (!opBalanceGL.isEmpty()) {
                 TmpOpeningClosing tmpOC = opBalanceGL.get(0);
                 txtFOpening.setValue(tmpOC.getOpening());
             }
             calDebitCredit();
-            loadingObserver.load(this.getName(), "Stop");
         } catch (Exception ex) {
             LOGGER.error("TmpOpeningClosing" + ex.getMessage());
         }
