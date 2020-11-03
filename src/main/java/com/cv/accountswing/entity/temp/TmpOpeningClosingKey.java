@@ -22,7 +22,7 @@ public class TmpOpeningClosingKey implements Serializable{
 
     public TmpOpeningClosingKey() {}
     
-    @Column(name="coa_id", nullable=false, length=25)
+    @Column(name="coa_code", nullable=false, length=25)
     public String getCoaId() {
         return coaId;
     }

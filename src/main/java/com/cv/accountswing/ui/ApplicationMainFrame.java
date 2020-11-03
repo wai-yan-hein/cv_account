@@ -7,7 +7,7 @@ package com.cv.accountswing.ui;
 
 import com.cv.accountswing.AccountSwingApplication;
 import com.cv.accountswing.common.FilterObserver;
-import com.cv.accountswing.common.Global;
+import com.cv.accountswing.common.Global; 
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.NetworkDetector;
 import com.cv.accountswing.common.NetworkObserver;
@@ -120,7 +120,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private final ImageIcon lowIcon = new ImageIcon(this.getClass().getResource("/images/low-signal.png"));
     private final ImageIcon offlineIcon = new ImageIcon(this.getClass().getResource("/images/offline-signal.png"));
     private final ImageIcon loadingIcon = new ImageIcon(this.getClass().getResource("/images/dual-loading.gif"));
-    private int count = 0;
     private final ActionListener menuListener = (java.awt.event.ActionEvent evt) -> {
         JMenuItem actionMenu = (JMenuItem) evt.getSource();
         String className = actionMenu.getName();
@@ -947,6 +946,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
 
         lblNeworkPing.setText("2344ms");
 
+        txtSearch.setFont(Global.textFont);
         txtSearch.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 txtSearchKeyReleased(evt);
@@ -1154,23 +1154,21 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             switch (status) {
                 case "Start":
                     JLabel sLoading = hmTabLoading.get(parent);
-                    if (!sLoading.isShowing()) {
-                        taskExecutor.execute(() -> {
-                            LOGGER.info("Loading Visible Start");
-                            sLoading.setVisible(true);
-                            LOGGER.info("Loading Visible End");
-                        });
-                    }
+                    taskExecutor.execute(() -> {
+                        LOGGER.info("Loading Visible Start");
+                        sLoading.setVisible(true);
+                        LOGGER.info("Loading Visible End");
+                    });
+
                     break;
                 case "Stop":
                     JLabel eLoading = hmTabLoading.get(parent);
-                    if (eLoading.isShowing()) {
-                        taskExecutor.execute(() -> {
-                            LOGGER.info("Loading Invisbile Start");
-                            eLoading.setVisible(false);
-                            LOGGER.info("Loading Invisbile End");
-                        });
-                    }
+                    taskExecutor.execute(() -> {
+                        LOGGER.info("Loading Invisbile Start");
+                        eLoading.setVisible(false);
+                        LOGGER.info("Loading Invisbile End");
+                    });
+
                     break;
             }
         }

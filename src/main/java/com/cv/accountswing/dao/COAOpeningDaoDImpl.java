@@ -104,11 +104,30 @@ public class COAOpeningDaoDImpl extends AbstractDao<Long, AccOpeningD> implement
 
     @Override
     public void deleteTmp(String coaCode, String userId) throws Exception {
-        String strDeleteSql1 = "delete from tmp_op_filter where coa_code= '"
-                + coaCode + "' and user_id ='" + userId + "'";
-        String strDeleteSql2 = "delete from tmp_op_cl where coa_id = '" + coaCode + "' and user_id ='" + userId + "'";
+        String strFilter = "";
+        String delOp = "delete from tmp_op_cl";
+        String delFilter = "delete from tmp_op_filter";
+        if (!coaCode.equals("-")) {
+            if (strFilter.isEmpty()) {
+                strFilter = "coa_code = '" + coaCode + "'";
+            } else {
+                strFilter = strFilter + " and coa_code = '" + coaCode + "'";
+            }
+        }
 
-        execSQL(strDeleteSql1, strDeleteSql2);
+        if (userId.equals("-")) {
+            if (strFilter.isEmpty()) {
+                strFilter = "user_id = '" + userId + "'";
+            } else {
+                strFilter = strFilter + "and user_id = '" + userId + "";
+            }
+        }
+        if (!strFilter.isEmpty()) {
+            delOp = delOp + " where " + strFilter;
+            delFilter = delFilter + " where " + strFilter;
+        }
+
+        execSQL(delFilter, delOp);
     }
 
     @Override
@@ -122,7 +141,7 @@ public class COAOpeningDaoDImpl extends AbstractDao<Long, AccOpeningD> implement
          execSQL(strDeleteSql1, strDeleteSql2);*/
         insertFilter(coaCode, level, opDate, curr, userId);
 
-        String strSql = "insert into tmp_op_cl(coa_id, curr_id, user_id, opening, dr_amt, cr_amt) "
+        String strSql = "insert into tmp_op_cl(coa_code, curr_id, user_id, opening, dr_amt, cr_amt) "
                 + "select a.coa_code, a.curr_id, '" + userId + "', sum(ifnull(a.balance,0)), 0, 0 "
                 + "from (select tof.comp_code, tof.coa_code, tof.curr_id, aod.ex_rate, aod.dr_amt, "
                 + "aod.cr_amt,(ifnull(aod.dr_amt,0)-ifnull(aod.cr_amt,0)) balance,"
@@ -203,7 +222,7 @@ public class COAOpeningDaoDImpl extends AbstractDao<Long, AccOpeningD> implement
             String clDate, int level, String curr, String userId, String dept) throws Exception {
         deleteTmp(coaCode, userId);
         insertFilterGL(coaCode, opDate, level, curr, userId);
-        String strSql = "insert into tmp_op_cl(coa_id, curr_id, user_id, opening, dr_amt, cr_amt) \n"
+        String strSql = "insert into tmp_op_cl(coa_code, curr_id, user_id, opening, dr_amt, cr_amt) \n"
                 + "select coa_code, curr_id, '" + userId + "', sum(balance), 0, 0 \n"
                 + "from (\n"
                 + "select tof.coa_code, tof.curr_id, ifnull(gl.dr_amt,0)-ifnull(gl.cr_amt,0) balance,\n"
@@ -264,7 +283,7 @@ public class COAOpeningDaoDImpl extends AbstractDao<Long, AccOpeningD> implement
             execSQL("delete from tmp_op_filter where user_id = '" + userId + "' and cv_id <> " + cvId);
         }
 
-        String strSql = "insert into tmp_op_cl(coa_id, curr_id, user_id, dr_amt, cr_amt) \n"
+        String strSql = "insert into tmp_op_cl(coa_code, curr_id, user_id, dr_amt, cr_amt) \n"
                 + "select coa_code, curr_id, '" + userId + "', if(sum(dr_amt-cr_amt)>0, sum(dr_amt-cr_amt),0), if(sum(dr_amt-cr_amt)<0, sum(dr_amt-cr_amt)*-1,0) \n"
                 + "from (\n"
                 + "	select tof.coa_code, tof.curr_id,\n"
@@ -359,7 +378,7 @@ public class COAOpeningDaoDImpl extends AbstractDao<Long, AccOpeningD> implement
         logger.info("tmp_op_filter : End");
 
         logger.info("tmp_op_cl_apar : Start");
-        String strSql = "insert into tmp_op_cl_apar(coa_id, curr_id, user_id, cv_id, dept_id, dr_amt, cr_amt) \n"
+        String strSql = "insert into tmp_op_cl_apar(coa_code, curr_id, user_id, cv_id, dept_id, dr_amt, cr_amt) \n"
                 + "select coa_code, curr_id, '" + userId + "', cv_id, dept_id "
                 + ", if(sum(dr_amt-cr_amt)>0, sum(dr_amt-cr_amt),0), if(sum(dr_amt-cr_amt)<0, sum(dr_amt-cr_amt)*-1,0) \n"
                 + "from (\n"
@@ -468,7 +487,7 @@ public class COAOpeningDaoDImpl extends AbstractDao<Long, AccOpeningD> implement
             logger.info("delete tmp op filter.");
             execSQL("delete from tmp_op_filter where user_id = '" + userId + "' and cv_id <> " + cvId);
         }
-        deleteTmp(coaCode, userId);
+        deleteTmp("-", userId);
         String strSqlFilter = "insert into tmp_op_filter(comp_code, coa_code, dept_id, curr_id, tran_source, op_date, user_id)"
                 + "select vcc.comp_code, vcc.coa_code, ifnull(a.dept_id, '-') dept_id, vcc.cur_code, 'OPENING' as tran_source, ifnull(a.op_date, '1900-01-01') op_date,\n"
                 + "'" + userId + "' from v_coa_curr vcc left join (\n"
@@ -486,7 +505,7 @@ public class COAOpeningDaoDImpl extends AbstractDao<Long, AccOpeningD> implement
                 + "and (vcc.cur_code = '" + currency + "' or '-' = '" + currency + "')";
         execSQL(strSqlFilter);
 
-        String strSql = "insert into tmp_op_cl(coa_id, curr_id, user_id, dr_amt, cr_amt) \n"
+        String strSql = "insert into tmp_op_cl(coa_code, curr_id, user_id, dr_amt, cr_amt) \n"
                 + "select coa_code, curr_id, '" + userId + "', if(sum(dr_amt-cr_amt)>0, sum(dr_amt-cr_amt),0), if(sum(dr_amt-cr_amt)<0, sum(dr_amt-cr_amt)*-1,0) \n"
                 + "from (\n"
                 + "	select tof.coa_code, tof.curr_id,\n"
@@ -524,7 +543,7 @@ public class COAOpeningDaoDImpl extends AbstractDao<Long, AccOpeningD> implement
                 + "on coa.coa_code = op.source_acc_id\n"
                 + "where coa.coa_code = '" + coaCode + "' \n";
         execSQL(insertSql);
-        String strSql = "insert into tmp_op_cl(coa_id, curr_id, user_id, opening, dr_amt, cr_amt) \n"
+        String strSql = "insert into tmp_op_cl(coa_code, curr_id, user_id, opening, dr_amt, cr_amt) \n"
                 + "select coa_code, curr_id, '" + userId + "', sum(balance), 0, 0 \n"
                 + "from (\n"
                 + "select tof.coa_code, tof.curr_id, ifnull(coa.dr_amt,0)-ifnull(coa.cr_amt,0) balance,\n"
