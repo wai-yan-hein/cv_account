@@ -14,6 +14,7 @@ import com.cv.inv.entity.Stock;
 import com.cv.inv.entity.StockUnit;
 import com.cv.inv.entity.UnitRelation;
 import com.cv.inv.service.RelationService;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
@@ -36,6 +37,7 @@ public class ReturnOutTableModel extends AbstractTableModel {
     private JTable parent;
     private List<RetOutDetailHis> listDetail;
     private String deletedList;
+    private List<String> delList = new ArrayList();
 
     @Autowired
     private RelationService relationService;
@@ -389,11 +391,12 @@ public class ReturnOutTableModel extends AbstractTableModel {
 
         if (record != null) {
             if (record.getOutCompoundKey() != null) {
-                if (deletedList == null) {
-                    deletedList = "'" + record.getOutCompoundKey().getRetOutDetailId() + "'";
-                } else {
-                    deletedList = deletedList + "," + "'" + record.getOutCompoundKey().getRetOutDetailId() + "'";
-                }
+                delList.add(record.getOutCompoundKey().getRetOutDetailId());
+//                if (deletedList == null) {
+//                    deletedList = "'" + record.getOutCompoundKey().getRetOutDetailId() + "'";
+//                } else {
+//                    deletedList = deletedList + "," + "'" + record.getOutCompoundKey().getRetOutDetailId() + "'";
+//                }
             }
         }
 
@@ -416,4 +419,20 @@ public class ReturnOutTableModel extends AbstractTableModel {
         return deletedListStr;
     }
 
+    public List<String> getDelList() {
+        return delList;
+    }
+
+    public List<RetOutDetailHis> getListRetInDetail() {
+        List<RetOutDetailHis> listRetInDetailhis = new ArrayList();
+        for (RetOutDetailHis pdh2 : listDetail) {
+            if (pdh2.getStock() != null) {
+                if (pdh2.getStock().getStockCode() != null) {
+                    listRetInDetailhis.add(pdh2);
+                }
+            }
+        }
+
+        return listRetInDetailhis;
+    }
 }

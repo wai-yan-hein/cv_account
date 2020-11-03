@@ -5,11 +5,11 @@
  */
 package com.cv.inv.service;
 
-import com.cv.accountswing.dao.GlDao;
-import com.cv.accountswing.entity.Gl;
 import com.cv.inv.dao.RetOutDao;
+import com.cv.inv.dao.RetOutDetailDao;
 import com.cv.inv.entity.RetOutCompoundKey;
 import com.cv.inv.entity.RetOutDetailHis;
+import com.cv.inv.entity.RetOutHis;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,52 +30,55 @@ public class RetOutServiceImpl implements RetOutService {
     @Autowired
     private RetOutDao retOutDao;
     @Autowired
-    private GlDao glDao;
+    private RetOutDetailDao dao;
 
     @Override
-    public RetOutDetailHis save(Gl saveGl, List<RetOutDetailHis> listRetOut) {
+    public void save(RetOutHis retOut, List<RetOutDetailHis> listRetIn, List<String> delList) {
 
-        String retOutDetailId;
+        String retInDetailId;
         RetOutCompoundKey key;
 
         try {
-            Gl gl = glDao.save(saveGl);
-
-            for (RetOutDetailHis detailHis : listRetOut) {
-                if (detailHis.getStock() != null) {
-                    if (detailHis.getOutCompoundKey() == null) {
-                        retOutDetailId = gl.getVouNo() + '-' + detailHis.getUniqueId();
-                        key = new RetOutCompoundKey(retOutDetailId, gl.getGlId(), gl.getVouNo());
+            if (delList != null) {
+                for (String detailId : delList) {
+                    dao.delete(detailId);
+                }
+            }
+            retOutDao.save(retOut);
+            String vouNo = retOut.getRetOutId();
+            for (RetOutDetailHis rd : listRetIn) {
+                if (rd.getStock() != null) {
+                    if (rd.getOutCompoundKey() != null) {
+                        rd.setOutCompoundKey(rd.getOutCompoundKey());
                     } else {
-                        retOutDetailId = detailHis.getOutCompoundKey().getRetOutDetailId();
-                        key = new RetOutCompoundKey(retOutDetailId, gl.getGlId(), gl.getVouNo());
-
+                        retInDetailId = vouNo + '-' + rd.getUniqueId();
+                        rd.setOutCompoundKey(new RetOutCompoundKey(retInDetailId, vouNo));
                     }
-                    detailHis.setOutCompoundKey(key);
-                    retOutDao.save(detailHis);
-                    retOutDetailHis = detailHis;
+                    dao.save(rd);
                 }
 
             }
 
         } catch (Exception ex) {
-            logger.error("saveRetOut : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
+            logger.error("saveRetIn : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
 
         }
-        return retOutDetailHis;
 
     }
 
     @Override
-    public List<RetOutDetailHis> search(String glId, String vouNo) {
-        return  retOutDao.search(glId, vouNo);
+    public void delete(String retInId) {
+        dao.delete(retInId);
     }
 
     @Override
-    public void delete(String retOutId, String glId) {
-        retOutDao.delete(retOutId, glId);
+    public List<RetOutHis> search(String fromDate, String toDate, String cusId, String locId, String vouNo, String filterCode) {
+        return retOutDao.search(fromDate, toDate, cusId, locId, vouNo, filterCode);
     }
 
-   
+    @Override
+    public RetOutHis findById(String id) {
+        return retOutDao.findById(id);
+    }
 
 }

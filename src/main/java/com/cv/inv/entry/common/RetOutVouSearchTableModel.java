@@ -6,6 +6,7 @@
 package com.cv.inv.entry.common;
 
 import com.cv.accountswing.util.Util1;
+import com.cv.inv.entity.RetOutHis;
 import com.cv.inv.entity.view.VRetOut;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +23,7 @@ import org.springframework.stereotype.Component;
 public class RetOutVouSearchTableModel extends AbstractTableModel {
 
     static Logger log = Logger.getLogger(RetInVouSearchTableModel.class.getName());
-    private List<VRetOut> listVRetOut = new ArrayList();
+    private List<RetOutHis> listVRetOut = new ArrayList();
     private final String[] columnNames = {"Date", "Vou No", "Customer", "User", "V-Total"};
     private JTable parent;
 
@@ -65,19 +66,19 @@ public class RetOutVouSearchTableModel extends AbstractTableModel {
         }
 
         try {
-            VRetOut vRetOut = listVRetOut.get(row);
+            RetOutHis vRetOut = listVRetOut.get(row);
 
             switch (column) {
                 case 0: //Date
-                    return Util1.toDateStr(vRetOut.getGlDate(), "dd/MM/yyyy");
+                    return Util1.toDateStr(vRetOut.getRetOutDate(), "dd/MM/yyyy");
                 case 1: //Vou No
 
-                    return vRetOut.getKey().getVouNo();
+                    return vRetOut.getRetOutId();
 
                 case 2: //Customer
-                    return vRetOut.getTraderName();
+                    return vRetOut.getCustomer();
                 case 3: //User
-                    return vRetOut.getUserName();
+                    return vRetOut.getCreatedBy();
                 case 4: //V-Total
                     return vRetOut.getVouTotal();
                 default:
@@ -92,47 +93,6 @@ public class RetOutVouSearchTableModel extends AbstractTableModel {
 
     @Override
     public void setValueAt(Object value, int row, int column) {
-        if (listVRetOut == null) {
-            return;
-        }
-
-        if (listVRetOut.isEmpty()) {
-            return;
-        }
-
-        VRetOut record = listVRetOut.get(row);
-        VRetOut vRetOut = (VRetOut) value;
-        switch (column) {
-
-            case 0: //Date
-                if (value != null) {
-
-                    record.setGlDate(vRetOut.getGlDate());
-
-                }
-                break;
-            case 1: //VouNo
-                record.setKey(vRetOut.getKey());
-                break;
-            case 2://CusName
-                record.setTraderName(vRetOut.getTraderName());
-            case 3:
-                record.setUserName(vRetOut.getUserName());
-            case 4:
-                record.setVouTotal(vRetOut.getVouTotal());
-            default:
-                System.out.println("invalid index");
-        }
-        fireTableRowsUpdated(row, row);
-        parent.requestFocusInWindow();
-    }
-
-    @Override
-    public int getRowCount() {
-        if (listVRetOut == null) {
-            return 0;
-        }
-        return listVRetOut.size();
     }
 
     @Override
@@ -140,16 +100,16 @@ public class RetOutVouSearchTableModel extends AbstractTableModel {
         return columnNames.length;
     }
 
-    public List<VRetOut> getListVRetOuts() {
+    public List<RetOutHis> getListVRetOuts() {
         return listVRetOut;
     }
 
-    public void setListGl(List<VRetOut> listVRetIns) {
+    public void setListGl(List<RetOutHis> listVRetIns) {
         this.listVRetOut = listVRetIns;
         fireTableDataChanged();
     }
 
-    public VRetOut getSelectVou(int row) {
+    public RetOutHis getSelectVou(int row) {
         if (listVRetOut != null) {
             if (!listVRetOut.isEmpty()) {
                 return listVRetOut.get(row);
@@ -165,6 +125,18 @@ public class RetOutVouSearchTableModel extends AbstractTableModel {
     public void clearList() {
         this.listVRetOut.clear();
         fireTableDataChanged();
+    }
+    public void setListReturnHis(List<RetOutHis> list){
+        listVRetOut=list;
+        fireTableDataChanged();
+    }
+
+    @Override
+    public int getRowCount() {
+        if (listVRetOut == null) {
+            return 0;
+        }
+        return listVRetOut.size();
     }
 
 }
