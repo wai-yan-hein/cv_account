@@ -110,4 +110,11 @@ public class COAOpeningDServiceImpl implements COAOpeningDService {
         List<TmpOpeningClosing> listTOC = dao.getOpBalanceGL(userId, coaCode);
         return listTOC;
     }
+
+    @Override
+    public List<TmpOpeningClosing> getOpBalanceByTrader(String coaCode, String opDate, String clDate, int level, String curr, String userId, String dept, String cvId) throws Exception {
+        dao.getOpBalanceByTrader(coaCode, opDate, clDate, level, curr, userId, dept, cvId);
+        List<TmpOpeningClosing> listTOC = dao.getOpBalanceGL(userId, coaCode);
+        return listTOC;
+    }
 }

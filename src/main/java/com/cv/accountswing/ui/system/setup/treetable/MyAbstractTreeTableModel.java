@@ -9,7 +9,6 @@ package com.cv.accountswing.ui.system.setup.treetable;
  *
  * @author Lenovo
  */
-import com.cv.accountswing.entity.view.VRoleMenu;
 import javax.swing.event.EventListenerList;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;

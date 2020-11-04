@@ -7,6 +7,7 @@ package com.cv.accountswing.ui.system.setup;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.PanelControl;
+import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.UserRole;
 import com.cv.accountswing.entity.view.VRoleMenu;
 import com.cv.accountswing.service.MenuService;
@@ -38,7 +39,7 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-public class RoleSetup extends javax.swing.JPanel implements KeyListener, PanelControl {
+public class RoleSetup extends javax.swing.JPanel implements KeyListener, PanelControl, SelectionObserver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RoleSetup.class);
 
@@ -106,7 +107,7 @@ public class RoleSetup extends javax.swing.JPanel implements KeyListener, PanelC
         taskExecutor.execute(() -> {
             List<VRoleMenu> listVRM = menuService.getParentChildMenu(roleId);
             VRoleMenu vRoleMenu = new VRoleMenu("Best-System", "System", true, listVRM);
-            MyAbstractTreeTableModel treeTableModel = new MyDataModel(vRoleMenu, privilegeService);
+            MyAbstractTreeTableModel treeTableModel = new MyDataModel(vRoleMenu, privilegeService, this);
             MyTreeTable treeTable = new MyTreeTable(treeTableModel);
             scrollPane.getViewport().add(treeTable);
             loading.setVisible(false);
@@ -137,6 +138,7 @@ public class RoleSetup extends javax.swing.JPanel implements KeyListener, PanelC
         jLabel1 = new javax.swing.JLabel();
         txtRoleName = new javax.swing.JTextField();
         scrollPane = new javax.swing.JScrollPane();
+        btnApply = new javax.swing.JButton();
 
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentShown(java.awt.event.ComponentEvent evt) {
@@ -168,7 +170,16 @@ public class RoleSetup extends javax.swing.JPanel implements KeyListener, PanelC
         txtRoleName.setEditable(false);
         txtRoleName.setFont(Global.lableFont);
 
+        scrollPane.setBackground(new java.awt.Color(255, 255, 255));
         scrollPane.setFont(Global.textFont);
+
+        btnApply.setText("Apply");
+        btnApply.setEnabled(false);
+        btnApply.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnApplyActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -181,7 +192,9 @@ public class RoleSetup extends javax.swing.JPanel implements KeyListener, PanelC
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addGap(18, 18, 18)
-                        .addComponent(txtRoleName, javax.swing.GroupLayout.DEFAULT_SIZE, 336, Short.MAX_VALUE)))
+                        .addComponent(txtRoleName, javax.swing.GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE)
+                        .addGap(14, 14, 14)
+                        .addComponent(btnApply)))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -190,7 +203,8 @@ public class RoleSetup extends javax.swing.JPanel implements KeyListener, PanelC
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(txtRoleName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtRoleName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnApply))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(scrollPane))
         );
@@ -201,7 +215,7 @@ public class RoleSetup extends javax.swing.JPanel implements KeyListener, PanelC
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 213, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 215, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
@@ -227,8 +241,15 @@ public class RoleSetup extends javax.swing.JPanel implements KeyListener, PanelC
         }
     }//GEN-LAST:event_formComponentShown
 
+    private void btnApplyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnApplyActionPerformed
+        // TODO add your handling code here:
+        mainFrame.initMenu();
+        btnApply.setEnabled(false);
+    }//GEN-LAST:event_btnApplyActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnApply;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
@@ -288,5 +309,12 @@ public class RoleSetup extends javax.swing.JPanel implements KeyListener, PanelC
     @Override
     public void refresh() {
         searchAllUsers();
+    }
+
+    @Override
+    public void selected(Object source, Object selectObj) {
+        if (source.equals("CHANGE")) {
+            btnApply.setEnabled(true);
+        }
     }
 }

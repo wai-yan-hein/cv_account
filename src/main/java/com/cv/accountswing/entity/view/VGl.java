@@ -78,7 +78,6 @@ public class VGl implements java.io.Serializable {
     }
 
     @Temporal(TemporalType.DATE)
-    @JsonFormat(pattern = "yyyy-MM-dd")
     @Column(name = "gl_date")
     public Date getGlDate() {
         return glDate;

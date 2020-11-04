@@ -6,11 +6,11 @@
 package com.cv.accountswing.ui.system.setup.treetable;
 
 import com.cv.accountswing.common.Global;
+import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.Privilege;
 import com.cv.accountswing.entity.PrivilegeKey;
 import com.cv.accountswing.entity.view.VRoleMenu;
 import com.cv.accountswing.service.PrivilegeService;
-import static com.lowagie.text.pdf.BidiOrder.L;
 import java.util.List;
 import javax.swing.JOptionPane;
 import org.slf4j.Logger;
@@ -26,14 +26,16 @@ public class MyDataModel extends MyAbstractTreeTableModel {
 
     // Spalten Name.
     static protected String[] columnNames = {"Name", "Type", "Allow"};
-    private PrivilegeService privilegeService;
+    private final PrivilegeService privilegeService;
+    private SelectionObserver observer;
     // Spalten Typen.
     static protected Class<?>[] columnTypes = {MyTreeTableModel.class, String.class, Boolean.class};
 
-    public MyDataModel(VRoleMenu rootNode, PrivilegeService privilegeService) {
+    public MyDataModel(VRoleMenu rootNode, PrivilegeService privilegeService, SelectionObserver observer) {
         super(rootNode);
         root = rootNode;
         this.privilegeService = privilegeService;
+        this.observer = observer;
     }
 
     @Override
@@ -124,6 +126,9 @@ public class MyDataModel extends MyAbstractTreeTableModel {
                 privilege.setKey(key);
                 privilege.setIsAllow(allow);
                 privilegeService.save(privilege);
+                if (observer != null) {
+                    observer.selected("CHANGE", "-");
+                }
             }
         } catch (Exception e) {
             LOGGER.error("Save Priviliges  :" + e.getMessage());

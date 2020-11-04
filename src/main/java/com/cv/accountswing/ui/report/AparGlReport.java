@@ -59,7 +59,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class AparGlReport extends javax.swing.JPanel implements SelectionObserver, PanelControl, FilterObserver {
-    
+
     private int selectRow = -1;
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(AparGlReport.class);
 
@@ -103,21 +103,21 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
     private String currency;
     private String userId;
     private String panelName;
-    
+
     public void setIsShown(boolean isShown) {
         this.isShown = isShown;
         clear();
     }
-    
+
     public void setLoadingObserver(LoadingObserver loadingObserver) {
         this.loadingObserver = loadingObserver;
     }
-    
+
     public AparGlReport() {
         initComponents();
         initPopup();
     }
-    
+
     private void initMain() {
         panelName = this.getName();
         assingDefaultValue();
@@ -125,7 +125,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         initTable();
         isShown = true;
     }
-    
+
     private void initPopup() {
         popup = new JPopupMenu();
         JMenuItem print = new JMenuItem("Print");
@@ -137,20 +137,18 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
             }
         });
     }
-    
+
     private void assingDefaultValue() {
         stDate = Util1.toDateStr(Util1.getTodayDate(), "dd/MM/yyyy");
         enDate = stDate;
         txtDate.setText("Today");
     }
-    
+
     private void initTable() {
         if (panelName.equals("AP/AR")) {
             tblAPAR.setModel(aPARTableModel);
-            searchAPAR();
         } else if (panelName.equals("G/L Listing")) {
             tblAPAR.setModel(glListingTableModel);
-            searchGLListing();
         }
         tblAPAR.getTableHeader().setFont(Global.lableFont);
         tblAPAR.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -164,7 +162,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         tblAPAR.setDefaultRenderer(Object.class, new TableCellRender());
         sorter = new TableRowSorter<>(tblAPAR.getModel());
         tblAPAR.setRowSorter(sorter);
-        
+
         tblAPAR.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -179,7 +177,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                             String cvId = apar.getKey().getCvId().toString();
                             String desp = apar.getTraderName();
                             Double netChange = apar.getClosing();
-                            
+
                             searchTriBalDetail(cvId, "-", desp, netChange);
                         } else if (panelName.equals("G/L Listing")) {
                             VTriBalance vtb = glListingTableModel.getTBAL(selectRow);
@@ -187,17 +185,17 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                             String coaName = vtb.getCoaName();
                             Double netChange = vtb.getClosing();
                             searchTriBalDetail("-", coaId, coaName, netChange);
-                            
+
                         }
-                        
+
                     }
                 }
             }
-            
+
         });
-        
+
     }
-    
+
     private String getTarget() {
         String targetId = "-";
         if (panelName.equals("AP/AR")) {
@@ -209,7 +207,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         }
         return targetId;
     }
-    
+
     private void searchAPAR() {
         loadingObserver.load(this.getName(), "Start");
         clearTable();
@@ -234,19 +232,19 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
             }
         });
         uploadToFirebase();
-        
+
     }
-    
+
     private void uploadToFirebase() {
         taskExecutor.execute(() -> {
             try {
-                firebaseService.save(aPARTableModel.getListAPAR());
+                firebaseService.uploadCustomerBalance(aPARTableModel.getListAPAR());
             } catch (Exception e) {
                 LOGGER.info("User Offline...");
             }
         });
     }
-    
+
     private void searchGLListing() {
         loadingObserver.load(this.getName(), "Start");
         clearTable();
@@ -267,9 +265,9 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                 loadingObserver.load(this.getName(), "Stop");
             }
         });
-        
+
     }
-    
+
     private void searchTriBalDetail(String cvId, String coaId, String desp, Double netChange) {
         try {
             List<VGl> listVGL = vGlService.searchGlDrCr(Util1.isNull(stDate, "-"),
@@ -277,23 +275,31 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                     cvId, Global.compId.toString(),
                     "DR");
             swapDrCrAmt(listVGL, getTarget());
-            calculateOpening();
+            calculateOpening(cvId);
             openTBDDialog(listVGL, desp, netChange);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(Global.parentForm, e.getMessage());
             loadingObserver.load(this.getName(), "Stop");
         }
-        
+
     }
-    
-    private void calculateOpening() {
+
+    private void calculateOpening(String cvId) {
         List<TmpOpeningClosing> opBalanceGL;
         try {
-            opBalanceGL = coaOpDService.getOpBalanceGL1(getTarget(),
-                    Global.finicialPeriodFrom,
-                    stDate, 3, "MMK",
-                    Global.loginUser.getUserId().toString(),
-                    Util1.isNull(dept, "-"));
+            if (!cvId.equals("-")) {
+                opBalanceGL = coaOpDService.getOpBalanceByTrader(getTarget(),
+                        Global.finicialPeriodFrom,
+                        stDate, 3, "MMK",
+                        Global.loginUser.getUserId().toString(),
+                        Util1.isNull(dept, "-"), cvId);
+            } else {
+                opBalanceGL = coaOpDService.getOpBalanceGL1(getTarget(),
+                        Global.finicialPeriodFrom,
+                        stDate, 3, "MMK",
+                        Global.loginUser.getUserId().toString(),
+                        Util1.isNull(dept, "-"));
+            }
             if (!opBalanceGL.isEmpty()) {
                 TmpOpeningClosing tmpOC = opBalanceGL.get(0);
                 trialBalanceDetailDialog.setOpeningAmt(tmpOC.getOpening());
@@ -305,9 +311,9 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         } catch (Exception ex) {
             LOGGER.error("Calculation Opening :" + ex.getMessage());
         }
-        
+
     }
-    
+
     private void openTBDDialog(List<VGl> listVGl, String traderName, Double netChange) {
         trialBalanceDetailDialog.setDesp(traderName);
         trialBalanceDetailDialog.setNetChange(netChange);
@@ -316,23 +322,10 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         trialBalanceDetailDialog.setLocationRelativeTo(null);
         trialBalanceDetailDialog.setVisible(true);
     }
-    
+
     private void swapDrCrAmt(List<VGl> listVGL, String targetId) {
         listVGL.forEach(vgl -> {
             String sourceAcId = Util1.isNull(vgl.getSourceAcId(), "-");
-            //String accId = Util1.isNull(vgl.getAccountId(), "-");
-            /*if (sourceAcId.equals(targetId)) {
-            double tmpAmt;
-            if (Util1.isNullZero(vgl.getSplitId()) == 8) { //Credit Voucher
-            tmpAmt = Util1.getDouble(vgl.getDrAmt());
-            vgl.setDrAmt(Util1.getDouble(vgl.getCrAmt()));
-            vgl.setCrAmt(tmpAmt);
-            } else if (Util1.isNullZero(vgl.getSplitId()) == 9) { //Debit Voucher
-            tmpAmt = Util1.getDouble(vgl.getCrAmt());
-            vgl.setCrAmt(Util1.getDouble(vgl.getDrAmt()));
-            vgl.setDrAmt(tmpAmt);
-            }
-            } else */
             if (!sourceAcId.equals(targetId)) {
                 double tmpDrAmt = 0.0;
                 if (vgl.getDrAmt() != null) {
@@ -340,7 +333,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                 }
                 vgl.setDrAmt(Util1.getDouble(vgl.getCrAmt()));
                 vgl.setCrAmt(tmpDrAmt);
-                
+
                 String tmpStr = vgl.getAccName();
                 vgl.setAccName(vgl.getSrcAccName());
                 vgl.setSrcAccName(tmpStr);
@@ -350,11 +343,12 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
             }
         });
     }
-    
+
     private void calAPARTotalAmount(List<VApar> listApar) {
         double ttlDrAmt = 0.0;
         double ttlCrAmt = 0.0;
         double ttlNetChange = 0.0;
+        double outBal;
         for (VApar apar : listApar) {
             ttlDrAmt += Util1.getDouble(apar.getDrAmt());
             ttlCrAmt += Util1.getDouble(apar.getCrAmt());
@@ -363,27 +357,38 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         txtFTotalCrAmt.setValue(ttlCrAmt);
         txtFTotalDrAmt.setValue(ttlDrAmt);
         txtFNetChange.setValue(ttlNetChange);
-        txtFOFB.setValue(ttlDrAmt - ttlCrAmt);
+        if (ttlDrAmt > ttlCrAmt) {
+            outBal = ttlDrAmt - ttlCrAmt;
+        } else {
+            outBal = ttlCrAmt - ttlDrAmt;
+        }
+        txtFOFB.setValue(Util1.toFormatPattern(outBal));
     }
-    
+
     private void calGLTotlaAmount(List<VTriBalance> listTB) {
         if (!listTB.isEmpty()) {
             String curr = listTB.get(0).getKey().getCurrId();
             double ttlDrAmt = 0.0;
             double ttlCrAmt = 0.0;
             double ttlNet = 0.0;
+            double outBal = 0.0;
             for (VTriBalance tb : listTB) {
                 ttlDrAmt += Util1.getDouble(tb.getDrAmt());
                 ttlCrAmt += Util1.getDouble(tb.getCrAmt());
                 ttlNet += Util1.getDouble(tb.getClosing());
             }
-            txtFTotalCrAmt.setValue(ttlCrAmt);
-            txtFTotalDrAmt.setValue(ttlDrAmt);
-            txtFNetChange.setValue(ttlNet);
-            txtFOFB.setValue(ttlDrAmt - ttlCrAmt);
+            txtFTotalCrAmt.setValue(Util1.toFormatPattern(ttlCrAmt));
+            txtFTotalDrAmt.setValue(Util1.toFormatPattern(ttlDrAmt));
+            txtFNetChange.setValue(Util1.toFormatPattern(ttlNet));
+            if (ttlDrAmt > ttlCrAmt) {
+                outBal = ttlDrAmt - ttlCrAmt;
+            } else {
+                outBal = ttlCrAmt - ttlDrAmt;
+            }
+            txtFOFB.setValue(Util1.toFormatPattern(outBal));
         }
     }
-    
+
     private void initializeParameter() {
         dept = Util1.isNull(txtDep.getText(), "-");
         cvId = Util1.isNull(txtPerson.getText(), "-1");
@@ -392,16 +397,16 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         enDate = Util1.isNull(enDate, Util1.toDateStr(Util1.getTodayDate(), "dd/MM/yyyy"));
         userId = Global.loginUser.getUserId().toString();
     }
-    
+
     private void initCombo() {
         DateAutoCompleter dateAutoCompleter = new DateAutoCompleter(txtDate,
                 Global.listDateModel, null);
         dateAutoCompleter.setSelectionObserver(this);
-        
+
         TraderAutoCompleter traderAutoCompleter = new TraderAutoCompleter(txtPerson,
                 Global.listTrader, null);
         traderAutoCompleter.setSelectionObserver(this);
-        
+
         DepartmentAutoCompleter departmentAutoCompleter = new DepartmentAutoCompleter(txtDep,
                 Global.listDepartment, null);
         departmentAutoCompleter.setSelectionObserver(this);
@@ -410,7 +415,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         currencyAutoCompleter.setSelectionObserver(this);
         currencyAutoCompleter.setCurrency(Global.defalutCurrency);
     }
-    
+
     public void printApar() {
         loadingObserver.load(this.getName(), "Start");
         taskExecutor.execute(() -> {
@@ -424,35 +429,35 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                 String reportPath = sp.getPropValue();
                 String imgPath = reportPath;
                 String filePath = reportPath + "/temp/" + fileName;
-                
+
                 reportPath = reportPath + "APAR";
                 key = new SystemPropertyKey();
                 key.setCompCode(Global.compId);
                 key.setPropKey("system.font.path");
                 sp = spService.findById(key);
                 String fontPath = sp.getPropValue();
-                
+
                 Map<String, Object> parameters = new HashMap();
                 parameters.put("p_company_name", ci.getName());
                 parameters.put("p_comp_id", Global.compId.toString());
                 parameters.put("img_path", imgPath);
-                
+
                 rService.genCreditVoucher(reportPath, filePath, fontPath, parameters);
                 loadingObserver.load(this.getName(), "Stop");
             } catch (Exception ex) {
                 LOGGER.error("PRINT APAR REPORT :::" + ex.getMessage());
             }
         });
-        
+
     }
-    
+
     public void clear() {
         txtCurrency.setText(null);
         txtDate.setText(null);
         txtDep.setText(null);
         txtPerson.setText(null);
     }
-    
+
     private void search() {
         if (panelName.equals("AP/AR")) {
             searchAPAR();
@@ -460,18 +465,18 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
             searchGLListing();
         }
     }
-    
+
     private void clearTable() {
-        if (panelName.equals("AP/AR")) {
+        if (this.getName().equals("AP/AR")) {
             aPARTableModel.clear();
-        } else if (panelName.equals("G/L Listing")) {
+        } else if (this.getName().equals("G/L Listing")) {
             glListingTableModel.clear();
         }
     }
-    
+
     private void setTableFilter(String filter) {
         sorter.setRowFilter(RowFilter.regexFilter(filter));
-        
+
     }
 
     /**
@@ -497,8 +502,9 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         jPanel2 = new javax.swing.JPanel();
         txtFTotalDrAmt = new javax.swing.JFormattedTextField();
         txtFTotalCrAmt = new javax.swing.JFormattedTextField();
-        txtFOFB = new javax.swing.JFormattedTextField();
         txtFNetChange = new javax.swing.JFormattedTextField();
+        txtFOFB = new javax.swing.JFormattedTextField();
+        jLabel5 = new javax.swing.JLabel();
 
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentShown(java.awt.event.ComponentEvent evt) {
@@ -601,34 +607,24 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         tblAPAR.setRowHeight(Global.tblRowHeight);
         jScrollPane1.setViewportView(tblAPAR);
 
-        txtFTotalDrAmt.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Total Dr-Amt", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, Global.shortCutFont));
+        txtFTotalDrAmt.setEditable(false);
         txtFTotalDrAmt.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txtFTotalDrAmt.setDisabledTextColor(new java.awt.Color(0, 0, 0));
-        txtFTotalDrAmt.setEnabled(false);
         txtFTotalDrAmt.setFont(Global.amtFont);
 
-        txtFTotalCrAmt.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Total Crd-Amt", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, Global.shortCutFont));
+        txtFTotalCrAmt.setEditable(false);
         txtFTotalCrAmt.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txtFTotalCrAmt.setDisabledTextColor(new java.awt.Color(0, 0, 0));
-        txtFTotalCrAmt.setEnabled(false);
         txtFTotalCrAmt.setFont(Global.amtFont);
 
-        txtFOFB.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Out of balance", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, Global.shortCutFont));
+        txtFNetChange.setEditable(false);
+        txtFNetChange.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        txtFNetChange.setFont(Global.amtFont);
+
+        txtFOFB.setEditable(false);
         txtFOFB.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txtFOFB.setDisabledTextColor(new java.awt.Color(0, 0, 0));
-        txtFOFB.setEnabled(false);
         txtFOFB.setFont(Global.amtFont);
 
-        txtFNetChange.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Total Net-Change", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, Global.shortCutFont));
-        txtFNetChange.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txtFNetChange.setDisabledTextColor(new java.awt.Color(0, 0, 0));
-        txtFNetChange.setEnabled(false);
-        txtFNetChange.setFont(Global.amtFont);
-        txtFNetChange.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtFNetChangeActionPerformed(evt);
-            }
-        });
+        jLabel5.setFont(Global.lableFont);
+        jLabel5.setText("Out Of Balance");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -640,12 +636,18 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                         .addComponent(txtFTotalDrAmt, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(txtFTotalCrAmt, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(txtFNetChange, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(txtFOFB, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(txtFTotalCrAmt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(txtFNetChange, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                        .addComponent(jLabel5)
+                        .addGap(18, 18, 18)
+                        .addComponent(txtFOFB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
+
+        jPanel2Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {txtFNetChange, txtFOFB, txtFTotalCrAmt, txtFTotalDrAmt});
+
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
@@ -654,9 +656,11 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                     .addComponent(txtFTotalDrAmt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtFTotalCrAmt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtFNetChange, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtFOFB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(17, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtFOFB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel5))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -677,7 +681,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 370, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 387, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -691,6 +695,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         if (!isShown) {
             initMain();
         }
+        search();
     }//GEN-LAST:event_formComponentShown
 
     private void txtDepActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDepActionPerformed
@@ -708,16 +713,13 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         search();
     }//GEN-LAST:event_txtCurrencyActionPerformed
 
-    private void txtFNetChangeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtFNetChangeActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtFNetChangeActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
@@ -737,12 +739,12 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         if (source != null) {
             String name = source.toString();
             switch (name) {
-                
+
                 case "Date":
                     String[] split = selectObj.toString().split("to");
                     stDate = split[0];
                     enDate = split[1];
-                    
+
                     break;
                 case "Department":
                     dept = selectObj.toString();
@@ -755,38 +757,38 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                     break;
             }
             search();
-            
+
         }
     }
-    
+
     @Override
     public void save() {
     }
-    
+
     @Override
     public void delete() {
     }
-    
+
     @Override
     public void newForm() {
         assingDefaultValue();
         search();
         isShown = false;
     }
-    
+
     @Override
     public void history() {
     }
-    
+
     @Override
     public void print() {
     }
-    
+
     @Override
     public void refresh() {
         search();
     }
-    
+
     @Override
     public void sendFilter(String filter) {
         setTableFilter(filter);

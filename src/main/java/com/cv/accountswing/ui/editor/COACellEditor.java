@@ -7,20 +7,16 @@ package com.cv.accountswing.ui.editor;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.entity.ChartOfAccount;
-import com.cv.accountswing.service.COAService;
-import java.awt.event.ActionEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
-import java.util.Date;
 import java.util.EventObject;
 import javax.swing.AbstractCellEditor;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.SwingConstants;
-import javax.swing.Timer;
 import javax.swing.table.TableCellEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +30,17 @@ public class COACellEditor extends AbstractCellEditor implements TableCellEditor
     private static final Logger LOGGER = LoggerFactory.getLogger(COACellEditor.class);
     private JComponent component = null;
     private COAAutoCompleter completer;
+    private final FocusAdapter fa = new FocusAdapter() {
+        @Override
+        public void focusLost(FocusEvent e) {
+        }
+        @Override
+        public void focusGained(FocusEvent e) {
+            JTextField jtf = (JTextField) e.getSource();
+            jtf.setCaretPosition(jtf.getText().length());
+        }
+
+    };
     //private List<Medicine> listCOA = new ArrayList();
 
     public COACellEditor() {
@@ -43,10 +50,10 @@ public class COACellEditor extends AbstractCellEditor implements TableCellEditor
     @Override
     public java.awt.Component getTableCellEditorComponent(JTable table, Object value,
             boolean isSelected, int rowIndex, int vColIndex) {
+        LOGGER.info("Value :" + value);
         JTextField jtf = new JTextField();
         jtf.setFont(Global.textFont);
-        jtf.setHighlighter(null);
-        //List<Medicine> listCOA = dao.findAll("Medicine", "active = true");
+        //jtf.setHighlighter(null);
         KeyListener keyListener = new KeyListener() {
             @Override
             public void keyPressed(KeyEvent keyEvent) {
@@ -73,12 +80,12 @@ public class COACellEditor extends AbstractCellEditor implements TableCellEditor
         };
 
         jtf.addKeyListener(keyListener);
+        jtf.addFocusListener(fa);
         component = jtf;
         if (value != null) {
             jtf.setText(value.toString());
         }
         completer = new COAAutoCompleter(jtf, Global.listCOA, this);
-        component.requestFocus();
         return component;
     }
 
@@ -108,11 +115,7 @@ public class COACellEditor extends AbstractCellEditor implements TableCellEditor
         } else if (anEvent instanceof KeyEvent) {
             KeyEvent ke = (KeyEvent) anEvent;
 
-            if (ke.isActionKey()) {//Function key
-                return false;
-            } else {
-                return true;
-            }
+            return !ke.isActionKey(); //Function key
         } else {
             return true;
         }

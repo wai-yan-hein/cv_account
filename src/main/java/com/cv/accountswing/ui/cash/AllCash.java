@@ -150,7 +150,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
         filterPanel();
         initTable();
         clearFilter();
-        isShown = false;
+        isShown = true;
     }
 
     private void clearTextBox() {
@@ -601,6 +601,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
         } else {
             //requestFoucsTable();
         }
+        searchCash();
 
     }//GEN-LAST:event_formComponentShown
 
