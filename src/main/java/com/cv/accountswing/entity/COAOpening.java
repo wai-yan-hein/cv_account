@@ -23,6 +23,7 @@ import javax.persistence.TemporalType;
 @Entity
 @Table(name = "coa_opening")
 public class COAOpening implements Serializable {
+
     @Id
     @GeneratedValue(strategy = IDENTITY)
     @Column(name = "coa_op_id", unique = true, nullable = false)
@@ -48,7 +49,7 @@ public class COAOpening implements Serializable {
     @Column(name = "dept_code")
     private String depCode;
     @Column(name = "cv_id")
-    private String traderCode;
+    private String cvId;
 
     public Integer getOpId() {
         return opId;
@@ -130,13 +131,12 @@ public class COAOpening implements Serializable {
         this.depCode = depCode;
     }
 
-    public String getTraderCode() {
-        return traderCode;
+    public String getCvId() {
+        return cvId;
     }
 
-    public void setTraderCode(String traderCode) {
-        this.traderCode = traderCode;
+    public void setCvId(String cvId) {
+        this.cvId = cvId;
     }
-    
-    
+
 }

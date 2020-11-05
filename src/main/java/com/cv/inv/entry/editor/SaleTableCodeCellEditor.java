@@ -8,6 +8,8 @@ package com.cv.inv.entry.editor;
 import com.cv.accountswing.common.Global;
 import com.cv.inv.entity.Stock;
 import java.awt.Component;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -29,6 +31,18 @@ public class SaleTableCodeCellEditor extends AbstractCellEditor implements Table
     private static final Logger LOGGER = LoggerFactory.getLogger(SaleTableCodeCellEditor.class);
     private JComponent component = null;
     private StockAutoCompleter completer;
+    private final FocusAdapter fa = new FocusAdapter() {
+        @Override
+        public void focusLost(FocusEvent e) {
+        }
+
+        @Override
+        public void focusGained(FocusEvent e) {
+            JTextField jtf = (JTextField) e.getSource();
+            jtf.setCaretPosition(jtf.getText().length());
+        }
+
+    };
 
     public SaleTableCodeCellEditor() {
     }
@@ -80,10 +94,11 @@ public class SaleTableCodeCellEditor extends AbstractCellEditor implements Table
         };
 
         jtf.addKeyListener(keyListener);
+        jtf.addFocusListener(fa);
+
         component = jtf;
         if (value != null) {
             jtf.setText(value.toString());
-            jtf.selectAll();
         }
         completer = new StockAutoCompleter(jtf, Global.listStock, this);
         return component;

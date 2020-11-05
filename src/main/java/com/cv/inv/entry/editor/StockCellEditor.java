@@ -7,6 +7,8 @@ package com.cv.inv.entry.editor;
 
 import com.cv.accountswing.common.Global;
 import com.cv.inv.entity.Stock;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -28,8 +30,20 @@ public class StockCellEditor extends AbstractCellEditor implements TableCellEdit
     private static final Logger LOGGER = LoggerFactory.getLogger(StockCellEditor.class);
     private JComponent component = null;
     private StockAutoCompleter completer;
-    //private List<Medicine> listDepartment = new ArrayList();
+    private final FocusAdapter fa = new FocusAdapter() {
+        @Override
+        public void focusLost(FocusEvent e) {
+        }
 
+        @Override
+        public void focusGained(FocusEvent e) {
+            JTextField jtf = (JTextField) e.getSource();
+            jtf.setCaretPosition(jtf.getText().length());
+        }
+
+    };
+
+    //private List<Medicine> listDepartment = new ArrayList();
     public StockCellEditor() {
     }
 
@@ -38,7 +52,6 @@ public class StockCellEditor extends AbstractCellEditor implements TableCellEdit
             boolean isSelected, int rowIndex, int vColIndex) {
         JTextField jtf = new JTextField();
         jtf.setFont(Global.textFont);
-        jtf.setHighlighter(null);
         //List<Medicine> listDepartment = dao.findAll("Medicine", "active = true");
 
         KeyListener keyListener = new KeyListener() {
@@ -66,6 +79,7 @@ public class StockCellEditor extends AbstractCellEditor implements TableCellEdit
             }
         };
 
+        jtf.addFocusListener(fa);
         jtf.addKeyListener(keyListener);
         component = jtf;
         if (value != null) {
@@ -73,7 +87,7 @@ public class StockCellEditor extends AbstractCellEditor implements TableCellEdit
             //jtf.selectAll();
         }
         completer = new StockAutoCompleter(jtf, Global.listStock, this);
-       
+
         return component;
     }
 

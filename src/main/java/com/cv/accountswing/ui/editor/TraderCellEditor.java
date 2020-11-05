@@ -7,6 +7,8 @@ package com.cv.accountswing.ui.editor;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.entity.Trader;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -28,8 +30,20 @@ public class TraderCellEditor extends AbstractCellEditor implements TableCellEdi
     private static final Logger LOGGER = LoggerFactory.getLogger(TraderCellEditor.class);
     private JComponent component = null;
     private TraderAutoCompleter completer;
-    //private List<Medicine> listTrader = new ArrayList();
+    private final FocusAdapter fa = new FocusAdapter() {
+        @Override
+        public void focusLost(FocusEvent e) {
+        }
 
+        @Override
+        public void focusGained(FocusEvent e) {
+            JTextField jtf = (JTextField) e.getSource();
+            jtf.setCaretPosition(jtf.getText().length());
+        }
+
+    };
+
+    //private List<Medicine> listTrader = new ArrayList();
     public TraderCellEditor() {
 
     }
@@ -39,7 +53,6 @@ public class TraderCellEditor extends AbstractCellEditor implements TableCellEdi
             boolean isSelected, int rowIndex, int vColIndex) {
         JTextField jtf = new JTextField();
         jtf.setFont(Global.textFont);
-        jtf.setHighlighter(null);
         //List<Medicine> listTrader = dao.findAll("Medicine", "active = true");
         KeyListener keyListener = new KeyListener() {
             @Override
@@ -67,6 +80,7 @@ public class TraderCellEditor extends AbstractCellEditor implements TableCellEdi
         };
 
         jtf.addKeyListener(keyListener);
+        jtf.addFocusListener(fa);
         component = jtf;
         if (value != null) {
             jtf.setText(value.toString());

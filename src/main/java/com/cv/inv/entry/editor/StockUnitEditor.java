@@ -7,6 +7,8 @@ package com.cv.inv.entry.editor;
 
 import com.cv.accountswing.common.Global;
 import com.cv.inv.entity.StockUnit;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -28,8 +30,20 @@ public class StockUnitEditor extends AbstractCellEditor implements TableCellEdit
     private static final Logger LOGGER = LoggerFactory.getLogger(StockUnitEditor.class);
     private JComponent component = null;
     private UnitAutoCompleter completer;
-    //private List<Medicine> listDepartment = new ArrayList();
+    private final FocusAdapter fa = new FocusAdapter() {
+        @Override
+        public void focusLost(FocusEvent e) {
+        }
 
+        @Override
+        public void focusGained(FocusEvent e) {
+            JTextField jtf = (JTextField) e.getSource();
+            jtf.setCaretPosition(jtf.getText().length());
+        }
+
+    };
+
+    //private List<Medicine> listDepartment = new ArrayList();
     public StockUnitEditor() {
     }
 
@@ -64,7 +78,7 @@ public class StockUnitEditor extends AbstractCellEditor implements TableCellEdit
             public void keyTyped(KeyEvent keyEvent) {
             }
         };
-
+        jtf.addFocusListener(fa);
         jtf.addKeyListener(keyListener);
         component = jtf;
         if (value != null) {

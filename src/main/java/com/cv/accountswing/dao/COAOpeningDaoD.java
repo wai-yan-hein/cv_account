@@ -55,4 +55,7 @@ public interface COAOpeningDaoD {
     public void genArAp1(String compCode, String fromDate, String opDate, String tranDate,
             String coaCode, String currency, String dept, String cvId, String userId) throws Exception;
 
+    public void getOpBalanceByTrader(String coaCode, String opDate,
+            String clDate, int level, String curr, String userId, String dept, String cvId) throws Exception;
+
 }
