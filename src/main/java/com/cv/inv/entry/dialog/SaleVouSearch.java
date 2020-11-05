@@ -132,11 +132,15 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
             VouStatus vouStaus = vouStatusService.findById(vouStausId);
             vouCompleter.setVouStatus(vouStaus);
             String userId = Global.sysProperties.get("system.default.user");
-            AppUser appUser = userService.findById(userId);
-            appUserAutoCompleter.setAppUser(appUser);
+            if (userId != null) {
+                AppUser appUser = userService.findById(userId);
+                appUserAutoCompleter.setAppUser(appUser);
+            }
             String machineId = Global.sysProperties.get("system.default.machine");
-            MachineInfo machInfo = machInfoService.findById(machineId);
-            machAutoCompleter.setMachineInfo(machInfo);
+            if (machineId != null) {
+                MachineInfo machInfo = machInfoService.findById(machineId);
+                machAutoCompleter.setMachineInfo(machInfo);
+            }
 
         } catch (Exception e) {
             LOGGER.info("Assign Default Value :" + e.getMessage());
@@ -150,8 +154,8 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
     }
 
     private void search() {
-        String fromDate = Util1.toDateStr(txtFromDate.getDate(), "dd/MM/yyyy");
-        String toDate = Util1.toDateStr(txtToDate.getDate(), "dd/MM/yyyy");
+        String fromDate = Util1.toDateStr(txtFromDate.getDate(), "yyyy-MM-dd HH:mm:ss");
+        String toDate = Util1.toDateStr(txtToDate.getDate(), "yyyy-MM-dd HH:mm:ss");
         String customerId = traderAutoCompleter.getTrader().getId().toString();
         String vouStatusId = vouCompleter.getVouStatus().getVouStatusId().toString();
         String remark = txtRemark.getText();

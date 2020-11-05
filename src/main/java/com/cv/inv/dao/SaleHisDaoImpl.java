@@ -31,23 +31,23 @@ public class SaleHisDaoImpl extends AbstractDao<String, SaleHis> implements Sale
 
         if (!fromDate.equals("-") && !toDate.equals("-")) {
             if (strFilter.isEmpty()) {
-                strFilter = "o.saleDate between '" + Util1.toDateStrMYSQL(fromDate, "dd/MM/yyyy")
-                        + "' and '" + Util1.toDateStrMYSQL(toDate, "dd/MM/yyyy") + "'";
+                strFilter = "o.saleDate between '" + fromDate
+                        + "' and '" + toDate + "'";
             } else {
                 strFilter = strFilter + " and o.saleDate between '"
-                        + Util1.toDateStrMYSQL(fromDate, "dd/MM/yyyy") + "' and '" + Util1.toDateStrMYSQL(toDate, "dd/MM/yyyy") + "'";
+                        + fromDate + "' and '" + toDate + "'";
             }
         } else if (!fromDate.endsWith("-")) {
             if (strFilter.isEmpty()) {
-                strFilter = "o.saleDate >= '" + Util1.toDateStrMYSQL(fromDate, "dd/MM/yyyy") + "'";
+                strFilter = "o.saleDate >= '" + fromDate + "'";
             } else {
-                strFilter = strFilter + " and o.saleDate >= '" + Util1.toDateStrMYSQL(fromDate, "dd/MM/yyyy") + "'";
+                strFilter = strFilter + " and o.saleDate >= '" + fromDate + "'";
             }
         } else if (!toDate.equals("-")) {
             if (strFilter.isEmpty()) {
-                strFilter = "o.saleDate <= '" + Util1.toDateStrMYSQL(toDate, "dd/MM/yyyy") + "'";
+                strFilter = "o.saleDate <= '" + toDate + "'";
             } else {
-                strFilter = strFilter + " and o.saleDate <= '" + Util1.toDateStrMYSQL(toDate, "dd/MM/yyyy") + "'";
+                strFilter = strFilter + " and o.saleDate <= '" + toDate + "'";
             }
         }
 

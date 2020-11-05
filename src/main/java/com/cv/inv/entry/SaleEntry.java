@@ -288,8 +288,10 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
             VouStatus vouStaus = vouStatusService.findById(vouStausId);
             vouCompleter.setVouStatus(vouStaus);
             String saleManId = Global.sysProperties.get("system.default.saleman");
-            SaleMan saleMan = saleManService.findById(saleManId);
-            saleManCompleter.setSaleMan(saleMan);
+            if (saleManId != null) {
+                SaleMan saleMan = saleManService.findById(saleManId);
+                saleManCompleter.setSaleMan(saleMan);
+            }
         } catch (Exception e) {
             LOGGER.info("Assign Default Value :" + e.getMessage());
             JOptionPane.showMessageDialog(Global.parentForm, "Defalut Values are missing in System Property.");
@@ -367,14 +369,14 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
 
             if (lblStatus.getText().equals("NEW")) {
                 saleHis.setSaleDate(txtSaleDate.getDate());
-                saleHis.setCreatedBy(Global.loginUser);
+                saleHis.setCreatedBy(Global.loginUser.getUserId().toString());
                 saleHis.setSession(Global.sessionId);
             } else {
                 Date tmpDate = txtSaleDate.getDate();
                 if (!Util1.isSameDate(tmpDate, saleHis.getSaleDate())) {
                     saleHis.setSaleDate(txtSaleDate.getDate());
                 }
-                saleHis.setUpdatedBy(Global.loginUser);
+                saleHis.setUpdatedBy(Global.loginUser.getUserId().toString());
                 saleHis.setUpdatedDate(Util1.getTodayDate());
             }
             try {
@@ -404,8 +406,8 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
 
     private void actionMapping() {
         //F8 event on tblSale
-        tblSale.getInputMap().put(KeyStroke.getKeyStroke("F6"), "F6-Action");
-        tblSale.getActionMap().put("F6-Action", actionItemDelete);
+        tblSale.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "DELETE");
+        tblSale.getActionMap().put("DELETE", actionItemDelete);
 
     }
     private final Action actionItemDelete = new AbstractAction() {
@@ -1017,23 +1019,23 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
         switch (source.toString()) {
             case "CustomerList":
                 try {
-                    Trader cus = (Trader) selectObj;
+                Trader cus = (Trader) selectObj;
 
-                    if (cus != null) {
-                        txtCus.setText(cus.getTraderName());
+                if (cus != null) {
+                    txtCus.setText(cus.getTraderName());
 
-                        if (cus.getTraderType() != null) {
-                            saleTableModel.setCusType(cus.getTraderType().getDescription());
-                        } else {
-                            saleTableModel.setCusType("N");
-                        }
+                    if (cus.getTraderType() != null) {
+                        saleTableModel.setCusType(cus.getTraderType().getDescription());
                     } else {
-                        txtCus.setText(null);
+                        saleTableModel.setCusType("N");
                     }
-                } catch (Exception ex) {
-                    LOGGER.error("selected CustomerList : " + selectObj.toString() + " - " + ex.getMessage());
+                } else {
+                    txtCus.setText(null);
                 }
-                break;
+            } catch (Exception ex) {
+                LOGGER.error("selected CustomerList : " + selectObj.toString() + " - " + ex.getMessage());
+            }
+            break;
         }
     }
 
