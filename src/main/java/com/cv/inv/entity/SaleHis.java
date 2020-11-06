@@ -5,7 +5,6 @@
  */
 package com.cv.inv.entity;
 
-import com.cv.accountswing.entity.AppUser;
 import com.cv.accountswing.entity.Trader;
 import java.util.Date;
 import javax.persistence.Column;
@@ -65,14 +64,12 @@ public class SaleHis implements java.io.Serializable {
     private Double paid;
     @Column(name = "vou_balance")
     private Double vouBalance;
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private AppUser createdBy;
+    @Column(name = "user_id")
+    private String createdBy;
     @Column(name = "session_id")
     private Integer session;
-    @ManyToOne
-    @JoinColumn(name = "updated_by")
-    private AppUser updatedBy;
+    @Column(name = "updated_by")
+    private String updatedBy;
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_date")
     private Date updatedDate;
@@ -221,19 +218,19 @@ public class SaleHis implements java.io.Serializable {
         this.vouBalance = vouBalance;
     }
 
-    public AppUser getCreatedBy() {
+    public String getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(AppUser createdBy) {
+    public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
 
-    public AppUser getUpdatedBy() {
+    public String getUpdatedBy() {
         return updatedBy;
     }
 
-    public void setUpdatedBy(AppUser updatedBy) {
+    public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
     }
 

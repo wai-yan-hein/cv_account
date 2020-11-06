@@ -463,7 +463,16 @@ public class SaleEntryTableModel extends AbstractTableModel {
     }
 
     public List<SaleDetailHis> getListSaleDetail() {
-        return listDetail;
+       List<SaleDetailHis> listpurDetail = new ArrayList();
+        for (SaleDetailHis pdh2 : listDetail) {
+            if (pdh2.getStock() != null) {
+                if (pdh2.getStock().getStockCode() != null) {
+                    listpurDetail.add(pdh2);
+                }
+            }
+        }
+
+        return listpurDetail;
     }
 
     public void setTxtTotalItem(JTextField txtTtlItem) {
