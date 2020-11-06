@@ -391,7 +391,7 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
 
     private void deleteSale() {
         int yes_no = JOptionPane.showConfirmDialog(Global.parentForm,
-                "Are you sure to delete?", "Damage item delete", JOptionPane.YES_NO_OPTION);
+                "Are you sure to delete?", "Sale item delete", JOptionPane.YES_NO_OPTION);
         if (yes_no == 0) {
             String vouNo = txtVouNo.getText();
             if (lblStatus.getText().equals("EDIT")) {
@@ -403,7 +403,6 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
     }
 
     private void actionMapping() {
-        //F8 event on tblSale
         tblSale.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "DELETE");
         tblSale.getActionMap().put("DELETE", actionItemDelete);
 
@@ -503,27 +502,6 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
             txtTotalItem.setText(Integer.toString(listSaleDetail.size() - 1));
         }
     }
-
-    private final Action actionSave = new AbstractAction() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            saveSale();
-        }
-    };
-
-    private final Action actionNewForm = new AbstractAction() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            clear();
-        }
-    };
-
-    private final Action actionHistory = new AbstractAction() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            historySale();
-        }
-    };
 
     private void saleOutstand() {
         if (listDetail.size() > 1) {
@@ -1017,23 +995,23 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
         switch (source.toString()) {
             case "CustomerList":
                 try {
-                Trader cus = (Trader) selectObj;
+                    Trader cus = (Trader) selectObj;
 
-                if (cus != null) {
-                    txtCus.setText(cus.getTraderName());
+                    if (cus != null) {
+                        txtCus.setText(cus.getTraderName());
 
-                    if (cus.getTraderType() != null) {
-                        saleTableModel.setCusType(cus.getTraderType().getDescription());
+                        if (cus.getTraderType() != null) {
+                            saleTableModel.setCusType(cus.getTraderType().getDescription());
+                        } else {
+                            saleTableModel.setCusType("N");
+                        }
                     } else {
-                        saleTableModel.setCusType("N");
+                        txtCus.setText(null);
                     }
-                } else {
-                    txtCus.setText(null);
+                } catch (Exception ex) {
+                    LOGGER.error("selected CustomerList : " + selectObj.toString() + " - " + ex.getMessage());
                 }
-            } catch (Exception ex) {
-                LOGGER.error("selected CustomerList : " + selectObj.toString() + " - " + ex.getMessage());
-            }
-            break;
+                break;
         }
     }
 
