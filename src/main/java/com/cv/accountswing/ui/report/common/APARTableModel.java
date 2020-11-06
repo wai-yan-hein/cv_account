@@ -5,6 +5,7 @@
 package com.cv.accountswing.ui.report.common;
 
 import com.cv.accountswing.entity.view.VApar;
+import com.cv.accountswing.util.Util1;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
@@ -66,6 +67,8 @@ public class APARTableModel extends AbstractTableModel {
                     return apar.getCrAmt();
                 case 5:
                     return apar.getClosing();
+                /*return apar.getDrAmt() > 0 ? apar.getDrAmt() - apar.getClosing()
+                    : apar.getCrAmt() - apar.getClosing();*/
                 default:
                     return null;
             }
