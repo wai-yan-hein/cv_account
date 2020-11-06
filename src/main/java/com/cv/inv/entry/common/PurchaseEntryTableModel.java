@@ -43,18 +43,20 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
     private List<String> delList = new ArrayList();
     private LocationAutoCompleter locationCompleter;
     private JFormattedTextField txtTotalAmt;
+    private Location location;
+    private Department department;
 
     public void setTxtTotalAmt(JFormattedTextField txtTotalAmt) {
         this.txtTotalAmt = txtTotalAmt;
     }
-
-    public LocationAutoCompleter getLocationCompleter() {
-        return locationCompleter;
-    }
-
-    public void setLocationCompleter(LocationAutoCompleter locationCompleter) {
-        this.locationCompleter = locationCompleter;
-    }
+//
+//    public LocationAutoCompleter getLocationCompleter() {
+//        return locationCompleter;
+//    }
+//
+//    public void setLocationCompleter(LocationAutoCompleter locationCompleter) {
+//        this.locationCompleter = locationCompleter;
+//    }
 
     @Autowired
     private RelationService relationService;
@@ -118,11 +120,13 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                 }
             case 2:
                 if (pur.getDepartment() != null) {
-                    return pur.getDepartment().getDeptName();
+                    return pur.getDepartment();
+                } else {
+                    return null;
                 }
             case 3:
                 if (pur.getLocation() != null) {
-                    return pur.getLocation().getLocationName();
+                    return pur.getLocation();
                 }
             case 4:
                 return pur.getQty();
@@ -157,23 +161,23 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                             pur.setAvgPrice(stock.getPurPrice());
                             pur.setStdWeight(stock.getPurPriceMeasure());
                             pur.setPurUnit(stock.getPurPriceUnit());
+                            pur.setDepartment(department);
+                            pur.setLocation(location);
                             addNewRow();
                             parent.setColumnSelectionInterval(4, 4);
                         }
                     case 2:
-                        if (aValue instanceof Department) {
-                            Department dept = (Department) aValue;
-                            pur.setDepartment(dept);
-                            parent.setRowSelectionInterval(rowIndex + 1, rowIndex + 1);
-                            parent.setColumnSelectionInterval(0, 0);
+                        if (pur.getDepartment() != null) {
+                            pur.setDepartment((Department) aValue);
+                            parent.setColumnSelectionInterval(3, 3);
                         }
+
                         break;
                     case 3:
-                        if (aValue instanceof Location) {
-                            Location loc = (Location) aValue;
-                            pur.setLocation(loc);
-                            parent.setRowSelectionInterval(rowIndex + 1, rowIndex + 1);
-                            parent.setColumnSelectionInterval(0, 0);
+                        if (pur.getLocation() != null) {
+                            pur.setLocation((Location) aValue);
+                        } else {
+                            pur.setLocation(null);
                         }
                         break;
                     case 4://Qty
@@ -353,9 +357,6 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
             if (hasEmptyRow()) {
                 PurchaseDetail pd = new PurchaseDetail();
                 pd.setUniqueId(listPurDetail.size() + 1);
-                if (locationCompleter != null) {
-                    pd.setLocation(locationCompleter.getLocation());
-                }
                 listPurDetail.add(pd);
                 fireTableRowsInserted(listPurDetail.size() - 1, listPurDetail.size() - 1);
             }
@@ -461,5 +462,21 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
         } else {
             parent.setRowSelectionInterval(0, 0);
         }
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+
+    public Department getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(Department dept) {
+        this.department = dept;
     }
 }
