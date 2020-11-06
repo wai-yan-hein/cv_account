@@ -21,6 +21,7 @@ import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.editor.CurrencyAutoCompleter;
 import com.cv.accountswing.ui.editor.DepartmentAutoCompleter;
 import com.cv.accountswing.ui.editor.TraderAutoCompleter;
+import com.cv.accountswing.util.BindingUtil;
 import com.cv.accountswing.util.NumberUtil;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.Location;
@@ -48,6 +49,8 @@ import java.util.Date;
 import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.DefaultCellEditor;
+import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -136,7 +139,7 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
 
     private void initPurTable() {
         tblPurchase.setModel(purTableModel);
-        purTableModel.setLocationCompleter(locCompleter);
+      //  purTableModel.setLocationCompleter(locCompleter);
         purTableModel.addNewRow();
         purTableModel.setParent(tblPurchase);
         purTableModel.setTxtTotalAmt(txtVouTotal);
@@ -160,6 +163,22 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
         tblPurchase.getColumnModel().getColumn(7).setCellEditor(new AutoClearEditor());//avg-wt
         tblPurchase.getColumnModel().getColumn(8).setCellEditor(new AutoClearEditor());//pur price
         tblPurchase.getColumnModel().getColumn(9).setCellEditor(new AutoClearEditor());//amt
+        if (Util1.getPropValue("system.default.department").equals("1-003")) {
+            JComboBox cboDepartmentCell = new JComboBox();
+            cboDepartmentCell.setFont(Global.textFont);
+            BindingUtil.BindCombo(cboDepartmentCell, departmentService.findAll());
+            tblPurchase.getColumnModel().getColumn(2).setCellEditor(new DefaultCellEditor(cboDepartmentCell));
+            purTableModel.setDepartment((Department) cboDepartmentCell.getSelectedItem());
+            tblPurchase.getColumnModel().getColumn(2).setPreferredWidth(30);
+        }
+        if (Util1.getPropValue("system.default.location").equals("23")) {
+            JComboBox cboLocationCell = new JComboBox();
+            cboLocationCell.setFont(Global.textFont);
+            BindingUtil.BindCombo(cboLocationCell, locationService.findAll());
+            tblPurchase.getColumnModel().getColumn(3).setCellEditor(new DefaultCellEditor(cboLocationCell));
+            purTableModel.setLocation((Location) cboLocationCell.getSelectedItem());
+            tblPurchase.getColumnModel().getColumn(3).setPreferredWidth(30);
+        }
         tblPurchase.setDefaultRenderer(Float.class, new TableCellRender());
         tblPurchase.setDefaultRenderer(Double.class, new TableCellRender());
         tblPurchase.setDefaultRenderer(Object.class, new TableCellRender());
@@ -215,20 +234,12 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
         taskExecutor.execute(() -> {
             try {
                 txtPurDate.setDate(Util1.getTodayDate());
-                String depId = Global.sysProperties.get("system.default.department");
-                Department dep = departmentService.findById(depId);
-                if (dep != null) {
-                    departmentAutoCompleter.setDepartment(dep);
-                }
                 String cuId = Global.sysProperties.get("system.default.currency");
                 CurrencyKey key = new CurrencyKey();
                 key.setCode(cuId);
                 key.setCompCode(Global.compId);
                 Currency currency = currencyService.findById(key);
                 currAutoCompleter.setCurrency(currency);
-//                String locId = Global.sysProperties.get("system.default.location");
-//                Location location = locationService.findById(locId);
-//                locCompleter.setLocation(location);
                 String vouStausId = Global.sysProperties.get("system.default.vou.status");
                 VouStatus vouStaus = vouStatusService.findById(vouStausId);
                 vouCompleter.setVouStatus(vouStaus);
@@ -286,7 +297,7 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
         } else {
             ph.setPurInvId(txtVouNo.getText());
             ph.setDueDate(txtDueDate.getDate());
-            ph.setLocationId(locCompleter.getLocation());
+         //   ph.setLocationId(locCompleter.getLocation());
             ph.setVouStatus(vouCompleter.getVouStatus());
             ph.setRemark(txtRemark.getText());
             ph.setVouTotal(NumberUtil.getDouble(txtVouTotal.getText()));

@@ -64,7 +64,7 @@ public class PurchaseDetatilServiceImpl implements PurchaseDetailService {
                         retInDetailId = vouNo + '-' + pd.getUniqueId();
                         pd.setPurDetailKey(new PurDetailKey(vouNo, retInDetailId));
                     }
-                    pd.setLocation(gl.getLocationId());
+                  //  pd.setLocation(gl.getLocationId());
                     dao.save(pd);
                 }
             }
