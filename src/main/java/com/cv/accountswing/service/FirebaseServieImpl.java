@@ -37,7 +37,7 @@ public class FirebaseServieImpl implements FirebaseService {
     public void uploadCustomerBalance(List<VApar> listApar) throws Exception {
         if (!listApar.isEmpty()) {
             listApar.forEach(apar -> {
-                hmApar.put(apar.getKey().getCompCode().toString(), apar);
+                hmApar.put(apar.getTraderId(), apar);
             });
             Firestore firestore = FirestoreClient.getFirestore();
             ApiFuture<WriteResult> apiFuture = firestore.collection("cv-account").document("cus-balance").set(hmApar);
