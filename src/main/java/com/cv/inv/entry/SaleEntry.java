@@ -181,23 +181,21 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
         tblSale.getColumnModel().getColumn(5).setCellEditor(new AutoClearEditor());
         tblSale.getColumnModel().getColumn(6).setCellEditor(new StockUnitEditor());
         tblSale.getColumnModel().getColumn(7).setCellEditor(new AutoClearEditor());
+        //cboDept
+        JComboBox cboDepartmentCell = new JComboBox();
+        cboDepartmentCell.setFont(Global.textFont);
+        BindingUtil.BindCombo(cboDepartmentCell, departmentService.findAll());
+        tblSale.getColumnModel().getColumn(2).setCellEditor(new DefaultCellEditor(cboDepartmentCell));
+        saleTableModel.setDepartment((Department) cboDepartmentCell.getSelectedItem());
+        tblSale.getColumnModel().getColumn(2).setPreferredWidth(30);
+        //cboLoc
+        JComboBox cboLocationCell = new JComboBox();
+        cboLocationCell.setFont(Global.textFont);
+        BindingUtil.BindCombo(cboLocationCell, locationService.findAll());
+        tblSale.getColumnModel().getColumn(3).setCellEditor(new DefaultCellEditor(cboLocationCell));
+        saleTableModel.setLocation((Location) cboLocationCell.getSelectedItem());
+        tblSale.getColumnModel().getColumn(3).setPreferredWidth(30);
 
-        if (Util1.getPropValue("system.default.department").equals("1-003")) {
-            JComboBox cboDepartmentCell = new JComboBox();
-            cboDepartmentCell.setFont(Global.textFont);
-            BindingUtil.BindCombo(cboDepartmentCell, departmentService.findAll());
-            tblSale.getColumnModel().getColumn(2).setCellEditor(new DefaultCellEditor(cboDepartmentCell));
-            saleTableModel.setDepartment((Department) cboDepartmentCell.getSelectedItem());
-            tblSale.getColumnModel().getColumn(2).setPreferredWidth(30);
-        }
-        if (Util1.getPropValue("system.default.location").equals("23")) {
-            JComboBox cboLocationCell = new JComboBox();
-            cboLocationCell.setFont(Global.textFont);
-            BindingUtil.BindCombo(cboLocationCell, locationService.findAll());
-            tblSale.getColumnModel().getColumn(3).setCellEditor(new DefaultCellEditor(cboLocationCell));
-            saleTableModel.setLocation((Location) cboLocationCell.getSelectedItem());
-            tblSale.getColumnModel().getColumn(3).setPreferredWidth(30);
-        }
         tblSale.setDefaultRenderer(Boolean.class, new TableCellRender());
         tblSale.setDefaultRenderer(Object.class, new TableCellRender());
         tblSale.setDefaultRenderer(Double.class, new TableCellRender());

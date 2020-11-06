@@ -55,6 +55,7 @@ public class SaleOutstandingDialog extends javax.swing.JDialog {
         tblSaleOutstand = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Sale Outstanding Entry");
 
         tblSaleOutstand.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
