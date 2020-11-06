@@ -12,12 +12,15 @@ import com.cv.accountswing.entity.ChartOfAccount;
 import com.cv.accountswing.entity.Menu;
 import com.cv.accountswing.entity.Privilege;
 import com.cv.accountswing.entity.PrivilegeKey;
+import com.cv.accountswing.entity.UserRole;
 import com.cv.accountswing.service.COAService;
 import com.cv.accountswing.service.MenuService;
 import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.service.PrivilegeService;
+import com.cv.accountswing.service.UserRoleService;
 import com.cv.accountswing.util.BindingUtil;
 import com.cv.accountswing.util.Util1;
+import java.awt.HeadlessException;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -66,7 +69,10 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
     private MenuService menuService;
     @Autowired
     private ApplicationMainFrame mainFrame;
+    @Autowired
     private PrivilegeService privilegeService;
+    @Autowired
+    private UserRoleService userRoleService;
     JPopupMenu popupmenu;
     private LoadingObserver loadingObserver;
     private HashMap<String, Menu> hmMenu = new HashMap<>();
@@ -277,31 +283,44 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
     }
 
     private void saveMenu() {
-        try {
-            if (cboMenu.getSelectedItem() != null) {
-                if (cboMenu.getSelectedItem() instanceof Menu) {
-                    ChartOfAccount coa = (ChartOfAccount) selectedNode.getUserObject();
-                    Menu selectMenu = (Menu) cboMenu.getSelectedItem();
-                    Menu menu = new Menu();
-                    menu.setMenuName(coa.getCoaNameEng());
-                    menu.setMenuClass(selectMenu.getMenuClass());
-                    menu.setParent(selectMenu.getId().toString());
-                    menu.setSoureAccCode(coa.getCode());
+        if (cboMenu.getSelectedItem() != null) {
+            if (cboMenu.getSelectedItem() instanceof Menu) {
+                ChartOfAccount coa = (ChartOfAccount) selectedNode.getUserObject();
+                Menu selectMenu = (Menu) cboMenu.getSelectedItem();
+                Menu menu = new Menu();
+                menu.setMenuName(coa.getCoaNameEng());
+                menu.setMenuClass(selectMenu.getMenuClass());
+                menu.setParent(selectMenu.getId().toString());
+                menu.setSoureAccCode(coa.getCode());
+                try {
                     Menu saveMenu = menuService.saveMenu(menu);
                     if (saveMenu != null) {
                         Integer menuId = saveMenu.getId();
-                        Privilege p = new Privilege();
-                        PrivilegeKey key = new PrivilegeKey(Global.roleId, menuId);
-                        p.setKey(key);
-                        p.setIsAllow(Boolean.FALSE);
-                        privilegeService.save(p);
+                        List<UserRole> listUser = userRoleService.search("-", Global.compId.toString());
+                        if (!listUser.isEmpty()) {
+                            listUser.stream().map(role -> {
+                                Privilege p = new Privilege();
+                                PrivilegeKey key = new PrivilegeKey(role.getRoleId(), menuId);
+                                p.setKey(key);
+                                return p;
+                            }).map(p -> {
+                                p.setIsAllow(Boolean.FALSE);
+                                return p;
+                            }).forEachOrdered(p -> {
+                                privilegeService.save(p);
+                            });
+                        }
+                        JOptionPane.showMessageDialog(Global.parentForm, "Successfully Created");
+
                     }
+                } catch (HeadlessException e) {
+                    JOptionPane.showMessageDialog(Global.parentForm, e.getMessage());
+                    LOGGER.info("Save Menu :" + e.getMessage());
                 }
+
             }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(Global.parentForm, e.getMessage());
-            LOGGER.info("Save Menu :" + e.getMessage());
         }
+
     }
 
     /**

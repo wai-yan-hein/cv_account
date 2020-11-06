@@ -7,6 +7,8 @@ package com.cv.inv.entry.editor;
 
 import com.cv.accountswing.common.Global;
 import com.cv.inv.entity.Location;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -28,8 +30,20 @@ public class LocationCellEditor extends AbstractCellEditor implements TableCellE
     private static final Logger LOGGER = LoggerFactory.getLogger(LocationCellEditor.class);
     private JComponent component = null;
     private LocationAutoCompleter completer;
-    //private List<Medicine> listDepartment = new ArrayList();
+    private final FocusAdapter fa = new FocusAdapter() {
+        @Override
+        public void focusLost(FocusEvent e) {
+        }
 
+        @Override
+        public void focusGained(FocusEvent e) {
+            JTextField jtf = (JTextField) e.getSource();
+            jtf.setCaretPosition(jtf.getText().length());
+        }
+
+    };
+
+    //private List<Medicine> listDepartment = new ArrayList();
     public LocationCellEditor() {
     }
 
@@ -66,6 +80,7 @@ public class LocationCellEditor extends AbstractCellEditor implements TableCellE
         };
 
         jtf.addKeyListener(keyListener);
+        jtf.addFocusListener(fa);
         component = jtf;
         if (value != null) {
             jtf.setText(value.toString());

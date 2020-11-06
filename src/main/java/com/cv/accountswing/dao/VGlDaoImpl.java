@@ -242,7 +242,7 @@ public class VGlDaoImpl extends AbstractDao<Long, VGl> implements VGlDao {
 
         if (!from.equals("-") && !to.equals("-")) {
             if (strFilter.isEmpty()) {
-                strFilter = "o.glDate between '" + Util1.toDateStrMYSQL(from, "dd/MM/yyyy")
+                strFilter = "date(o.glDate) between '" + Util1.toDateStrMYSQL(from, "dd/MM/yyyy")
                         + "' and '" + Util1.toDateStrMYSQL(to, "dd/MM/yyyy") + "'";
             } else {
                 strFilter = strFilter + " and o.glDate between '"
@@ -250,13 +250,13 @@ public class VGlDaoImpl extends AbstractDao<Long, VGl> implements VGlDao {
             }
         } else if (!from.endsWith("-")) {
             if (strFilter.isEmpty()) {
-                strFilter = "o.glDate >= '" + Util1.toDateStrMYSQL(from, "dd/MM/yyyy") + "'";
+                strFilter = "date(o.glDate) >= '" + Util1.toDateStrMYSQL(from, "dd/MM/yyyy") + "'";
             } else {
                 strFilter = strFilter + " and o.glDate >= '" + Util1.toDateStrMYSQL(from, "dd/MM/yyyy") + "'";
             }
         } else if (!to.equals("-")) {
             if (strFilter.isEmpty()) {
-                strFilter = "o.glDate <= '" + Util1.toDateStrMYSQL(to, "dd/MM/yyyy") + "'";
+                strFilter = "date(o.glDate) <= '" + Util1.toDateStrMYSQL(to, "dd/MM/yyyy") + "'";
             } else {
                 strFilter = strFilter + " and o.glDate <= '" + Util1.toDateStrMYSQL(to, "dd/MM/yyyy") + "'";
             }

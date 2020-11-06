@@ -53,6 +53,8 @@ public class VCOAOpening implements Serializable {
     private String traderName;
     @Column(name = "dept_code")
     private String depCode;
+    @Column(name = "cv_id")
+    private String cvId;
 
     public Integer getOpId() {
         return opId;
@@ -157,6 +159,13 @@ public class VCOAOpening implements Serializable {
     public void setDepCode(String depCode) {
         this.depCode = depCode;
     }
-    
+
+    public String getCvId() {
+        return cvId;
+    }
+
+    public void setCvId(String cvId) {
+        this.cvId = cvId;
+    }
 
 }

@@ -5,13 +5,9 @@
  */
 package com.cv.inv.service;
 
-import com.cv.accountswing.dao.GlDao;
-import com.cv.accountswing.entity.Department;
-import com.cv.accountswing.entity.Gl;
 import com.cv.inv.dao.SaleDetailDao;
 import com.cv.inv.dao.SaleHisDao;
 import com.cv.inv.entity.SaleDetailHis;
-import com.cv.inv.entity.SaleDetailKey;
 import com.cv.inv.entity.SaleHis;
 import java.util.List;
 import org.slf4j.Logger;
@@ -49,17 +45,17 @@ public class SaleDetailServiceImpl implements SaleDetailService {
     @Override
     public void save(SaleHis saleHis, List<SaleDetailHis> listSaleDetail,
             String vouStatus, List<String> deleteList) throws Exception {
-
-        if (vouStatus.equals("EDIT")) {
-            if (deleteList != null) {
-                for (String detailId : deleteList) {
-                    dao.delete(detailId);
+        try {
+            if (vouStatus.equals("EDIT")) {
+                if (deleteList != null) {
+                    for (String detailId : deleteList) {
+                        dao.delete(detailId);
+                    }
                 }
             }
-        }
 
-        hisDao.save(saleHis);
-        try {
+            hisDao.save(saleHis);
+
             for (SaleDetailHis sdh : listSaleDetail) {
                 if (sdh.getStock().getStockCode() != null) {
                     String vouNo = saleHis.getVouNo();

@@ -43,7 +43,7 @@ public class Company extends javax.swing.JPanel implements KeyListener, PanelCon
     private static final Logger LOGGER = LoggerFactory.getLogger(Company.class);
 
     private int selectRow = -1;
-    private CompanyInfo companyInfo;
+    private CompanyInfo companyInfo = new CompanyInfo();
     @Autowired
     private CompanyInfoService compInfoService;
     @Autowired
@@ -114,6 +114,7 @@ public class Company extends javax.swing.JPanel implements KeyListener, PanelCon
     }
 
     private void setCompanyInfo(CompanyInfo cInfo) {
+        companyInfo = cInfo;
         txtCode.setText(cInfo.getCompCode());
         txtShortCode.setText(cInfo.getShortCode());
         txtName.setText(cInfo.getName());
@@ -157,8 +158,9 @@ public class Company extends javax.swing.JPanel implements KeyListener, PanelCon
             txtName.requestFocus();
             status = false;
         } else {
-            companyInfo = new CompanyInfo();
-            companyInfo.setCompCode(txtShortCode.getText());
+            //companyInfo = new CompanyInfo();
+            companyInfo.setCompCode(txtCode.getText());
+            companyInfo.setShortCode(txtShortCode.getText());
             companyInfo.setName(txtName.getText());
             companyInfo.setPhone(txtPhone.getText());
             companyInfo.setEmail(txtEmail.getText());
@@ -187,6 +189,7 @@ public class Company extends javax.swing.JPanel implements KeyListener, PanelCon
         txtToDate.setText(null);
         chkActive.setSelected(Boolean.FALSE);
         lblStatus.setText("NEW");
+        companyInfo = new CompanyInfo();
     }
 
     private void initKeyListener() {

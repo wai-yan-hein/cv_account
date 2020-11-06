@@ -37,12 +37,12 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class AllCashTableModel extends AbstractTableModel {
-
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(AllCashTableModel.class);
     private List<VGl> listVGl = new ArrayList();
     private String[] columnNames = {"Date", "Dept:", "Description", "Ref", "Person", "Account", "Curr", "Cash In / Dr", "Cash Out / Cr"};
     Gson gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
-
+    
     @Autowired
     private GlService glService;
     @Autowired
@@ -56,28 +56,28 @@ public class AllCashTableModel extends AbstractTableModel {
     private SelectionObserver selectionObserver;
     private Trader trader;
     private ReloadData reloadData;
-
+    
     public void setReloadData(ReloadData reloadData) {
         this.reloadData = reloadData;
     }
-
+    
     public void setSelectionObserver(SelectionObserver selectionObserver) {
         this.selectionObserver = selectionObserver;
     }
-
+    
     public void setParent(JTable parent) {
         this.parent = parent;
     }
-
+    
     public void setSourceAccId(String sourceAccId) {
         this.sourceAccId = sourceAccId;
     }
-
+    
     @Override
     public String getColumnName(int column) {
         return columnNames[column];
     }
-
+    
     @Override
     public boolean isCellEditable(int row, int column) {
         /*if (column == 6) {
@@ -87,7 +87,7 @@ public class AllCashTableModel extends AbstractTableModel {
         }*/
         return column != 6;
     }
-
+    
     @Override
     public Class getColumnClass(int column) {
         switch (column) {
@@ -99,13 +99,13 @@ public class AllCashTableModel extends AbstractTableModel {
                 return String.class;
         }
     }
-
+    
     @Override
     public Object getValueAt(int row, int column) {
-
+        
         try {
             VGl vgi = listVGl.get(row);
-
+            
             switch (column) {
                 case 0: //Id
                     if (vgi.getGlDate() != null) {
@@ -128,17 +128,17 @@ public class AllCashTableModel extends AbstractTableModel {
                     return vgi.getDrAmt();
                 case 8:
                     return vgi.getCrAmt();
-
+                
                 default:
                     return null;
             }
         } catch (Exception ex) {
             LOGGER.error("getValueAt : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
         }
-
+        
         return null;
     }
-
+    
     @Override
     public void setValueAt(Object value, int row, int column) {
         VGl vgl = listVGl.get(row);
@@ -158,7 +158,7 @@ public class AllCashTableModel extends AbstractTableModel {
                     }
                 }
                 parent.setColumnSelectionInterval(1, 1);
-
+                
                 break;
             case 1:
                 if (value != null) {
@@ -175,7 +175,7 @@ public class AllCashTableModel extends AbstractTableModel {
                     vgl.setDescription(value.toString());
                 }
                 parent.setColumnSelectionInterval(3, 3);
-
+                
                 break;
             case 3:
                 if (value != null) {
@@ -205,7 +205,7 @@ public class AllCashTableModel extends AbstractTableModel {
                         ChartOfAccount coa = (ChartOfAccount) value;
                         vgl.setAccountId(coa.getCode());
                         vgl.setAccName(coa.getCoaNameEng());
-
+                        
                     }
                 }
                 parent.setColumnSelectionInterval(6, 6);
@@ -233,9 +233,9 @@ public class AllCashTableModel extends AbstractTableModel {
         }
         save(vgl, row, column);
         parent.requestFocus();
-
+        
     }
-
+    
     private void save(VGl vgl, int row, int column) {
         if (isValidEntry(vgl, row, column)) {
             vgl.setSourceAcId(sourceAccId);
@@ -243,7 +243,7 @@ public class AllCashTableModel extends AbstractTableModel {
             vgl.setCreatedBy(Global.loginUser.getUserId().toString());
             String strVGL = gson.toJson(vgl);
             Gl gl = gson.fromJson(strVGL, Gl.class);
-
+            
             try {
                 Gl glSave = glService.save(gl);
                 if (glSave != null) {
@@ -261,9 +261,9 @@ public class AllCashTableModel extends AbstractTableModel {
                 LOGGER.error("Save Gl :" + ex.getMessage());
             }
         }
-
+        
     }
-
+    
     private boolean isValidEntry(VGl vgl, int row, int column) {
         boolean status = true;
         if (vgl.getAccountId() == null) {
@@ -282,14 +282,17 @@ public class AllCashTableModel extends AbstractTableModel {
         }
         if (vgl.getDeptId() == null) {
             status = false;
-            JOptionPane.showMessageDialog(Global.parentForm, "Missing Department.");
-            parent.setColumnSelectionInterval(1, 1);
-            parent.setRowSelectionInterval(row, row);
+            if (column > 1) {
+                JOptionPane.showMessageDialog(Global.parentForm, "Missing Department.");
+                parent.setColumnSelectionInterval(1, 1);
+                parent.setRowSelectionInterval(row, row);
+                
+            }
         }
-
+        
         return status;
     }
-
+    
     private void sendPaymentToInv(Gl gl) {
         taskExecutor.execute(() -> {
             try {
@@ -297,7 +300,7 @@ public class AllCashTableModel extends AbstractTableModel {
                     if (gl.getTraderId() != null) {
                         Trader trader = traderService.findById(gl.getTraderId().intValue());
                         if (trader != null) {
-
+                            
                             if (trader.getAppShortName() != null) {
                                 if (trader.getAppShortName().equals("INVENTORY")) {
                                     //Need to sent to inventory
@@ -307,7 +310,7 @@ public class AllCashTableModel extends AbstractTableModel {
                                     }
                                 }
                             }
-
+                            
                         }
                     }
                 }
@@ -318,9 +321,9 @@ public class AllCashTableModel extends AbstractTableModel {
                 LOGGER.error("sendPaymentToInv :" + e.getMessage());
             }
         });
-
+        
     }
-
+    
     @Override
     public int getRowCount() {
         if (listVGl == null) {
@@ -328,36 +331,36 @@ public class AllCashTableModel extends AbstractTableModel {
         }
         return listVGl.size();
     }
-
+    
     @Override
     public int getColumnCount() {
         return columnNames.length;
     }
-
+    
     public String[] getColumnNames() {
         return columnNames;
     }
-
+    
     public void setColumnNames(String[] columnNames) {
         this.columnNames = columnNames;
     }
-
+    
     public List<VGl> getListVGl() {
         return listVGl;
     }
-
+    
     public void setListVGl(List<VGl> listVGl) {
         this.listVGl = listVGl;
         fireTableDataChanged();
     }
-
+    
     public VGl getVGl(int row) {
         return listVGl.get(row);
     }
-
+    
     public void deleteVGl(int row) {
         if (!listVGl.isEmpty()) {
-
+            
             VGl vgl = listVGl.get(row);
             try {
                 int delete = glService.delete(vgl.getGlId());
@@ -371,11 +374,11 @@ public class AllCashTableModel extends AbstractTableModel {
                 JOptionPane.showMessageDialog(Global.parentForm, ex.getMessage());
                 LOGGER.error("Delete GL :" + ex.getMessage());
             }
-
+            
         }
-
+        
     }
-
+    
     private void sendDeletePaymentToInv(Trader trader, long glId) {
         if (trader != null) {
             if (trader.getAppShortName() != null) {
@@ -385,19 +388,19 @@ public class AllCashTableModel extends AbstractTableModel {
             }
         }
     }
-
+    
     public void addVGl(VGl vgi) {
         listVGl.add(vgi);
         fireTableRowsInserted(listVGl.size() - 1, listVGl.size() - 1);
     }
-
+    
     public void setVGl(int row, VGl vgi) {
         if (!listVGl.isEmpty()) {
             listVGl.set(row, vgi);
             fireTableRowsUpdated(row, row);
         }
     }
-
+    
     public void addNewRow() {
         if (hasEmptyRow()) {
             VGl vGl = new VGl();
@@ -411,7 +414,7 @@ public class AllCashTableModel extends AbstractTableModel {
             fireTableRowsInserted(listVGl.size() - 1, listVGl.size() - 1);
         }
     }
-
+    
     public boolean hasEmptyRow() {
         boolean status = true;
         if (listVGl.isEmpty() || listVGl == null) {
@@ -422,23 +425,23 @@ public class AllCashTableModel extends AbstractTableModel {
                 status = false;
             }
         }
-
+        
         return status;
     }
-
+    
     public int getListSize() {
         return listVGl.size();
     }
-
+    
     public void setColumnName(int i, String name) {
         columnNames[i] = name;
         fireTableStructureChanged();
     }
-
+    
     public void clear() {
         if (listVGl != null) {
             listVGl.clear();
         }
     }
-
+    
 }

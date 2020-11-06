@@ -14,5 +14,5 @@ import java.util.List;
  */
 public interface FirebaseService {
 
-    public void save(List<VApar> listApar) throws  Exception;
+    public void uploadCustomerBalance(List<VApar> listApar) throws  Exception;
 }

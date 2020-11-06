@@ -10,17 +10,23 @@ import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.ui.ApplicationMainFrame;
+import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.StockOutstanding;
 import com.cv.inv.entry.common.IssueTableModel;
 import com.cv.inv.entry.editor.LocationAutoCompleter;
+import com.cv.inv.entry.editor.StockCellEditor;
+import com.cv.inv.entry.editor.StockUnitEditor;
+import com.cv.inv.service.VouIdService;
+import com.cv.inv.util.GenVouNoImpl;
 import com.toedter.calendar.JTextFieldDateEditor;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import javax.swing.JButton;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -38,10 +44,13 @@ public class Issue extends javax.swing.JPanel implements SelectionObserver, KeyL
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(Issue.class);
     private LoadingObserver loadingObserver;
     private boolean isShown = false;
+    private GenVouNoImpl vouEngine = null;
     @Autowired
     private IssueTableModel issueTableModel;
     @Autowired
     private ApplicationMainFrame mainFrame;
+    @Autowired
+    private VouIdService voudIdService;
 
     public void setLoadingObserver(LoadingObserver loadingObserver) {
         this.loadingObserver = loadingObserver;
@@ -49,6 +58,7 @@ public class Issue extends javax.swing.JPanel implements SelectionObserver, KeyL
 
     public Issue() {
         initComponents();
+
     }
 
     private void initMain() {
@@ -56,13 +66,18 @@ public class Issue extends javax.swing.JPanel implements SelectionObserver, KeyL
         initKeyListener();
         setTodayDate();
         initCombo();
+        genVouNo();
+        isShown = true;
     }
 
     private void initTable() {
         tblIssue.setModel(issueTableModel);
         issueTableModel.setParent(tblIssue);
         tblIssue.getTableHeader().setFont(Global.lableFont);
+        issueTableModel.addEmptyRow();
+        issueTableModel.setCallBack(this);
         tblIssue.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
         tblIssue.getColumnModel().getColumn(0).setPreferredWidth(10);
         tblIssue.getColumnModel().getColumn(1).setPreferredWidth(90);
         tblIssue.getColumnModel().getColumn(2).setPreferredWidth(30);
@@ -73,9 +88,18 @@ public class Issue extends javax.swing.JPanel implements SelectionObserver, KeyL
         tblIssue.getColumnModel().getColumn(7).setPreferredWidth(2);
         tblIssue.getColumnModel().getColumn(8).setPreferredWidth(10);
         tblIssue.getColumnModel().getColumn(9).setPreferredWidth(30);
+
+        tblIssue.getColumnModel().getColumn(2).setCellEditor(new StockCellEditor());
+        tblIssue.getColumnModel().getColumn(7).setCellEditor(new AutoClearEditor());
+        tblIssue.getColumnModel().getColumn(8).setCellEditor(new StockUnitEditor());
+
         tblIssue.setDefaultRenderer(Boolean.class, new TableCellRender());
         tblIssue.setDefaultRenderer(Object.class, new TableCellRender());
         tblIssue.setDefaultRenderer(Float.class, new TableCellRender());
+        tblIssue.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tblIssue.getSelectionModel().addListSelectionListener((ListSelectionEvent e) -> {
+            //     txtRecNo.setText(Integer.toString(tblDamage.getSelectedRow() + 1));
+        });
     }
 
     private void initKeyListener() {
@@ -118,6 +142,11 @@ public class Issue extends javax.swing.JPanel implements SelectionObserver, KeyL
 
     private void clear() {
         issueTableModel.removeListDetail();
+    }
+
+    private void genVouNo() {
+        vouEngine = new GenVouNoImpl(voudIdService, "Damage", Util1.getPeriod(txtDate.getDate()));
+        txtIssueId.setText(vouEngine.genVouNo());
     }
 
     /**

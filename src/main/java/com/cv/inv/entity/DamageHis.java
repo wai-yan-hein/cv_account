@@ -7,7 +7,6 @@ package com.cv.inv.entity;
 
 import com.cv.accountswing.entity.AppUser;
 import java.util.Date;
-import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -16,7 +15,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.Transient;
 import org.hibernate.annotations.GenerationTime;
 
 /**

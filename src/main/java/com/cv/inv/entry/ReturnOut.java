@@ -11,11 +11,11 @@ import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.Currency;
 import com.cv.accountswing.entity.CurrencyKey;
-import com.cv.accountswing.entity.Gl;
+import com.cv.accountswing.entity.Trader;
 import com.cv.accountswing.service.CurrencyService;
-import com.cv.accountswing.service.GlService;
 import com.cv.accountswing.service.TraderService;
 import com.cv.accountswing.ui.ApplicationMainFrame;
+import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.editor.CurrencyAutoCompleter;
 import com.cv.accountswing.ui.editor.TraderAutoCompleter;
@@ -23,11 +23,13 @@ import com.cv.accountswing.util.NumberUtil;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.Location;
 import com.cv.inv.entity.RetOutDetailHis;
+import com.cv.inv.entity.RetOutHis;
 import com.cv.inv.entry.common.ReturnOutTableModel;
 import com.cv.inv.entry.editor.LocationAutoCompleter;
 import com.cv.inv.entry.editor.StockCellEditor;
 import com.cv.inv.entry.editor.StockUnitEditor;
 import com.cv.inv.service.LocationService;
+import com.cv.inv.service.RetOutDetailService;
 import com.cv.inv.service.RetOutService;
 import com.cv.inv.service.VouIdService;
 import com.cv.inv.ui.commom.VouFormatFactory;
@@ -38,6 +40,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -74,17 +77,14 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
     private CurrencyAutoCompleter currencyAutoCompleter;
     private GenVouNoImpl vouEngine = null;
     private Long glId;
-    private Gl gl = new Gl();
+    private RetOutHis retOut = new RetOutHis();
     private boolean isShown = false;
     @Autowired
     private ReturnOutTableModel retOutTableModel;
-
     @Autowired
     private CurrencyService currencyService;
-
     @Autowired
     private LocationService locationService;
-
     @Autowired
     private VouIdService vouIdService;
     @Autowired
@@ -92,13 +92,13 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
     @Autowired
     private RetInVouSearch retInVouSearch;
     @Autowired
-    private GlService glService;
-    @Autowired
     private TraderService traderService;
     @Autowired
     private RetOutService retOutService;
     @Autowired
     private ApplicationMainFrame mainFrame;
+    @Autowired
+    private RetOutDetailService retOutDetailService;
 
     public void setLoadingObserver(LoadingObserver loadingObserver) {
         this.loadingObserver = loadingObserver;
@@ -141,6 +141,7 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
         tblRetOut.getColumnModel().getColumn(5).setPreferredWidth(30);
         tblRetOut.getColumnModel().getColumn(6).setPreferredWidth(60);
         tblRetOut.getColumnModel().getColumn(7).setPreferredWidth(70);
+        tblRetOut.getColumnModel().getColumn(3).setCellEditor(new AutoClearEditor());//qty
         tblRetOut.setDefaultRenderer(Double.class, new TableCellRender());
         tblRetOut.setDefaultRenderer(Boolean.class, new TableCellRender());
         tblRetOut.setDefaultRenderer(Object.class, new TableCellRender());
@@ -256,42 +257,32 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
 
     private void actionMapping() {
         //Enter event on tblSale
-        //tblReturnIn.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "ENTER-Action");
-        //tblReturnIn.getActionMap().put("ENTER-Action", actionTblRetInEnterKey);
+        tblRetOut.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "ENTER-Action");
+        tblRetOut.getActionMap().put("ENTER-Action", actionTblRetOutEnterKey);
 
         //F8 event on tblRetIn
-        tblRetOut.getInputMap().put(KeyStroke.getKeyStroke("F8"), "F8-Action");
-        tblRetOut.getActionMap().put("F8-Action", actionItemDelete);
+        tblRetOut.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "DELETE");
+        tblRetOut.getActionMap().put("DELETE", actionItemDelete);
     }
 
     private Action actionItemDelete = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            RetOutDetailHis retdh;
-            int yes_no = -1;
-
             if (tblRetOut.getSelectedRow() >= 0) {
-                retdh = listDetail.get(tblRetOut.getSelectedRow());
-
-                if (retdh.getStock() != null) {
-                    if (retdh.getStock().getStockCode() != null) {
-                        try {
-                            yes_no = JOptionPane.showConfirmDialog(Global.parentForm, "Are you sure to delete?",
-                                    "Purchase item delete", JOptionPane.YES_NO_OPTION);
-
-                        } catch (Exception ex) {
-                            LOGGER.error("actionItemDelete : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.toString());
-                        }
-
-                        if (yes_no == 0) {
-                            retOutTableModel.delete(tblRetOut.getSelectedRow());
-                            calculateTotalAmount();
-                        }
-                    }
-
-                } else {
-                    JOptionPane.showMessageDialog(Global.parentForm, "Can't delete empty record");
+                int yes_no = JOptionPane.showConfirmDialog(Global.parentForm,
+                        "Are you sure to delete?", "Return in item delete", JOptionPane.YES_NO_OPTION);
+                if (yes_no == 0) {
+                    retOutTableModel.delete(tblRetOut.getSelectedRow());
                 }
+            }
+        }
+    };
+    private final Action actionTblRetOutEnterKey = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                tblRetOut.getCellEditor().stopCellEditing();
+            } catch (Exception ex) {
             }
         }
     };
@@ -605,42 +596,38 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
 
     @Override
     public void selected(Object source, Object selectObj) {
-        /*switch (source.toString()) {
-        case "RetOutVouList":
+        switch (source.toString()) {
+            case "RetOutVouList":
         try {
-        VRetOut vRetOut = (VRetOut) selectObj;
-        gl = glService.findById(vRetOut.getKey().getGlId());
-        glId = gl.getGlId();
-        
-        if (Util1.getNullTo(gl.getDeleted())) {
-        lblStatus.setText("DELETED");
-        } else {
-        lblStatus.setText("EDIT");
+                RetOutHis vRetOut = (RetOutHis) selectObj;
+                retOut = outService.findById(vRetOut.getRetOutId());
+                if (Util1.getNullTo(retOut.isDeleted())) {
+                    lblStatus.setText("DELETED");
+                } else {
+                    lblStatus.setText("EDIT");
+                }
+
+                txtVouNo.setText(retOut.getRetOutId());
+                txtVouTotal.setText(retOut.getVouTotal().toString());
+                txtVouPaid.setText(retOut.getPaid().toString());
+                txtVouBalance.setText(retOut.getBalance().toString());
+                txtRemark.setText(retOut.getRemark());
+                txtRetOutDate.setDate(retOut.getRetOutDate());
+                Trader trader = retOut.getCustomer();
+                traderAutoCompleter.setTrader(trader);
+                locationAutoCompleter.setLocation(retOut.getLocation());
+                currencyAutoCompleter.setCurrency(retOut.getCurrency());
+
+                List<RetOutDetailHis> listRetOut = retOutDetailService.search(retOut.getRetOutId());
+                retOutTableModel.setRetOutDetailList(listRetOut);
+
+            } catch (Exception ex) {
+                LOGGER.error("selected : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.toString());
+
+            }
+
+            break;
         }
-        
-        txtVouNo.setText(gl.getVouNo());
-        txtVouTotal.setText(gl.getVouTotal().toString());
-        txtVouPaid.setText(gl.getPaid().toString());
-        txtVouBalance.setText(gl.getBalance().toString());
-        txtRemark.setText(gl.getRemark());
-        txtRetOutDate.setDate(gl.getGlDate());
-        Trader trader = traderService.findById(Integer.parseInt(gl.getTraderId().toString()));
-        traderAutoCompleter.setTrader(trader);
-        Location location = locationService.findById(gl.getLocationId().toString());
-        locationAutoCompleter.setLocation(location);
-        Currency currency = currencyService.findById(new CurrencyKey(gl.getFromCurId(), Global.compId));
-        currencyAutoCompleter.setCurrency(currency);
-        
-        List<RetOutDetailHis> listRetOut = retOutService.search(gl.getGlId().toString(), gl.getVouNo());
-        retOutTableModel.setRetOutDetailList(listRetOut);
-        
-        } catch (Exception ex) {
-        LOGGER.error("selected : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.toString());
-        
-        }
-        
-        break;
-        }*/
 
     }
 
@@ -765,88 +752,99 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
     }
 
     public void saveReturnOut() {
-        /*if (isValidEntry()) {
-        try {
-        outService.save(gl, listDetail);
-        if (lblStatus.getText().equals("NEW")) {
-        vouEngine.updateVouNo();
+        if (isValidEntry()) {
+            List<String> delList = retOutTableModel.getDelList();
+            try {
+                outService.save(retOut, retOutTableModel.getListRetInDetail(), delList);
+                if (lblStatus.getText().equals("NEW")) {
+                    vouEngine.updateVouNo();
+                }
+            } catch (Exception ex) {
+                LOGGER.error("saveRetOut : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
+            }
+
+            clear();
         }
-        } catch (Exception ex) {
-        LOGGER.error("saveRetOut : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
-        }
-        
-        clear();
-        }*/
     }
 
-    /*private boolean isValidEntry() {
-    boolean status = true;
-    Location location = null;
-    Currency currency = null;
-    Trader trader = null;
-    try {
-    if (locationAutoCompleter.getLocation() != null) {
-    location = locationAutoCompleter.getLocation();
+    private boolean isValidEntry() {
+        boolean status = true;
+        Location location = null;
+        Currency currency = null;
+        Trader trader = null;
+        try {
+            if (locationAutoCompleter.getLocation() != null) {
+                location = locationAutoCompleter.getLocation();
+            }
+            if (currencyAutoCompleter.getCurrency() != null) {
+                currency = currencyAutoCompleter.getCurrency();
+            }
+            if (traderAutoCompleter.getTrader() != null) {
+                trader = traderAutoCompleter.getTrader();
+
+            }
+            if (txtVouNo.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(Global.parentForm, "Invalid voucher no.",
+                        "Invalid Voucher ID", JOptionPane.ERROR_MESSAGE);
+                status = false;
+            } else if (txtSup.getText() == null) {
+                JOptionPane.showMessageDialog(Global.parentForm, "Supplier cannot be blank.",
+                        "No Supplier.", JOptionPane.ERROR_MESSAGE);
+                status = false;
+                txtSup.requestFocusInWindow();
+            } else if (location.getLocationId() == null) {
+                JOptionPane.showMessageDialog(Global.parentForm, "Location cannot be blank.",
+                        "Select Location.", JOptionPane.ERROR_MESSAGE);
+                status = false;
+                txtLocation.requestFocusInWindow();
+            } else if (currency.getKey().getCode() == null) {
+                JOptionPane.showMessageDialog(Global.parentForm, "Currency cannot be blank.",
+                        "Select Currency", JOptionPane.ERROR_MESSAGE);
+                status = false;
+                txtCurrency.requestFocusInWindow();
+            } else if (listDetail.size() == 1) {
+                JOptionPane.showMessageDialog(Global.parentForm, "No Purchase record.",
+                        "No data.", JOptionPane.ERROR_MESSAGE);
+                status = false;
+            } else {
+
+                retOut.setRetOutId(txtVouNo.getText());
+                retOut.setCustomer(traderAutoCompleter.getTrader());
+                retOut.setRemark(txtRemark.getText());
+                retOut.setRetOutDate(txtRetOutDate.getDate());
+                retOut.setCreatedDate(Util1.getTodayDate());
+                retOut.setCurrency((currencyAutoCompleter.getCurrency()));
+                retOut.setLocation(locationAutoCompleter.getLocation());
+                retOut.setCreatedBy(Global.loginUser.getUserId().toString());
+                retOut.setVouTotal(NumberUtil.getDouble(txtVouTotal.getText()));
+                retOut.setPaid(NumberUtil.getDouble(txtVouPaid.getText()));
+                retOut.setBalance(NumberUtil.getDouble(txtVouBalance.getText()));
+                retOut.setDeleted(Util1.getNullTo(retOut.isDeleted()));
+                if (lblStatus.getText().equals("NEW")) {
+                    retOut.setRetOutDate(txtRetOutDate.getDate());
+                } else {
+                    Date tmpDate = txtRetOutDate.getDate();
+                    if (!Util1.isSameDate(tmpDate, retOut.getRetOutDate())) {
+                        retOut.setRetOutDate(txtRetOutDate.getDate());
+                    }
+                }
+                if (lblStatus.getText().equals("NEW")) {
+                    retOut.setCreatedBy(Global.loginUser.getUserId().toString());
+                    retOut.setSession(Global.sessionId);
+                } else {
+                    retOut.setUpdatedBy(Global.loginUser.getUserId().toString());
+                    retOut.setUpdatedDate(Util1.getTodayDate());
+                }
+
+            }
+
+        } catch (Exception ex) {
+            LOGGER.error("isValidEntry : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
+
+        }
+
+        return status;
     }
-    if (currencyAutoCompleter.getCurrency() != null) {
-    currency = currencyAutoCompleter.getCurrency();
-    }
-    if (traderAutoCompleter.getTrader() != null) {
-    trader = traderAutoCompleter.getTrader();
-    
-    }
-    if (txtVouNo.getText().isEmpty()) {
-    JOptionPane.showMessageDialog(Global.parentForm, "Invalid voucher no.",
-    "Invalid Voucher ID", JOptionPane.ERROR_MESSAGE);
-    status = false;
-    } else if (txtSup.getText() == null) {
-    JOptionPane.showMessageDialog(Global.parentForm, "Supplier cannot be blank.",
-    "No Supplier.", JOptionPane.ERROR_MESSAGE);
-    status = false;
-    txtSup.requestFocusInWindow();
-    } else if (location.getLocationId() == null) {
-    JOptionPane.showMessageDialog(Global.parentForm, "Location cannot be blank.",
-    "Select Location.", JOptionPane.ERROR_MESSAGE);
-    status = false;
-    txtLocation.requestFocusInWindow();
-    } else if (currency.getKey().getCode() == null) {
-    JOptionPane.showMessageDialog(Global.parentForm, "Currency cannot be blank.",
-    "Select Currency", JOptionPane.ERROR_MESSAGE);
-    status = false;
-    txtCurrency.requestFocusInWindow();
-    } else if (listDetail.size() == 1) {
-    JOptionPane.showMessageDialog(Global.parentForm, "No Purchase record.",
-    "No data.", JOptionPane.ERROR_MESSAGE);
-    status = false;
-    } else {
-    
-    gl.setVouNo(txtVouNo.getText());
-    gl.setTraderId(NumberUtil.NZeroL(trader.getId()));
-    gl.setRemark(txtRemark.getText());
-    gl.setGlDate(txtRetOutDate.getDate());
-    gl.setCreatedDate(Util1.getTodayDate());
-    gl.setFromCurId(currency.getKey().getCode());
-    gl.setCompId(Global.compId);
-    gl.setSplitId(5);
-    gl.setTranSource("ÄCCOUNT-RETOut");
-    gl.setLocationId(location.getLocationId());
-    gl.setTranSource("ÄCCOUNT-RETIN");
-    gl.setLocationId(location.getLocationId());
-    gl.setCreatedBy(Global.loginUser.getUserId().toString());
-    gl.setVouTotal(NumberUtil.getDouble(txtVouTotal.getText()));
-    gl.setPaid(NumberUtil.getDouble(txtVouPaid.getText()));
-    gl.setBalance(NumberUtil.getDouble(txtVouBalance.getText()));
-    gl.setDeleted(Util1.getNullTo(gl.getDeleted()));
-    
-    }
-    
-    } catch (Exception ex) {
-    LOGGER.error("isValidEntry : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
-    
-    }
-    
-    return status;
-    }*/
 
     public void clear() {
         //Clear text box.
@@ -860,7 +858,7 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
         genVouNo();
         assignDefaultValue();
         retOutTableModel.clearRetOutTable();
-        deleteRetOutDetail();
+        //   deleteRetOutDetail();
     }
 
 //    private void newForm() {
@@ -895,15 +893,14 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
     }
 
     private void deleteRetOutDetail() {
-        String retOutIds = retOutTableModel.getDeleteListStr();
-        if (retOutIds != null && glId != null) {
-            try {
-                retOutService.delete(retOutIds, glId.toString());
-            } catch (Exception ex) {
-                LOGGER.error("deleteRetOutDetail : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
-
+        int yes_no = JOptionPane.showConfirmDialog(Global.parentForm,
+                "Are you sure to delete?", "Return in item delete", JOptionPane.YES_NO_OPTION);
+        if (yes_no == 0) {
+            String vouNo = txtVouNo.getText();
+            if (lblStatus.getText().equals("EDIT")) {
+                outService.delete(vouNo);
+                clear();
             }
-
         }
     }
 

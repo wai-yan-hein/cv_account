@@ -7,6 +7,8 @@ package com.cv.accountswing.ui.editor;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.entity.AppUser;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -28,6 +30,18 @@ public class AppUserCellEditor extends AbstractCellEditor implements TableCellEd
     private static final Logger LOGGER = LoggerFactory.getLogger(AppUserCellEditor.class);
     private JComponent component = null;
     private AppUserAutoCompleter completer;
+    private final FocusAdapter fa = new FocusAdapter() {
+        @Override
+        public void focusLost(FocusEvent e) {
+        }
+
+        @Override
+        public void focusGained(FocusEvent e) {
+            JTextField jtf = (JTextField) e.getSource();
+            jtf.setCaretPosition(jtf.getText().length());
+        }
+
+    };
 
     //private List<Medicine> listTrader = new ArrayList();
     public AppUserCellEditor() {
@@ -39,7 +53,6 @@ public class AppUserCellEditor extends AbstractCellEditor implements TableCellEd
             boolean isSelected, int rowIndex, int vColIndex) {
         JTextField jtf = new JTextField();
         jtf.setFont(Global.textFont);
-        jtf.setHighlighter(null);
 
         //List<Medicine> listTrader = dao.findAll("Medicine", "active = true");
         KeyListener keyListener = new KeyListener() {
@@ -68,6 +81,7 @@ public class AppUserCellEditor extends AbstractCellEditor implements TableCellEd
         };
 
         jtf.addKeyListener(keyListener);
+        jtf.addFocusListener(fa);
         component = jtf;
         if (value != null) {
             jtf.setText(value.toString());

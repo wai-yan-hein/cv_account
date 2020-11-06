@@ -5,10 +5,17 @@
  */
 package com.cv.inv.entry.common;
 
+import com.cv.accountswing.common.Global;
+import com.cv.accountswing.common.SelectionObserver;
+import com.cv.accountswing.util.NumberUtil;
+import com.cv.accountswing.util.Util1;
+import com.cv.inv.entity.Stock;
 import com.cv.inv.entity.StockIssueDetailHis;
 import com.cv.inv.entity.StockOutstanding;
+import com.cv.inv.entity.StockUnit;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import org.slf4j.Logger;
@@ -26,6 +33,7 @@ public class IssueTableModel extends AbstractTableModel {
     private String[] columnNames = {"Option", "Vou No", "Item Code", "Description",
         "T-Code", "Trader Name", "Outstanding", "Qty", "Unit", "Balance"};
     private JTable parent;
+    private SelectionObserver callBack;
     private List<StockIssueDetailHis> listDetail = new ArrayList();
 
     public void setParent(JTable parent) {
@@ -56,6 +64,40 @@ public class IssueTableModel extends AbstractTableModel {
 
     public void setColumnNames(String[] columnNames) {
         this.columnNames = columnNames;
+    }
+
+    @Override
+    public boolean isCellEditable(int row, int column) {
+        switch (column) {
+            case 0: //Option
+                return false;
+            case 1: //Vou No
+                return false;
+            case 2: //Med Code
+                return true;//isEditable(getValueAt(row, 0).toString());
+            case 3: //Medicine
+                return false;
+            case 4: //T-Code
+                return isEditable(getValueAt(row, 0).toString());
+            case 5: //Trader Name
+                return false;
+            case 6: //Outstanding
+                return false;
+            case 7: //Exp-Date
+                return true;
+            case 8: //Qty
+                return true;
+            case 9: //Unit
+                return false;
+            case 10: //Balance
+                return false;
+            default:
+                return false;
+        }
+    }
+
+    private boolean isEditable(String recOption) {
+        return recOption.equals("Borrow");
     }
 
     @Override
@@ -116,6 +158,94 @@ public class IssueTableModel extends AbstractTableModel {
         }
     }
 
+    @Override
+    public void setValueAt(Object value, int row, int column) {
+        if (listDetail == null) {
+            return;
+        }
+
+        if (listDetail.isEmpty()) {
+            return;
+        }
+
+        try {
+            StockIssueDetailHis record = listDetail.get(row);
+             switch (column) {
+                case 0: //Option
+                    //srdh.setRecOption((String)value);
+                    break;
+                case 1: //Vou No
+                    //srdh.setRefVou((String)value);
+                    break;
+                case 2: //Med Code
+                   if (value != null) {
+                        if (value instanceof Stock) {
+                            Stock stock = (Stock) value;
+                            record.setIssueStock(stock);
+                            record.setUnitQty(1.0f);
+                            record.setItemUnit(stock.getSaleUnit());
+                            addEmptyRow();
+                            parent.setColumnSelectionInterval(2, 2);
+                        }
+                    }
+                    break;
+                case 3: //Medicine
+                    break;
+                case 4: //T-Code                    
+                  
+                    break;
+                case 5: //Trader Name
+                    break;
+                case 6: //Outstanding
+                    break;
+                case 7: //Exp-Date
+                
+                    break;
+                case 8: //Qty
+                    if (value != null) {
+                        Float qty = NumberUtil.NZeroFloat(value);
+                        if (qty <= 0) {
+                            JOptionPane.showMessageDialog(Global.parentForm, "Qty must be positive value.",
+                                    "Minus or zero qty.", JOptionPane.ERROR_MESSAGE);
+
+                        } else {
+                            record.setUnitQty(qty);
+                          //  record.setAmount(Util1.getFloat(record.getUnitQty()) * Util1.getDouble(record.getCostPrice()));
+                            if ((row + 1) <= listDetail.size()) {
+                                parent.setRowSelectionInterval(row + 1, row + 1);
+                            }
+                            parent.setColumnSelectionInterval(0, 0); //Move to Code
+
+                        }
+                    }
+                    break;
+                case 9: //Unit
+                     if (value != null) {
+                        if (value instanceof StockUnit) {
+                            StockUnit st = (StockUnit) value;
+                            record.setItemUnit(st);
+                            //    String toUnit = record.getUnit().getItemUnitCode();
+                            //   Float calAmount = calPrice(record, toUnit);
+                            //   record.setCostPrice(Util1.getDouble(calAmount));
+                            parent.setColumnSelectionInterval(5, 5);
+                        }
+                    }
+                    break;
+               
+                case 10: //Balance
+                    break;
+                default:
+                    System.out.println("IssueTableModel invalid index.");
+            }
+        } catch (Exception ex) {
+            LOGGER.error("setValueAt : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.toString());
+        }
+
+        parent.requestFocusInWindow();
+        fireTableCellUpdated(row, column);
+        callBack.selected("STM-TOTAL", "STM-TOTAL");
+    }
+
     public void add(StockOutstanding outs) {
         if (listDetail != null) {
             StockIssueDetailHis sidh = new StockIssueDetailHis();
@@ -136,4 +266,41 @@ public class IssueTableModel extends AbstractTableModel {
         this.listDetail.clear();
         fireTableDataChanged();
     }
+
+    public void addEmptyRow() {
+        if (listDetail != null) {
+            if (!hasEmptyRow()) {
+                StockIssueDetailHis record = new StockIssueDetailHis();
+
+                record.setIssueStock(new Stock());
+                listDetail.add(record);
+
+                fireTableRowsInserted(listDetail.size() - 1, listDetail.size() - 1);
+                parent.scrollRectToVisible(parent.getCellRect(parent.getRowCount() - 1, 0, true));
+            }
+        }
+    }
+
+    public boolean hasEmptyRow() {
+        if (listDetail == null) {
+            return false;
+        }
+
+        if (listDetail.isEmpty()) {
+            return false;
+        }
+
+        StockIssueDetailHis record = listDetail.get(listDetail.size() - 1);
+
+        if (record.getIssueStock().getStockCode() != null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public void setCallBack(SelectionObserver callBack) {
+        this.callBack = callBack;
+    }
+
 }

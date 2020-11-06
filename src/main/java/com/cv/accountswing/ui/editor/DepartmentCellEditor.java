@@ -7,18 +7,16 @@ package com.cv.accountswing.ui.editor;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.entity.Department;
-import com.cv.accountswing.service.DepartmentService;
-import java.awt.event.ActionEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
-import java.util.Date;
 import java.util.EventObject;
 import javax.swing.AbstractCellEditor;
 import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.Timer;
 import javax.swing.table.TableCellEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,8 +30,20 @@ public class DepartmentCellEditor extends AbstractCellEditor implements TableCel
     private static final Logger LOGGER = LoggerFactory.getLogger(DepartmentCellEditor.class);
     private JComponent component = null;
     private DepartmentAutoCompleter completer;
-    //private List<Medicine> listDepartment = new ArrayList();
+    private final FocusAdapter fa = new FocusAdapter() {
+        @Override
+        public void focusLost(FocusEvent e) {
+        }
 
+        @Override
+        public void focusGained(FocusEvent e) {
+            JTextField jtf = (JTextField) e.getSource();
+            jtf.setCaretPosition(jtf.getText().length());
+        }
+
+    };
+
+    //private List<Medicine> listDepartment = new ArrayList();
     public DepartmentCellEditor() {
 
     }
@@ -43,7 +53,6 @@ public class DepartmentCellEditor extends AbstractCellEditor implements TableCel
             boolean isSelected, int rowIndex, int vColIndex) {
         JTextField jtf = new JTextField();
         jtf.setFont(Global.textFont);
-        jtf.setHighlighter(null);
         //List<Medicine> listDepartment = dao.findAll("Medicine", "active = true");
         KeyListener keyListener = new KeyListener() {
             @Override
@@ -71,6 +80,7 @@ public class DepartmentCellEditor extends AbstractCellEditor implements TableCel
         };
 
         jtf.addKeyListener(keyListener);
+        jtf.addFocusListener(fa);
         component = jtf;
         if (value != null) {
             jtf.setText(value.toString());
