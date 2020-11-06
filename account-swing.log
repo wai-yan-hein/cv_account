@@ -2,3 +2,8 @@
 26 Oct 2020 08:00:43,042 ERROR: com.cv.inv.entry.common.SaleVouSearchTableModel - getValueAt : 598 - null
 26 Oct 2020 08:00:49,730 ERROR: com.cv.inv.entry.common.SaleVouSearchTableModel - getValueAt : 598 - null
 26 Oct 2020 09:56:27,932 ERROR: com.cv.inv.entry.common.CodeTableModel - setValueAt : 93 - java.lang.String cannot be cast to com.cv.inv.entity.Stock
+05 Nov 2020 06:36:34,317 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.accountswing.entity.AppUser.getUserShort()" because the return value of "com.cv.inv.entity.DamageHis.getCreatedBy()" is null
+05 Nov 2020 06:36:35,344 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.accountswing.entity.AppUser.getUserShort()" because the return value of "com.cv.inv.entity.DamageHis.getCreatedBy()" is null
+05 Nov 2020 06:36:45,548 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.accountswing.entity.AppUser.getUserShort()" because the return value of "com.cv.inv.entity.DamageHis.getCreatedBy()" is null
+05 Nov 2020 06:36:47,917 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.accountswing.entity.AppUser.getUserShort()" because the return value of "com.cv.inv.entity.DamageHis.getCreatedBy()" is null
+05 Nov 2020 06:36:49,243 ERROR: com.cv.inv.entry.common.DamageSearchTableModel - getValueAt : Cannot invoke "com.cv.accountswing.entity.AppUser.getUserShort()" because the return value of "com.cv.inv.entity.DamageHis.getCreatedBy()" is null
