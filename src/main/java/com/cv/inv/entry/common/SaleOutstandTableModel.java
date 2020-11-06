@@ -78,7 +78,7 @@ public class SaleOutstandTableModel extends AbstractTableModel {
 
     @Override
     public boolean isCellEditable(int row, int column) {
-        return column == 4;
+        return column == 3;
     }
 
     @Override
