@@ -500,6 +500,7 @@
             <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="Global.amtFont" type="code"/>
             </Property>
+            <Property name="name" type="java.lang.String" value="txtDiscP" noResource="true"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel13">
@@ -516,6 +517,7 @@
             <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="Global.amtFont" type="code"/>
             </Property>
+            <Property name="name" type="java.lang.String" value="txtVouDiscount" noResource="true"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="txtTaxP">
@@ -523,6 +525,7 @@
             <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="Global.amtFont" type="code"/>
             </Property>
+            <Property name="name" type="java.lang.String" value="txtTaxP" noResource="true"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel15">
@@ -539,6 +542,7 @@
             <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="Global.amtFont" type="code"/>
             </Property>
+            <Property name="name" type="java.lang.String" value="txtTax" noResource="true"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JFormattedTextField" name="txtVouPaid">
@@ -547,6 +551,7 @@
             <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="Global.amtFont" type="code"/>
             </Property>
+            <Property name="name" type="java.lang.String" value="txtVouPaid" noResource="true"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JFormattedTextField" name="txtVouBalance">
@@ -555,6 +560,7 @@
             <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="Global.amtFont" type="code"/>
             </Property>
+            <Property name="name" type="java.lang.String" value="txtVouBalance" noResource="true"/>
           </Properties>
         </Component>
       </SubComponents>

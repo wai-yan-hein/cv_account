@@ -105,7 +105,7 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
         damageTableModel.addEmptyRow();
         damageTableModel.setCallBack(this);
         tblDamage.getTableHeader().setFont(Global.lableFont);
-        //  tblDamage.setCellSelectionEnabled(true);
+        tblDamage.setCellSelectionEnabled(true);
 
         tblDamage.getColumnModel().getColumn(0).setPreferredWidth(50);
         tblDamage.getColumnModel().getColumn(1).setPreferredWidth(300);
@@ -116,6 +116,7 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
 
         tblDamage.getColumnModel().getColumn(0).setCellEditor(new StockCellEditor());
         tblDamage.getColumnModel().getColumn(2).setCellEditor(new AutoClearEditor());
+        tblDamage.getColumnModel().getColumn(4).setCellEditor(new AutoClearEditor());
         tblDamage.getColumnModel().getColumn(3).setCellEditor(new StockUnitEditor());
 
         tblDamage.setDefaultRenderer(Boolean.class, new TableCellRender());
@@ -253,10 +254,7 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
         //F8 event on tblSale
         tblDamage.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "DELETE");
         tblDamage.getActionMap().put("DELETE", actionItemDelete);
-
-        //Enter event on tblSale
-        tblDamage.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "ENTER-Action");
-        tblDamage.getActionMap().put("ENTER-Action", actionTblPurEnterKey);
+     
     }
     private final Action actionItemDelete = new AbstractAction() {
         @Override
