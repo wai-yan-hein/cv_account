@@ -136,7 +136,6 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
         tblReturnIn.getColumnModel().getColumn(5).setCellEditor(new StockUnitEditor());
         tblReturnIn.getColumnModel().getColumn(3).setCellEditor(new AutoClearEditor());//qty
         tblReturnIn.getColumnModel().getColumn(4).setCellEditor(new AutoClearEditor());
-         tblReturnIn.getColumnModel().getColumn(5).setCellEditor(new AutoClearEditor());
         tblReturnIn.getColumnModel().getColumn(6).setCellEditor(new AutoClearEditor());
 
         tblReturnIn.setDefaultRenderer(Float.class, new TableCellRender());

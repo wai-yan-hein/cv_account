@@ -118,7 +118,6 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
         tblDamage.getColumnModel().getColumn(2).setCellEditor(new AutoClearEditor());
         tblDamage.getColumnModel().getColumn(4).setCellEditor(new AutoClearEditor());
         tblDamage.getColumnModel().getColumn(3).setCellEditor(new StockUnitEditor());
-        tblDamage.getColumnModel().getColumn(3).setCellEditor(new AutoClearEditor());
 
         tblDamage.setDefaultRenderer(Boolean.class, new TableCellRender());
         tblDamage.setDefaultRenderer(Object.class, new TableCellRender());
