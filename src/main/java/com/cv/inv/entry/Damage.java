@@ -118,6 +118,7 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
         tblDamage.getColumnModel().getColumn(2).setCellEditor(new AutoClearEditor());
         tblDamage.getColumnModel().getColumn(4).setCellEditor(new AutoClearEditor());
         tblDamage.getColumnModel().getColumn(3).setCellEditor(new StockUnitEditor());
+        tblDamage.getColumnModel().getColumn(3).setCellEditor(new AutoClearEditor());
 
         tblDamage.setDefaultRenderer(Boolean.class, new TableCellRender());
         tblDamage.setDefaultRenderer(Object.class, new TableCellRender());
@@ -254,7 +255,7 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
         //F8 event on tblSale
         tblDamage.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "DELETE");
         tblDamage.getActionMap().put("DELETE", actionItemDelete);
-     
+
     }
     private final Action actionItemDelete = new AbstractAction() {
         @Override
