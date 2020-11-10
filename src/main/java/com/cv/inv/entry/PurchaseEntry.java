@@ -166,7 +166,6 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
         tblPurchase.getColumnModel().getColumn(4).setCellEditor(new AutoClearEditor());//qty
         tblPurchase.getColumnModel().getColumn(5).setCellEditor(new AutoClearEditor());//std-wt
         tblPurchase.getColumnModel().getColumn(6).setCellEditor(new StockUnitEditor());//unit
-        tblPurchase.getColumnModel().getColumn(6).setCellEditor(new AutoClearEditor());//unit
         tblPurchase.getColumnModel().getColumn(7).setCellEditor(new AutoClearEditor());//avg-wt
         tblPurchase.getColumnModel().getColumn(8).setCellEditor(new AutoClearEditor());//pur price
         tblPurchase.getColumnModel().getColumn(9).setCellEditor(new AutoClearEditor());//amt
