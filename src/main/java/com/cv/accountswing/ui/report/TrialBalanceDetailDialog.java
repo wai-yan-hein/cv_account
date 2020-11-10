@@ -8,10 +8,13 @@ package com.cv.accountswing.ui.report;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.entity.view.VGl;
+import com.cv.accountswing.service.VGlService;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.report.common.CrAmtTableModel;
 import com.cv.accountswing.ui.report.common.DrAmtTableModel;
 import com.cv.accountswing.util.Util1;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -38,7 +41,9 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Pan
     @Autowired
     private DrAmtTableModel drAmtTableModel;
     @Autowired
-    private TaskExecutor taskExecutor;
+    private EditCashDialog editCashDialog;
+    @Autowired
+    private VGlService vGlService;
     private TableRowSorter<TableModel> sorter;
     private String desp;
     private Double netChange;
@@ -80,11 +85,45 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Pan
         initComponents();
         ImageIcon size = new ImageIcon(getClass().getResource("/images/logo.png"));
         setIconImage(size.getImage());
+        initTableListener();
     }
 
     private void initMain() {
         initTable();
 
+    }
+
+    private void initTableListener() {
+        tblCr.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    VGl vGl = crAmtTableModel.getVGl(tblCr.convertRowIndexToModel(tblCr.getSelectedRow()));
+                    vGl = vGlService.findById(vGl.getGlId());
+                    editCash(vGl);
+                }
+            }
+
+        });
+        tblDr.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    VGl vGl = drAmtTableModel.getVGl(tblDr.convertRowIndexToModel(tblDr.getSelectedRow()));
+                    vGl = vGlService.findById(vGl.getGlId());
+                    editCash(vGl);
+                }
+            }
+
+        });
+
+    }
+
+    private void editCash(VGl vgl) {
+        editCashDialog.setSize(Global.width - 1000, Global.height - 380);
+        editCashDialog.setLocationRelativeTo(null);
+        editCashDialog.setvGl(vgl);
+        editCashDialog.setVisible(true);
     }
 
     private void initTable() {
@@ -235,6 +274,7 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Pan
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tblDr.setName("Debit"); // NOI18N
         tblDr.setRowHeight(Global.tblRowHeight);
         jScrollPane1.setViewportView(tblDr);
 
@@ -250,6 +290,7 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Pan
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tblCr.setName("Credit"); // NOI18N
         tblCr.setRowHeight(Global.tblRowHeight);
         jScrollPane2.setViewportView(tblCr);
 

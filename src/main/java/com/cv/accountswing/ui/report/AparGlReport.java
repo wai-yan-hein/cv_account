@@ -131,7 +131,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         JMenuItem print = new JMenuItem("Print");
         popup.add(print);
         print.addActionListener((ActionEvent e) -> {
-            if (panelName.equals("AP/AR")) {
+            if (panelName.equals("AR/AP")) {
                 printApar();
             } else if (panelName.equals("G/L Listing")) {
             }
@@ -145,7 +145,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
     }
 
     private void initTable() {
-        if (panelName.equals("AP/AR")) {
+        if (panelName.equals("AR/AP")) {
             tblAPAR.setModel(aPARTableModel);
         } else if (panelName.equals("G/L Listing")) {
             tblAPAR.setModel(glListingTableModel);
@@ -172,7 +172,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                 if (e.getClickCount() == 2) {
                     if (tblAPAR.getSelectedRow() >= 0) {
                         selectRow = tblAPAR.convertRowIndexToModel(tblAPAR.getSelectedRow());
-                        if (panelName.equals("AP/AR")) {
+                        if (panelName.equals("AR/AP")) {
                             VApar apar = aPARTableModel.getAPAR(selectRow);
                             String cvId = apar.getKey().getCvId().toString();
                             String desp = apar.getTraderName();
@@ -198,7 +198,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
 
     private String getTarget() {
         String targetId = "-";
-        if (panelName.equals("AP/AR")) {
+        if (panelName.equals("AR/AP")) {
             VApar apar = aPARTableModel.getAPAR(selectRow);
             targetId = apar.getAccountCode();
         } else if (panelName.equals("G/L Listing")) {
@@ -459,7 +459,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
     }
 
     private void search() {
-        if (panelName.equals("AP/AR")) {
+        if (panelName.equals("AR/AP")) {
             searchAPAR();
         } else if (panelName.equals("G/L Listing")) {
             searchGLListing();
@@ -467,7 +467,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
     }
 
     private void clearTable() {
-        if (this.getName().equals("AP/AR")) {
+        if (this.getName().equals("AR/AP")) {
             aPARTableModel.clear();
         } else if (this.getName().equals("G/L Listing")) {
             glListingTableModel.clear();
@@ -624,7 +624,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         txtFOFB.setFont(Global.amtFont);
 
         jLabel5.setFont(Global.lableFont);
-        jLabel5.setText("Out Of Balance");
+        jLabel5.setText("Difference");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);

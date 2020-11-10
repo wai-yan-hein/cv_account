@@ -36,7 +36,7 @@ public class AccountSwingApplication {
     @PostConstruct
     void started() {
         TimeZone.setDefault(TimeZone.getTimeZone("TimeZone"));
-        SPLASH_WINDOW.showSplash();
+        SPLASH_WINDOW.run();
     }
 
     public static void main(String[] args) {

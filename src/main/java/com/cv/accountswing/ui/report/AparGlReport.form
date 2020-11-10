@@ -281,7 +281,7 @@
             <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="Global.lableFont" type="code"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="Out Of Balance"/>
+            <Property name="text" type="java.lang.String" value="Difference"/>
           </Properties>
         </Component>
       </SubComponents>

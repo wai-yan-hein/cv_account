@@ -483,7 +483,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                 }
             case "Report":
                 switch (panelName) {
-                    case "AP/AR":
+                    case "AR/AP":
                         aPARReport.setName(panelName);
                         aPARReport.setLoadingObserver(this);
                         return aPARReport;

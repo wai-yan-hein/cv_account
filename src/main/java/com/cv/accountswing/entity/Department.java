@@ -32,6 +32,15 @@ public class Department implements java.io.Serializable {
     private Date updatedDt;
     private String usrCode;
 
+    public Department(String deptCode, String deptName) {
+        this.deptCode = deptCode;
+        this.deptName = deptName;
+    }
+
+    public Department() {
+    }
+    
+    
     @Id
     @Column(name = "dept_code", unique = true, nullable = false, length = 15)
     public String getDeptCode() {

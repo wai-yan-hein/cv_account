@@ -317,6 +317,12 @@ public class COAAutoCompleter implements KeyListener {
     public ChartOfAccount getCOA() {
         return coa;
     }
+    
+    public void setCoa(ChartOfAccount coa) {
+        this.coa = coa;
+        textComp.setText(coa.getCoaNameEng());
+    }
+
 
     /*
      * KeyListener implementation

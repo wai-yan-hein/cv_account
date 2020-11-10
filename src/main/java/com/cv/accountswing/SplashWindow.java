@@ -16,7 +16,7 @@ import javax.swing.JWindow;
  *
  * @author Lenovo
  */
-public class SplashWindow extends JWindow {
+public class SplashWindow extends JWindow implements Runnable{
 
     ImageIcon imageIcon;
 
@@ -50,6 +50,11 @@ public class SplashWindow extends JWindow {
     public void stopSplah() {
         setVisible(false);
         dispose();
+    }
+
+    @Override
+    public void run() {
+        showSplash();
     }
 
 }

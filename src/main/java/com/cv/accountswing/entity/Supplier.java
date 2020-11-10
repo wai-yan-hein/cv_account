@@ -18,5 +18,12 @@ import javax.persistence.Table;
 @Table(name="trader")
 @DiscriminatorValue("S")
 public class Supplier extends Trader implements java.io.Serializable{
+
+    public Supplier() {
+    }
+    
+    public Supplier(Integer id, String traderName) {
+        super(id, traderName);
+    }
     
 }
