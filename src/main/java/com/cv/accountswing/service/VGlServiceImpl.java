@@ -53,5 +53,9 @@ public class VGlServiceImpl implements VGlService {
         return dao.getCrDrVoucher(vouNo, compCode);
     }
 
-    
+    @Override
+    public VGl findById(Long id) {
+        return dao.findById(id);
+    }
+
 }

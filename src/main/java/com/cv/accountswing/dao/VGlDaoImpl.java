@@ -330,4 +330,9 @@ public class VGlDaoImpl extends AbstractDao<Long, VGl> implements VGlDao {
         List<VGl> listVGL = findHSQL(strSql);
         return listVGL;
     }
+
+    @Override
+    public VGl findById(Long glId) {
+        return getByKey(glId);
+    }
 }

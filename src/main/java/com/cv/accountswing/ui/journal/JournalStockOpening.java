@@ -138,20 +138,13 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
     }
 
     private void initCombo() {
-
-        if (Global.listDepartment == null) {
-            Global.listDepartment = departmentService.search("-", "-", "-", "-", "-");
-        }
-
-        if (Global.listCurrency == null) {
-            Global.listCurrency = currencyService.search("-", "-", "-");
-        }
         DateAutoCompleter dateAutoCompleter = new DateAutoCompleter(txtDate, Global.listDateModel, null);
         dateAutoCompleter.setSelectionObserver(this);
         DepartmentAutoCompleter departmentAutoCompleter = new DepartmentAutoCompleter(txtDepartment, Global.listDepartment, null);
         departmentAutoCompleter.setSelectionObserver(this);
         CurrencyAutoCompleter currencyAutoCompleter = new CurrencyAutoCompleter(txtCurrency, Global.listCurrency, null);
         currencyAutoCompleter.setSelectionObserver(this);
+        currencyAutoCompleter.setCurrency(Global.defalutCurrency);
         txtDate.requestFocus();
     }
 
@@ -289,6 +282,7 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
         jLabel3.setText("Currency");
 
         txtCurrency.setFont(Global.textFont);
+        txtCurrency.setEnabled(false);
         txtCurrency.setName("txtCurrency"); // NOI18N
 
         btnNewEntry.setFont(Global.textFont);

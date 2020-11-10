@@ -5,19 +5,16 @@
  */
 package com.cv.accountswing.service;
 
+import com.cv.accountswing.common.FontConventor;
 import com.cv.accountswing.entity.view.VApar;
 import com.cv.accountswing.ui.report.AparGlReport;
 import com.google.api.core.ApiFuture;
-import com.google.cloud.firestore.DocumentReference;
-import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.FirestoreException;
 import com.google.cloud.firestore.WriteResult;
 import com.google.firebase.cloud.FirestoreClient;
 import com.google.gson.Gson;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -37,28 +34,14 @@ public class FirebaseServieImpl implements FirebaseService {
     public void uploadCustomerBalance(List<VApar> listApar) throws Exception {
         if (!listApar.isEmpty()) {
             listApar.forEach(apar -> {
-                hmApar.put(apar.getKey().getCompCode().toString(), apar);
+                String uniName = FontConventor.zg12uni51(apar.getTraderName());
+                apar.setAccountCode(uniName);
+                hmApar.put(apar.getTraderId(), apar);
             });
             Firestore firestore = FirestoreClient.getFirestore();
             ApiFuture<WriteResult> apiFuture = firestore.collection("cv-account").document("cus-balance").set(hmApar);
             WriteResult get = apiFuture.get();
             LOGGER.info("Uploaded Time :" + get.getUpdateTime());
-            DocumentReference document = firestore.collection("cv-account").document("cus-balance");
-            document.addSnapshotListener((DocumentSnapshot t, FirestoreException fe) -> {
-                if (t.exists()) {
-                    Map<String, Object> data = t.getData();
-                    if (data != null) {
-                        data.values().stream().map(ob -> gson.toJsonTree(ob)).forEachOrdered(toJsonTree -> {
-                            VApar vApar = gson.fromJson(toJsonTree, VApar.class);
-                            LOGGER.info(vApar.getTraderName());
-                        });
-                    } else {
-                        LOGGER.info("Data Null");
-                    }
-
-                }
-            });
-
         }
 
     }

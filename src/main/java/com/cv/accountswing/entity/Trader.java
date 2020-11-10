@@ -42,6 +42,15 @@ public class Trader implements java.io.Serializable {
     private String appShortName; //use integration with other application
     private String appTraderCode; //Original trader id from integration app
 
+    public Trader(Integer id, String traderName) {
+        this.id = id;
+        this.traderName = traderName;
+    }
+
+    public Trader() {
+    }
+    
+    
     @Id
     @GeneratedValue(strategy = IDENTITY)
     @Column(name = "id", unique = true, nullable = false)

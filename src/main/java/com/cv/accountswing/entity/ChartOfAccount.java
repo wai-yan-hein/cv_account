@@ -42,6 +42,14 @@ public class ChartOfAccount implements java.io.Serializable {
     private String appShortName;
     private String appTraderTypeCode;
 
+    public ChartOfAccount() {
+    }
+
+    public ChartOfAccount(String code, String coaNameEng) {
+        this.code = code;
+        this.coaNameEng = coaNameEng;
+    }
+
     @Id
     @Column(name = "coa_code", unique = true, nullable = false, length = 15)
     public String getCode() {
