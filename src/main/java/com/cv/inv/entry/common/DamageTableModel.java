@@ -159,6 +159,8 @@ public class DamageTableModel extends AbstractTableModel {
                             record.setQty(1.0f);
                             record.setCostPrice(stock.getSalePriceN());
                             record.setUnit(stock.getSaleUnit());
+                            double amt=record.getQty()*record.getCostPrice();
+                            record.setAmount(amt);
                             addEmptyRow();
                             parent.setColumnSelectionInterval(2, 2);
                         }
@@ -221,7 +223,7 @@ public class DamageTableModel extends AbstractTableModel {
         }
 
         parent.requestFocusInWindow();
-        fireTableCellUpdated(row, column);
+        fireTableRowsUpdated(row, column);
         callBack.selected("STM-TOTAL", "STM-TOTAL");
     }
 

@@ -6,6 +6,7 @@
 package com.cv.inv.entry.common;
 
 import com.cv.accountswing.common.Global;
+import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.Department;
 import com.cv.accountswing.util.NumberUtil;
 import com.cv.accountswing.util.Util1;
@@ -45,6 +46,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
     private JFormattedTextField txtTotalAmt;
     private Location location;
     private Department department;
+    private SelectionObserver callBack;
 
     public void setTxtTotalAmt(JFormattedTextField txtTotalAmt) {
         this.txtTotalAmt = txtTotalAmt;
@@ -148,144 +150,193 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
 
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+        if (listPurDetail == null) {
+            return;
+        }
+
+        if (listPurDetail.isEmpty()) {
+            return;
+        }
         try {
             PurchaseDetail pur = listPurDetail.get(rowIndex);
-            if (aValue != null) {
-                switch (columnIndex) {
-                    case 0://Stock
-                        if (aValue instanceof Stock) {
-                            Stock stock = (Stock) aValue;
-                            pur.setStock(stock);
-                            pur.setQty(1.0f);
-                            pur.setPurPrice(stock.getPurPrice());
-                            pur.setAvgPrice(stock.getPurPrice());
-                            pur.setStdWeight(stock.getPurPriceMeasure());
-                            pur.setPurUnit(stock.getPurPriceUnit());
-                            pur.setDepartment(department);
-                            pur.setLocation(location);
-                            addNewRow();
-                            parent.setColumnSelectionInterval(4, 4);
-                        }
-                    case 2:
-                        if (pur.getDepartment() != null) {
-                            pur.setDepartment((Department) aValue);
-                            parent.setColumnSelectionInterval(3, 3);
-                        }
+            boolean isAmount = false;
 
-                        break;
-                    case 3:
-                        if (pur.getLocation() != null) {
-                            pur.setLocation((Location) aValue);
+            switch (columnIndex) {
+                case 0://Stock
+                    if (aValue instanceof Stock) {
+                        Stock stock = (Stock) aValue;
+                        pur.setStock(stock);
+                        pur.setQty(1.0f);
+                        pur.setPurPrice(stock.getPurPrice());
+                        pur.setAvgPrice(stock.getPurPrice());
+                        pur.setStdWeight(stock.getPurPriceMeasure());
+                        pur.setPurUnit(stock.getPurPriceUnit());
+                        pur.setDepartment(department);
+                        pur.setLocation(location);
+                        addNewRow();
+                        parent.setColumnSelectionInterval(4, 4);
+                    }
+                case 2:
+                    if (pur.getDepartment() != null) {
+                        pur.setDepartment((Department) aValue);
+                        parent.setColumnSelectionInterval(3, 3);
+                    }
+
+                    break;
+                case 3:
+                    if (pur.getLocation() != null) {
+                        pur.setLocation((Location) aValue);
+                    } else {
+                        pur.setLocation(null);
+                    }
+                    break;
+                case 4://Qty
+                    if (NumberUtil.isNumber(aValue)) {
+                        if (NumberUtil.isPositive(aValue)) {
+                            pur.setQty(Util1.getFloat(aValue));
                         } else {
-                            pur.setLocation(null);
-                        }
-                        break;
-                    case 4://Qty
-                        if (NumberUtil.isNumber(aValue)) {
-                            if (NumberUtil.isPositive(aValue)) {
-                                pur.setQty(Util1.getFloat(aValue));
-                            } else {
-                                showMessageBox("Input value must be positive");
-                                parent.setColumnSelectionInterval(columnIndex, columnIndex);
-                            }
-                        } else {
-                            showMessageBox("Input value must be number.");
+                            showMessageBox("Input value must be positive");
                             parent.setColumnSelectionInterval(columnIndex, columnIndex);
                         }
-
-                        break;
-                    case 5://std wt
-                        if (NumberUtil.isNumber(aValue)) {
-                            if (NumberUtil.isPositive(aValue)) {
-                                pur.setStdWeight(Util1.getFloat(aValue));
-                                //calculation with unit
-                                String toUnit = pur.getPurUnit().getItemUnitCode();
-                                Float calAmount = calPrice(pur, toUnit);
-                                pur.setPurPrice(calAmount);
-                                parent.setColumnSelectionInterval(5, 5);
-                            } else {
-                                showMessageBox("Input value must be positive");
-                                parent.setColumnSelectionInterval(columnIndex, columnIndex);
-                            }
-
-                        } else {
-                            showMessageBox("Input value must be number.");
-                            parent.setColumnSelectionInterval(columnIndex, columnIndex);
-                        }
-                        break;
-
-                    case 6:// unit
-                        if (aValue instanceof StockUnit) {
-                            StockUnit st = (StockUnit) aValue;
-                            pur.setPurUnit(st);
+                    } else {
+                        showMessageBox("Input value must be number.");
+                        parent.setColumnSelectionInterval(columnIndex, columnIndex);
+                    }
+                    parent.setColumnSelectionInterval(5, 5);
+                    break;
+                case 5://std wt
+                    if (NumberUtil.isNumber(aValue)) {
+                        if (NumberUtil.isPositive(aValue)) {
+                            pur.setStdWeight(Util1.getFloat(aValue));
+                            //calculation with unit
                             String toUnit = pur.getPurUnit().getItemUnitCode();
                             Float calAmount = calPrice(pur, toUnit);
-                            pur.setPurPrice(calAmount);
-                            parent.setColumnSelectionInterval(6, 6);
-
-                        }
-                        break;
-                    case 7://avg-wt
-                        if (NumberUtil.isNumber(aValue)) {
-                            if (NumberUtil.isPositive(aValue)) {
-                                Float avgWt = Util1.getFloat(aValue);
-                                Float stdWt = pur.getStdWeight();
-                                float avgPrice = (avgWt / stdWt) * pur.getPurPrice();
-                                pur.setAvgWeight(avgWt);
-                                pur.setAvgPrice(avgPrice);
-                                parent.setColumnSelectionInterval(7, 7);
-                            } else {
-                                showMessageBox("Input value must be positive");
-                                parent.setColumnSelectionInterval(columnIndex, columnIndex);
-                            }
-
+                            //  pur.setPurPrice(calAmount);
+                            pur.setPurAmt(calAmount);
+                            parent.setColumnSelectionInterval(5, 5);
                         } else {
-                            showMessageBox("Input value must be number.");
+                            showMessageBox("Input value must be positive");
                             parent.setColumnSelectionInterval(columnIndex, columnIndex);
                         }
 
-                        break;
+                    } else {
+                        showMessageBox("Input value must be number.");
+                        parent.setColumnSelectionInterval(columnIndex, columnIndex);
+                    }
+                    parent.setColumnSelectionInterval(6, 6);
 
-                    case 8:
-                        if (NumberUtil.isNumber(aValue)) {
-                            if (NumberUtil.isPositive(aValue)) {
-                                pur.setPurPrice(Util1.getFloat(aValue));
-                                parent.setColumnSelectionInterval(8, 8);
-                            } else {
-                                showMessageBox("Input value must be positive");
-                                parent.setColumnSelectionInterval(columnIndex, columnIndex);
-                            }
+                    break;
+                case 6:// unit
+                    if (aValue instanceof StockUnit) {
+                        StockUnit st = (StockUnit) aValue;
+                        pur.setPurUnit(st);
+                        String toUnit = pur.getPurUnit().getItemUnitCode();
+                        Float calAmount = calPrice(pur, toUnit);
+                        pur.setPurPrice(calAmount);
+                        parent.setColumnSelectionInterval(6, 6);
+
+                    }
+                    break;
+                case 7://avg-wt
+                    if (NumberUtil.isNumber(aValue)) {
+                        if (NumberUtil.isPositive(aValue)) {
+                            Float avgWt = Util1.getFloat(aValue);
+                            Float stdWt = pur.getStdWeight();
+                            float avgPrice = (avgWt / stdWt) * pur.getPurPrice();
+                            pur.setAvgWeight(avgWt);
+                            pur.setAvgPrice(avgPrice);
+                            parent.setColumnSelectionInterval(7, 7);
                         } else {
-                            showMessageBox("Input value must be number.");
+                            showMessageBox("Input value must be positive");
                             parent.setColumnSelectionInterval(columnIndex, columnIndex);
                         }
 
-                        break;
-                }
+                    } else {
+                        showMessageBox("Input value must be number.");
+                        parent.setColumnSelectionInterval(columnIndex, columnIndex);
+                    }
+
+                    break;
+
+                case 8:
+                    if (NumberUtil.isNumber(aValue)) {
+                        if (NumberUtil.isPositive(aValue)) {
+                            pur.setPurPrice(Util1.getFloat(aValue));
+                            parent.setColumnSelectionInterval(8, 8);
+                        } else {
+                            showMessageBox("Input value must be positive");
+                            parent.setColumnSelectionInterval(columnIndex, columnIndex);
+                        }
+                    } else {
+                        showMessageBox("Input value must be number.");
+                        parent.setColumnSelectionInterval(columnIndex, columnIndex);
+                    }
+
+                    break;
             }
-            calTotalAmount(pur);
+            if (!isAmount) {
+                calculateAmount(pur);
+                fireTableCellUpdated(rowIndex, 9);
+            }
+            //    calTotalAmount(pur);
             fireTableRowsUpdated(rowIndex, rowIndex);
+            callBack.selected("STM-TOTAL", "STM-TOTAL");
+            parent.requestFocusInWindow();
 
         } catch (Exception e) {
             LOGGER.error("setValueAt :" + e.getStackTrace()[0].getLineNumber() + " - " + e.getMessage());
         }
     }
 
-    private void calTotalAmount(PurchaseDetail pur) {
+    private void calculateAmount(PurchaseDetail pur) {
         if (pur.getStock() != null) {
-            //cal amt
-            pur.setPurAmt(Util1.getFloat(pur.getQty()) * pur.getAvgPrice());
-            //cal smallest wt
-            //pur.setSmallestWT(getSmallestUnit(pur.getStdWeight(), pur.getPurUnit().getItemUnitCode()));
-            pur.setSmallestWT(getSmallestUnit(pur.getStdWeight(), pur.getPurUnit().getItemUnitCode()));
+            float saleQty = pur.getQty();
+            float stdSalePrice = pur.getPurPrice();
+            float calAmount = Util1.getFloat(pur.getPurAmt());
+            float userWt = pur.getStdWeight();
+            pur.setSmallestWT(getSmallestUnit(userWt, pur.getPurUnit().getItemUnitCode()));
             pur.setSmallestUnit("oz");
-            //cal total amount
-            float ttlAmt = 0.0f;
-            for (PurchaseDetail pd : listPurDetail) {
-                ttlAmt += Util1.getFloat(pd.getPurAmt());
+
+            if (calAmount != 0) {
+                float amount = saleQty * calAmount;
+                pur.setPurAmt(amount);
+            } else {
+                float amount = saleQty * stdSalePrice;
+                pur.setPurAmt(amount);
             }
-            txtTotalAmt.setValue(ttlAmt);
+            //  calTotalAmount(pur);
         }
+    }
+
+//    private void calTotalAmount(PurchaseDetail pur) {
+//        float ttlAmt = 0.0f;
+//        if (pur.getStock() != null) {
+//            //cal amt
+//            pur.setPurAmt(Util1.getFloat(pur.getQty()) * pur.getAvgPrice());
+//            //cal smallest wt
+//            //pur.setSmallestWT(getSmallestUnit(pur.getStdWeight(), pur.getPurUnit().getItemUnitCode()));
+//            pur.setSmallestWT(getSmallestUnit(pur.getStdWeight(), pur.getPurUnit().getItemUnitCode()));
+//            pur.setSmallestUnit("oz");
+//            //cal total amount
+//
+//            for (PurchaseDetail pd : listPurDetail) {
+//                ttlAmt += Util1.getFloat(pd.getPurAmt());
+//            }
+//             txtTotalAmt.setValue(ttlAmt);
+//
+//        }
+//    }
+    public List<PurchaseDetail> getListPurDetail() {
+        List<PurchaseDetail> listDetail = new ArrayList();
+        for (PurchaseDetail pdh2 : listPurDetail) {
+            if (pdh2.getStock() != null) {
+                if (pdh2.getStock().getStockCode() != null) {
+                    listDetail.add(pdh2);
+                }
+            }
+        }
+
+        return listDetail;
     }
 
     private Float calPrice(PurchaseDetail pd, String toUnit) {
@@ -356,9 +407,11 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
         if (listPurDetail != null) {
             if (hasEmptyRow()) {
                 PurchaseDetail pd = new PurchaseDetail();
-                pd.setUniqueId(listPurDetail.size() + 1);
+                pd.setStock(new Stock());
                 listPurDetail.add(pd);
+
                 fireTableRowsInserted(listPurDetail.size() - 1, listPurDetail.size() - 1);
+                parent.scrollRectToVisible(parent.getCellRect(parent.getRowCount() - 1, 0, true));
             }
         }
     }
@@ -381,19 +434,6 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
             fireTableDataChanged();
         }
 
-    }
-
-    public List<PurchaseDetail> getListPurDetail() {
-        List<PurchaseDetail> listRetInDetail = new ArrayList();
-        for (PurchaseDetail pdh2 : listPurDetail) {
-            if (pdh2.getStock() != null) {
-                if (pdh2.getStock().getStockCode() != null) {
-                    listRetInDetail.add(pdh2);
-                }
-            }
-        }
-
-        return listRetInDetail;
     }
 
     public void setListPurDetail(List<PurchaseDetail> listPurDetail) {
@@ -479,4 +519,10 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
     public void setDepartment(Department dept) {
         this.department = dept;
     }
+
+    public void setCallBack(SelectionObserver callBack) {
+        this.callBack = callBack;
+    }
+
+  
 }

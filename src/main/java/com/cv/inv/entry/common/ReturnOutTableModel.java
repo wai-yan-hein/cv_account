@@ -183,7 +183,7 @@ public class ReturnOutTableModel extends AbstractTableModel {
         if (listDetail.isEmpty()) {
             return;
         }
-
+        boolean isAmount = false;
         try {
             RetOutDetailHis record = listDetail.get(row);
 
@@ -212,7 +212,7 @@ public class ReturnOutTableModel extends AbstractTableModel {
                     if (value != null) {
                         record.setExpireDate(((RetOutDetailHis) value).getExpireDate());
                     }
-                    parent.setColumnSelectionInterval(3, 3);
+                    // parent.setColumnSelectionInterval(3, 3);
                     break;
                 case 3://Qty
                     if (value != null) {
@@ -223,18 +223,19 @@ public class ReturnOutTableModel extends AbstractTableModel {
 
                         } else {
                             record.setQty(qty);
-                            parent.setColumnSelectionInterval(4, 4);
                         }
                     }
+                    parent.setColumnSelectionInterval(3, 3);
                     break;
                 case 4://Std-w
-                    if (value != null) {
+                    if (NumberUtil.isNumber(value)) {
                         record.setStdWt(Util1.getFloat(value));
                         //calculation with unit
                         String toUnit = record.getStockUnit().getItemUnitCode();
                         Float calAmount = calPrice(record, toUnit);
-                        record.setPrice(Util1.getDouble(calAmount));
-                        parent.setColumnSelectionInterval(5, 5);
+                        //  record.setPrice(Util1.getDouble(calAmount));
+                       record.setAmount(Util1.getDouble(calAmount));
+                        parent.setColumnSelectionInterval(4, 4);
                     }
                     break;
                 case 5://Unit
@@ -245,7 +246,7 @@ public class ReturnOutTableModel extends AbstractTableModel {
                             String toUnit = record.getStockUnit().getItemUnitCode();
                             Float calAmount = calPrice(record, toUnit);
                             record.setPrice(Util1.getDouble(calAmount));
-                            parent.setColumnSelectionInterval(6, 6);
+                            parent.setColumnSelectionInterval(5, 5);
                         }
                     }
                     break;
@@ -261,36 +262,50 @@ public class ReturnOutTableModel extends AbstractTableModel {
 
                         } else {
                             record.setPrice(price);
-                            parent.setColumnSelectionInterval(7, 7);
+                            parent.setColumnSelectionInterval(6, 6);
                         }
                     }
 
                     break;
                 case 7://Amount
                     if (value != null) {
-                        record.setAmount(NumberUtil.NZero(value));
-                        if ((row + 1) <= listDetail.size()) {
-                            parent.setRowSelectionInterval(row + 1, row + 1);
-                        }
-                        parent.setColumnSelectionInterval(0, 0); //Move to Code
-
+                        record.setAmount(Util1.getDouble(value));
+                        isAmount = true;
                     }
                     break;
 
             }
-            calAmt(record);
-            //parent.requestFocusInWindow();
-            fireTableCellUpdated(row, column);
+            if (!isAmount) {
+                calAmt(record);
+                fireTableCellUpdated(row, 8);
+            }
+
         } catch (Exception ex) {
             LOGGER.error("setValueAt : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
 
         }
-
+        fireTableRowsUpdated(row, column);
     }
 
     private void calAmt(RetOutDetailHis retOutDetailHis) {
-        Double amt = retOutDetailHis.getQty() * retOutDetailHis.getPrice();
-        retOutDetailHis.setAmount(amt);
+//        Double amt = retOutDetailHis.getQty() * Double.parseDouble(retOutDetailHis.getStdWt().toString());
+//        retOutDetailHis.setAmount(amt);
+        if (retOutDetailHis.getStock() != null) {
+            float saleQty = retOutDetailHis.getQty();
+            double stdSalePrice = retOutDetailHis.getPrice();
+            float calAmount = Util1.getFloat(retOutDetailHis.getAmount());
+            float userWt = retOutDetailHis.getStdWt();
+            //   retOutDetailHis.setSmallestWT(getSmallestUnit(userWt, retOutDetailHis.getItemUnit().getItemUnitCode()));
+            //      retOutDetailHis.set("oz");
+
+            if (calAmount != 0) {
+                double amount = saleQty * calAmount;
+                retOutDetailHis.setAmount(amount);
+            } else {
+                double amount = saleQty * stdSalePrice;
+                retOutDetailHis.setAmount(amount);
+            }
+        }
     }
 
     public boolean hasEmptyRow() {
@@ -323,6 +338,7 @@ public class ReturnOutTableModel extends AbstractTableModel {
             detailHis.setUniqueId(listDetail.size() + 1);
             listDetail.add(detailHis);
             fireTableRowsInserted(listDetail.size() - 1, listDetail.size() - 1);
+            parent.scrollRectToVisible(parent.getCellRect(parent.getRowCount() - 1, 0, true));
         }
 
     }

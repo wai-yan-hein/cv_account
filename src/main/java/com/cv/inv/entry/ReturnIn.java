@@ -105,11 +105,11 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
     }
 
     private void initMain() {
-        initTable();
         actionMapping();
         initKeyListener();
         setTodayDate();
         initCombo();
+        initTable();
         assignDefaultValue();
         initTextBoxAlign();
         initTextBoxValue();
@@ -120,8 +120,9 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
     private void initTable() {
         tblReturnIn.setModel(returnInTableModel);
         returnInTableModel.setParent(tblReturnIn);
+        returnInTableModel.addNewRow();
         tblReturnIn.getTableHeader().setFont(Global.lableFont);
-        tblReturnIn.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tblReturnIn.setCellSelectionEnabled(true);
         tblReturnIn.getColumnModel().getColumn(0).setPreferredWidth(50);
         tblReturnIn.getColumnModel().getColumn(1).setPreferredWidth(300);
         tblReturnIn.getColumnModel().getColumn(2).setPreferredWidth(60);
@@ -130,16 +131,22 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
         tblReturnIn.getColumnModel().getColumn(5).setPreferredWidth(30);
         tblReturnIn.getColumnModel().getColumn(6).setPreferredWidth(60);
         tblReturnIn.getColumnModel().getColumn(7).setPreferredWidth(70);
+
+        tblReturnIn.getColumnModel().getColumn(0).setCellEditor(new StockCellEditor());
+        tblReturnIn.getColumnModel().getColumn(5).setCellEditor(new StockUnitEditor());
         tblReturnIn.getColumnModel().getColumn(3).setCellEditor(new AutoClearEditor());//qty
+        tblReturnIn.getColumnModel().getColumn(4).setCellEditor(new AutoClearEditor());
+         tblReturnIn.getColumnModel().getColumn(5).setCellEditor(new AutoClearEditor());
+        tblReturnIn.getColumnModel().getColumn(6).setCellEditor(new AutoClearEditor());
+
         tblReturnIn.setDefaultRenderer(Float.class, new TableCellRender());
         tblReturnIn.setDefaultRenderer(Double.class, new TableCellRender());
         tblReturnIn.setDefaultRenderer(Object.class, new TableCellRender());
-        returnInTableModel.addNewRow();
-        addRetInTableModelListener();
-        tblReturnIn.getColumnModel().getColumn(0).setCellEditor(new StockCellEditor());
-        tblReturnIn.getColumnModel().getColumn(5).setCellEditor(new StockUnitEditor());
+
+         addRetInTableModelListener();
         tblReturnIn.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                 .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
+        tblReturnIn.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
     }
 
@@ -721,10 +728,6 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
     }
 
     private void actionMapping() {
-        //Enter event on tblSale
-        tblReturnIn.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "ENTER-Action");
-        tblReturnIn.getActionMap().put("ENTER-Action", actionTblRetInEnterKey);
-
         //F8 event on tblRetIn
         tblReturnIn.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "DELETE");
         tblReturnIn.getActionMap().put("DELETE", actionItemDelete);
@@ -1007,7 +1010,6 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
 
     @Override
     public void refresh() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

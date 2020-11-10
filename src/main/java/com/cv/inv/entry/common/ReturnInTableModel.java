@@ -8,13 +8,13 @@ package com.cv.inv.entry.common;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.util.NumberUtil;
 import com.cv.accountswing.util.Util1;
-import com.cv.inv.entity.PurchaseDetail;
 import com.cv.inv.entity.RelationKey;
 import com.cv.inv.entity.RetInDetailHis;
 import com.cv.inv.entity.Stock;
 import com.cv.inv.entity.StockUnit;
 import com.cv.inv.entity.UnitRelation;
 import com.cv.inv.service.RelationService;
+import java.awt.HeadlessException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
@@ -143,9 +143,10 @@ public class ReturnInTableModel extends AbstractTableModel {
     public void addNewRow() {
         if (hasEmptyRow()) {
             RetInDetailHis detailHis = new RetInDetailHis();
-            detailHis.setUniqueId(listRetInDtail.size() + 1);
+            detailHis.setStock(new Stock());
             listRetInDtail.add(detailHis);
             fireTableRowsInserted(listRetInDtail.size() - 1, listRetInDtail.size() - 1);
+            parent.scrollRectToVisible(parent.getCellRect(parent.getRowCount() - 1, 0, true));
         }
 
     }
@@ -189,7 +190,7 @@ public class ReturnInTableModel extends AbstractTableModel {
         if (listRetInDtail.isEmpty()) {
             return;
         }
-
+        boolean isAmount = false;
         try {
             RetInDetailHis record = listRetInDtail.get(row);
 
@@ -230,19 +231,27 @@ public class ReturnInTableModel extends AbstractTableModel {
 
                         } else {
                             record.setQty(qty);
-                            parent.setColumnSelectionInterval(4, 4);
                         }
                     }
+
+                    parent.setColumnSelectionInterval(3, 3);
                     break;
 
                 case 4://Std-w
-                    if (value != null) {
+                    if (NumberUtil.isNumber(value)) {
                         record.setStdWt(Util1.getFloat(value));
                         //calculation with unit
                         String toUnit = record.getStockUnit().getItemUnitCode();
                         Float calAmount = calPrice(record, toUnit);
-                        record.setPrice(Util1.getDouble(calAmount));
-                        parent.setColumnSelectionInterval(5, 5);
+//                        if (calAmount != 0) {
+//                            double amount = record.getQty() * calAmount;
+//                            record.setAmount(amount);
+//                        } else {
+//                            double amount = record.getQty() * record.getPrice();
+                        record.setAmount(Util1.NZeroDouble(calAmount));
+                        // }
+                        // record.setPrice(Util1.getDouble(calAmount));
+                        //  parent.setColumnSelectionInterval(4, 4);
 
                     }
 
@@ -255,7 +264,7 @@ public class ReturnInTableModel extends AbstractTableModel {
                             String toUnit = record.getStockUnit().getItemUnitCode();
                             Float calAmount = calPrice(record, toUnit);
                             record.setPrice(Util1.getDouble(calAmount));
-                            parent.setColumnSelectionInterval(6, 6);
+                            parent.setColumnSelectionInterval(5, 5);
                         }
                     }
 
@@ -267,33 +276,43 @@ public class ReturnInTableModel extends AbstractTableModel {
                             JOptionPane.showMessageDialog(Global.parentForm, "Price must be positive value.",
                                     "Minus or zero qty.", JOptionPane.ERROR_MESSAGE);
                             parent.requestFocusInWindow();
-                            parent.setColumnSelectionInterval(6, 6);
+                            parent.setColumnSelectionInterval(column, column);
 
                         } else {
                             record.setPrice(price);
-                            parent.setColumnSelectionInterval(7, 7);
+                            parent.setColumnSelectionInterval(column, column);
                         }
                     }
 
                     break;
                 case 7://Amount
+//                    if (value != null) {
+//                        record.setAmount(Util1.getDouble(value));
+//                        if ((row + 1) <= listRetInDtail.size()) {
+//                            parent.setRowSelectionInterval(row + 1, row + 1);
+//                        }
+//                        parent.setColumnSelectionInterval(0, 0); //Move to Code
+//                    }
                     if (value != null) {
                         record.setAmount(Util1.getDouble(value));
-                        if ((row + 1) <= listRetInDtail.size()) {
-                            parent.setRowSelectionInterval(row + 1, row + 1);
-                        }
-                        parent.setColumnSelectionInterval(0, 0); //Move to Code
+                        isAmount = true;
                     }
                     break;
 
             }
             //parent.requestFocusInWindow();
-            calAmt(record);
-            fireTableCellUpdated(row, column);
-        } catch (Exception ex) {
+            if (!isAmount) {
+                calAmt(record);
+                fireTableCellUpdated(row, 8);
+            }
+            fireTableRowsUpdated(row, row);
+            parent.requestFocusInWindow();
+
+        } catch (HeadlessException ex) {
             LOGGER.error("setValueAt : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
 
         }
+
     }
 
     public List<RetInDetailHis> getCurrentRow() {
@@ -302,8 +321,13 @@ public class ReturnInTableModel extends AbstractTableModel {
 
     private void calAmt(RetInDetailHis retInDetail) {
         Double amt;
-        amt = retInDetail.getQty() * retInDetail.getPrice();
-        retInDetail.setAmount(amt);
+        if (retInDetail.getAmount() != null) {
+            amt = retInDetail.getQty() * Double.parseDouble(retInDetail.getAmount().toString());
+            retInDetail.setAmount(amt);
+        }else{
+            amt = retInDetail.getQty() * Double.parseDouble(retInDetail.getPrice().toString());
+            retInDetail.setAmount(amt);  
+        }
     }
 
     public List<RetInDetailHis> getRetInDetailHis() {
@@ -313,7 +337,7 @@ public class ReturnInTableModel extends AbstractTableModel {
     public void addEmptyRow() {
         if (listRetInDtail != null) {
             RetInDetailHis record = new RetInDetailHis();
-            record.setUniqueId(listRetInDtail.size() + 1);
+            record.setStock(new Stock());
             listRetInDtail.add(record);
             fireTableRowsInserted(listRetInDtail.size() - 1, listRetInDtail.size() - 1);
             parent.scrollRectToVisible(parent.getCellRect(parent.getRowCount() - 1, 0, true));
@@ -342,7 +366,7 @@ public class ReturnInTableModel extends AbstractTableModel {
     private Float calPrice(RetInDetailHis pd, String toUnit) {
         Stock stock = pd.getStock();
         float purAmt = 0.0f;
-        float stdPurPrice = Util1.getFloat(stock.getSalePriceN());
+        float stdPurPrice = Util1.getFloat(stock.getPurPrice());
         float stdPrice = Util1.getFloat(stock.getSalePriceN());
         float userWt = pd.getStdWt();
         float stdWt = stock.getSaleMeasure();

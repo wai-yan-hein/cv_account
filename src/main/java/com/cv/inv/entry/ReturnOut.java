@@ -132,7 +132,7 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
         tblRetOut.setModel(retOutTableModel);
         retOutTableModel.setParent(tblRetOut);
         tblRetOut.getTableHeader().setFont(Global.lableFont);
-        tblRetOut.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tblRetOut.setCellSelectionEnabled(true);
         tblRetOut.getColumnModel().getColumn(0).setPreferredWidth(50);
         tblRetOut.getColumnModel().getColumn(1).setPreferredWidth(300);
         tblRetOut.getColumnModel().getColumn(2).setPreferredWidth(60);
@@ -141,7 +141,12 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
         tblRetOut.getColumnModel().getColumn(5).setPreferredWidth(30);
         tblRetOut.getColumnModel().getColumn(6).setPreferredWidth(60);
         tblRetOut.getColumnModel().getColumn(7).setPreferredWidth(70);
+
         tblRetOut.getColumnModel().getColumn(3).setCellEditor(new AutoClearEditor());//qty
+        tblRetOut.getColumnModel().getColumn(4).setCellEditor(new AutoClearEditor());
+        tblRetOut.getColumnModel().getColumn(6).setCellEditor(new AutoClearEditor());
+        tblRetOut.getColumnModel().getColumn(5).setCellEditor(new AutoClearEditor());
+
         tblRetOut.setDefaultRenderer(Double.class, new TableCellRender());
         tblRetOut.setDefaultRenderer(Boolean.class, new TableCellRender());
         tblRetOut.setDefaultRenderer(Object.class, new TableCellRender());
@@ -151,6 +156,7 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
         addRetOutTableModelListener();
         tblRetOut.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                 .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
+        tblRetOut.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         retOutTableModel.addNewRow();
 
     }
@@ -256,10 +262,6 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
     }
 
     private void actionMapping() {
-        //Enter event on tblSale
-        tblRetOut.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "ENTER-Action");
-        tblRetOut.getActionMap().put("ENTER-Action", actionTblRetOutEnterKey);
-
         //F8 event on tblRetIn
         tblRetOut.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "DELETE");
         tblRetOut.getActionMap().put("DELETE", actionItemDelete);
