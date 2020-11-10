@@ -163,10 +163,6 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
             JOptionPane.showMessageDialog(Global.parentForm, "Select Department.");
             txtDepartment.requestFocus();
             status = false;
-        } else if (currency == null) {
-            JOptionPane.showMessageDialog(Global.parentForm, "Select Department.");
-            txtCurrency.requestFocus();
-            status = false;
         } else if (stDate == null) {
             JOptionPane.showMessageDialog(Global.parentForm, "Select Date.");
             txtDate.requestFocus();
@@ -187,7 +183,6 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
             curKey.setCode(currency);
             curKey.setCompCode(Global.compId);
             Currency curr = curService.findById(curKey);
-
             Department oDept = deptService.findById(depId);
 
             List<VStockOpValue> listVSO = new ArrayList();
@@ -282,6 +277,7 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
         jLabel3.setText("Currency");
 
         txtCurrency.setFont(Global.textFont);
+        txtCurrency.setDisabledTextColor(new java.awt.Color(0, 0, 0));
         txtCurrency.setEnabled(false);
         txtCurrency.setName("txtCurrency"); // NOI18N
 
