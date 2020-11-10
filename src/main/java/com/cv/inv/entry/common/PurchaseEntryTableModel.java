@@ -245,6 +245,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                             float avgPrice = (avgWt / stdWt) * pur.getPurPrice();
                             pur.setAvgWeight(avgWt);
                             pur.setAvgPrice(avgPrice);
+                            pur.setPurAmt(avgPrice);
                             parent.setColumnSelectionInterval(7, 7);
                         } else {
                             showMessageBox("Input value must be positive");

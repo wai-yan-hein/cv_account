@@ -144,7 +144,6 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
 
         tblRetOut.getColumnModel().getColumn(3).setCellEditor(new AutoClearEditor());//qty
         tblRetOut.getColumnModel().getColumn(4).setCellEditor(new AutoClearEditor());
-        tblRetOut.getColumnModel().getColumn(5).setCellEditor(new AutoClearEditor());//unit
         tblRetOut.getColumnModel().getColumn(6).setCellEditor(new AutoClearEditor());
 
         tblRetOut.setDefaultRenderer(Double.class, new TableCellRender());
