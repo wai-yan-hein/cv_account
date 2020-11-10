@@ -232,7 +232,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                         pur.setPurUnit(st);
                         String toUnit = pur.getPurUnit().getItemUnitCode();
                         Float calAmount = calPrice(pur, toUnit);
-                        pur.setPurPrice(calAmount);
+                        pur.setPurAmt(calAmount);
                         parent.setColumnSelectionInterval(6, 6);
 
                     }
