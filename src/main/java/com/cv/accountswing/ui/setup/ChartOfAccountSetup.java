@@ -56,8 +56,7 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
         PanelControl {
 
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(ChartOfAccountSetup.class);
-    private int count = 0;
-    DefaultMutableTreeNode selectedNode;
+    private DefaultMutableTreeNode selectedNode;
     DefaultTreeModel treeModel;
     private final String parentRootName = "Core Account";
     private DefaultMutableTreeNode treeRoot;
@@ -75,7 +74,7 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
     private UserRoleService userRoleService;
     JPopupMenu popupmenu;
     private LoadingObserver loadingObserver;
-    private HashMap<String, Menu> hmMenu = new HashMap<>();
+    private final HashMap<String, Menu> hmMenu = new HashMap<>();
     private boolean isShown = false;
 
     public void setIsShown(boolean isShown) {
@@ -212,17 +211,15 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
     }
 
     private void initTree() {
-
-        treeModel = (DefaultTreeModel) treeCOA.getModel();
-        treeModel.setRoot(null);
-        treeRoot = new DefaultMutableTreeNode(parentRootName);
         loadingObserver.load(this.getName(), "Start");
+        treeRoot = new DefaultMutableTreeNode(parentRootName);
         taskExecutor.execute(() -> {
             createTreeNode("#", treeRoot);
             treeModel.setRoot(treeRoot);
             loadingObserver.load(this.getName(), "Stop");
         });
-
+        treeModel = (DefaultTreeModel) treeCOA.getModel();
+        treeModel.setRoot(treeRoot);
         //treMenu.addPropertyChangeListener(propertyChangeListener);
     }
 
@@ -231,6 +228,9 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
         listChild.forEach(child -> {
             DefaultMutableTreeNode root = new DefaultMutableTreeNode(child);
             treeRoot.add(root);
+            if (!treeRoot.isLeaf()) {
+                treeModel.setRoot(treeRoot);
+            }
             createTreeNode(child.getCode(), root);
         });
 

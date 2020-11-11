@@ -276,6 +276,7 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
         });
 
         txtCurrency.setFont(Global.textFont);
+        txtCurrency.setDisabledTextColor(new java.awt.Color(0, 0, 0));
         txtCurrency.setEnabled(false);
         txtCurrency.setName("txtCurrency"); // NOI18N
         txtCurrency.addFocusListener(new java.awt.event.FocusAdapter() {

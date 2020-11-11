@@ -6,7 +6,6 @@ import com.cv.accountswing.ui.LoginDialog;
 import com.cv.accountswing.entity.view.VUsrCompAssign;
 import com.cv.accountswing.service.UsrCompRoleService;
 import com.formdev.flatlaf.IntelliJTheme;
-import java.awt.Image;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.List;
@@ -32,6 +31,7 @@ public class AccountSwingApplication {
     private static final Logger LOGGER = LoggerFactory.getLogger(AccountSwingApplication.class);
     private static final SplashWindow SPLASH_WINDOW = new SplashWindow();
     private static ConfigurableApplicationContext context;
+    private static final ImageIcon accIcon = new ImageIcon(AccountSwingApplication.class.getResource("/images/user-account.png"));
 
     @PostConstruct
     void started() {
@@ -84,6 +84,7 @@ public class AccountSwingApplication {
                     System.exit(0);
                 }
             });
+            loginDialog.setIconImage(accIcon.getImage());
             loginDialog.startThread();
             loginDialog.setLocationRelativeTo(null);
             loginDialog.setVisible(true);

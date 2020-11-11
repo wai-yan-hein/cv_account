@@ -9,6 +9,8 @@ import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.util.Util1;
 import com.toedter.calendar.JTextFieldDateEditor;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import javax.swing.JButton;
@@ -40,8 +42,6 @@ public class DatePickerDialog extends javax.swing.JDialog implements KeyListener
         initComponents();
         initKeyListener();
         setDate();
-        this.requestFocusInWindow();
-
     }
 
     private void initKeyListener() {
@@ -49,7 +49,18 @@ public class DatePickerDialog extends javax.swing.JDialog implements KeyListener
         txtToDate.getDateEditor().getUiComponent().setName("txtToDate");
         txtFromDate.getDateEditor().getUiComponent().addKeyListener(this);
         txtToDate.getDateEditor().getUiComponent().addKeyListener(this);
-        txtToDate.getDateEditor().getUiComponent().addKeyListener(this);
+        txtFromDate.getDateEditor().getUiComponent().addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent evt) {
+                ((JTextFieldDateEditor) evt.getSource()).selectAll();
+            }
+        });
+        txtToDate.getDateEditor().getUiComponent().addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent evt) {
+                ((JTextFieldDateEditor) evt.getSource()).selectAll();
+            }
+        });
         btnOK.addKeyListener(this);
 
     }
@@ -154,6 +165,11 @@ public class DatePickerDialog extends javax.swing.JDialog implements KeyListener
         txtToDate.setDateFormatString("dd/MM/yyyy");
         txtToDate.setFont(Global.textFont);
         txtToDate.setName("txtToDate"); // NOI18N
+        txtToDate.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtToDateFocusGained(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -218,6 +234,10 @@ public class DatePickerDialog extends javax.swing.JDialog implements KeyListener
         // TODO add your handling code here:
     }//GEN-LAST:event_txtFromDateFocusGained
 
+    private void txtToDateFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtToDateFocusGained
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtToDateFocusGained
+
     /**
      * @param args the command line arguments
      */
@@ -252,10 +272,12 @@ public class DatePickerDialog extends javax.swing.JDialog implements KeyListener
             case "txtFromDate":
                 switch (e.getKeyCode()) {
                     case KeyEvent.VK_ENTER:
-                        String date = ((JTextFieldDateEditor) sourceObj).getText();
-                        if (date.length() == 8) {
-                            String toFormatDate = Util1.toFormatDate(date);
-                            txtFromDate.setDate(Util1.toDate(toFormatDate, "dd/MM/yyyy"));
+                        if (sourceObj != null) {
+                            String date = ((JTextFieldDateEditor) sourceObj).getText();
+                            if (date.length() == 8) {
+                                String toFormatDate = Util1.toFormatDate(date);
+                                txtFromDate.setDate(Util1.toDate(toFormatDate, "dd/MM/yyyy"));
+                            }
                         }
                         txtToDate.requestFocusInWindow();
                         break;
@@ -272,10 +294,12 @@ public class DatePickerDialog extends javax.swing.JDialog implements KeyListener
             case "txtToDate":
                 switch (e.getKeyCode()) {
                     case KeyEvent.VK_ENTER:
-                        String date = ((JTextFieldDateEditor) sourceObj).getText();
-                        if (date.length() == 8) {
-                            String toFormatDate = Util1.toFormatDate(date);
-                            txtFromDate.setDate(Util1.toDate(toFormatDate, "dd/MM/yyyy"));
+                        if (sourceObj != null) {
+                            String date = ((JTextFieldDateEditor) sourceObj).getText();
+                            if (date.length() == 8) {
+                                String toFormatDate = Util1.toFormatDate(date);
+                                txtToDate.setDate(Util1.toDate(toFormatDate, "dd/MM/yyyy"));
+                            }
                         }
                         btnOK.requestFocus();
                         break;
@@ -286,8 +310,13 @@ public class DatePickerDialog extends javax.swing.JDialog implements KeyListener
                 break;
 
             case "btnOK":
-                if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_RIGHT) {
-                    txtFromDate.getDateEditor().getUiComponent().requestFocusInWindow();
+                switch (e.getKeyCode()) {
+                    case KeyEvent.VK_ENTER:
+                        sendDate();
+                        break;
+                    case KeyEvent.VK_UP:
+                        txtFromDate.getDateEditor().getUiComponent().requestFocusInWindow();
+                        break;
                 }
 
                 break;

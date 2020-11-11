@@ -133,7 +133,13 @@ public class PurchaseVouSearch extends javax.swing.JDialog implements KeyListene
         String fromDate = Util1.toDateStr(txtFromDate.getDate(), "yyyy-MM-dd HH:mm:ss");
         String toDate = Util1.toDateStr(txtToDate.getDate(), "yyyy-MM-dd HH:mm:ss");
         String customerId = traderAutoCompleter.getTrader().getId().toString();
+        if (txtCus.getText().isEmpty()) {
+            customerId = "-";
+        }
         String vouStatusId = vouCompleter.getVouStatus().getVouStatusId().toString();
+        if (txtVouStatus.getText().isEmpty()) {
+            vouStatusId = "-";
+        }
         String remark = txtRemark.getText();
         List<PurHis> listHis = purHisService.search(fromDate, toDate, customerId, vouStatusId, remark);
         purVouTableModel.setListPurHis(listHis);

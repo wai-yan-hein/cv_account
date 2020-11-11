@@ -5,6 +5,7 @@
  */
 package com.cv.accountswing.ui.cash;
 
+import com.cv.accountswing.common.FilterObserver;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
@@ -50,6 +51,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
+import javax.swing.RowFilter;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
@@ -65,7 +67,8 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-public class AllCash extends javax.swing.JPanel implements SelectionObserver, PanelControl {
+public class AllCash extends javax.swing.JPanel implements SelectionObserver,
+        PanelControl, FilterObserver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AllCash.class);
     String stDate;
@@ -596,6 +599,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
         mainFrame.setControl(this);
+        mainFrame.setFilterObserver(this);
         if (!isShown) {
             initMain();
         } else {
@@ -751,6 +755,15 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
     @Override
     public void refresh() {
         searchCash();
+    }
+
+    @Override
+    public void sendFilter(String filter) {
+        setTableFilter(filter);
+    }
+
+    private void setTableFilter(String filter) {
+        sorter.setRowFilter(RowFilter.regexFilter(filter));
     }
 
 }

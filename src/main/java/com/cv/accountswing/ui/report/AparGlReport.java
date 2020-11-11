@@ -316,7 +316,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
 
     private void openTBDDialog(List<VGl> listVGl, String traderName, Double netChange) {
         trialBalanceDetailDialog.setDesp(traderName);
-        trialBalanceDetailDialog.setNetChange(netChange);
+        trialBalanceDetailDialog.setTargetId(getTarget());
         trialBalanceDetailDialog.setListVGl(listVGl);
         trialBalanceDetailDialog.setSize(Global.width - 200, Global.height - 200);
         trialBalanceDetailDialog.setLocationRelativeTo(null);
