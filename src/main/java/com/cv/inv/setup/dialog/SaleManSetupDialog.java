@@ -42,7 +42,7 @@ public class SaleManSetupDialog extends javax.swing.JDialog implements KeyListen
     private SaleMan saleMan;
 
     public SaleManSetupDialog() {
-        super(new Frame(), true);
+        super(Global.parentForm, true);
         initComponents();
     }
 

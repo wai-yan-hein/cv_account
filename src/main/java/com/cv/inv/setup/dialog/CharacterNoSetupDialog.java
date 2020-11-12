@@ -51,7 +51,7 @@ public class CharacterNoSetupDialog extends javax.swing.JDialog implements KeyLi
      * Creates new form ItemTypeSetupDialog
      */
     public CharacterNoSetupDialog() {
-        super(new Frame(), true);
+        super(Global.parentForm, true);
         initComponents();
     }
 

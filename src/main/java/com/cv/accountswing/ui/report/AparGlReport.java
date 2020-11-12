@@ -542,6 +542,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
 
         txtCurrency.setFont(Global.lableFont);
         txtCurrency.setToolTipText("");
+        txtCurrency.setDisabledTextColor(new java.awt.Color(0, 0, 0));
         txtCurrency.setEnabled(false);
         txtCurrency.setName("txtCurrency"); // NOI18N
         txtCurrency.addActionListener(new java.awt.event.ActionListener() {

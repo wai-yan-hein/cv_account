@@ -115,7 +115,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationMainFrame.class);
     private final HashMap<String, JLabel> hmTabLoading = new HashMap();
     private final HashMap<String, JPanel> hmPanel = new HashMap<>();
-    JPopupMenu popupmenu;
+    private JPopupMenu popupmenu;
     private final ImageIcon onlineIcon = new ImageIcon(this.getClass().getResource("/images/online-signal.png"));
     private final ImageIcon lowIcon = new ImageIcon(this.getClass().getResource("/images/low-signal.png"));
     private final ImageIcon offlineIcon = new ImageIcon(this.getClass().getResource("/images/offline-signal.png"));
@@ -1058,7 +1058,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
 
     private void formWindowStateChanged(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowStateChanged
         //LOGGER.info("formWindowStateChanged");
-        setLocationRelativeTo(null);
         assignWindoInfo();
     }//GEN-LAST:event_formWindowStateChanged
 

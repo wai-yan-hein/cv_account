@@ -80,7 +80,7 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
      * Creates new form JournalEntryDialog
      */
     public JournalEntryDialog() {
-        super(new javax.swing.JFrame(), true);
+        super(Global.parentForm, true);
         initComponents();
         initKeyListener();
     }

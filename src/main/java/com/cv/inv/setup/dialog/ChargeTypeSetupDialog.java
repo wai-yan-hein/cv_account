@@ -41,7 +41,7 @@ public class ChargeTypeSetupDialog extends javax.swing.JDialog implements KeyLis
     private ChargeType chargeType;
 
     public ChargeTypeSetupDialog() {
-        super(new Frame(), true);
+        super(Global.parentForm, true);
         initComponents();
         txtChargeType.requestFocus();
     }

@@ -46,8 +46,7 @@ public class PurchaseVouSearch extends javax.swing.JDialog implements KeyListene
      * Creates new form purVouSearchDialog
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(PurchaseVouSearch.class);
-    @Autowired
-    private LocationService locationService;
+
     @Autowired
     private VouStatusService vouStatusService;
     @Autowired
@@ -59,8 +58,6 @@ public class PurchaseVouSearch extends javax.swing.JDialog implements KeyListene
     @Autowired
     private PurchaseHisService purHisService;
     @Autowired
-    private ApplicationMainFrame mainFrame;
-    @Autowired
     private PurchaseEntry pur;
     @Autowired
     private PurchaseDetailService pdService;
@@ -68,7 +65,7 @@ public class PurchaseVouSearch extends javax.swing.JDialog implements KeyListene
     private TraderAutoCompleter traderAutoCompleter;
 
     public PurchaseVouSearch() {
-        super(new Frame(), true);
+        super(Global.parentForm, true);
         initComponents();
     }
 

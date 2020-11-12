@@ -51,7 +51,7 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
      * Creates new form ItemTypeSetupDialog
      */
     public CategorySetupDialog() {
-        super(new Frame(), true);
+        super(Global.parentForm, true);
         initComponents();
     }
 

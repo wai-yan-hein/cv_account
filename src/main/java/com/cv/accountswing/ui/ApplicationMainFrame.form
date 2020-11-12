@@ -149,9 +149,6 @@
                   <Image iconType="3" name="/images/save.png"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="F5 - Save"/>
-                <Property name="model" type="javax.swing.ButtonModel" editor="org.netbeans.modules.form.ComponentChooserEditor">
-                  <ComponentRef name="default"/>
-                </Property>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSaveActionPerformed"/>
@@ -170,9 +167,6 @@
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="F6 - Print"/>
                 <Property name="focusable" type="boolean" value="false"/>
-                <Property name="model" type="javax.swing.ButtonModel" editor="org.netbeans.modules.form.ComponentChooserEditor">
-                  <ComponentRef name="default"/>
-                </Property>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnPrintActionPerformed"/>
@@ -187,9 +181,6 @@
                   <Image iconType="3" name="/images/refresh.png"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="F7 - Refresh"/>
-                <Property name="model" type="javax.swing.ButtonModel" editor="org.netbeans.modules.form.ComponentChooserEditor">
-                  <ComponentRef name="default"/>
-                </Property>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnRefreshActionPerformed"/>
@@ -208,9 +199,6 @@
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="F8 - Delete"/>
                 <Property name="focusable" type="boolean" value="false"/>
-                <Property name="model" type="javax.swing.ButtonModel" editor="org.netbeans.modules.form.ComponentChooserEditor">
-                  <ComponentRef name="default"/>
-                </Property>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnDeleteActionPerformed"/>
@@ -229,9 +217,6 @@
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="F9-History"/>
                 <Property name="focusable" type="boolean" value="false"/>
-                <Property name="model" type="javax.swing.ButtonModel" editor="org.netbeans.modules.form.ComponentChooserEditor">
-                  <ComponentRef name="default"/>
-                </Property>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnHistoryActionPerformed"/>
@@ -250,9 +235,6 @@
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="F10 - Clear "/>
                 <Property name="focusable" type="boolean" value="false"/>
-                <Property name="model" type="javax.swing.ButtonModel" editor="org.netbeans.modules.form.ComponentChooserEditor">
-                  <ComponentRef name="default"/>
-                </Property>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnClearActionPerformed"/>
@@ -270,9 +252,6 @@
                   <Image iconType="3" name="/images/logout.png"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="Logout"/>
-                <Property name="model" type="javax.swing.ButtonModel" editor="org.netbeans.modules.form.ComponentChooserEditor">
-                  <ComponentRef name="default"/>
-                </Property>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnLogoutActionPerformed"/>

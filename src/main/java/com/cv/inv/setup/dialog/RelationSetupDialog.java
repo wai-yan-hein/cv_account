@@ -45,7 +45,7 @@ public class RelationSetupDialog extends javax.swing.JDialog implements KeyListe
      * Creates new form ItemTypeSetupDialog
      */
     public RelationSetupDialog() {
-        super(new Frame(), true);
+        super(Global.parentForm, true);
         initComponents();
     }
 

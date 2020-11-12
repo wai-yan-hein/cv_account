@@ -38,7 +38,7 @@ public class DatePickerDialog extends javax.swing.JDialog implements KeyListener
      * Creates new form DatePickerDialog
      */
     public DatePickerDialog() {
-        super(new javax.swing.JFrame(), true);
+        super(Global.parentForm, true);
         initComponents();
         initKeyListener();
         setDate();

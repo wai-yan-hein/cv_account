@@ -31,8 +31,7 @@ import org.springframework.stereotype.Component;
 public class DamageSearchDialog extends javax.swing.JDialog implements SelectionObserver {
 
     private final DamageSearchTableModel vouTableModel = new DamageSearchTableModel();
-    private int selectedRow = -1;
-    private SelectionObserver observer;
+
     /**
      * Creates new form DamageSearchDialog
      */
@@ -44,7 +43,7 @@ public class DamageSearchDialog extends javax.swing.JDialog implements Selection
     private DamageDetailHisService ddhService;
 
     public DamageSearchDialog() {
-        super(new Frame(), true);
+        super(Global.parentForm, true);
         initComponents();
     }
 
