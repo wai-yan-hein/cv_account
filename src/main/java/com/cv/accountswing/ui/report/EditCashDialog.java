@@ -6,17 +6,26 @@
 package com.cv.accountswing.ui.report;
 
 import com.cv.accountswing.common.Global;
+import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.ChartOfAccount;
 import com.cv.accountswing.entity.Department;
+import com.cv.accountswing.entity.Gl;
 import com.cv.accountswing.entity.Trader;
 import com.cv.accountswing.entity.view.VGl;
+import com.cv.accountswing.service.GlService;
+import com.cv.accountswing.ui.cash.common.AllCashTableModel;
 import com.cv.accountswing.ui.editor.COAAutoCompleter;
 import com.cv.accountswing.ui.editor.CurrencyAutoCompleter;
 import com.cv.accountswing.ui.editor.DepartmentAutoCompleter;
 import com.cv.accountswing.ui.editor.TraderAutoCompleter;
-import com.cv.accountswing.ui.journal.Journal;
-import com.cv.accountswing.ui.journal.JournalEntryDialog;
+import com.cv.accountswing.util.Util1;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import java.text.DateFormat;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -27,12 +36,34 @@ import org.springframework.stereotype.Component;
 @Component
 public class EditCashDialog extends javax.swing.JDialog {
 
+    private final Logger LOGGER = LoggerFactory.getLogger(AllCashTableModel.class);
+    private final Gson gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
     private DepartmentAutoCompleter departmentAutoCompleter;
     private TraderAutoCompleter traderAutoCompleter;
     private COAAutoCompleter cOAAutoCompleter;
     private CurrencyAutoCompleter currencyAutoCompleter;
+    private String dType;
+    private SelectionObserver selectionObserver;
+
+    public SelectionObserver getSelectionObserver() {
+        return selectionObserver;
+    }
+
+    public void setSelectionObserver(SelectionObserver selectionObserver) {
+        this.selectionObserver = selectionObserver;
+    }
+
+    public String getdType() {
+        return dType;
+    }
+
+    public void setdType(String dType) {
+        this.dType = dType;
+    }
+
     @Autowired
-    private JournalEntryDialog journalEntryDialog;
+    private GlService glService;
+
     private VGl vGl;
 
     public VGl getvGl() {
@@ -56,9 +87,9 @@ public class EditCashDialog extends javax.swing.JDialog {
         txtDate.setDate(vgl.getGlDate());
         txtCashIn.setValue(vgl.getDrAmt());
         txtCashOut.setValue(vgl.getCrAmt());
-        txtCurrency.setText(vgl.getfCurName());
         txtDesp.setText(vgl.getDescription());
         txtRef.setText(vgl.getReference());
+        currencyAutoCompleter.setCurrency(Global.defalutCurrency);
         departmentAutoCompleter.setDepartment(new Department(vgl.getDeptId(), vgl.getDeptName()));
         cOAAutoCompleter.setCoa(new ChartOfAccount(vgl.getAccountId(), vgl.getAccName()));
         if (vgl.getTraderId() != null) {
@@ -71,6 +102,63 @@ public class EditCashDialog extends javax.swing.JDialog {
         traderAutoCompleter = new TraderAutoCompleter(txtPerson, Global.listTrader, null);
         cOAAutoCompleter = new COAAutoCompleter(txtAccount, Global.listCOA, null);
         currencyAutoCompleter = new CurrencyAutoCompleter(txtCurrency, Global.listCurrency, null);
+    }
+
+    private void save() {
+        if (isValidEntry()) {
+            try {
+                vGl.setAccountId(cOAAutoCompleter.getCOA().getCode());
+                vGl.setDeptId(departmentAutoCompleter.getDepartment().getDeptCode());
+                vGl.setfCurName(currencyAutoCompleter.getCurrency().getKey().getCode());
+                vGl.setGlDate(txtDate.getDate());
+                vGl.setDescription(txtDesp.getText());
+                vGl.setReference(txtRef.getText());
+                vGl.setDrAmt(Util1.getDouble(txtCashIn.getValue()));
+                vGl.setCrAmt(Util1.getDouble(txtCashOut.getValue()));
+                if (traderAutoCompleter.getTrader() != null) {
+                    vGl.setTraderId(traderAutoCompleter.getTrader().getId().longValue());
+                }
+                Gl gl = gson.fromJson(gson.toJson(vGl), Gl.class);
+                glService.save(gl);
+                sendToParent(vGl);
+            } catch (Exception ex) {
+                LOGGER.error("Save GL :" + ex.getMessage());
+                JOptionPane.showMessageDialog(Global.parentForm, ex.getMessage(), "Save Gl", JOptionPane.ERROR_MESSAGE);
+
+            }
+        }
+    }
+
+    private void sendToParent(VGl vGl) {
+        if (dType.equals("DR")) {
+            selectionObserver.selected("SAVE-GL-DR", vGl);
+        } else {
+            selectionObserver.selected("SAVE-GL-CR", vGl);
+        }
+        this.dispose();
+    }
+
+    private boolean isValidEntry() {
+        boolean status = true;
+        if (cOAAutoCompleter.getCOA() == null) {
+            status = false;
+            JOptionPane.showMessageDialog(Global.parentForm, "Select Account");
+            txtAccount.requestFocus();
+        }
+        if (departmentAutoCompleter.getDepartment() == null) {
+            status = false;
+            JOptionPane.showMessageDialog(Global.parentForm, "Select Department");
+            txtDep.requestFocus();
+        }
+        if (currencyAutoCompleter.getCurrency() == null) {
+            status = false;
+            JOptionPane.showMessageDialog(Global.parentForm, "Select Currency");
+        }
+        if (txtCashIn.getValue() == null && txtCashOut.getValue() == null) {
+            status = false;
+            JOptionPane.showMessageDialog(Global.parentForm, "Cash In/ Cash Out Amount.");
+        }
+        return status;
     }
 
     /**
@@ -111,6 +199,11 @@ public class EditCashDialog extends javax.swing.JDialog {
                 formComponentShown(evt);
             }
         });
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         jLabel1.setFont(Global.lableFont);
         jLabel1.setText("Date");
@@ -149,22 +242,30 @@ public class EditCashDialog extends javax.swing.JDialog {
         txtCurrency.setEnabled(false);
 
         jLabel8.setFont(Global.lableFont);
-        jLabel8.setText("Cash In");
+        jLabel8.setText("Cash In / Dr");
 
         jLabel9.setFont(Global.lableFont);
-        jLabel9.setText("Cash Out");
+        jLabel9.setText("Cash Out / Cr");
 
         jButton1.setText("Save");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
+        txtCashIn.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
         txtCashIn.setFont(Global.textFont);
 
+        txtCashOut.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
         txtCashOut.setFont(Global.textFont);
 
-        panel.setBackground(new java.awt.Color(255, 255, 102));
+        panel.setBackground(Global.mainColor);
         panel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
         panel.setFont(Global.textFont);
 
         txtName.setFont(Global.menuFont);
+        txtName.setForeground(new java.awt.Color(255, 255, 255));
         txtName.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         txtName.setText("Name");
 
@@ -274,18 +375,21 @@ public class EditCashDialog extends javax.swing.JDialog {
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
         initCombo();
-        if (vGl.getGlVouNo() != null) {
-            //journalEntryDialog.setSelectionObserver(this);
-            journalEntryDialog.clear();
-            journalEntryDialog.setGlVouId(vGl.getGlVouNo());
-            journalEntryDialog.setSize(Global.width - 200, Global.height - 200);
-            journalEntryDialog.setResizable(false);
-            journalEntryDialog.setLocationRelativeTo(null);
-            journalEntryDialog.setVisible(true);
-        } else {
-            setData(vGl);
-        }
+        setData(vGl);
     }//GEN-LAST:event_formComponentShown
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        save();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        // TODO add your handling code here:
+        int yes_no = JOptionPane.showConfirmDialog(Global.parentForm, "Do you want to save changes", "Save Cash", JOptionPane.YES_NO_OPTION);
+        if (yes_no == JOptionPane.YES_OPTION) {
+            save();
+        }
+    }//GEN-LAST:event_formWindowClosing
 
     /**
      * @param args the command line arguments

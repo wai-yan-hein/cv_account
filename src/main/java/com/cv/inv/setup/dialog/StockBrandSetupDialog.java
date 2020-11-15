@@ -51,7 +51,7 @@ public class StockBrandSetupDialog extends javax.swing.JDialog implements KeyLis
      * Creates new form ItemTypeSetupDialog
      */
     public StockBrandSetupDialog() {
-        super(new Frame(), true);
+        super(Global.parentForm, true);
         initComponents();
     }
 

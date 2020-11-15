@@ -145,7 +145,7 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
             List<VCOAOpening> listOpening = openingService.search(stDate, "-", "-", Global.compId.toString(), depCode, curId);
             openingTableModel.setListOpening(listOpening);
             btnGen.setEnabled(listOpening.isEmpty());
-            //calTotalAmt(listVGl);
+            calTotalAmt(listOpening);
             //btnGen.setEnabled(false);
             loadingObserver.load(this.getName(), "Stop");
         });

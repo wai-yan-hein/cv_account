@@ -16,6 +16,7 @@ import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.journal.common.JournalTableModel;
 import com.cv.accountswing.util.Util1;
 import com.toedter.calendar.JTextFieldDateEditor;
+import java.awt.Image;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
@@ -23,6 +24,7 @@ import java.awt.event.MouseEvent;
 import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
@@ -41,6 +43,7 @@ public class Journal extends javax.swing.JPanel implements KeyListener, Selectio
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Journal.class);
     private int selectRow = -1;
+    private final ImageIcon jIcon = new ImageIcon(this.getClass().getResource("/images/journal.png"));
     @Autowired
     private VGvService vGvService;
     @Autowired
@@ -111,16 +114,21 @@ public class Journal extends javax.swing.JPanel implements KeyListener, Selectio
         LOGGER.info("searchGV");
         loadingObserver.load(this.getName(), "Start");
         taskExecutor.execute(() -> {
-            String fromDate = Util1.toDateStr(txtFromDate.getDate(), "dd/MM/yyyy");
-            String toDate = Util1.toDateStr(txtToDate.getDate(), "dd/MM/yyyy");
-            String vouNo = txtVouNo.getText();
-            String refrence = txtRefrence.getText();
-            List<VGeneralVoucher> listGV = vGvService.search(fromDate, toDate, Util1.isNull(vouNo, "-"),
-                    Util1.isNull(refrence, "-"), Global.compId.toString(),
-                    "-");
-            journalTableModel.setListGV(listGV);
-            loadingObserver.load(this.getName(), "Stop");
+            try {
+                String fromDate = Util1.toDateStr(txtFromDate.getDate(), "dd/MM/yyyy");
+                String toDate = Util1.toDateStr(txtToDate.getDate(), "dd/MM/yyyy");
+                String vouNo = txtVouNo.getText();
+                String refrence = txtRefrence.getText();
+                List<VGeneralVoucher> listGV = vGvService.search(fromDate, toDate, Util1.isNull(vouNo, "-"),
+                        Util1.isNull(refrence, "-"), Global.compId.toString(),
+                        "-");
+                journalTableModel.setListGV(listGV);
+                loadingObserver.load(this.getName(), "Stop");
+            } catch (Exception e) {
+                LOGGER.error("Search Journal Voucher :" + e.getMessage());
+                JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Search Journal", JOptionPane.ERROR_MESSAGE);
 
+            }
         });
 
     }
@@ -164,7 +172,7 @@ public class Journal extends javax.swing.JPanel implements KeyListener, Selectio
     });
     }*/
     private void openJournalEntryDialog(String gvId) {
-        //journalEntryDialog.setIconImage(new ImageIcon(this.getClass().getResource("/images/voucher.png")).getImage());
+        journalEntryDialog.setIconImage(jIcon.getImage());
         journalEntryDialog.setSelectionObserver(this);
         journalEntryDialog.clear();
         journalEntryDialog.setGlVouId(gvId);
@@ -237,8 +245,11 @@ public class Journal extends javax.swing.JPanel implements KeyListener, Selectio
             }
         });
 
+        btnEntry.setBackground(Global.mainColor);
         btnEntry.setFont(Global.lableFont);
+        btnEntry.setForeground(new java.awt.Color(255, 255, 255));
         btnEntry.setText("+");
+        btnEntry.setToolTipText("New Journal");
         btnEntry.setName("btnEntry"); // NOI18N
         btnEntry.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -282,19 +293,19 @@ public class Journal extends javax.swing.JPanel implements KeyListener, Selectio
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtToDate, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(txtFromDate, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(txtVouNo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jLabel3)
                         .addComponent(jLabel4)
                         .addComponent(txtRefrence, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(btnEntry, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
+                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel1))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                            .addComponent(txtToDate, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(txtFromDate, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
         );
 

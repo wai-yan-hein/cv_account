@@ -53,6 +53,7 @@ public class BalanceSheet extends javax.swing.JPanel implements SelectionObserve
     private TaskExecutor taskExecutor;
     @Autowired
     private ApplicationMainFrame mainFrame;
+    private CurrencyAutoCompleter currencyAutoCompleter;
 
     public void setLoadingObserver(LoadingObserver loadingObserver) {
         this.loadingObserver = loadingObserver;
@@ -77,13 +78,15 @@ public class BalanceSheet extends javax.swing.JPanel implements SelectionObserve
         dateAutoCompleter.setSelectionObserver(this);
         DepartmentAutoCompleter departmentAutoCompleter = new DepartmentAutoCompleter(txtDep, Global.listDepartment, null);
         departmentAutoCompleter.setSelectionObserver(this);
-        CurrencyAutoCompleter currencyAutoCompleter = new CurrencyAutoCompleter(txtCurrency, Global.listCurrency, null);
+        currencyAutoCompleter = new CurrencyAutoCompleter(txtCurrency, Global.listCurrency, null);
         currencyAutoCompleter.setSelectionObserver(this);
+        currencyAutoCompleter.setCurrency(Global.defalutCurrency);
 
     }
 
     private void calBalanceSheet() {
         loadingObserver.load(this.getName(), "Start");
+        currency = currencyAutoCompleter.getCurrency().getKey().getCode();
         taskExecutor.execute(() -> {
             try {
                 String userId = Global.loginUser.getUserId().toString();
@@ -208,6 +211,8 @@ public class BalanceSheet extends javax.swing.JPanel implements SelectionObserve
         jLabel2.setText("Department");
 
         txtCurrency.setFont(Global.textFont);
+        txtCurrency.setDisabledTextColor(new java.awt.Color(0, 0, 0));
+        txtCurrency.setEnabled(false);
 
         jLabel3.setFont(Global.lableFont);
         jLabel3.setText("Currency");

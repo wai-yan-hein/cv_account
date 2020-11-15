@@ -52,7 +52,7 @@ public class StockUnitSetupDailog extends javax.swing.JDialog implements KeyList
      * Creates new form ItemTypeSetupDialog
      */
     public StockUnitSetupDailog() {
-        super(new Frame(), true);
+        super(Global.parentForm, true);
         initComponents();
     }
 

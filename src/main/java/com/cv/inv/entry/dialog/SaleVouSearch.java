@@ -78,7 +78,7 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
     private MachineInfoAutoCompleter machAutoCompleter;
 
     public SaleVouSearch() {
-        super(new Frame(), true);
+        super(Global.parentForm, true);
         initComponents();
     }
 

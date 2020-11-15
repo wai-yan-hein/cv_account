@@ -48,7 +48,7 @@ public class VouStatusSetupDialog extends javax.swing.JDialog implements KeyList
     private StartWithRowFilter swrf;
 
     public VouStatusSetupDialog() {
-        super(new Frame(), true);
+        super(Global.parentForm, true);
         initComponents();
     }
 

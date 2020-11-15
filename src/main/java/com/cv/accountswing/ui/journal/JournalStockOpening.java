@@ -23,6 +23,7 @@ import com.cv.accountswing.service.DepartmentService;
 import com.cv.accountswing.service.StockOpValueService;
 import com.cv.accountswing.service.SystemPropertyService;
 import com.cv.accountswing.ui.ApplicationMainFrame;
+import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.editor.CurrencyAutoCompleter;
 import com.cv.accountswing.ui.editor.DateAutoCompleter;
@@ -43,6 +44,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +59,7 @@ import org.springframework.stereotype.Component;
 public class JournalStockOpening extends javax.swing.JPanel implements SelectionObserver, KeyListener, PanelControl {
 
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(ChartOfAccountSetup.class);
-    private Gson gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
+    private final Gson gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
 
     @Autowired
     private TaskExecutor taskExecutor;
@@ -65,14 +67,6 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
     private StockOpValueService sovService;
     @Autowired
     private JournalStockOpeningTableModel journalStockOpeningTableModel;
-    @Autowired
-    private CurrencyService currencyService;
-    @Autowired
-    private DepartmentService departmentService;
-    @Autowired
-    private SystemPropertyService spService;
-    @Autowired
-    private CurrencyService curService;
     @Autowired
     private DepartmentService deptService;
     @Autowired
@@ -82,12 +76,15 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
 
     private LoadingObserver loadingObserver;
     private boolean isShown = false;
-
     private String stDate;
     private String enDate;
     private String coaCode;
     private String currency;
     private String depId;
+
+    public LoadingObserver getLoadingObserver() {
+        return loadingObserver;
+    }
 
     /**
      * Creates new form JournalStockOpening
@@ -105,28 +102,34 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
         initKeyListener();
         setTodayDate();
         initTable();
+        isShown = true;
     }
 
     private void initTable() {
         tblOpening.setModel(journalStockOpeningTableModel);
+        journalStockOpeningTableModel.setParent(tblOpening);
         tblOpening.getTableHeader().setFont(Global.textFont);
         tblOpening.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblOpening.setDefaultRenderer(Double.class, new TableCellRender());
         tblOpening.setDefaultRenderer(Object.class, new TableCellRender());
+        tblOpening.getColumnModel().getColumn(5).setCellEditor(new AutoClearEditor());
+        tblOpening.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+                .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
 
-        if (journalStockOpeningTableModel.getListStockOpening().isEmpty()) {
-            searchOpening();
-        }
     }
 
     private void searchOpening() {
         loadingObserver.load(this.getName(), "Start");
+        if (txtDepartment.getText().isEmpty()) {
+            depId = "-";
+        }
+        LOGGER.info("Start Date :" + stDate + "," + "End Date :" + enDate + "," + "Department :" + depId);
         taskExecutor.execute(() -> {
-            List listOp = sovService.search(stDate, enDate,
+            List<VStockOpValue> listOp = sovService.search(stDate, enDate,
                     Util1.isNull(coaCode, "-"), Util1.isNull(currency, "-"),
                     Util1.isNull(depId, "-"), Global.compId.toString());
-            List<VStockOpValue> listOPValue = (List<VStockOpValue>) (List<?>) listOp;
-            journalStockOpeningTableModel.setListStockOpening(listOPValue);
+            //List<VStockOpValue> listOPValue = (List<VStockOpValue>) (List<?>) listOp;
+            journalStockOpeningTableModel.setListStockOpening(listOp);
             loadingObserver.load(this.getName(), "Stop");
         });
     }
@@ -163,10 +166,6 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
             JOptionPane.showMessageDialog(Global.parentForm, "Select Department.");
             txtDepartment.requestFocus();
             status = false;
-        } else if (currency == null) {
-            JOptionPane.showMessageDialog(Global.parentForm, "Select Department.");
-            txtCurrency.requestFocus();
-            status = false;
         } else if (stDate == null) {
             JOptionPane.showMessageDialog(Global.parentForm, "Select Date.");
             txtDate.requestFocus();
@@ -178,18 +177,11 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
     private void getNewStockOpValue() {
         if (isValidEntry()) {
             String userId = Global.loginUser.getUserId().toString();
-            SystemPropertyKey key = new SystemPropertyKey();
-            key.setCompCode(Global.compId);
-            key.setPropKey("system.stockop.parentid");
-            SystemProperty sp = spService.findById(key);
-            String[] coaIds = sp.getPropValue().split(",");
+            String[] coaIds = Global.sysProperties.get("system.stockop.parentid").split(",");
             CurrencyKey curKey = new CurrencyKey();
             curKey.setCode(currency);
             curKey.setCompCode(Global.compId);
-            Currency curr = curService.findById(curKey);
-
             Department oDept = deptService.findById(depId);
-
             List<VStockOpValue> listVSO = new ArrayList();
             for (String tmpId : coaIds) {
                 List<ChartOfAccount> listCOA = coaService.getAllChild(tmpId, Global.compId.toString());
@@ -203,7 +195,7 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
                     tmpVSOV.setCoaNameEng(coa.getCoaNameEng());
                     return tmpVSOV;
                 }).map(tmpVSOV -> {
-                    tmpVSOV.setCurrName(curr.getCurrencyName());
+                    tmpVSOV.setCurrName(Global.defalutCurrency.getCurrencyName());
                     return tmpVSOV;
                 }).map(tmpVSOV -> {
                     tmpVSOV.setDeptCodeUsr(oDept.getUsrCode());
@@ -220,15 +212,16 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
                 }).map(tmpVSOV -> {
                     String strSOV = gson.toJson(tmpVSOV);
                     StockOpValue sov = gson.fromJson(strSOV, StockOpValue.class);
-                    sov.getKey().setTranDate(Util1.toDate(stDate));
+                    sov.getKey().setTranDate(Util1.toDate(stDate, "dd/MM/yyyy"));
                     sov.setCreatedDate(new Date());
+                    sov.getKey().setCurrency(Global.defalutCurrency.getKey().getCode());
                     try {
                         sovService.save(sov, userId);
                     } catch (Exception e) {
                         LOGGER.error("Save StockOpening :" + e.getMessage());
                         JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Save StockOpening", JOptionPane.ERROR_MESSAGE);
                     }
-                    tmpVSOV.getKey().setTranDate(Util1.toDate(stDate));
+                    tmpVSOV.getKey().setTranDate(Util1.toDate(stDate, "dd/MM/yyyy"));
                     return tmpVSOV;
                 }).map(tmpVSOV -> {
                     tmpVSOV.setCreatedDate(new Date());
@@ -238,6 +231,7 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
                 });
             }
         }
+        searchOpening();
     }
 
     /**
@@ -282,6 +276,7 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
         jLabel3.setText("Currency");
 
         txtCurrency.setFont(Global.textFont);
+        txtCurrency.setDisabledTextColor(new java.awt.Color(0, 0, 0));
         txtCurrency.setEnabled(false);
         txtCurrency.setName("txtCurrency"); // NOI18N
 
@@ -374,6 +369,7 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
         if (!isShown) {
             initMain();
         }
+        searchOpening();
     }//GEN-LAST:event_formComponentShown
 
     private void btnNewEntryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewEntryActionPerformed

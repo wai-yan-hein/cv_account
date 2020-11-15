@@ -11,6 +11,7 @@ import com.google.firebase.FirebaseOptions;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,16 +28,19 @@ public class FireBaseConfig {
 
     @PostConstruct
     public void initialize() {
-        try {
-            InputStream serviceAccount = this.getClass().getResourceAsStream("/firebase/fb-sdk.json");
-            FirebaseOptions options = new FirebaseOptions.Builder()
-                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                    .setDatabaseUrl("https://cv-account.firebaseio.com")
-                    .build();
-
-            FirebaseApp.initializeApp(options);
-        } catch (IOException e) {
-            LOGGER.error("FBIntialize :" + e.getMessage());
+        List<FirebaseApp> apps = FirebaseApp.getApps();
+        if (apps == null) {
+            LOGGER.info("Firebase Intializing.");
+            try {
+                InputStream serviceAccount = this.getClass().getResourceAsStream("/firebase/fb-sdk.json");
+                FirebaseOptions options = new FirebaseOptions.Builder()
+                        .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                        .setDatabaseUrl("https://cv-account.firebaseio.com")
+                        .build();
+                FirebaseApp.initializeApp(options);
+            } catch (IOException e) {
+                LOGGER.error("FBIntialize :" + e.getMessage());
+            }
         }
 
     }

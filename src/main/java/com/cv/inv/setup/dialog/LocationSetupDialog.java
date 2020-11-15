@@ -74,7 +74,7 @@ public class LocationSetupDialog extends javax.swing.JDialog implements KeyListe
     };
 
     public LocationSetupDialog() {
-        super(new JFrame(), true);
+        super(Global.parentForm, true);
         initComponents();
         initPopup();
         initKeyListener();
