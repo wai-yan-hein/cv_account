@@ -24,6 +24,7 @@ import javax.persistence.Transient;
 public class StockIssueDetailHis implements java.io.Serializable {
 
     private Long tranId;
+    private String issueId;
     private Stock issueStock;
     private Float unitQty;
     private StockUnit itemUnit;
@@ -148,4 +149,14 @@ public class StockIssueDetailHis implements java.io.Serializable {
     public void setStrOutstanding(String strOutstanding) {
         this.strOutstanding = strOutstanding;
     }
+
+    @Column(name = "issue_id", length = 15)
+    public String getIssueId() {
+        return issueId;
+    }
+
+    public void setIssueId(String issueId) {
+        this.issueId = issueId;
+    }
+
 }

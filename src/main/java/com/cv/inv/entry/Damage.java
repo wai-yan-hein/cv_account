@@ -203,8 +203,6 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
             rohh2.setUpdatedBy(Global.loginUser);
             rohh2.setUpdatedDate(Util1.getTodayDate());
         }
-        rohh2.setDmgVouId(txtVouNo.getText());
-
         rohh2.setDeleted(Util1.getNullTo(rohh2.isDeleted()));
         rohh2.setTotalAmount(Util1.getDouble(txtTotalAmount.getText()));
         if (locCompleter.getLocation() != null) {

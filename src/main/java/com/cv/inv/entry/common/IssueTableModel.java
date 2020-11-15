@@ -35,6 +35,8 @@ public class IssueTableModel extends AbstractTableModel {
     private JTable parent;
     private SelectionObserver callBack;
     private List<StockIssueDetailHis> listDetail = new ArrayList();
+    private String issueId;
+    private List<String> delList = new ArrayList();
 
     public void setParent(JTable parent) {
         this.parent = parent;
@@ -121,9 +123,9 @@ public class IssueTableModel extends AbstractTableModel {
                 case 3://desc
                     return sidh.getIssueStock().getStockName();
                 case 4://t-code
-                    return sidh.getTrader().getTraderId();
+                //  return sidh.getTrader().getTraderId();
                 case 5://trader name
-                    return sidh.getTrader().getTraderName();
+                //  return sidh.getTrader().getTraderName();
                 case 6://outstand
                     return sidh.getStrOutstanding();
                 case 7://qty
@@ -149,7 +151,7 @@ public class IssueTableModel extends AbstractTableModel {
             case 4: //T-Code
             case 5: //Trader Name
             case 6: //Outstanding
-            case 10: //Balance
+            case 9: //Balance
                 return String.class;
             case 7: //Qty
                 return Float.class;
@@ -170,7 +172,7 @@ public class IssueTableModel extends AbstractTableModel {
 
         try {
             StockIssueDetailHis record = listDetail.get(row);
-             switch (column) {
+            switch (column) {
                 case 0: //Option
                     //srdh.setRecOption((String)value);
                     break;
@@ -178,30 +180,31 @@ public class IssueTableModel extends AbstractTableModel {
                     //srdh.setRefVou((String)value);
                     break;
                 case 2: //Med Code
-                   if (value != null) {
+                    if (value != null) {
                         if (value instanceof Stock) {
                             Stock stock = (Stock) value;
                             record.setIssueStock(stock);
                             record.setUnitQty(1.0f);
                             record.setItemUnit(stock.getSaleUnit());
+                            record.setIssueOpt("Issue");
+                            record.setRefVou(getIssueId());
+                            Global.hasQtyInSmallest.put(record.getIssueStock().getStockCode() + "-"
+                                    + record.getItemUnit().getItemUnitCode(), record.getSmallestQty());
                             addEmptyRow();
-                            parent.setColumnSelectionInterval(2, 2);
+                            parent.setColumnSelectionInterval(7, 7);
                         }
                     }
                     break;
                 case 3: //Medicine
                     break;
                 case 4: //T-Code                    
-                  
+
                     break;
                 case 5: //Trader Name
                     break;
                 case 6: //Outstanding
                     break;
-                case 7: //Exp-Date
-                
-                    break;
-                case 8: //Qty
+                case 7: //Qty
                     if (value != null) {
                         Float qty = NumberUtil.NZeroFloat(value);
                         if (qty <= 0) {
@@ -210,7 +213,15 @@ public class IssueTableModel extends AbstractTableModel {
 
                         } else {
                             record.setUnitQty(qty);
-                          //  record.setAmount(Util1.getFloat(record.getUnitQty()) * Util1.getDouble(record.getCostPrice()));
+//                            if (record.getItemUnit() != null) {
+//                                String unit = record.getItemUnit().getItemUnitCode();
+//                                Float smallqty = (float) Global.hasQtyInSmallest.get(record.getIssueStock().getStockCode() + "-" + unit);
+//                                record.setSmallestQty(record.getUnitQty() * smallqty);
+//                                float tmpBalance = NumberUtil.NZeroFloat(record.getOutsBalance())
+//                                        - (record.getUnitQty() * smallqty);
+//                                record.setBalance(tmpBalance + unit);
+//                            }
+                            //  record.setAmount(Util1.getFloat(record.getUnitQty()) * Util1.getDouble(record.getCostPrice()));
                             if ((row + 1) <= listDetail.size()) {
                                 parent.setRowSelectionInterval(row + 1, row + 1);
                             }
@@ -220,10 +231,12 @@ public class IssueTableModel extends AbstractTableModel {
                     }
                     break;
                 case 9: //Unit
-                     if (value != null) {
+                    if (value != null) {
                         if (value instanceof StockUnit) {
                             StockUnit st = (StockUnit) value;
                             record.setItemUnit(st);
+                            ///
+
                             //    String toUnit = record.getUnit().getItemUnitCode();
                             //   Float calAmount = calPrice(record, toUnit);
                             //   record.setCostPrice(Util1.getDouble(calAmount));
@@ -231,7 +244,7 @@ public class IssueTableModel extends AbstractTableModel {
                         }
                     }
                     break;
-               
+
                 case 10: //Balance
                     break;
                 default:
@@ -246,24 +259,24 @@ public class IssueTableModel extends AbstractTableModel {
         callBack.selected("STM-TOTAL", "STM-TOTAL");
     }
 
-    public void add(StockOutstanding outs) {
-        if (listDetail != null) {
-            StockIssueDetailHis sidh = new StockIssueDetailHis();
-
-            sidh.setBalance(outs.getQtyStr());
-            sidh.setOutsBalance(outs.getBalanceQty());
-            sidh.setIssueStock(outs.getStock());
-            sidh.setIssueOpt(outs.getTranOption());
-            sidh.setRefVou(outs.getInvId());
-            sidh.setStrOutstanding(outs.getQtyStr());
-
-            listDetail.add(sidh);
-            fireTableRowsInserted(listDetail.size() - 1, listDetail.size() - 1);
-        }
-    }
-
+//    public void add(StockOutstanding outs) {
+//        if (listDetail != null) {
+//            StockIssueDetailHis sidh = new StockIssueDetailHis();
+//
+//            sidh.setBalance(outs.getQtyStr());
+//            sidh.setOutsBalance(outs.getBalanceQty());
+//            sidh.setIssueStock(outs.getStock());
+//            sidh.setIssueOpt(outs.getTranOption());
+//            sidh.setRefVou(outs.getInvId());
+//            sidh.setStrOutstanding(outs.getQtyStr());
+//
+//            listDetail.add(sidh);
+//            fireTableRowsInserted(listDetail.size() - 1, listDetail.size() - 1);
+//        }
+//    }
     public void removeListDetail() {
         this.listDetail.clear();
+        addEmptyRow();
         fireTableDataChanged();
     }
 
@@ -303,4 +316,68 @@ public class IssueTableModel extends AbstractTableModel {
         this.callBack = callBack;
     }
 
+    public String getIssueId() {
+        return issueId;
+    }
+
+    public void setIssueId(String issueId) {
+        this.issueId = issueId;
+    }
+
+    public List<StockIssueDetailHis> getDetail() {
+        List<StockIssueDetailHis> listRetInDetail = new ArrayList();
+        for (StockIssueDetailHis pdh2 : listDetail) {
+            if (pdh2.getIssueStock() != null) {
+                if (pdh2.getIssueStock().getStockCode() != null) {
+                    listRetInDetail.add(pdh2);
+                }
+            }
+        }
+
+        return listRetInDetail;
+    }
+
+    public List<String> getDelList() {
+        return delList;
+    }
+
+    public void delete(int row) {
+        if (listDetail == null) {
+            return;
+        }
+
+        if (listDetail.isEmpty()) {
+            return;
+        }
+
+        StockIssueDetailHis sdh = listDetail.get(row);
+        if (sdh.getTranId() != null) {
+            delList.add(sdh.getTranId().toString());
+        }
+
+        listDetail.remove(row);
+
+        if (!hasEmptyRow()) {
+            addEmptyRow();
+        }
+
+        //  callBack.selected("STM-TOTAL", "STM-TOTAL");
+        fireTableRowsDeleted(row, row);
+        if (row - 1 >= 0) {
+            parent.setRowSelectionInterval(row - 1, row - 1);
+        } else {
+            parent.setRowSelectionInterval(0, 0);
+        }
+    }
+
+    public void setStockIssueDetailList(List<StockIssueDetailHis> listIssueDetail) {
+        this.listDetail = listIssueDetail;
+
+        if (!hasEmptyRow()) {
+            addEmptyRow();
+        }
+        fireTableCellUpdated(listDetail.size() - 1, listDetail.size() - 1);
+
+        fireTableDataChanged();
+    }
 }
