@@ -35,6 +35,7 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
@@ -124,6 +125,8 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
         tblDamage.setDefaultRenderer(Float.class, new TableCellRender());
         tblDamage.setDefaultRenderer(Double.class, new TableCellRender());
         tblDamage.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tblDamage.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+                .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
         tblDamage.getSelectionModel().addListSelectionListener((ListSelectionEvent e) -> {
             //     txtRecNo.setText(Integer.toString(tblDamage.getSelectedRow() + 1));
         });

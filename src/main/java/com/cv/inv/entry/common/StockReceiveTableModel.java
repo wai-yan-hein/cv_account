@@ -207,7 +207,7 @@ public class StockReceiveTableModel extends AbstractTableModel {
                             if ((row + 1) <= listDetail.size()) {
                                 parent.setRowSelectionInterval(row + 1, row + 1);
                             }
-                            parent.setColumnSelectionInterval(0, 0); //Move to Code
+                            parent.setColumnSelectionInterval(3, 3); //Move to Code
 
                         }
                     }

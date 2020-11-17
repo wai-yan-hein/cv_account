@@ -8,10 +8,8 @@ package com.cv.inv.entry.common;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.util.NumberUtil;
-import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.Stock;
 import com.cv.inv.entity.StockIssueDetailHis;
-import com.cv.inv.entity.StockOutstanding;
 import com.cv.inv.entity.StockUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -225,7 +223,7 @@ public class IssueTableModel extends AbstractTableModel {
                             if ((row + 1) <= listDetail.size()) {
                                 parent.setRowSelectionInterval(row + 1, row + 1);
                             }
-                            parent.setColumnSelectionInterval(0, 0); //Move to Code
+                            parent.setColumnSelectionInterval(2, 2); //Move to Code
 
                         }
                     }

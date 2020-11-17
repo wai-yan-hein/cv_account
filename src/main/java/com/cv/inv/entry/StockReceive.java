@@ -34,6 +34,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
@@ -94,6 +95,7 @@ public class StockReceive extends javax.swing.JPanel implements SelectionObserve
         tblStockReceive.getTableHeader().setFont(Global.lableFont);
         receiveTableModel.addEmptyRow();
         receiveTableModel.setCallBack(this);
+        tblStockReceive.setCellSelectionEnabled(true);
 
         tblStockReceive.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblStockReceive.getColumnModel().getColumn(0).setPreferredWidth(10);
@@ -115,6 +117,8 @@ public class StockReceive extends javax.swing.JPanel implements SelectionObserve
         tblStockReceive.getColumnModel().getColumn(3).setCellEditor(new StockCellEditor());
         tblStockReceive.getColumnModel().getColumn(7).setCellEditor(new AutoClearEditor());
         tblStockReceive.getColumnModel().getColumn(8).setCellEditor(new StockUnitEditor());
+        tblStockReceive.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+                .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
 
     }
 
@@ -188,7 +192,7 @@ public class StockReceive extends javax.swing.JPanel implements SelectionObserve
         if (yes_no == 0) {
             String vouNo = txtId.getText();
             if (lblStatus.getText().equals("EDIT")) {
-                  rhService.delete(vouNo);
+                rhService.delete(vouNo);
                 clear();
             }
         }

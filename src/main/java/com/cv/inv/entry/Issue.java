@@ -35,6 +35,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
@@ -99,6 +100,7 @@ public class Issue extends javax.swing.JPanel implements SelectionObserver, KeyL
         tblIssue.getTableHeader().setFont(Global.lableFont);
         issueTableModel.addEmptyRow();
         issueTableModel.setCallBack(this);
+        tblIssue.setCellSelectionEnabled(true);
         tblIssue.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         tblIssue.getColumnModel().getColumn(0).setPreferredWidth(10);
@@ -120,6 +122,8 @@ public class Issue extends javax.swing.JPanel implements SelectionObserver, KeyL
         tblIssue.setDefaultRenderer(Object.class, new TableCellRender());
         tblIssue.setDefaultRenderer(Float.class, new TableCellRender());
         tblIssue.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tblIssue.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+                .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
         tblIssue.getSelectionModel().addListSelectionListener((ListSelectionEvent e) -> {
             //     txtRecNo.setText(Integer.toString(tblDamage.getSelectedRow() + 1));
         });
