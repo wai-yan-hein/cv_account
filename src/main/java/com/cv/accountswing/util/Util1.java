@@ -609,13 +609,11 @@ public class Util1 {
 
     }
 
-    public static JDialog getLoading(JFrame jframe) {
-        JDialog dialog = new JDialog(jframe, false);
+    public static JDialog getLoading(JDialog owner, ImageIcon icon) {
+        JDialog dialog = new JDialog(owner, false);
         dialog.getContentPane().setBackground(Color.white);
         dialog.setSize(70, 70);
         dialog.getContentPane().setLayout(new BorderLayout());
-        ImageIcon icon = new ImageIcon("./src/main/resources/images/loading.gif");
-
         JLabel lblImg = new JLabel(icon);
         lblImg.setLocation(70, 0);
         dialog.add(lblImg);

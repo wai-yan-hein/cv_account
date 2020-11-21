@@ -24,6 +24,7 @@ import com.cv.accountswing.util.Util1;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.List;
+import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -55,6 +56,7 @@ public class RoleSetup extends javax.swing.JPanel implements KeyListener, PanelC
     private TaskExecutor taskExecutor;
     @Autowired
     private ApplicationMainFrame mainFrame;
+    private final ImageIcon loadingIcon = new ImageIcon(this.getClass().getResource("/images/process.gif"));
 
     private int selectRow = -1;
     private boolean isShown = false;
@@ -103,16 +105,13 @@ public class RoleSetup extends javax.swing.JPanel implements KeyListener, PanelC
     }
 
     private void createTree(String roleId) {
-        JDialog loading = Util1.getLoading(Global.parentForm);
         taskExecutor.execute(() -> {
             List<VRoleMenu> listVRM = menuService.getParentChildMenu(roleId);
             VRoleMenu vRoleMenu = new VRoleMenu("Best-System", "System", true, listVRM);
             MyAbstractTreeTableModel treeTableModel = new MyDataModel(vRoleMenu, privilegeService, this);
             MyTreeTable treeTable = new MyTreeTable(treeTableModel);
             scrollPane.getViewport().add(treeTable);
-            loading.setVisible(false);
         });
-        loading.setVisible(true);
     }
 
     private void searchAllUsers() {

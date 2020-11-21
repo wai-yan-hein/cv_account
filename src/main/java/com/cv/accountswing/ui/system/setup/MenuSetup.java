@@ -267,7 +267,7 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
     private void setMenu(VRoleMenu menu) {
         txtMenuName.setText(menu.getMenuName());
         txtMenuUrl.setText(menu.getMenuUrl());
-        txtOrder.setText(menu.getOrderBy().toString());
+        txtOrder.setText(menu.getOrderBy() == null ? null : menu.getOrderBy().toString());
     }
 
     private void clear() {

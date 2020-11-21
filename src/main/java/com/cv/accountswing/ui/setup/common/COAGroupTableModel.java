@@ -145,6 +145,7 @@ public class COAGroupTableModel extends AbstractTableModel {
     private void save(ChartOfAccount coa, int row) {
         coa.setParent(coaHeadCode);
         coa.setCompCode(Global.compId);
+        coa.setActive(Boolean.TRUE);
         if (isValidCOA(coa, Global.compId.toString(), Global.loginUser.getUserId().toString())) {
             ChartOfAccount save = coaService.save(coa);
             if (save.getCode() != null) {

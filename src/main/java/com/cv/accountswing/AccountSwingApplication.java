@@ -85,7 +85,7 @@ public class AccountSwingApplication {
                 }
             });
             loginDialog.setIconImage(accIcon.getImage());
-            loginDialog.startThread();
+            loginDialog.checkMachineRegister();
             loginDialog.setLocationRelativeTo(null);
             loginDialog.setVisible(true);
             if (loginDialog.isLogin()) {
@@ -109,6 +109,8 @@ public class AccountSwingApplication {
                     Global.roleId = listVUCA.get(0).getKey().getRoleId();
                     Global.compId = listVUCA.get(0).getKey().getCompCode();
                     Global.companyName = listVUCA.get(0).getCompName();
+                    LOGGER.info("Role Id {}", Global.roleId);
+                    LOGGER.info("Company Id {}", Global.compId);
 
                     ApplicationMainFrame appMain = context.getBean(ApplicationMainFrame.class);
                     java.awt.EventQueue.invokeLater(() -> {

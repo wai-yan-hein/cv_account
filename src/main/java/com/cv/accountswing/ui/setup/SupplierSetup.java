@@ -49,7 +49,7 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-public class SupplierSetup extends javax.swing.JPanel implements KeyListener, PanelControl,FilterObserver {
+public class SupplierSetup extends javax.swing.JPanel implements KeyListener, PanelControl, FilterObserver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Supplier.class);
     private int selectRow = -1;
@@ -196,6 +196,7 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener, Pa
                 JOptionPane.showMessageDialog(Global.parentForm, "Saved");
                 if (lblStatus.getText().equals("NEW")) {
                     supplierTabelModel.addCustomer(customer);
+                    Global.listTrader.add(customer);
                 } else {
                     supplierTabelModel.setCustomer(selectRow, customer);
                 }
@@ -239,6 +240,7 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener, Pa
         tblCustomer.addKeyListener(this);
 
     }
+
     private void setTableFilter(String filter) {
         sorter.setRowFilter(RowFilter.regexFilter(filter));
     }

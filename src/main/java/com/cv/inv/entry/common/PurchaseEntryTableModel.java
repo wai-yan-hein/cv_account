@@ -451,6 +451,10 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
         boolean status = true;
         int uniqueId = 1;
         for (PurchaseDetail sdh2 : listPurDetail) {
+            if (sdh2.getLocation() == null) {
+                JOptionPane.showMessageDialog(Global.parentForm, "Invalid Location");
+                status = false;
+            }
             if (uniqueId != listPurDetail.size()) {
                 if (Util1.NZeroDouble(sdh2.getAvgWeight()) > Util1.NZeroDouble(sdh2.getStdWeight())) {
                     JOptionPane.showMessageDialog(Global.parentForm, "Avg cannot greater than Std.",
@@ -525,5 +529,4 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
         this.callBack = callBack;
     }
 
-  
 }
