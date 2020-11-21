@@ -10,15 +10,33 @@ import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.ui.ApplicationMainFrame;
+import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.util.Util1;
+import com.cv.inv.entity.StockReceiveDetailHis;
+import com.cv.inv.entity.StockReceiveHis;
 import com.cv.inv.entry.common.StockReceiveTableModel;
+import com.cv.inv.entry.dialog.StockReceiveListDialog;
 import com.cv.inv.entry.editor.LocationAutoCompleter;
+import com.cv.inv.entry.editor.StockCellEditor;
+import com.cv.inv.entry.editor.StockUnitEditor;
+import com.cv.inv.service.StockReceiveDetailHisService;
+import com.cv.inv.service.StockReceiveHisService;
+import com.cv.inv.service.VouIdService;
+import com.cv.inv.util.GenVouNoImpl;
 import com.toedter.calendar.JTextFieldDateEditor;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.Date;
+import java.util.List;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +55,9 @@ public class StockReceive extends javax.swing.JPanel implements SelectionObserve
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(Issue.class);
     private LoadingObserver loadingObserver;
     private boolean isShown = false;
+    private GenVouNoImpl vouEngine = null;
+    private StockReceiveHis rohh2 = new StockReceiveHis();
+    private LocationAutoCompleter locCompleter;
 
     public void setLoadingObserver(LoadingObserver loadingObserver) {
         this.loadingObserver = loadingObserver;
@@ -45,6 +66,14 @@ public class StockReceive extends javax.swing.JPanel implements SelectionObserve
     private StockReceiveTableModel receiveTableModel;
     @Autowired
     private ApplicationMainFrame mainFrame;
+    @Autowired
+    private VouIdService voudIdService;
+    @Autowired
+    private StockReceiveHisService rhService;
+    @Autowired
+    private StockReceiveListDialog receiveSearchDialog;
+    @Autowired
+    private StockReceiveDetailHisService rDetailService;
 
     public StockReceive() {
         initComponents();
@@ -55,12 +84,19 @@ public class StockReceive extends javax.swing.JPanel implements SelectionObserve
         initKeyListener();
         setTodayDate();
         initCombo();
+        genVouNo();
+        actionMapping();
+        isShown = true;
     }
 
     private void initTable() {
         tblStockReceive.setModel(receiveTableModel);
         receiveTableModel.setParent(tblStockReceive);
         tblStockReceive.getTableHeader().setFont(Global.lableFont);
+        receiveTableModel.addEmptyRow();
+        receiveTableModel.setCallBack(this);
+        tblStockReceive.setCellSelectionEnabled(true);
+
         tblStockReceive.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblStockReceive.getColumnModel().getColumn(0).setPreferredWidth(10);
         tblStockReceive.getColumnModel().getColumn(1).setPreferredWidth(90);
@@ -75,6 +111,15 @@ public class StockReceive extends javax.swing.JPanel implements SelectionObserve
 
         tblStockReceive.setDefaultRenderer(Boolean.class, new TableCellRender());
         tblStockReceive.setDefaultRenderer(Object.class, new TableCellRender());
+        tblStockReceive.setDefaultRenderer(Float.class, new TableCellRender());
+        tblStockReceive.setDefaultRenderer(Object.class, new TableCellRender());
+
+        tblStockReceive.getColumnModel().getColumn(3).setCellEditor(new StockCellEditor());
+        tblStockReceive.getColumnModel().getColumn(7).setCellEditor(new AutoClearEditor());
+        tblStockReceive.getColumnModel().getColumn(8).setCellEditor(new StockUnitEditor());
+        tblStockReceive.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+                .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
+
     }
 
     private void initKeyListener() {
@@ -100,8 +145,104 @@ public class StockReceive extends javax.swing.JPanel implements SelectionObserve
     }
 
     private void initCombo() {
-        LocationAutoCompleter locAutoCompleter = new LocationAutoCompleter(txtLocation, Global.listLocation, null);
-        locAutoCompleter.setSelectionObserver(this);
+        locCompleter = new LocationAutoCompleter(txtLocation, Global.listLocation, null);
+        locCompleter.setSelectionObserver(this);
+    }
+
+    private void clear() {
+        receiveTableModel.removeListDetail();
+
+        lblStatus.setText("NEW");
+        if (Global.loginDate != null) {
+            txtDate.setDate(Util1.toDate(Global.loginDate, "dd/MM/yyyy"));
+        } else {
+            txtDate.setDate(Util1.getTodayDate());
+        }
+        txtRemark.setText(null);
+        genVouNo();
+        isShown = false;
+    }
+
+    private void genVouNo() {
+        vouEngine = new GenVouNoImpl(voudIdService, "Damage", Util1.getPeriod(txtDate.getDate()));
+        txtId.setText(vouEngine.genVouNo());
+    }
+
+    private void actionMapping() {
+        //F8 event on tblRetIn
+        tblStockReceive.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "DELETE");
+        tblStockReceive.getActionMap().put("DELETE", actionItemDelete);
+    }
+    private final Action actionItemDelete = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (tblStockReceive.getSelectedRow() >= 0) {
+                int yes_no = JOptionPane.showConfirmDialog(Global.parentForm,
+                        "Are you sure to delete?", "Return in item delete", JOptionPane.YES_NO_OPTION);
+                if (yes_no == 0) {
+                    receiveTableModel.delete(tblStockReceive.getSelectedRow());
+                }
+            }
+        }
+    };
+
+    public void deleteReceive() {
+        int yes_no = JOptionPane.showConfirmDialog(Global.parentForm,
+                "Are you sure to delete?", "Return in item delete", JOptionPane.YES_NO_OPTION);
+        if (yes_no == 0) {
+            String vouNo = txtId.getText();
+            if (lblStatus.getText().equals("EDIT")) {
+                rhService.delete(vouNo);
+                clear();
+            }
+        }
+    }
+
+    private boolean saveReceive() {
+        boolean status = false;
+        if (isValidEntry()) {
+            List<StockReceiveDetailHis> listDmgDetail = receiveTableModel.getDetail();
+            List<String> delList = receiveTableModel.getDelList();
+
+            try {
+                String vouStatus = lblStatus.getText();
+                rhService.save(rohh2, listDmgDetail, vouStatus, delList);
+                vouEngine.updateVouNo();
+                genVouNo();
+                status = true;
+            } catch (Exception ex) {
+                LOGGER.error("save Receive : " + rohh2.getReceivedId() + " : " + ex.getMessage());
+            }
+        }
+        return status;
+    }
+
+    private boolean isValidEntry() {
+        boolean status = true;
+
+        rohh2.setReceivedId(txtId.getText());
+        rohh2.setRemark(txtRemark.getText());
+        if (lblStatus.getText().equals("NEW")) {
+            rohh2.setReceiveDate(txtDate.getDate());
+            rohh2.setCreatedBy(Global.loginUser);
+        } else {
+            Date tmpDate = txtDate.getDate();
+            if (!Util1.isSameDate(tmpDate, rohh2.getReceiveDate())) {
+                rohh2.setReceiveDate(txtDate.getDate());
+            }
+            rohh2.setUpdatedBy(Global.loginUser);
+            rohh2.setUpdatedDate(Util1.getTodayDate());
+        }
+        rohh2.setDeleted(Util1.getNullTo(rohh2.isDeleted()));
+        if (locCompleter.getLocation() != null) {
+            rohh2.setLocation(locCompleter.getLocation());
+        } else {
+            JOptionPane.showMessageDialog(Global.parentForm, "Location cannot be null.",
+                    "Invalid.", JOptionPane.ERROR_MESSAGE);
+            status = false;
+        }
+
+        return status;
     }
 
     /**
@@ -126,6 +267,7 @@ public class StockReceive extends javax.swing.JPanel implements SelectionObserve
         txtDate = new com.toedter.calendar.JDateChooser();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblStockReceive = new javax.swing.JTable();
+        lblStatus = new javax.swing.JLabel();
 
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentShown(java.awt.event.ComponentEvent evt) {
@@ -172,7 +314,7 @@ public class StockReceive extends javax.swing.JPanel implements SelectionObserve
                 .addContainerGap()
                 .addComponent(jLabel1)
                 .addGap(18, 18, 18)
-                .addComponent(txtId, javax.swing.GroupLayout.DEFAULT_SIZE, 143, Short.MAX_VALUE)
+                .addComponent(txtId, javax.swing.GroupLayout.DEFAULT_SIZE, 147, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addComponent(jLabel2)
                 .addGap(18, 18, 18)
@@ -180,11 +322,11 @@ public class StockReceive extends javax.swing.JPanel implements SelectionObserve
                 .addGap(18, 18, 18)
                 .addComponent(jLabel3)
                 .addGap(18, 18, 18)
-                .addComponent(txtLocation, javax.swing.GroupLayout.DEFAULT_SIZE, 143, Short.MAX_VALUE)
+                .addComponent(txtLocation, javax.swing.GroupLayout.DEFAULT_SIZE, 147, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addComponent(jLabel4)
                 .addGap(18, 18, 18)
-                .addComponent(txtRemark, javax.swing.GroupLayout.DEFAULT_SIZE, 143, Short.MAX_VALUE)
+                .addComponent(txtRemark, javax.swing.GroupLayout.DEFAULT_SIZE, 147, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addComponent(jLabel5)
                 .addGap(18, 18, 18)
@@ -224,6 +366,9 @@ public class StockReceive extends javax.swing.JPanel implements SelectionObserve
         ));
         jScrollPane1.setViewportView(tblStockReceive);
 
+        lblStatus.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
+        lblStatus.setText("NEW");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -232,7 +377,10 @@ public class StockReceive extends javax.swing.JPanel implements SelectionObserve
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 926, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 926, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblStatus)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -241,7 +389,9 @@ public class StockReceive extends javax.swing.JPanel implements SelectionObserve
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 343, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 301, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblStatus)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -250,6 +400,9 @@ public class StockReceive extends javax.swing.JPanel implements SelectionObserve
         mainFrame.setControl(this);
         if (!isShown) {
             initMain();
+            if (txtId != null) {
+                receiveTableModel.setReceiveId(txtId.getText());
+            }
         }
         txtId.requestFocus();
     }//GEN-LAST:event_formComponentShown
@@ -264,6 +417,7 @@ public class StockReceive extends javax.swing.JPanel implements SelectionObserve
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lblStatus;
     private javax.swing.JTable tblStockReceive;
     private com.toedter.calendar.JDateChooser txtDate;
     private javax.swing.JTextField txtId;
@@ -273,7 +427,32 @@ public class StockReceive extends javax.swing.JPanel implements SelectionObserve
 
     @Override
     public void selected(Object source, Object selectObj) {
+        switch (source.toString()) {
+            case "ReceiveVouList":
+        try {
+                StockReceiveHis vRetIn = (StockReceiveHis) selectObj;
+                rohh2 = rhService.findById(vRetIn.getReceivedId());
 
+                if (Util1.getNullTo(rohh2.isDeleted())) {
+                    lblStatus.setText("DELETED");
+                } else {
+                    lblStatus.setText("EDIT");
+                }
+
+                txtId.setText(rohh2.getReceivedId());
+                txtRemark.setText(rohh2.getRemark());
+                txtDate.setDate(rohh2.getReceiveDate());
+                locCompleter.setLocation(rohh2.getLocation());
+                List<StockReceiveDetailHis> listDetail = rDetailService.search(rohh2.getReceivedId());
+                receiveTableModel.setStockReceiveDetailList(listDetail);
+
+            } catch (Exception ex) {
+                LOGGER.error("selected : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.toString());
+
+            }
+
+            break;
+        }
     }
 
     @Override
@@ -356,10 +535,14 @@ public class StockReceive extends javax.swing.JPanel implements SelectionObserve
 
     @Override
     public void save() {
+        if (saveReceive()) {
+            clear();
+        }
     }
 
     @Override
     public void delete() {
+        deleteReceive();
     }
 
     @Override
@@ -368,6 +551,11 @@ public class StockReceive extends javax.swing.JPanel implements SelectionObserve
 
     @Override
     public void history() {
+        receiveSearchDialog.setSize(Global.width - 200, Global.height - 200);
+        receiveSearchDialog.setLocationRelativeTo(null);
+        receiveSearchDialog.setSelectionObserver(this);
+        receiveSearchDialog.setVisible(true);
+
     }
 
     @Override

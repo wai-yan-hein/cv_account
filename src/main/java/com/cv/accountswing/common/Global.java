@@ -102,5 +102,7 @@ public class Global {
     public static Currency defalutCurrency;
     //default department
     public static Department defaultDepartment;
+    
+    public static HashMap<String, Float> hasQtyInSmallest = new HashMap();
 
 }
