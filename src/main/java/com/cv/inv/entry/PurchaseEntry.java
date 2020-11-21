@@ -169,27 +169,27 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
         tblPurchase.getColumnModel().getColumn(7).setCellEditor(new AutoClearEditor());//avg-wt
         tblPurchase.getColumnModel().getColumn(8).setCellEditor(new AutoClearEditor());//pur price
         tblPurchase.getColumnModel().getColumn(9).setCellEditor(new AutoClearEditor());//amt
-        addPurTableModelListener();
-        if (Util1.getPropValue("system.default.department").equals("1-003")) {
-            JComboBox cboDepartmentCell = new JComboBox();
-            cboDepartmentCell.setFont(Global.textFont);
-            BindingUtil.BindCombo(cboDepartmentCell, departmentService.findAll());
-            tblPurchase.getColumnModel().getColumn(2).setCellEditor(new DefaultCellEditor(cboDepartmentCell));
-            purTableModel.setDepartment((Department) cboDepartmentCell.getSelectedItem());
-            tblPurchase.getColumnModel().getColumn(2).setPreferredWidth(30);
-        }
-        if (Util1.getPropValue("system.default.location").equals("23")) {
-            JComboBox cboLocationCell = new JComboBox();
-            cboLocationCell.setFont(Global.textFont);
-            BindingUtil.BindCombo(cboLocationCell, locationService.findAll());
-            tblPurchase.getColumnModel().getColumn(3).setCellEditor(new DefaultCellEditor(cboLocationCell));
-            purTableModel.setLocation((Location) cboLocationCell.getSelectedItem());
-            tblPurchase.getColumnModel().getColumn(3).setPreferredWidth(30);
-        }
+        //departement combobox
+        JComboBox cboDepartmentCell = new JComboBox();
+        cboDepartmentCell.setSelectedItem(Global.defaultDepartment);
+        cboDepartmentCell.setFont(Global.textFont);
+        BindingUtil.BindCombo(cboDepartmentCell, Global.listDepartment);
+        tblPurchase.getColumnModel().getColumn(2).setCellEditor(new DefaultCellEditor(cboDepartmentCell));
+        purTableModel.setDepartment((Department) cboDepartmentCell.getSelectedItem());
+        tblPurchase.getColumnModel().getColumn(2).setPreferredWidth(30);
+        //location combobox
+        JComboBox cboLocationCell = new JComboBox();
+        cboLocationCell.setSelectedItem(Global.defaultLocation);
+        cboLocationCell.setFont(Global.textFont);
+        BindingUtil.BindCombo(cboLocationCell, Global.listLocation);
+        tblPurchase.getColumnModel().getColumn(3).setCellEditor(new DefaultCellEditor(cboLocationCell));
+        purTableModel.setLocation((Location) cboLocationCell.getSelectedItem());
+        tblPurchase.getColumnModel().getColumn(3).setPreferredWidth(30);
+        //table render
         tblPurchase.setDefaultRenderer(Float.class, new TableCellRender());
         tblPurchase.setDefaultRenderer(Double.class, new TableCellRender());
         tblPurchase.setDefaultRenderer(Object.class, new TableCellRender());
-
+        //foucs enter
         tblPurchase.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                 .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
         tblPurchase.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -242,26 +242,6 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
         currAutoCompleter.setSelectionObserver(this);
         traderAutoCompleter = new TraderAutoCompleter(txtSupplier, Global.listTrader, null);
         traderAutoCompleter.setSelectionObserver(this);
-    }
-
-    private void addPurTableModelListener() {
-        tblPurchase.getModel().addTableModelListener(new TableModelListener() {
-            @Override
-            public void tableChanged(TableModelEvent e) {
-                int column = e.getColumn();
-                if (column >= 0) {
-                    switch (column) {
-                        case 0: //Code
-                        case 4: //Qty
-                        case 5://Std-Wt
-                        case 6: //Unit
-                        case 7: //Sale price
-                            calculateTotalAmount();
-                            break;
-                    }
-                }
-            }
-        });
     }
 
     private void assignDefalutValue() {
@@ -554,6 +534,11 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
 
         txtSupplier.setFont(Global.textFont);
         txtSupplier.setName("txtSupplier"); // NOI18N
+        txtSupplier.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtSupplierFocusGained(evt);
+            }
+        });
 
         jLabel4.setFont(Global.lableFont);
         jLabel4.setText("Remark");
@@ -864,6 +849,11 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
         }
         txtVouNo.requestFocus();
     }//GEN-LAST:event_formComponentShown
+
+    private void txtSupplierFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtSupplierFocusGained
+        // TODO add your handling code here:
+        txtSupplier.selectAll();
+    }//GEN-LAST:event_txtSupplierFocusGained
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

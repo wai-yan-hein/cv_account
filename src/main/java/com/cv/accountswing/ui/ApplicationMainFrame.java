@@ -677,6 +677,9 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             //Default department
             String depId = Global.sysProperties.get("system.default.department");
             Global.defaultDepartment = departmentService.findById(depId);
+            //Defatult Loction
+            String locId = Global.sysProperties.get("system.default.location");
+            Global.defaultLocation = locationService.findById(locId);
             getMachinceInfo();
         } catch (Exception e) {
             LOGGER.error("Initialize Data :" + e.getMessage());
