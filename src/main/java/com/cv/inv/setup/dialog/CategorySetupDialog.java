@@ -197,6 +197,7 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
         setTitle("Category Setup");
         setModalityType(java.awt.Dialog.ModalityType.DOCUMENT_MODAL);
 
+        tblCategory.setFont(Global.textFont);
         tblCategory.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},

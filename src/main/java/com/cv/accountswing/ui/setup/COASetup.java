@@ -261,13 +261,13 @@ public class COASetup extends javax.swing.JPanel implements KeyListener, PanelCo
         tblCOAGroupChild.setRowHeight(Global.tblRowHeight);
         jScrollPane3.setViewportView(tblCOAGroupChild);
 
-        jLabel1.setFont(Global.textFont);
+        jLabel1.setFont(Global.menuFont);
         jLabel1.setText("Account Head");
 
-        lblCoaChild.setFont(Global.textFont);
+        lblCoaChild.setFont(Global.menuFont);
         lblCoaChild.setText("...");
 
-        lblCoaGroup.setFont(Global.textFont);
+        lblCoaGroup.setFont(Global.menuFont);
         lblCoaGroup.setText("...");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -301,7 +301,7 @@ public class COASetup extends javax.swing.JPanel implements KeyListener, PanelCo
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(lblCoaChild, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 202, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 202, Short.MAX_VALUE))
                     .addComponent(jScrollPane1))
                 .addGap(10, 10, 10))
         );

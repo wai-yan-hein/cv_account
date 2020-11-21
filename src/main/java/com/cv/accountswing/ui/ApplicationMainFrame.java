@@ -62,12 +62,16 @@ import com.cv.inv.service.SaleManService;
 import com.cv.inv.service.VouStatusService;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.MachineInfo;
+import com.cv.inv.entity.StockBrand;
 import com.cv.inv.entry.SaleEntry;
+import com.cv.inv.service.CategoryService;
 import com.cv.inv.service.ChargeTypeService;
 import com.cv.inv.service.MachineInfoService;
 import com.cv.inv.service.RelationService;
+import com.cv.inv.service.StockBrandService;
 import com.cv.inv.service.StockUnitService;
 import com.cv.inv.service.StockService;
+import com.cv.inv.service.StockTypeService;
 import com.cv.inv.setup.OtherSetup;
 import com.cv.inv.setup.StockSetup;
 import java.awt.Color;
@@ -232,8 +236,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private SaleManService saleManService;
     @Autowired
     private StockService stockService;
-    @Autowired
-    private MachineInfoService machineInfoService;
+
     @Autowired
     private StockUnitService stockUnitService;
     @Autowired
@@ -242,6 +245,14 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private ChargeTypeService chargeTypeService;
     @Autowired
     private SystemPropertyService systemPropertyService;
+    @Autowired
+    private MachineInfoService machineInfoService;
+    @Autowired
+    private StockTypeService stockTypeService;
+    @Autowired
+    private CategoryService categoryService;
+    @Autowired
+    private StockBrandService stockBrandService;
     private PanelControl control;
     private FilterObserver filterObserver;
 
@@ -660,10 +671,12 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             Global.listVou = vouService.findAll();
             Global.listSaleMan = saleManService.findAll();
             Global.listStock = stockService.findActiveStock();
-            Global.listStock = stockService.findAll();
             Global.listStockUnit = stockUnitService.findAll();
             Global.listRelation = relationService.findAll();
             Global.listMachine = machineInfoService.findAll();
+            Global.listStockType = stockTypeService.findAll();
+            Global.listCategory = categoryService.findAll();
+            Global.listStockBrand = stockBrandService.findAll();
             Global.listRelation.forEach(ur -> {
                 Global.hmRelation.put(ur.getUnitKey(), ur.getFactor());
             });
@@ -677,7 +690,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             //Default department
             String depId = Global.sysProperties.get("system.default.department");
             Global.defaultDepartment = departmentService.findById(depId);
-            getMachinceInfo();
         } catch (Exception e) {
             LOGGER.error("Initialize Data :" + e.getMessage());
             JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Initialize Data", JOptionPane.ERROR_MESSAGE);
@@ -1206,28 +1218,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
 
     @Override
     public void keyReleased(KeyEvent e) {
-    }
-
-    private void getMachinceInfo() {
-        Global.machineName = Util1.getComputerName();
-        try {
-            Global.machineId = machineInfoService.getMax(Global.machineName);
-            if (Global.machineId == 0) {
-                String machineName = Util1.getComputerName();
-                String ipAddress = Util1.getIPAddress();
-                MachineInfo machine = new MachineInfo();
-
-                machine.setIpAddress(ipAddress);
-                machine.setMachineName(machineName);
-                machineInfoService.save(machine);
-                Global.machineId = machineInfoService.getMax(Global.machineName);
-
-            }
-
-        } catch (Exception ex) {
-            LOGGER.error("getMachieInfo : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.toString());
-
-        }
     }
 
     @Override

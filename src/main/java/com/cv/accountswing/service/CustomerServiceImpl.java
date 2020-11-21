@@ -32,8 +32,8 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Customer save(Customer cus) {
-        if (cus.getTraderId().isEmpty()) {
-            String tmpTraderId = getTraderId("CUS", "-", String.valueOf(Global.compId));
+        if (cus.getTraderId() == null) {
+            String tmpTraderId = getTraderId("CUS", "-", Global.compId.toString());
             cus.setTraderId(tmpTraderId);
             cus.setCreatedBy(Global.loginUser.getUserId().toString());
         } else {

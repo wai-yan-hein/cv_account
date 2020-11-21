@@ -323,11 +323,13 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
         txtFSalePriceD.addKeyListener(this);
         txtFilter.addKeyListener(this);
         txtPurPrice.addKeyListener(this);
+        txtFPurPriceNo.addKeyListener(this);
         txtRemark.addKeyListener(this);
         txtShortName.addKeyListener(this);
         txtStockCode.addKeyListener(this);
         txtStockName.addKeyListener(this);
         txtTotalCount.addKeyListener(this);
+        txtFSaleUnitNo.addKeyListener(this);
         cboBrand.getEditor().getEditorComponent().addKeyListener(this);
         cboCategory.getEditor().getEditorComponent().addKeyListener(this);
         cboPurPrice.getEditor().getEditorComponent().addKeyListener(this);
@@ -697,6 +699,7 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
         txtFSaleUnitNo.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         txtFSaleUnitNo.setToolTipText("Sale Weight");
         txtFSaleUnitNo.setFont(Global.textFont);
+        txtFSaleUnitNo.setName("txtFSaleUnitNo"); // NOI18N
         txtFSaleUnitNo.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 txtFSaleUnitNoFocusGained(evt);
@@ -724,7 +727,7 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel14, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(txtFSalePriceA, javax.swing.GroupLayout.DEFAULT_SIZE, 69, Short.MAX_VALUE))
+                            .addComponent(txtFSalePriceA))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel15, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -732,11 +735,11 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel16, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(txtFSalePriceC, javax.swing.GroupLayout.DEFAULT_SIZE, 69, Short.MAX_VALUE))
+                            .addComponent(txtFSalePriceC))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel17, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(txtFSalePriceD, javax.swing.GroupLayout.DEFAULT_SIZE, 69, Short.MAX_VALUE))
+                            .addComponent(txtFSalePriceD))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtFCostPrice)
@@ -752,7 +755,7 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(9, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cboSaleUnit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel12)
@@ -780,6 +783,7 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
         txtFPurPriceNo.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         txtFPurPriceNo.setToolTipText("Purchase Weight");
         txtFPurPriceNo.setFont(Global.textFont);
+        txtFPurPriceNo.setName("txtFPurPriceNo"); // NOI18N
         txtFPurPriceNo.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 txtFPurPriceNoFocusGained(evt);
@@ -958,7 +962,7 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
                             .addComponent(txtFilter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtTotalCount, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 508, Short.MAX_VALUE)))
+                        .addComponent(jScrollPane1)))
                 .addContainerGap())
         );
 
@@ -1076,6 +1080,7 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
 
     private void txtFPurPriceNoFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtFPurPriceNoFocusGained
         // TODO add your handling code here:
+        txtFPurPriceNo.selectAll();
     }//GEN-LAST:event_txtFPurPriceNoFocusGained
 
     private void txtPurPriceFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtPurPriceFocusGained
@@ -1435,10 +1440,10 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
             case "txtExpDate":
                 switch (e.getKeyCode()) {
                     case KeyEvent.VK_ENTER:
-                        txtPurPrice.requestFocus();
+                        txtFPurPriceNo.requestFocus();
                         break;
                     case KeyEvent.VK_DOWN:
-                        txtPurPrice.requestFocus();
+                        txtFPurPriceNo.requestFocus();
                         break;
                     case KeyEvent.VK_UP:
                         txtShortName.requestFocus();
@@ -1452,7 +1457,27 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
                      */
                 }
                 tabToTable(e);
-
+                break;
+            case "txtFPurPriceNo":
+                switch (e.getKeyCode()) {
+                    case KeyEvent.VK_ENTER:
+                        cboPurPrice.requestFocus();
+                        break;
+                    case KeyEvent.VK_DOWN:
+                        cboPurPrice.requestFocus();
+                        break;
+                    case KeyEvent.VK_UP:
+                        txtExpDate.requestFocus();
+                        break;
+                    /*case KeyEvent.VK_RIGHT:
+                        btnChNo.requestFocus();
+                        break;
+                        case KeyEvent.VK_LEFT:
+                        txtShortName.requestFocus();
+                        break;
+                     */
+                }
+                tabToTable(e);
                 break;
             case "btnChNo":
                 switch (e.getKeyCode()) {
@@ -1500,16 +1525,16 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
             case "txtPurPrice":
                 switch (e.getKeyCode()) {
                     case KeyEvent.VK_ENTER:
-                        cboPurPrice.requestFocus();
+                        txtFSaleUnitNo.requestFocus();
                         break;
                     case KeyEvent.VK_DOWN:
-                        cboPurPrice.requestFocus();
+                        txtFSaleUnitNo.requestFocus();
                         break;
                     case KeyEvent.VK_UP:
                         btnUnit.requestFocus();
                         break;
                     case KeyEvent.VK_RIGHT:
-                        cboPurPrice.requestFocus();
+                        txtFSaleUnitNo.requestFocus();
                         break;
                     case KeyEvent.VK_LEFT:
                         btnUnit.requestFocus();
@@ -1521,16 +1546,16 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
             case "cboPurPrice":
                 switch (e.getKeyCode()) {
                     case KeyEvent.VK_ENTER:
-                        chkActive.requestFocus();
+                        txtPurPrice.requestFocus();
                         break;
                     case KeyEvent.VK_UP:
-                        txtPurPrice.requestFocus();
+                        txtFPurPriceNo.requestFocus();
                         break;
                     case KeyEvent.VK_RIGHT:
-                        chkActive.requestFocus();
+                        txtPurPrice.requestFocus();
                         break;
                     case KeyEvent.VK_LEFT:
-                        txtPurPrice.requestFocus();
+                        txtFPurPriceNo.requestFocus();
                         break;
                 }
                 tabToTable(e);
@@ -1539,19 +1564,19 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
             case "chkActive":
                 switch (e.getKeyCode()) {
                     case KeyEvent.VK_ENTER:
-                        cboSaleUnit.requestFocus();
+                        txtFSaleUnitNo.requestFocus();
                         break;
                     case KeyEvent.VK_DOWN:
-                        cboSaleUnit.requestFocus();
+                        txtFSaleUnitNo.requestFocus();
                         break;
                     case KeyEvent.VK_UP:
-                        cboPurPrice.requestFocus();
+                        txtPurPrice.requestFocus();
                         break;
                     case KeyEvent.VK_RIGHT:
-                        cboSaleUnit.requestFocus();
+                        txtFSaleUnitNo.requestFocus();
                         break;
                     case KeyEvent.VK_LEFT:
-                        cboPurPrice.requestFocus();
+                        txtPurPrice.requestFocus();
                         break;
                 }
                 tabToTable(e);
@@ -1570,6 +1595,23 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
                         break;
                     case KeyEvent.VK_LEFT:
                         txtFSaleUnitNo.requestFocus();
+                        break;
+                }
+                tabToTable(e);
+                break;
+            case "txtFSaleUnitNo":
+                switch (e.getKeyCode()) {
+                    case KeyEvent.VK_ENTER:
+                        cboSaleUnit.requestFocus();
+                        break;
+                    case KeyEvent.VK_UP:
+                        chkActive.requestFocus();
+                        break;
+                    case KeyEvent.VK_RIGHT:
+                        cboSaleUnit.requestFocus();
+                        break;
+                    case KeyEvent.VK_LEFT:
+                        chkActive.requestFocus();
                         break;
                 }
                 tabToTable(e);
@@ -1738,7 +1780,6 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
                         break;
                 }
                 tabToTable(e);
-
                 break;
             case "btnSave":
                 switch (e.getKeyCode()) {

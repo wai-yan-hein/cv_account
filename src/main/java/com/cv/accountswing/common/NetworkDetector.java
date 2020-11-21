@@ -8,6 +8,8 @@ package com.cv.accountswing.common;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.GregorianCalendar;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -15,9 +17,10 @@ import java.util.GregorianCalendar;
  */
 public class NetworkDetector extends Thread {
 
-    private final long sleepTime = 5000;
+    private static final Logger LOGGER = LoggerFactory.getLogger(NetworkDetector.class);
     private NetworkObserver networkObserver;
     private boolean error = false;
+    private final int timeOut = 10000;
 
     public NetworkObserver getNetworkObserver() {
         return networkObserver;
@@ -30,27 +33,32 @@ public class NetworkDetector extends Thread {
     @Override
     public void run() {
         try {
-            String ipAddress = "www.google.com";
+            //LOGGER.info("Network Detector Started.");
+            String ipAddress = "graph.facebook.com";
             InetAddress inet = InetAddress.getByName(ipAddress);
 
             long start = new GregorianCalendar().getTimeInMillis();
 
-            if (inet.isReachable(5000)) {
+            if (inet.isReachable(timeOut)) {
+                //LOGGER.info("Network Reached.");
                 long finish = new GregorianCalendar().getTimeInMillis();
                 long time = finish - start;
                 if (networkObserver != null) {
+                    //LOGGER.info("Network Online.");
                     networkObserver.sendPingTime(time);
                 }
             } else {
+                //LOGGER.info("Network UnReached.");
                 if (networkObserver != null) {
                     networkObserver.sendPingTime(-1);
                 }
                 //System.out.println(ipAddress + " NOT reachable.");
             }
             error = false;
-            Thread.sleep(sleepTime);
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
+            //LOGGER.error("Network Error :" + e.getMessage());
             if (!error) {
+                //LOGGER.info("Network  Offline");
                 networkObserver.sendPingTime(-1);
                 error = true;
             }
