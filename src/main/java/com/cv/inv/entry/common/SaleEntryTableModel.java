@@ -308,13 +308,10 @@ public class SaleEntryTableModel extends AbstractTableModel {
                     }
                     break;
             }
-<<<<<<< HEAD
+
             calculateAmount(record);
-=======
-                calculateAmount(record);
-             //   fireTableCellUpdated(row, 8);
-            
->>>>>>> 9382068f17c9af6dc08e660494c7c724929c17a3
+            //   fireTableCellUpdated(row, 8);
+
         } catch (Exception ex) {
             LOGGER.error("setValueAt : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
         }

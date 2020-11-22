@@ -61,8 +61,6 @@ import com.cv.inv.service.LocationService;
 import com.cv.inv.service.SaleManService;
 import com.cv.inv.service.VouStatusService;
 import com.cv.accountswing.util.Util1;
-import com.cv.inv.entity.MachineInfo;
-import com.cv.inv.entity.StockBrand;
 import com.cv.inv.entry.SaleEntry;
 import com.cv.inv.service.CategoryService;
 import com.cv.inv.service.ChargeTypeService;
@@ -695,8 +693,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             //Defatult Loction
             String locId = Global.sysProperties.get("system.default.location");
             Global.defaultLocation = locationService.findById(locId);
-<<<<<<< HEAD
-=======
+
             //Default VouStatus
             String vouStausId = Global.sysProperties.get("system.default.vou.status");
             Global.defaultVouStatus = vouStatusService.findById(vouStausId);
@@ -708,7 +705,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             //Defatult Trader
             String traderId = Global.sysProperties.get("system.default.customer");
             Global.defaultTrader = traderService.findById(Util1.getInteger(traderId));
->>>>>>> 9382068f17c9af6dc08e660494c7c724929c17a3
         } catch (Exception e) {
             LOGGER.error("Initialize Data :" + e.getMessage());
             JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Initialize Data", JOptionPane.ERROR_MESSAGE);

@@ -121,7 +121,7 @@
         <dependency>
             <groupId>com.formdev</groupId>
             <artifactId>flatlaf</artifactId>
-            <version>0.38</version>
+            <version>0.44</version>
         </dependency>
         <!-- for high jdk-->
         <!--<dependency>

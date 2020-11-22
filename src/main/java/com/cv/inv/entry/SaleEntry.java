@@ -11,8 +11,6 @@ import com.cv.accountswing.common.KeyPropagate;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.SelectionObserver;
-import com.cv.accountswing.entity.Currency;
-import com.cv.accountswing.entity.CurrencyKey;
 import com.cv.accountswing.entity.Department;
 import com.cv.accountswing.entity.Trader;
 import com.cv.accountswing.service.CurrencyService;
@@ -30,8 +28,6 @@ import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.Location;
 import com.cv.inv.entity.SaleDetailHis;
 import com.cv.inv.entity.SaleHis;
-import com.cv.inv.entity.SaleMan;
-import com.cv.inv.entity.VouStatus;
 import com.cv.inv.entry.common.SaleEntryTableModel;
 import com.cv.inv.entry.dialog.SaleOutstandingDialog;
 import com.cv.inv.entry.editor.SaleManAutoCompleter;
@@ -997,10 +993,6 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
     private void btnSaleOutStandActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaleOutStandActionPerformed
         saleOutstand();
     }//GEN-LAST:event_btnSaleOutStandActionPerformed
-<<<<<<< HEAD
-=======
-
->>>>>>> 9382068f17c9af6dc08e660494c7c724929c17a3
 
     private void txtCusFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtCusFocusGained
         txtCus.selectAll();
@@ -1025,11 +1017,6 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
         txtVouStatus.selectAll();
         // TODO add your handling code here:
     }//GEN-LAST:event_txtVouStatusFocusGained
-<<<<<<< HEAD
-    
-=======
-
->>>>>>> 9382068f17c9af6dc08e660494c7c724929c17a3
     private void tabToTable(KeyEvent e) {
         if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_RIGHT) {
             tblSale.requestFocus();
@@ -1052,20 +1039,15 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
                 Trader cus = (Trader) selectObj;
                 if (cus != null) {
                     txtCus.setText(cus.getTraderName());
-<<<<<<< HEAD
-                    
                     if (cus.getTraderType() != null) {
                         saleTableModel.setCusType(cus.getTraderType().getDescription());
-=======
 
-                    if (cus != null) {
                         txtCus.setText(cus.getTraderName());
                         if (cus.getTraderType() != null) {
                             saleTableModel.setCusType(cus.getTraderType().getDescription());
                         } else {
                             saleTableModel.setCusType("N");
                         }
->>>>>>> 9382068f17c9af6dc08e660494c7c724929c17a3
                     } else {
                         txtCus.setText(null);
                     }

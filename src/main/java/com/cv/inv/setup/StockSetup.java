@@ -440,6 +440,7 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
         jLabel1.setText("Stock Code");
 
         txtStockCode.setFont(Global.textFont);
+        txtStockCode.setEnabled(false);
         txtStockCode.setName("txtStockCode"); // NOI18N
 
         cboStockType.setFont(Global.textFont);
