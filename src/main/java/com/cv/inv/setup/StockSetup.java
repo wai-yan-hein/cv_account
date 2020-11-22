@@ -591,7 +591,11 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
         btnSave.setFont(Global.lableFont);
         btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save-button.png"))); // NOI18N
         btnSave.setText("Save");
+<<<<<<< HEAD
         btnSave.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+=======
+        btnSave.setHorizontalAlignment(javax.swing.SwingConstants.LEADING);
+>>>>>>> 223395af1d7837ea3ceccfddb3a4425717173d93
         btnSave.setName("btnSave"); // NOI18N
         btnSave.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
         btnSave.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
