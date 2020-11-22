@@ -270,25 +270,14 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
     private void assignDefaultValue() {
         try {
             txtSaleDate.setDate(Util1.getTodayDate());
-            String traderId = Global.sysProperties.get("system.default.customer");
-            if (traderId != null) {
-                Trader trader = traderService.findById(Util1.getInteger(traderId));
-                traderAutoCompleter.setTrader(trader);
-                selected("CustomerList", trader);
+            if (Global.defaultTrader != null) {
+                traderAutoCompleter.setTrader(Global.defaultTrader);
+                selected("CustomerList", Global.defaultTrader);
             }
-            String cuId = Global.sysProperties.get("system.default.currency");
-            CurrencyKey key = new CurrencyKey();
-            key.setCode(cuId);
-            key.setCompCode(Global.compId);
-            Currency currency = currencyService.findById(key);
-            currAutoCompleter.setCurrency(currency);
-            String vouStausId = Global.sysProperties.get("system.default.vou.status");
-            VouStatus vouStaus = vouStatusService.findById(vouStausId);
-            vouCompleter.setVouStatus(vouStaus);
-            String saleManId = Global.sysProperties.get("system.default.saleman");
-            if (saleManId != null) {
-                SaleMan saleMan = saleManService.findById(saleManId);
-                saleManCompleter.setSaleMan(saleMan);
+            currAutoCompleter.setCurrency(Global.defalutCurrency);
+            vouCompleter.setVouStatus(Global.defaultVouStatus);
+            if (Global.defaultSaleMan != null) {
+                saleManCompleter.setSaleMan(Global.defaultSaleMan);
             }
         } catch (Exception e) {
             LOGGER.info("Assign Default Value :" + e.getMessage());
@@ -1006,7 +995,7 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
     private void btnSaleOutStandActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaleOutStandActionPerformed
         saleOutstand();
     }//GEN-LAST:event_btnSaleOutStandActionPerformed
-    
+
 
     private void txtCusFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtCusFocusGained
         txtCus.selectAll();
@@ -1031,7 +1020,6 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
         txtVouStatus.selectAll();
         // TODO add your handling code here:
     }//GEN-LAST:event_txtVouStatusFocusGained
-
 
     private void tabToTable(KeyEvent e) {
         if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_RIGHT) {

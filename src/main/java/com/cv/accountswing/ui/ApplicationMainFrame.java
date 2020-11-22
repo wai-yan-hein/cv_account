@@ -253,6 +253,8 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private CategoryService categoryService;
     @Autowired
     private StockBrandService stockBrandService;
+    @Autowired
+    private VouStatusService vouStatusService;
     private PanelControl control;
     private FilterObserver filterObserver;
 
@@ -693,10 +695,17 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             //Defatult Loction
             String locId = Global.sysProperties.get("system.default.location");
             Global.defaultLocation = locationService.findById(locId);
-<<<<<<< HEAD
-=======
-            // getMachinceInfo();
->>>>>>> be1a975ccac423ca581e8aa460bf52a15fb3820e
+            //Default VouStatus
+            String vouStausId = Global.sysProperties.get("system.default.vou.status");
+            Global.defaultVouStatus = vouStatusService.findById(vouStausId);
+            //Default SaleMan
+            String saleManId = Global.sysProperties.get("system.default.saleman");
+            if (saleManId != null) {
+                Global.defaultSaleMan = saleManService.findById(saleManId);
+            }
+            //Defatult Trader
+            String traderId = Global.sysProperties.get("system.default.customer");
+            Global.defaultTrader = traderService.findById(Util1.getInteger(traderId));
         } catch (Exception e) {
             LOGGER.error("Initialize Data :" + e.getMessage());
             JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Initialize Data", JOptionPane.ERROR_MESSAGE);

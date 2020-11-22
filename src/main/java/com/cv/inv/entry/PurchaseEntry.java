@@ -240,39 +240,12 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
         traderAutoCompleter = new TraderAutoCompleter(txtSupplier, Global.listTrader, null);
         traderAutoCompleter.setSelectionObserver(this);
     }
-<<<<<<< HEAD
 
-    private void addPurTableModelListener() {
-        tblPurchase.getModel().addTableModelListener((TableModelEvent e) -> {
-            int column = e.getColumn();
-            if (column >= 0) {
-                switch (column) {
-                    case 0: //Code
-                    case 4: //Qty
-                    case 5://Std-Wt
-                    case 6: //Unit
-                    case 7: //Sale price
-                        calculateTotalAmount();
-                        break;
-                }
-            }
-        });
-    }
-
-=======
->>>>>>> 04ef77bd6fdcc031330c61edf180251124a4e4ef
     private void assignDefalutValue() {
         try {
             txtPurDate.setDate(Util1.getTodayDate());
-            String cuId = Global.sysProperties.get("system.default.currency");
-            CurrencyKey key = new CurrencyKey();
-            key.setCode(cuId);
-            key.setCompCode(Global.compId);
-            Currency currency = currencyService.findById(key);
-            currAutoCompleter.setCurrency(currency);
-            String vouStausId = Global.sysProperties.get("system.default.vou.status");
-            VouStatus vouStaus = vouStatusService.findById(vouStausId);
-            vouCompleter.setVouStatus(vouStaus);
+            currAutoCompleter.setCurrency(Global.defalutCurrency );
+            vouCompleter.setVouStatus(Global.defaultVouStatus);
             genVouNo();
         } catch (Exception e) {
             LOGGER.info("Assign Default Value :" + e.getMessage());
