@@ -586,6 +586,11 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
 
         txtCus.setFont(Global.textFont);
         txtCus.setName("txtCus"); // NOI18N
+        txtCus.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtCusFocusGained(evt);
+            }
+        });
         txtCus.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtCusActionPerformed(evt);
@@ -597,6 +602,11 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
 
         txtSaleman.setFont(Global.textFont);
         txtSaleman.setName("txtSaleman"); // NOI18N
+        txtSaleman.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtSalemanFocusGained(evt);
+            }
+        });
 
         txtVouNo.setEditable(false);
         txtVouNo.setFont(Global.textFont);
@@ -630,9 +640,24 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
 
         txtRemark.setFont(Global.textFont);
         txtRemark.setName("txtRemark"); // NOI18N
+        txtRemark.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtRemarkFocusGained(evt);
+            }
+        });
 
         txtVouStatus.setFont(Global.textFont);
         txtVouStatus.setName("txtVouStatus"); // NOI18N
+        txtVouStatus.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtVouStatusFocusGained(evt);
+            }
+        });
+        txtVouStatus.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtVouStatusActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -981,7 +1006,35 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
     private void btnSaleOutStandActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaleOutStandActionPerformed
         saleOutstand();
     }//GEN-LAST:event_btnSaleOutStandActionPerformed
+<<<<<<< HEAD
+
+    private void txtCusFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtCusFocusGained
+        txtCus.selectAll();
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtCusFocusGained
+
+    private void txtSalemanFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtSalemanFocusGained
+        txtSaleman.selectAll();
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtSalemanFocusGained
+
+    private void txtRemarkFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtRemarkFocusGained
+
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtRemarkFocusGained
+
+    private void txtVouStatusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtVouStatusActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtVouStatusActionPerformed
+
+    private void txtVouStatusFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtVouStatusFocusGained
+        txtVouStatus.selectAll();
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtVouStatusFocusGained
+
+=======
     
+>>>>>>> d371a974defd65db49849509e958c5a9a68e34c5
     private void tabToTable(KeyEvent e) {
         if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_RIGHT) {
             tblSale.requestFocus();
@@ -1002,10 +1055,17 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
             case "CustomerList":
                 try {
                 Trader cus = (Trader) selectObj;
+<<<<<<< HEAD
+
+                if (cus != null) {
+                    txtCus.setText(cus.getTraderName());
+
+=======
                 
                 if (cus != null) {
                     txtCus.setText(cus.getTraderName());
                     
+>>>>>>> d371a974defd65db49849509e958c5a9a68e34c5
                     if (cus.getTraderType() != null) {
                         saleTableModel.setCusType(cus.getTraderType().getDescription());
                     } else {
@@ -1073,7 +1133,8 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
                     txtVouStatus.requestFocus();
                 }
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    txtSaleDate.getDateEditor().getUiComponent().requestFocusInWindow();
+                  //  txtSaleDate.getDateEditor().getUiComponent().requestFocusInWindow();
+                  tblSale.requestFocus();
                 }
                 if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
                     txtCurrency.requestFocus();

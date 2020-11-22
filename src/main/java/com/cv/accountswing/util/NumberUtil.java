@@ -120,7 +120,7 @@ public class NumberUtil {
         boolean status = false;
 
         if (obj != null) {
-            int parseInt = Integer.parseInt(obj.toString());
+            float parseInt = Float.parseFloat(obj.toString());
             if (parseInt > 0) {
                 status = true;
             }

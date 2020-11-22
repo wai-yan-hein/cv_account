@@ -57,8 +57,6 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
@@ -554,19 +552,25 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
 
         txtCurrency.setEditable(false);
         txtCurrency.setFont(Global.textFont);
+        txtCurrency.setEnabled(false);
         txtCurrency.setName("txtCurrency"); // NOI18N
 
         txtDueDate.setDateFormatString("dd/MM/yyyy");
         txtDueDate.setFont(Global.lableFont);
 
         txtPurDate.setDateFormatString("dd/MM/yyyy");
-        txtPurDate.setFont(Global.lableFont);
+        txtPurDate.setFont(Global.textFont);
 
         jLabel10.setFont(Global.lableFont);
         jLabel10.setText("Vou Status");
 
         txtVouStatus.setFont(Global.textFont);
         txtVouStatus.setName("txtVouStatus"); // NOI18N
+        txtVouStatus.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtVouStatusFocusGained(evt);
+            }
+        });
 
         jLabel8.setFont(Global.lableFont);
         jLabel8.setText("Credit Term");
@@ -852,6 +856,11 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
         txtSupplier.selectAll();
     }//GEN-LAST:event_txtSupplierFocusGained
 
+    private void txtVouStatusFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtVouStatusFocusGained
+        txtVouStatus.selectAll();
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtVouStatusFocusGained
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
@@ -969,7 +978,8 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
                     txtVouStatus.requestFocus();
                 }
                 if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_DOWN) {
-                    txtRemark.requestFocus();
+                    tblPurchase.requestFocus();
+                //    tblPurchase.getSelectionModel().getSelectionMode();
                 }
                 if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
                     txtRefNo.requestFocus();
