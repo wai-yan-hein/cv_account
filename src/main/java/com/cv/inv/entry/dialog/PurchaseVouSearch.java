@@ -246,10 +246,20 @@ public class PurchaseVouSearch extends javax.swing.JDialog implements KeyListene
         txtToDate.setDateFormatString("dd/MM/yyyy");
 
         txtCus.setName("txtCus"); // NOI18N
+        txtCus.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtCusFocusGained(evt);
+            }
+        });
 
         txtVouNo.setName("txtVouNo"); // NOI18N
 
         txtVouStatus.setName("txtVouStatus"); // NOI18N
+        txtVouStatus.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtVouStatusFocusGained(evt);
+            }
+        });
 
         txtRemark.setName("txtRemark"); // NOI18N
 
@@ -442,6 +452,16 @@ public class PurchaseVouSearch extends javax.swing.JDialog implements KeyListene
         }
         // TODO add your handling code here:
     }//GEN-LAST:event_tblVoucherMouseClicked
+
+    private void txtCusFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtCusFocusGained
+        txtCus.selectAll();
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtCusFocusGained
+
+    private void txtVouStatusFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtVouStatusFocusGained
+        txtVouStatus.selectAll();
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtVouStatusFocusGained
 
     /**
      * @param args the command line arguments

@@ -690,13 +690,10 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             //Default department
             String depId = Global.sysProperties.get("system.default.department");
             Global.defaultDepartment = departmentService.findById(depId);
-<<<<<<< HEAD
             //Defatult Loction
             String locId = Global.sysProperties.get("system.default.location");
             Global.defaultLocation = locationService.findById(locId);
-            getMachinceInfo();
-=======
->>>>>>> 69535decddc95601f9182c6454e4bc8ba24266a9
+            // getMachinceInfo();
         } catch (Exception e) {
             LOGGER.error("Initialize Data :" + e.getMessage());
             JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Initialize Data", JOptionPane.ERROR_MESSAGE);

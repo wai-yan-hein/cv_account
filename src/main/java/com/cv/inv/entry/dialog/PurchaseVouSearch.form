@@ -246,6 +246,9 @@
           <Properties>
             <Property name="name" type="java.lang.String" value="txtCus" noResource="true"/>
           </Properties>
+          <Events>
+            <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtCusFocusGained"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JTextField" name="txtVouNo">
           <Properties>
@@ -256,6 +259,9 @@
           <Properties>
             <Property name="name" type="java.lang.String" value="txtVouStatus" noResource="true"/>
           </Properties>
+          <Events>
+            <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtVouStatusFocusGained"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JTextField" name="txtRemark">
           <Properties>
