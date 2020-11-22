@@ -184,14 +184,16 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
         //cboDept
         JComboBox cboDepartmentCell = new JComboBox();
         cboDepartmentCell.setFont(Global.textFont);
-        BindingUtil.BindCombo(cboDepartmentCell, departmentService.findAll());
+        BindingUtil.BindCombo(cboDepartmentCell, Global.listDepartment);
+        cboDepartmentCell.setSelectedItem(Global.defaultDepartment);
         tblSale.getColumnModel().getColumn(2).setCellEditor(new DefaultCellEditor(cboDepartmentCell));
         saleTableModel.setDepartment((Department) cboDepartmentCell.getSelectedItem());
         tblSale.getColumnModel().getColumn(2).setPreferredWidth(30);
         //cboLoc
         JComboBox cboLocationCell = new JComboBox();
         cboLocationCell.setFont(Global.textFont);
-        BindingUtil.BindCombo(cboLocationCell, locationService.findAll());
+        BindingUtil.BindCombo(cboLocationCell, Global.listLocation);
+        cboDepartmentCell.setSelectedItem(Global.defaultLocation);
         tblSale.getColumnModel().getColumn(3).setCellEditor(new DefaultCellEditor(cboLocationCell));
         saleTableModel.setLocation((Location) cboLocationCell.getSelectedItem());
         tblSale.getColumnModel().getColumn(3).setPreferredWidth(30);
@@ -1006,7 +1008,6 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
     private void btnSaleOutStandActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaleOutStandActionPerformed
         saleOutstand();
     }//GEN-LAST:event_btnSaleOutStandActionPerformed
-<<<<<<< HEAD
 
     private void txtCusFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtCusFocusGained
         txtCus.selectAll();
@@ -1031,10 +1032,7 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
         txtVouStatus.selectAll();
         // TODO add your handling code here:
     }//GEN-LAST:event_txtVouStatusFocusGained
-
-=======
     
->>>>>>> d371a974defd65db49849509e958c5a9a68e34c5
     private void tabToTable(KeyEvent e) {
         if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_RIGHT) {
             tblSale.requestFocus();
@@ -1055,17 +1053,9 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
             case "CustomerList":
                 try {
                 Trader cus = (Trader) selectObj;
-<<<<<<< HEAD
-
-                if (cus != null) {
-                    txtCus.setText(cus.getTraderName());
-
-=======
-                
                 if (cus != null) {
                     txtCus.setText(cus.getTraderName());
                     
->>>>>>> d371a974defd65db49849509e958c5a9a68e34c5
                     if (cus.getTraderType() != null) {
                         saleTableModel.setCusType(cus.getTraderType().getDescription());
                     } else {
@@ -1133,8 +1123,8 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
                     txtVouStatus.requestFocus();
                 }
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                  //  txtSaleDate.getDateEditor().getUiComponent().requestFocusInWindow();
-                  tblSale.requestFocus();
+                    //  txtSaleDate.getDateEditor().getUiComponent().requestFocusInWindow();
+                    tblSale.requestFocus();
                 }
                 if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
                     txtCurrency.requestFocus();

@@ -310,10 +310,7 @@ public class SaleEntryTableModel extends AbstractTableModel {
                     }
                     break;
             }
-            if (!isAmount) {
-                calculateAmount(record);
-                fireTableCellUpdated(row, 8);
-            }
+            calculateAmount(record);
         } catch (Exception ex) {
             LOGGER.error("setValueAt : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
         }
@@ -467,7 +464,7 @@ public class SaleEntryTableModel extends AbstractTableModel {
     }
 
     public List<SaleDetailHis> getListSaleDetail() {
-       List<SaleDetailHis> listpurDetail = new ArrayList();
+        List<SaleDetailHis> listpurDetail = new ArrayList();
         for (SaleDetailHis pdh2 : listDetail) {
             if (pdh2.getStock() != null) {
                 if (pdh2.getStock().getStockCode() != null) {

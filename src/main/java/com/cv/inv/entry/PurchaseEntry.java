@@ -11,10 +11,8 @@ import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.Currency;
 import com.cv.accountswing.entity.CurrencyKey;
-import com.cv.accountswing.entity.Department;
 import com.cv.accountswing.entity.Trader;
 import com.cv.accountswing.service.CurrencyService;
-import com.cv.accountswing.service.DepartmentService;
 import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
@@ -24,7 +22,6 @@ import com.cv.accountswing.ui.editor.TraderAutoCompleter;
 import com.cv.accountswing.util.BindingUtil;
 import com.cv.accountswing.util.NumberUtil;
 import com.cv.accountswing.util.Util1;
-import com.cv.inv.entity.Location;
 import com.cv.inv.entity.PurHis;
 import com.cv.inv.entity.PurchaseDetail;
 import com.cv.inv.entity.VouStatus;
@@ -35,7 +32,6 @@ import com.cv.inv.entry.editor.LocationCellEditor;
 import com.cv.inv.entry.editor.StockCellEditor;
 import com.cv.inv.entry.editor.StockUnitEditor;
 import com.cv.inv.entry.editor.VouStatusAutoCompleter;
-import com.cv.inv.service.LocationService;
 import com.cv.inv.service.PurchaseDetailService;
 import com.cv.inv.service.PurchaseHisService;
 import com.cv.inv.service.VouIdService;
@@ -77,11 +73,7 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
     @Autowired
     private PurchaseEntryTableModel purTableModel;
     @Autowired
-    private DepartmentService departmentService;
-    @Autowired
     private CurrencyService currencyService;
-    @Autowired
-    private LocationService locationService;
     @Autowired
     private VouStatusService vouStatusService;
     @Autowired
@@ -167,19 +159,17 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
         tblPurchase.getColumnModel().getColumn(9).setCellEditor(new AutoClearEditor());//amt
         //departement combobox
         JComboBox cboDepartmentCell = new JComboBox();
-        cboDepartmentCell.setSelectedItem(Global.defaultDepartment);
         cboDepartmentCell.setFont(Global.textFont);
         BindingUtil.BindCombo(cboDepartmentCell, Global.listDepartment);
+        cboDepartmentCell.setSelectedItem(Global.defaultDepartment);
         tblPurchase.getColumnModel().getColumn(2).setCellEditor(new DefaultCellEditor(cboDepartmentCell));
-        purTableModel.setDepartment((Department) cboDepartmentCell.getSelectedItem());
         tblPurchase.getColumnModel().getColumn(2).setPreferredWidth(30);
         //location combobox
         JComboBox cboLocationCell = new JComboBox();
-        cboLocationCell.setSelectedItem(Global.defaultLocation);
         cboLocationCell.setFont(Global.textFont);
         BindingUtil.BindCombo(cboLocationCell, Global.listLocation);
+        cboLocationCell.setSelectedItem(Global.defaultLocation);
         tblPurchase.getColumnModel().getColumn(3).setCellEditor(new DefaultCellEditor(cboLocationCell));
-        purTableModel.setLocation((Location) cboLocationCell.getSelectedItem());
         tblPurchase.getColumnModel().getColumn(3).setPreferredWidth(30);
         //table render
         tblPurchase.setDefaultRenderer(Float.class, new TableCellRender());
@@ -239,6 +229,7 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
         traderAutoCompleter = new TraderAutoCompleter(txtSupplier, Global.listTrader, null);
         traderAutoCompleter.setSelectionObserver(this);
     }
+
     private void assignDefalutValue() {
         taskExecutor.execute(() -> {
             try {
@@ -979,7 +970,7 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
                 }
                 if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_DOWN) {
                     tblPurchase.requestFocus();
-                //    tblPurchase.getSelectionModel().getSelectionMode();
+                    //    tblPurchase.getSelectionModel().getSelectionMode();
                 }
                 if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
                     txtRefNo.requestFocus();
