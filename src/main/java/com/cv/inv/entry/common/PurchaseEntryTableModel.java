@@ -169,10 +169,10 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                         Stock stock = (Stock) aValue;
                         pur.setStock(stock);
                         pur.setQty(Util1.getFloat(1.0));
-                        if(stock.getPurPrice()!=null){
+                        if (stock.getPurPrice() != null) {
                             pur.setPurPrice(stock.getPurPrice());
-                        }else{
-                           pur.setPurPrice(Util1.getFloat(0.0)); 
+                        } else {
+                            pur.setPurPrice(Util1.getFloat(0.0));
                         }
                         pur.setAvgPrice(stock.getPurPrice());
                         pur.setStdWeight(stock.getPurPriceMeasure());
@@ -182,8 +182,9 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                         addNewRow();
                         parent.setColumnSelectionInterval(4, 4);
                     }
+                    break;
                 case 2:
-                    if (pur.getDepartment() != null) {
+                    if (aValue != null) {
                         pur.setDepartment((Department) aValue);
                         parent.setColumnSelectionInterval(3, 3);
                     }
@@ -198,9 +199,9 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                     break;
                 case 4://Qty
                     if (NumberUtil.isNumber(aValue)) {
-                         if (NumberUtil.isPositive(aValue)) {
+                        if (NumberUtil.isPositive(aValue)) {
                             pur.setQty(Util1.getFloat(aValue));
-                         } else {
+                        } else {
                             showMessageBox("Input value must be positive");
                             parent.setColumnSelectionInterval(columnIndex, columnIndex);
                         }
@@ -245,7 +246,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                     break;
                 case 7://avg-wt
                     if (NumberUtil.isNumber(aValue)) {
-                     if (NumberUtil.isPositive(aValue)) {
+                        if (NumberUtil.isPositive(aValue)) {
                             Float avgWt = Util1.getFloat(aValue);
                             Float stdWt = pur.getStdWeight();
                             float avgPrice = (avgWt / stdWt) * pur.getPurPrice();
@@ -267,7 +268,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
 
                 case 8:
                     if (NumberUtil.isNumber(aValue)) {
-                      if (NumberUtil.isPositive(aValue)) {
+                        if (NumberUtil.isPositive(aValue)) {
                             pur.setPurPrice(Util1.getFloat(aValue));
                             parent.setColumnSelectionInterval(8, 8);
                         } else {
@@ -281,10 +282,10 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
 
                     break;
             }
-            
-                calculateAmount(pur);
-             //   fireTableCellUpdated(rowIndex, 9);
-           
+
+            calculateAmount(pur);
+            //   fireTableCellUpdated(rowIndex, 9);
+
             //    calTotalAmount(pur);
             fireTableRowsUpdated(rowIndex, rowIndex);
             callBack.selected("STM-TOTAL", "STM-TOTAL");

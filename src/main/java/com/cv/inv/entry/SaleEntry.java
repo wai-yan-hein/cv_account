@@ -272,7 +272,7 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
             txtSaleDate.setDate(Util1.getTodayDate());
             if (Global.defaultTrader != null) {
                 traderAutoCompleter.setTrader(Global.defaultTrader);
-                selected("CustomerList", Global.defaultTrader);
+              //  selected("CustomerList", Global.defaultTrader);
             }
             currAutoCompleter.setCurrency(Global.defalutCurrency);
             vouCompleter.setVouStatus(Global.defaultVouStatus);
@@ -618,6 +618,7 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
 
         txtCurrency.setEditable(false);
         txtCurrency.setFont(Global.textFont);
+        txtCurrency.setDisabledTextColor(new java.awt.Color(0, 0, 0));
         txtCurrency.setEnabled(false);
         txtCurrency.setName("txtCurrency"); // NOI18N
 
