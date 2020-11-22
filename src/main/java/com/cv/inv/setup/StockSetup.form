@@ -27,7 +27,7 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="txtTotalCount" min="-2" pref="58" max="-2" attributes="0"/>
                   </Group>
-                  <Component id="jScrollPane1" pref="435" max="32767" attributes="0"/>
+                  <Component id="jScrollPane1" pref="427" max="32767" attributes="0"/>
               </Group>
               <EmptySpace min="-2" pref="8" max="-2" attributes="0"/>
               <Component id="jPanel1" max="32767" attributes="0"/>
@@ -94,8 +94,9 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
+              <Component id="jPanel2" alignment="1" max="32767" attributes="0"/>
               <Group type="102" attributes="0">
-                  <EmptySpace min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="1" attributes="0">
                           <Group type="103" groupAlignment="1" attributes="0">
@@ -103,15 +104,13 @@
                               <Component id="jLabel2" linkSize="1" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" alignment="0" attributes="0">
-                                  <EmptySpace type="separate" max="-2" attributes="0"/>
-                                  <Component id="cboStockType" max="32767" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="btnAddItemType" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <Group type="102" alignment="0" attributes="0">
+                              <Group type="102" attributes="0">
                                   <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
                                   <Component id="txtStockCode" max="32767" attributes="0"/>
+                              </Group>
+                              <Group type="102" attributes="0">
+                                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                                  <Component id="cboStockType" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                       </Group>
@@ -127,11 +126,6 @@
                           </Group>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="1" attributes="0">
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Component id="cboBrand" max="32767" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="btnAddBrand" min="-2" max="-2" attributes="0"/>
-                              </Group>
                               <Component id="txtRemark" alignment="0" max="32767" attributes="0"/>
                               <Component id="txtBarCode" alignment="0" max="32767" attributes="0"/>
                               <Component id="txtShortName" alignment="0" max="32767" attributes="0"/>
@@ -143,11 +137,8 @@
                                   <Component id="btnUnit" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <Component id="txtStockName" max="32767" attributes="0"/>
-                              <Group type="102" alignment="1" attributes="0">
-                                  <Component id="cboCategory" max="32767" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="btnAddCategory" min="-2" max="-2" attributes="0"/>
-                              </Group>
+                              <Component id="cboCategory" max="32767" attributes="0"/>
+                              <Component id="cboBrand" alignment="0" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
@@ -155,7 +146,7 @@
                           <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
                           <Component id="txtFPurPriceNo" max="32767" attributes="0"/>
                           <EmptySpace min="-2" max="-2" attributes="0"/>
-                          <Component id="cboPurPrice" pref="112" max="32767" attributes="0"/>
+                          <Component id="cboPurPrice" max="32767" attributes="0"/>
                           <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
                           <Component id="txtPurPrice" max="32767" attributes="0"/>
                           <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
@@ -163,16 +154,21 @@
                           <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
                           <Component id="lblStatus" min="-2" max="-2" attributes="0"/>
                       </Group>
+                      <Group type="102" alignment="1" attributes="0">
+                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                          <Component id="btnAddItemType" linkSize="8" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="btnAddCategory" linkSize="8" min="-2" pref="112" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="btnAddBrand" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" max="-2" attributes="0"/>
+                          <Component id="btnNew" linkSize="7" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="btnSave" linkSize="7" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                      </Group>
                   </Group>
               </Group>
-              <Group type="102" alignment="1" attributes="0">
-                  <EmptySpace max="32767" attributes="0"/>
-                  <Component id="btnNew" linkSize="7" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="btnSave" linkSize="7" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
-              </Group>
-              <Component id="jPanel2" alignment="1" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
@@ -187,7 +183,6 @@
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="cboStockType" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="btnAddItemType" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
@@ -197,13 +192,11 @@
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="cboCategory" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="btnAddCategory" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jLabel4" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="cboBrand" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="btnAddBrand" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jLabel5" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
@@ -245,6 +238,9 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="btnSave" linkSize="6" min="-2" max="-2" attributes="0"/>
                       <Component id="btnNew" linkSize="6" min="-2" max="-2" attributes="0"/>
+                      <Component id="btnAddItemType" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="btnAddCategory" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="btnAddBrand" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
@@ -295,9 +291,14 @@
             <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="Global.lableFont" type="code"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="+"/>
-            <Property name="horizontalTextPosition" type="int" value="0"/>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/images/new-button.png"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="Stock Type"/>
+            <Property name="horizontalAlignment" type="int" value="11"/>
             <Property name="name" type="java.lang.String" value="btnAddItemType" noResource="true"/>
+            <Property name="verticalAlignment" type="int" value="3"/>
+            <Property name="verticalTextPosition" type="int" value="3"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnAddItemTypeActionPerformed"/>
@@ -340,8 +341,14 @@
             <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="Global.lableFont" type="code"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="+"/>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/images/new-button.png"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="Category"/>
+            <Property name="horizontalAlignment" type="int" value="11"/>
             <Property name="name" type="java.lang.String" value="btnAddCategory" noResource="true"/>
+            <Property name="verticalAlignment" type="int" value="3"/>
+            <Property name="verticalTextPosition" type="int" value="3"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnAddCategoryActionPerformed"/>
@@ -381,8 +388,14 @@
             <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="Global.lableFont" type="code"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="+"/>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/images/new-button.png"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="Brand"/>
+            <Property name="horizontalAlignment" type="int" value="11"/>
             <Property name="name" type="java.lang.String" value="btnAddBrand" noResource="true"/>
+            <Property name="verticalAlignment" type="int" value="3"/>
+            <Property name="verticalTextPosition" type="int" value="3"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnAddBrandActionPerformed"/>
@@ -541,11 +554,7 @@
               <Image iconType="3" name="/images/save-button.png"/>
             </Property>
             <Property name="text" type="java.lang.String" value="Save"/>
-<<<<<<< HEAD
             <Property name="horizontalAlignment" type="int" value="2"/>
-=======
-            <Property name="horizontalAlignment" type="int" value="10"/>
->>>>>>> 223395af1d7837ea3ceccfddb3a4425717173d93
             <Property name="name" type="java.lang.String" value="btnSave" noResource="true"/>
             <Property name="verticalAlignment" type="int" value="3"/>
             <Property name="verticalTextPosition" type="int" value="3"/>
@@ -591,32 +600,32 @@
                           <Group type="102" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="jLabel11" max="32767" attributes="0"/>
-                                  <Component id="txtFSalePrice" pref="69" max="32767" attributes="0"/>
+                                  <Component id="txtFSalePrice" pref="73" max="32767" attributes="0"/>
                               </Group>
                               <EmptySpace min="-2" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="jLabel14" max="32767" attributes="0"/>
-                                  <Component id="txtFSalePriceA" max="32767" attributes="0"/>
+                                  <Component id="txtFSalePriceA" pref="73" max="32767" attributes="0"/>
                               </Group>
                               <EmptySpace min="-2" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="jLabel15" max="32767" attributes="0"/>
-                                  <Component id="txtFSalePriceB" pref="69" max="32767" attributes="0"/>
+                                  <Component id="txtFSalePriceB" pref="73" max="32767" attributes="0"/>
                               </Group>
                               <EmptySpace min="-2" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="jLabel16" max="32767" attributes="0"/>
-                                  <Component id="txtFSalePriceC" max="32767" attributes="0"/>
+                                  <Component id="txtFSalePriceC" pref="73" max="32767" attributes="0"/>
                               </Group>
                               <EmptySpace min="-2" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="jLabel17" max="32767" attributes="0"/>
-                                  <Component id="txtFSalePriceD" max="32767" attributes="0"/>
+                                  <Component id="txtFSalePriceD" pref="77" max="32767" attributes="0"/>
                               </Group>
                               <EmptySpace min="-2" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="txtFCostPrice" max="32767" attributes="0"/>
-                                  <Component id="jLabel18" pref="78" max="32767" attributes="0"/>
+                                  <Component id="jLabel18" pref="82" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                           <Group type="102" attributes="0">
@@ -883,6 +892,7 @@
         <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
           <Connection code="Global.lableFont" type="code"/>
         </Property>
+        <Property name="horizontalAlignment" type="int" value="0"/>
       </Properties>
     </Component>
   </SubComponents>
