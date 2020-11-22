@@ -154,14 +154,35 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
     }
 
     private void search() {
+        String customerId = null;
+        String vouStatusId = null;
+        String userId = null;
+        String machineId = null;
         String fromDate = Util1.toDateStr(txtFromDate.getDate(), "yyyy-MM-dd HH:mm:ss");
         String toDate = Util1.toDateStr(txtToDate.getDate(), "yyyy-MM-dd HH:mm:ss");
-        String customerId = traderAutoCompleter.getTrader().getId().toString();
-        String vouStatusId = vouCompleter.getVouStatus().getVouStatusId().toString();
+        if (traderAutoCompleter.getTrader().getId() != null) {
+            customerId = traderAutoCompleter.getTrader().getId().toString();
+        } else {
+            customerId = "-";
+        }
+        if (vouCompleter.getVouStatus().getVouStatusId() != null) {
+            vouStatusId = vouCompleter.getVouStatus().getVouStatusId().toString();
+        } else {
+            vouStatusId = "-";
+        }
+
         String remark = txtRemark.getText();
         String stockId = codeTableModel.getFilterCodeStr();
-        String userId = appUserAutoCompleter.getAppUser().getUserId().toString();
-        String machineId = machAutoCompleter.getManchineInfo().getMachineId().toString();
+        if (appUserAutoCompleter.getAppUser().getUserId() != null) {
+            userId = appUserAutoCompleter.getAppUser().getUserId().toString();
+        } else {
+            userId = "-";
+        }
+        if (machAutoCompleter.getManchineInfo().getMachineId() != null) {
+            machineId = machAutoCompleter.getManchineInfo().getMachineId().toString();
+        } else {
+            machineId = "-";
+        }
 
         List<SaleHis> listHis = saleHisService.search(fromDate, toDate, customerId,
                 vouStatusId, remark, stockId, userId, machineId);

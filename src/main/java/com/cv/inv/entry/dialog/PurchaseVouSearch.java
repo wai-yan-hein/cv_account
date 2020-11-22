@@ -124,8 +124,27 @@ public class PurchaseVouSearch extends javax.swing.JDialog implements KeyListene
     }
 
     private void search() {
+        String customerId = null;
+        String vouStatusId = null;
         String fromDate = Util1.toDateStr(txtFromDate.getDate(), "yyyy-MM-dd HH:mm:ss");
         String toDate = Util1.toDateStr(txtToDate.getDate(), "yyyy-MM-dd HH:mm:ss");
+<<<<<<< HEAD
+        if (traderAutoCompleter.getTrader().getId() != null) {
+            customerId = traderAutoCompleter.getTrader().getId().toString();
+            if (txtCus.getText().isEmpty()) {
+                customerId = "-";
+            }
+        }else{
+            customerId = "-"; 
+        }
+        if (vouCompleter.getVouStatus().getVouStatusId() != null) {
+            vouStatusId = vouCompleter.getVouStatus().getVouStatusId().toString();
+            if (txtVouStatus.getText().isEmpty()) {
+                vouStatusId = "-";
+            }
+        }else{
+             vouStatusId = "-";
+=======
         String customerId = "-";
         if (traderAutoCompleter.getTrader() != null) {
             customerId = traderAutoCompleter.getTrader().getId().toString();
@@ -139,7 +158,9 @@ public class PurchaseVouSearch extends javax.swing.JDialog implements KeyListene
         }
         if (txtVouStatus.getText().isEmpty()) {
             vouStatusId = "-";
+>>>>>>> b009cb7122c01c598c03fd1d39cb087f88ca95b8
         }
+
         String remark = txtRemark.getText();
         List<PurHis> listHis = purHisService.search(fromDate, toDate, customerId, vouStatusId, remark);
         purVouTableModel.setListPurHis(listHis);

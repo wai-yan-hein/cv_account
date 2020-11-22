@@ -183,6 +183,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                         addNewRow();
                         parent.setColumnSelectionInterval(4, 4);
                     }
+                    break;
                 case 2:
                     if (aValue != null) {
                         pur.setDepartment((Department) aValue);
