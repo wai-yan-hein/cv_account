@@ -53,6 +53,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.TableModelEvent;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
@@ -231,24 +232,15 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
     }
 
     private void assignDefalutValue() {
-        taskExecutor.execute(() -> {
-            try {
-                txtPurDate.setDate(Util1.getTodayDate());
-                String cuId = Global.sysProperties.get("system.default.currency");
-                CurrencyKey key = new CurrencyKey();
-                key.setCode(cuId);
-                key.setCompCode(Global.compId);
-                Currency currency = currencyService.findById(key);
-                currAutoCompleter.setCurrency(currency);
-                String vouStausId = Global.sysProperties.get("system.default.vou.status");
-                VouStatus vouStaus = vouStatusService.findById(vouStausId);
-                vouCompleter.setVouStatus(vouStaus);
-                genVouNo();
-            } catch (Exception e) {
-                LOGGER.info("Assign Default Value :" + e.getMessage());
-                JOptionPane.showMessageDialog(Global.parentForm, "Defalut Values are missing in System Property.");
-            }
-        });
+        try {
+            txtPurDate.setDate(Util1.getTodayDate());
+            currAutoCompleter.setCurrency(Global.defalutCurrency );
+            vouCompleter.setVouStatus(Global.defaultVouStatus);
+            genVouNo();
+        } catch (Exception e) {
+            LOGGER.info("Assign Default Value :" + e.getMessage());
+            JOptionPane.showMessageDialog(Global.parentForm, "Defalut Values are missing in System Property.");
+        }
 
     }
 
@@ -969,6 +961,8 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
                     txtVouStatus.requestFocus();
                 }
                 if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_DOWN) {
+
+                    tblPurchase.setColumnSelectionInterval(0, 0);
                     tblPurchase.requestFocus();
                     //    tblPurchase.getSelectionModel().getSelectionMode();
                 }

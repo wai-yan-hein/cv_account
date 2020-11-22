@@ -282,10 +282,10 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                     
                     break;
             }
-            if (!isAmount) {
+            
                 calculateAmount(pur);
-                fireTableCellUpdated(rowIndex, 9);
-            }
+             //   fireTableCellUpdated(rowIndex, 9);
+           
             //    calTotalAmount(pur);
             fireTableRowsUpdated(rowIndex, rowIndex);
             callBack.selected("STM-TOTAL", "STM-TOTAL");

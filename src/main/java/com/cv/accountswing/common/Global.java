@@ -104,6 +104,13 @@ public class Global {
     public static Department defaultDepartment;
     //defatult location
     public static Location defaultLocation;
+    //default vouStatus
+    public static VouStatus defaultVouStatus;
+    //default saleMan
+    public static SaleMan defaultSaleMan;
+     //default saleMan
+    public static Trader defaultTrader;
+    
     public static HashMap<String, Float> hasQtyInSmallest = new HashMap();
 
 }
