@@ -589,8 +589,12 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
         lblStatus.setText("NEW");
 
         btnSave.setFont(Global.lableFont);
+        btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save-button.png"))); // NOI18N
         btnSave.setText("Save");
+        btnSave.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         btnSave.setName("btnSave"); // NOI18N
+        btnSave.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
+        btnSave.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         btnSave.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSaveActionPerformed(evt);
@@ -598,8 +602,11 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
         });
 
         btnNew.setFont(Global.lableFont);
+        btnNew.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/new-button.png"))); // NOI18N
         btnNew.setText("New");
         btnNew.setName("btnNew"); // NOI18N
+        btnNew.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
+        btnNew.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         btnNew.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnNewActionPerformed(evt);
@@ -870,6 +877,8 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
 
         jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jLabel1, jLabel10, jLabel2, jLabel3, jLabel4, jLabel5, jLabel6, jLabel7, jLabel8, jLabel9});
 
+        jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnNew, btnSave});
+
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
@@ -931,6 +940,8 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
                     .addComponent(btnNew))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+
+        jPanel1Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btnNew, btnSave});
 
         txtTotalCount.setEditable(false);
         txtTotalCount.setFont(Global.lableFont);

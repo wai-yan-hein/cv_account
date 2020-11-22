@@ -387,6 +387,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
         return sWt;
     }
 
+    @Override
     public String getColumnName(int column) {
         return columnNames[column];
     }

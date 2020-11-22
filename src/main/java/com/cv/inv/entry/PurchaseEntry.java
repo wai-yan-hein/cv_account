@@ -126,13 +126,11 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
         initTextBoxFormat();
     }
 
-    private void initMain() {
-        loadingObserver.load(this.getName(), "Start");
+    public void initMain() {
         initCombo();
         actionMapping();
         assignDefalutValue();
         initPurTable();
-        loadingObserver.load(this.getName(), "Stop");
         isShown = true;
         // calculateTotalAmount();
     }
@@ -245,20 +243,17 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
     }
 
     private void addPurTableModelListener() {
-        tblPurchase.getModel().addTableModelListener(new TableModelListener() {
-            @Override
-            public void tableChanged(TableModelEvent e) {
-                int column = e.getColumn();
-                if (column >= 0) {
-                    switch (column) {
-                        case 0: //Code
-                        case 4: //Qty
-                        case 5://Std-Wt
-                        case 6: //Unit
-                        case 7: //Sale price
-                            calculateTotalAmount();
-                            break;
-                    }
+        tblPurchase.getModel().addTableModelListener((TableModelEvent e) -> {
+            int column = e.getColumn();
+            if (column >= 0) {
+                switch (column) {
+                    case 0: //Code
+                    case 4: //Qty
+                    case 5://Std-Wt
+                    case 6: //Unit
+                    case 7: //Sale price
+                        calculateTotalAmount();
+                        break;
                 }
             }
         });
