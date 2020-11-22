@@ -8,7 +8,6 @@ package com.cv.inv.entry.dialog;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.entity.Trader;
 import com.cv.accountswing.service.TraderService;
-import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.editor.TraderAutoCompleter;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.PurHis;
@@ -19,12 +18,10 @@ import com.cv.inv.entry.common.CodeTableModel;
 import com.cv.inv.entry.common.PurVouSearchTableModel;
 import com.cv.inv.entry.editor.StockCellEditor;
 import com.cv.inv.entry.editor.VouStatusAutoCompleter;
-import com.cv.inv.service.LocationService;
 import com.cv.inv.service.PurchaseDetailService;
 import com.cv.inv.service.PurchaseHisService;
 import com.cv.inv.service.VouStatusService;
 import com.toedter.calendar.JTextFieldDateEditor;
-import java.awt.Frame;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.List;
@@ -131,6 +128,7 @@ public class PurchaseVouSearch extends javax.swing.JDialog implements KeyListene
         String vouStatusId = null;
         String fromDate = Util1.toDateStr(txtFromDate.getDate(), "yyyy-MM-dd HH:mm:ss");
         String toDate = Util1.toDateStr(txtToDate.getDate(), "yyyy-MM-dd HH:mm:ss");
+<<<<<<< HEAD
         if (traderAutoCompleter.getTrader().getId() != null) {
             customerId = traderAutoCompleter.getTrader().getId().toString();
             if (txtCus.getText().isEmpty()) {
@@ -146,6 +144,21 @@ public class PurchaseVouSearch extends javax.swing.JDialog implements KeyListene
             }
         }else{
              vouStatusId = "-";
+=======
+        String customerId = "-";
+        if (traderAutoCompleter.getTrader() != null) {
+            customerId = traderAutoCompleter.getTrader().getId().toString();
+        }
+        if (txtCus.getText().isEmpty()) {
+            customerId = "-";
+        }
+        String vouStatusId = null;
+        if (vouCompleter.getVouStatus() != null) {
+            vouStatusId = vouCompleter.getVouStatus().getVouStatusId().toString();
+        }
+        if (txtVouStatus.getText().isEmpty()) {
+            vouStatusId = "-";
+>>>>>>> b009cb7122c01c598c03fd1d39cb087f88ca95b8
         }
 
         String remark = txtRemark.getText();

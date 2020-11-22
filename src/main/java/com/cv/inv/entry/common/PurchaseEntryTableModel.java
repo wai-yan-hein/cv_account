@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class PurchaseEntryTableModel extends AbstractTableModel {
-
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(PurchaseEntryTableModel.class);
     private String[] columnNames = {"Code", "Description", "Department", "Location",
         "Qty", "Std-Wt", "Unit", "Avg-Wt", "Pur Price", "Amount"};
@@ -44,10 +44,9 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
     private List<String> delList = new ArrayList();
     private LocationAutoCompleter locationCompleter;
     private JFormattedTextField txtTotalAmt;
-    private Location location;
-    private Department department;
+    
     private SelectionObserver callBack;
-
+    
     public void setTxtTotalAmt(JFormattedTextField txtTotalAmt) {
         this.txtTotalAmt = txtTotalAmt;
     }
@@ -62,11 +61,11 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
 
     @Autowired
     private RelationService relationService;
-
+    
     public void setParent(JTable parent) {
         this.parent = parent;
     }
-
+    
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
         // return columnIndex == 8 ? false : true; //To change body of generated methods, choose Tools | Templates.
@@ -75,9 +74,9 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
         } else {
             return true;
         }
-
+        
     }
-
+    
     @Override
     public int getRowCount() {
         if (listPurDetail == null) {
@@ -85,7 +84,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
         }
         return listPurDetail.size();
     }
-
+    
     @Override
     public Class<?> getColumnClass(int columnIndex) {
         switch (columnIndex) {
@@ -109,7 +108,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                 return Object.class;
         }
     }
-
+    
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         PurchaseDetail pur = listPurDetail.get(rowIndex);
@@ -131,6 +130,8 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
             case 3:
                 if (pur.getLocation() != null) {
                     return pur.getLocation();
+                } else {
+                    return null;
                 }
             case 4:
                 return pur.getQty();
@@ -144,25 +145,25 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                 return pur.getPurPrice();
             case 9:
                 return pur.getPurAmt();
-
+            
             default:
                 return null;
         }
     }
-
+    
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
         if (listPurDetail == null) {
             return;
         }
-
+        
         if (listPurDetail.isEmpty()) {
             return;
         }
         try {
             PurchaseDetail pur = listPurDetail.get(rowIndex);
             boolean isAmount = false;
-
+            
             switch (columnIndex) {
                 case 0://Stock
                     if (aValue instanceof Stock) {
@@ -177,8 +178,8 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                         pur.setAvgPrice(stock.getPurPrice());
                         pur.setStdWeight(stock.getPurPriceMeasure());
                         pur.setPurUnit(stock.getPurPriceUnit());
-                        pur.setDepartment(department);
-                        pur.setLocation(location);
+                        pur.setDepartment(Global.defaultDepartment);
+                        pur.setLocation(Global.defaultLocation);
                         addNewRow();
                         parent.setColumnSelectionInterval(4, 4);
                     }
@@ -188,10 +189,10 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                         pur.setDepartment((Department) aValue);
                         parent.setColumnSelectionInterval(3, 3);
                     }
-
+                    
                     break;
                 case 3:
-                    if (pur.getLocation() != null) {
+                    if (aValue != null) {
                         pur.setLocation((Location) aValue);
                     } else {
                         pur.setLocation(null);
@@ -225,13 +226,13 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                             showMessageBox("Input value must be positive");
                             parent.setColumnSelectionInterval(columnIndex, columnIndex);
                         }
-
+                        
                     } else {
                         showMessageBox("Input value must be number.");
                         parent.setColumnSelectionInterval(columnIndex, columnIndex);
                     }
                     parent.setColumnSelectionInterval(6, 6);
-
+                    
                     break;
                 case 6:// unit
                     if (aValue instanceof StockUnit) {
@@ -241,7 +242,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                         Float calAmount = calPrice(pur, toUnit);
                         pur.setPurAmt(calAmount);
                         parent.setColumnSelectionInterval(6, 6);
-
+                        
                     }
                     break;
                 case 7://avg-wt
@@ -258,14 +259,14 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                             showMessageBox("Input value must be positive");
                             parent.setColumnSelectionInterval(columnIndex, columnIndex);
                         }
-
+                        
                     } else {
                         showMessageBox("Input value must be number.");
                         parent.setColumnSelectionInterval(columnIndex, columnIndex);
                     }
-
+                    
                     break;
-
+                
                 case 8:
                     if (NumberUtil.isNumber(aValue)) {
                         if (NumberUtil.isPositive(aValue)) {
@@ -279,7 +280,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                         showMessageBox("Input value must be number.");
                         parent.setColumnSelectionInterval(columnIndex, columnIndex);
                     }
-
+                    
                     break;
             }
 
@@ -290,12 +291,12 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
             fireTableRowsUpdated(rowIndex, rowIndex);
             callBack.selected("STM-TOTAL", "STM-TOTAL");
             parent.requestFocusInWindow();
-
+            
         } catch (Exception e) {
             LOGGER.error("setValueAt :" + e.getStackTrace()[0].getLineNumber() + " - " + e.getMessage());
         }
     }
-
+    
     private void calculateAmount(PurchaseDetail pur) {
         if (pur.getStock() != null) {
             float saleQty = pur.getQty();
@@ -304,7 +305,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
             float userWt = pur.getStdWeight();
             pur.setSmallestWT(getSmallestUnit(userWt, pur.getPurUnit().getItemUnitCode()));
             pur.setSmallestUnit("oz");
-
+            
             if (calAmount != 0) {
                 float amount = saleQty * calAmount;
                 pur.setPurAmt(amount);
@@ -343,10 +344,10 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                 }
             }
         }
-
+        
         return listDetail;
     }
-
+    
     private Float calPrice(PurchaseDetail pd, String toUnit) {
         Stock stock = pd.getStock();
         float purAmt = 0.0f;
@@ -355,7 +356,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
         float userWt = pd.getStdWeight();
         float stdWt = stock.getPurPriceMeasure();
         String fromUnit = stock.getPurPriceUnit().getItemUnitCode();
-
+        
         if (!fromUnit.equals(toUnit)) {
             RelationKey key = new RelationKey(fromUnit, toUnit);
             UnitRelation unitRelation = relationService.findByKey(key);
@@ -379,7 +380,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
         }
         return purAmt;
     }
-
+    
     private Float getSmallestUnit(Float weight, String unit) {
         float sWt = 0.0f;
         RelationKey key = new RelationKey(unit, "oz");
@@ -393,38 +394,38 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
         LOGGER.info("Smallest Weight :" + sWt + "From >>>" + unit + "<<<");
         return sWt;
     }
-
+    
     @Override
     public String getColumnName(int column) {
         return columnNames[column];
     }
-
+    
     @Override
     public int getColumnCount() {
         return columnNames.length;
     }
-
+    
     public String[] getColumnNames() {
         return columnNames;
     }
-
+    
     public void setColumnNames(String[] columnNames) {
         this.columnNames = columnNames;
     }
-
+    
     public void addNewRow() {
         if (listPurDetail != null) {
             if (hasEmptyRow()) {
                 PurchaseDetail pd = new PurchaseDetail();
                 pd.setStock(new Stock());
                 listPurDetail.add(pd);
-
+                
                 fireTableRowsInserted(listPurDetail.size() - 1, listPurDetail.size() - 1);
                 parent.scrollRectToVisible(parent.getCellRect(parent.getRowCount() - 1, 0, true));
             }
         }
     }
-
+    
     private boolean hasEmptyRow() {
         boolean status = true;
         if (listPurDetail.size() > 1) {
@@ -435,33 +436,35 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
         }
         return status;
     }
-
+    
     public void clear() {
         if (!listPurDetail.isEmpty()) {
             listPurDetail.clear();
             addNewRow();
             fireTableDataChanged();
         }
-
+        
     }
-
+    
     public void setListPurDetail(List<PurchaseDetail> listPurDetail) {
         this.listPurDetail = listPurDetail;
         addNewRow();
         fireTableDataChanged();
     }
-
+    
     private void showMessageBox(String text) {
         JOptionPane.showMessageDialog(Global.parentForm, text);
     }
-
+    
     public boolean isValidEntry() {
         boolean status = true;
         int uniqueId = 1;
         for (PurchaseDetail sdh2 : listPurDetail) {
-            if (sdh2.getLocation() == null) {
-                JOptionPane.showMessageDialog(Global.parentForm, "Invalid Location");
-                status = false;
+            if (sdh2.getStock().getStockCode() != null) {
+                if (sdh2.getLocation() == null) {
+                    JOptionPane.showMessageDialog(Global.parentForm, "Invalid Location");
+                    status = false;
+                }
             }
             if (uniqueId != listPurDetail.size()) {
                 if (Util1.NZeroDouble(sdh2.getAvgWeight()) > Util1.NZeroDouble(sdh2.getStdWeight())) {
@@ -476,34 +479,34 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                 }
             }
         }
-
+        
         if (uniqueId == 1) {
             status = false;
         }
-
+        
         return status;
     }
-
+    
     public List<String> getDelList() {
         return delList;
     }
-
+    
     public void delete(int row) {
         if (listPurDetail == null) {
             return;
         }
-
+        
         if (listPurDetail.isEmpty()) {
             return;
         }
-
+        
         PurchaseDetail sdh = listPurDetail.get(row);
         if (sdh.getPurDetailKey().getPurDetailId() != null) {
             delList.add(sdh.getPurDetailKey().getPurDetailId());
         }
-
+        
         listPurDetail.remove(row);
-
+        
         if (!hasEmptyRow()) {
             addNewRow();
         }
@@ -516,25 +519,9 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
             parent.setRowSelectionInterval(0, 0);
         }
     }
-
-    public Location getLocation() {
-        return location;
-    }
-
-    public void setLocation(Location location) {
-        this.location = location;
-    }
-
-    public Department getDepartment() {
-        return department;
-    }
-
-    public void setDepartment(Department dept) {
-        this.department = dept;
-    }
-
+    
     public void setCallBack(SelectionObserver callBack) {
         this.callBack = callBack;
     }
-
+    
 }
