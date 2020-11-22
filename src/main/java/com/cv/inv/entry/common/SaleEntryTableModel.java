@@ -210,7 +210,6 @@ public class SaleEntryTableModel extends AbstractTableModel {
         if (listDetail.isEmpty()) {
             return;
         }
-        boolean isAmount = false;
         try {
             SaleDetailHis record = listDetail.get(row);
             switch (column) {
@@ -306,14 +305,12 @@ public class SaleEntryTableModel extends AbstractTableModel {
                 case 8: //Amount
                     if (value != null) {
                         record.setAmount(Util1.getFloat(value));
-                        isAmount = true;
                     }
                     break;
             }
-            if (!isAmount) {
                 calculateAmount(record);
-                fireTableCellUpdated(row, 8);
-            }
+             //   fireTableCellUpdated(row, 8);
+            
         } catch (Exception ex) {
             LOGGER.error("setValueAt : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
         }

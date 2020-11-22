@@ -93,10 +93,6 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                 return String.class;
             case 1:
                 return String.class;
-            case 2:
-                return String.class;
-            case 3:
-                return String.class;
             case 4:
                 return Float.class;
             case 5:
@@ -285,10 +281,10 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
 
                     break;
             }
-            if (!isAmount) {
+            
                 calculateAmount(pur);
-                fireTableCellUpdated(rowIndex, 9);
-            }
+             //   fireTableCellUpdated(rowIndex, 9);
+           
             //    calTotalAmount(pur);
             fireTableRowsUpdated(rowIndex, rowIndex);
             callBack.selected("STM-TOTAL", "STM-TOTAL");
