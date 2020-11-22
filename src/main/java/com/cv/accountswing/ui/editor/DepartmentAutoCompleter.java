@@ -337,7 +337,9 @@ public class DepartmentAutoCompleter implements KeyListener {
     
     public void setDepartment(Department department) {
         this.department = department;
-        this.textComp.setText(this.department.getDeptName());
+        if (department != null) {
+            this.textComp.setText(this.department.getDeptName());
+        }
     }
 
 

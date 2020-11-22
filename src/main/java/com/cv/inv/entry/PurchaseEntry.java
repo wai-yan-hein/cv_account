@@ -9,10 +9,7 @@ import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.SelectionObserver;
-import com.cv.accountswing.entity.Currency;
-import com.cv.accountswing.entity.CurrencyKey;
 import com.cv.accountswing.entity.Trader;
-import com.cv.accountswing.service.CurrencyService;
 import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
@@ -24,7 +21,6 @@ import com.cv.accountswing.util.NumberUtil;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.PurHis;
 import com.cv.inv.entity.PurchaseDetail;
-import com.cv.inv.entity.VouStatus;
 import com.cv.inv.entry.common.PurchaseEntryTableModel;
 import com.cv.inv.entry.dialog.PurchaseVouSearch;
 import com.cv.inv.entry.editor.LocationAutoCompleter;
@@ -35,7 +31,6 @@ import com.cv.inv.entry.editor.VouStatusAutoCompleter;
 import com.cv.inv.service.PurchaseDetailService;
 import com.cv.inv.service.PurchaseHisService;
 import com.cv.inv.service.VouIdService;
-import com.cv.inv.service.VouStatusService;
 import com.cv.inv.util.GenVouNoImpl;
 import com.toedter.calendar.JTextFieldDateEditor;
 import java.awt.event.ActionEvent;
@@ -53,7 +48,6 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
-import javax.swing.event.TableModelEvent;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
@@ -73,10 +67,6 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(PurchaseEntry.class);
     @Autowired
     private PurchaseEntryTableModel purTableModel;
-    @Autowired
-    private CurrencyService currencyService;
-    @Autowired
-    private VouStatusService vouStatusService;
     @Autowired
     private PurchaseDetailService purchaseDetailService;
     @Autowired
@@ -1098,7 +1088,6 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
 
     @Override
     public void refresh() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

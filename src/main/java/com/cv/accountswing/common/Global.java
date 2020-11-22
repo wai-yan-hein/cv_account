@@ -40,7 +40,6 @@ import java.util.ArrayList;
  */
 public class Global {
 
-    public static Color mainColor = new Color(8, 113, 194);
     public static Font lableFont = new java.awt.Font("Arial", 1, 12);
     public static Font amtFont = new java.awt.Font("Arial", 1, 14);
     public static Font textFont = new java.awt.Font("Zawgyi-One", 0, 12);

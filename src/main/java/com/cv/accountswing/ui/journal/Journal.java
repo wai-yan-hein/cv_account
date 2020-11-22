@@ -5,6 +5,7 @@
  */
 package com.cv.accountswing.ui.journal;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
@@ -16,7 +17,6 @@ import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.journal.common.JournalTableModel;
 import com.cv.accountswing.util.Util1;
 import com.toedter.calendar.JTextFieldDateEditor;
-import java.awt.Image;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
@@ -245,7 +245,7 @@ public class Journal extends javax.swing.JPanel implements KeyListener, Selectio
             }
         });
 
-        btnEntry.setBackground(Global.mainColor);
+        btnEntry.setBackground(ColorUtil.mainColor);
         btnEntry.setFont(Global.lableFont);
         btnEntry.setForeground(new java.awt.Color(255, 255, 255));
         btnEntry.setText("+");

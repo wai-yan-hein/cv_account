@@ -5,20 +5,16 @@
  */
 package com.cv.inv.entry.dialog;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
-import com.cv.accountswing.entity.AppUser;
-import com.cv.accountswing.entity.Trader;
 import com.cv.accountswing.service.TraderService;
 import com.cv.accountswing.service.UserService;
 import com.cv.accountswing.ui.editor.AppUserAutoCompleter;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
-import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.editor.TraderAutoCompleter;
 import com.cv.accountswing.util.Util1;
-import com.cv.inv.entity.MachineInfo;
 import com.cv.inv.entity.SaleDetailHis;
 import com.cv.inv.entity.SaleHis;
-import com.cv.inv.entity.VouStatus;
 import com.cv.inv.entry.SaleEntry;
 //import com.cv.inv.entry.SaleEntry;
 import com.cv.inv.entry.common.CodeTableModel;
@@ -31,7 +27,6 @@ import com.cv.inv.service.SaleDetailService;
 import com.cv.inv.service.SaleHisService;
 import com.cv.inv.service.VouStatusService;
 import com.toedter.calendar.JTextFieldDateEditor;
-import java.awt.Frame;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.List;
@@ -71,7 +66,6 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
     private UserService userService;
     @Autowired
     private MachineInfoService machInfoService;
-    private ApplicationMainFrame mainFrame;
     private VouStatusAutoCompleter vouCompleter;
     private TraderAutoCompleter traderAutoCompleter;
     private AppUserAutoCompleter appUserAutoCompleter;
@@ -107,6 +101,8 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
         tblVoucher.getColumnModel().getColumn(3).setPreferredWidth(130);
         tblVoucher.getColumnModel().getColumn(4).setPreferredWidth(15);
         tblVoucher.getColumnModel().getColumn(5).setPreferredWidth(30);
+        tblVoucher.setDefaultRenderer(Double.class, new TableCellRender());
+        tblVoucher.setDefaultRenderer(Object.class, new TableCellRender());
     }
 
     private void initTableStock() {
@@ -121,31 +117,9 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
     }
 
     private void assignDefaultValue() {
-        try {
-            String traderId;
-            traderId = Global.sysProperties.get("system.default.customer");
-            if (traderId != null) {
-                Trader trader = traderService.findById(Util1.getInteger(traderId));
-                traderAutoCompleter.setTrader(trader);
-            }
-            String vouStausId = Global.sysProperties.get("system.default.vou.status");
-            VouStatus vouStaus = vouStatusService.findById(vouStausId);
-            vouCompleter.setVouStatus(vouStaus);
-            String userId = Global.sysProperties.get("system.default.user");
-            if (userId != null) {
-                AppUser appUser = userService.findById(userId);
-                appUserAutoCompleter.setAppUser(appUser);
-            }
-            String machineId = Global.sysProperties.get("system.default.machine");
-            if (machineId != null) {
-                MachineInfo machInfo = machInfoService.findById(machineId);
-                machAutoCompleter.setMachineInfo(machInfo);
-            }
-
-        } catch (Exception e) {
-            LOGGER.info("Assign Default Value :" + e.getMessage());
-            JOptionPane.showMessageDialog(Global.parentForm, "Defalut Values are missing in System Property.");
-        }
+        traderAutoCompleter.setTrader(Global.defaultTrader);
+        vouCompleter.setVouStatus(Global.defaultVouStatus);
+        appUserAutoCompleter.setAppUser(Global.loginUser);
     }
 
     private void setTodayDate() {
@@ -154,18 +128,18 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
     }
 
     private void search() {
-        String customerId = null;
-        String vouStatusId = null;
-        String userId = null;
-        String machineId = null;
+        String customerId;
+        String vouStatusId;
+        String userId;
+        String machineId;
         String fromDate = Util1.toDateStr(txtFromDate.getDate(), "yyyy-MM-dd HH:mm:ss");
         String toDate = Util1.toDateStr(txtToDate.getDate(), "yyyy-MM-dd HH:mm:ss");
-        if (traderAutoCompleter.getTrader().getId() != null) {
+        if (traderAutoCompleter.getTrader() != null) {
             customerId = traderAutoCompleter.getTrader().getId().toString();
         } else {
             customerId = "-";
         }
-        if (vouCompleter.getVouStatus().getVouStatusId() != null) {
+        if (vouCompleter.getVouStatus() != null) {
             vouStatusId = vouCompleter.getVouStatus().getVouStatusId().toString();
         } else {
             vouStatusId = "-";
@@ -173,12 +147,12 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
 
         String remark = txtRemark.getText();
         String stockId = codeTableModel.getFilterCodeStr();
-        if (appUserAutoCompleter.getAppUser().getUserId() != null) {
+        if (appUserAutoCompleter.getAppUser() != null) {
             userId = appUserAutoCompleter.getAppUser().getUserId().toString();
         } else {
             userId = "-";
         }
-        if (machAutoCompleter.getManchineInfo().getMachineId() != null) {
+        if (machAutoCompleter.getManchineInfo() != null) {
             machineId = machAutoCompleter.getManchineInfo().getMachineId().toString();
         } else {
             machineId = "-";
@@ -187,13 +161,15 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
         List<SaleHis> listHis = saleHisService.search(fromDate, toDate, customerId,
                 vouStatusId, remark, stockId, userId, machineId);
         saleVouTableModel.setListSaleHis(listHis);
-        lblTtlRecord.setText("Total Records : " + saleVouTableModel.getRowCount());
-        if (saleVouTableModel.getRowCount() > 0) {
-            double iAmount = 0;
-            for (int i = 0; i < saleVouTableModel.getRowCount(); i++) {
-                iAmount += Util1.getDouble(saleVouTableModel.getValueAt(i, 5).toString());
-            }
-            lblTtlAmount.setText("Total Amount : " + iAmount);
+        calAmount();
+    }
+
+    private void calAmount() {
+        double totalAmt = 0.0;
+        if (!saleVouTableModel.getListSaleHis().isEmpty()) {
+            totalAmt = saleVouTableModel.getListSaleHis().stream().map(saleHis -> saleHis.getVouTotal()).reduce(totalAmt, (accumulator, _item) -> accumulator + _item);
+            txtTotalAmt.setValue(totalAmt);
+            txtTotalRecord.setValue(saleVouTableModel.getListSaleHis().size());
         }
     }
 
@@ -264,6 +240,8 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
         lblTtlAmount = new javax.swing.JLabel();
         btnSelect = new javax.swing.JButton();
         btnSearch = new javax.swing.JButton();
+        txtTotalRecord = new javax.swing.JFormattedTextField();
+        txtTotalAmt = new javax.swing.JFormattedTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Sale Voucher Search");
@@ -416,6 +394,7 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tblVoucher.setRowHeight(Global.tblRowHeight);
         tblVoucher.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tblVoucherMouseClicked(evt);
@@ -423,11 +402,16 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
         });
         jScrollPane2.setViewportView(tblVoucher);
 
-        lblTtlRecord.setText("Total Record: 0");
+        lblTtlRecord.setFont(Global.lableFont);
+        lblTtlRecord.setText("Total Record :");
 
-        lblTtlAmount.setText("Total Amount: 0");
+        lblTtlAmount.setFont(Global.lableFont);
+        lblTtlAmount.setText("Total Amount :");
 
+        btnSelect.setBackground(ColorUtil.mainColor);
         btnSelect.setFont(Global.lableFont);
+        btnSelect.setForeground(ColorUtil.foreground);
+        btnSelect.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/select-button.png"))); // NOI18N
         btnSelect.setText("Select");
         btnSelect.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -435,13 +419,24 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
             }
         });
 
+        btnSearch.setBackground(ColorUtil.mainColor);
         btnSearch.setFont(Global.lableFont);
+        btnSearch.setForeground(ColorUtil.foreground);
+        btnSearch.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/search-button.png"))); // NOI18N
         btnSearch.setText("Search");
         btnSearch.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSearchActionPerformed(evt);
             }
         });
+
+        txtTotalRecord.setEditable(false);
+        txtTotalRecord.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        txtTotalRecord.setFont(Global.amtFont);
+
+        txtTotalAmt.setEditable(false);
+        txtTotalAmt.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        txtTotalAmt.setFont(Global.amtFont);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -452,10 +447,14 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblTtlRecord, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(lblTtlAmount, javax.swing.GroupLayout.PREFERRED_SIZE, 257, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(lblTtlRecord)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(txtTotalRecord, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(lblTtlAmount)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(txtTotalAmt)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnSearch)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnSelect))
@@ -473,7 +472,9 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
                     .addComponent(btnSearch)
                     .addComponent(btnSelect)
                     .addComponent(lblTtlRecord)
-                    .addComponent(lblTtlAmount))
+                    .addComponent(lblTtlAmount)
+                    .addComponent(txtTotalRecord, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtTotalAmt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(12, 12, 12))
         );
 
@@ -527,6 +528,8 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
     private javax.swing.JTextField txtMachine;
     private javax.swing.JTextField txtRemark;
     private com.toedter.calendar.JDateChooser txtToDate;
+    private javax.swing.JFormattedTextField txtTotalAmt;
+    private javax.swing.JFormattedTextField txtTotalRecord;
     private javax.swing.JTextField txtUser;
     private javax.swing.JTextField txtVouNo;
     private javax.swing.JTextField txtVouStatus;

@@ -5,6 +5,7 @@
  */
 package com.cv.accountswing.ui.report;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.ChartOfAccount;
@@ -260,7 +261,7 @@ public class EditCashDialog extends javax.swing.JDialog {
         txtCashOut.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
         txtCashOut.setFont(Global.textFont);
 
-        panel.setBackground(Global.mainColor);
+        panel.setBackground(ColorUtil.mainColor);
         panel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
         panel.setFont(Global.textFont);
 

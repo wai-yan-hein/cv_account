@@ -6,6 +6,7 @@
 package com.cv.accountswing.ui;
 
 import com.cv.accountswing.AccountSwingApplication;
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.FilterObserver;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
@@ -899,7 +900,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
 
         toolBar.setOpaque(false);
 
-        btnSave.setBackground(Global.mainColor);
+        btnSave.setBackground(ColorUtil.mainColor);
         btnSave.setFont(Global.lableFont);
         btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save.png"))); // NOI18N
         btnSave.setToolTipText("F5 - Save");
@@ -910,7 +911,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         });
         toolBar.add(btnSave);
 
-        btnPrint.setBackground(Global.mainColor);
+        btnPrint.setBackground(ColorUtil.mainColor);
         btnPrint.setFont(Global.lableFont);
         btnPrint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/printer.png"))); // NOI18N
         btnPrint.setToolTipText("F6 - Print");
@@ -922,7 +923,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         });
         toolBar.add(btnPrint);
 
-        btnRefresh.setBackground(Global.mainColor);
+        btnRefresh.setBackground(ColorUtil.mainColor);
         btnRefresh.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/refresh.png"))); // NOI18N
         btnRefresh.setToolTipText("F7 - Refresh");
         btnRefresh.addActionListener(new java.awt.event.ActionListener() {
@@ -932,7 +933,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         });
         toolBar.add(btnRefresh);
 
-        btnDelete.setBackground(Global.mainColor);
+        btnDelete.setBackground(ColorUtil.mainColor);
         btnDelete.setFont(Global.lableFont);
         btnDelete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/delete.png"))); // NOI18N
         btnDelete.setToolTipText("F8 - Delete");
@@ -944,7 +945,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         });
         toolBar.add(btnDelete);
 
-        btnHistory.setBackground(Global.mainColor);
+        btnHistory.setBackground(ColorUtil.mainColor);
         btnHistory.setFont(Global.lableFont);
         btnHistory.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/history.png"))); // NOI18N
         btnHistory.setToolTipText("F9-History");
@@ -956,7 +957,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         });
         toolBar.add(btnHistory);
 
-        btnClear.setBackground(Global.mainColor);
+        btnClear.setBackground(ColorUtil.mainColor);
         btnClear.setFont(Global.lableFont);
         btnClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/clean-code.png"))); // NOI18N
         btnClear.setToolTipText("F10 - Clear ");
@@ -968,7 +969,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         });
         toolBar.add(btnClear);
 
-        btnLogout.setBackground(Global.mainColor);
+        btnLogout.setBackground(ColorUtil.mainColor);
         btnLogout.setFont(Global.lableFont);
         btnLogout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/logout.png"))); // NOI18N
         btnLogout.setToolTipText("Logout");

@@ -68,15 +68,8 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
 
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
-        // return columnIndex == 8 ? false : true; //To change body of generated methods, choose Tools | Templates.
-        if (columnIndex == 1) {
-            return false;
-        } else {
-            return true;
-        }
-
+        return columnIndex != 9; //To change body of generated methods, choose Tools | Templates.
     }
-
     @Override
     public int getRowCount() {
         if (listPurDetail == null) {
@@ -300,19 +293,12 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
     private void calculateAmount(PurchaseDetail pur) {
         if (pur.getStock() != null) {
             float saleQty = pur.getQty();
-            float stdSalePrice = pur.getPurPrice();
-            float calAmount = Util1.getFloat(pur.getPurAmt());
+            float purPrice = Util1.getFloat(pur.getPurPrice());
             float userWt = pur.getStdWeight();
             pur.setSmallestWT(getSmallestUnit(userWt, pur.getPurUnit().getItemUnitCode()));
             pur.setSmallestUnit("oz");
-
-            if (calAmount != 0) {
-                float amount = saleQty * calAmount;
-                pur.setPurAmt(amount);
-            } else {
-                float amount = saleQty * stdSalePrice;
-                pur.setPurAmt(amount);
-            }
+            float amount = saleQty * purPrice;
+            pur.setPurAmt(amount);
             //  calTotalAmount(pur);
         }
     }
@@ -337,13 +323,9 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
 //    }
     public List<PurchaseDetail> getListPurDetail() {
         List<PurchaseDetail> listDetail = new ArrayList();
-        for (PurchaseDetail pdh2 : listPurDetail) {
-            if (pdh2.getStock() != null) {
-                if (pdh2.getStock().getStockCode() != null) {
-                    listDetail.add(pdh2);
-                }
-            }
-        }
+        listPurDetail.stream().filter(pdh2 -> (pdh2.getStock() != null)).filter(pdh2 -> (pdh2.getStock().getStockCode() != null)).forEachOrdered(pdh2 -> {
+            listDetail.add(pdh2);
+        });
 
         return listDetail;
     }

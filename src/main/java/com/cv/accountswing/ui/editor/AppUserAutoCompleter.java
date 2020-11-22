@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
  * @author Lenovo
  */
 public class AppUserAutoCompleter implements KeyListener {
-
+    
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(DepartmentTableModel.class);
     private JTable table = new JTable();
     private JPopupMenu popup = new JPopupMenu();
@@ -55,7 +55,7 @@ public class AppUserAutoCompleter implements KeyListener {
     private final TableRowSorter<TableModel> sorter;
     private int x = 0;
     private boolean popupOpen = false;
-
+    
     public AppUserAutoCompleter(JTextComponent comp, List<AppUser> list,
             AbstractCellEditor editor) {
         this.textComp = comp;
@@ -72,7 +72,7 @@ public class AppUserAutoCompleter implements KeyListener {
         sorter = new TableRowSorter(table.getModel());
         table.setRowSorter(sorter);
         JScrollPane scroll = new JScrollPane(table);
-
+        
         scroll.setBorder(null);
         table.setFocusable(false);
         table.getColumnModel().getColumn(0).setPreferredWidth(10);//Code
@@ -86,15 +86,15 @@ public class AppUserAutoCompleter implements KeyListener {
                 }
             }
         });
-
+        
         scroll.getVerticalScrollBar().setFocusable(false);
         scroll.getHorizontalScrollBar().setFocusable(false);
-
+        
         popup.setBorder(BorderFactory.createLineBorder(Color.black));
         popup.setPopupSize(600, 300);
-
+        
         popup.add(scroll);
-
+        
         if (textComp instanceof JTextField) {
             textComp.registerKeyboardAction(showAction, KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0),
                     JComponent.WHEN_FOCUSED);
@@ -104,31 +104,31 @@ public class AppUserAutoCompleter implements KeyListener {
                     popupOpen = true;
                     showPopup();
                 }
-
+                
             });
             textComp.getDocument().addDocumentListener(documentListener);
         } else {
             textComp.registerKeyboardAction(showAction, KeyStroke.getKeyStroke(KeyEvent.VK_SPACE,
                     KeyEvent.CTRL_MASK), JComponent.WHEN_FOCUSED);
         }
-
+        
         textComp.registerKeyboardAction(upAction, KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0),
                 JComponent.WHEN_FOCUSED);
         textComp.registerKeyboardAction(hidePopupAction, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_FOCUSED);
-
+        
         popup.addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
             }
-
+            
             @Override
             public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
                 textComp.unregisterKeyboardAction(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
                 popupOpen = false;
-
+                
             }
-
+            
             @Override
             public void popupMenuCanceled(PopupMenuEvent e) {
                 if (!popupOpen) {
@@ -138,40 +138,40 @@ public class AppUserAutoCompleter implements KeyListener {
                 }
             }
         });
-
+        
         table.setRequestFocusEnabled(false);
-
+        
         if (list.size() > 0) {
             table.setRowSelectionInterval(0, 0);
         }
     }
-
+    
     public void mouseSelect() {
         if (table.getSelectedRow() != -1) {
             appUser = userTableModel.getUser(table.convertRowIndexToModel(
                     table.getSelectedRow()));
             ((JTextField) textComp).setText(appUser.getUserName());
         }
-
+        
         popup.setVisible(false);
         popupOpen = false;
         if (editor != null) {
             editor.stopCellEditing();
         }
     }
-
+    
     private Action acceptAction = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
             JComponent tf = (JComponent) e.getSource();
             AppUserAutoCompleter completer = (AppUserAutoCompleter) tf.getClientProperty(AUTOCOMPLETER);
-
+            
             if (completer.table.getSelectedRow() != -1) {
                 appUser = userTableModel.getUser(completer.table.convertRowIndexToModel(
                         completer.table.getSelectedRow()));
                 ((JTextField) completer.textComp).setText(appUser.getUserName());
             }
-
+            
             completer.popup.setVisible(false);
             if (editor != null) {
                 editor.stopCellEditing();
@@ -186,26 +186,26 @@ public class AppUserAutoCompleter implements KeyListener {
                 showPopup();
             }
         }
-
+        
         @Override
         public void removeUpdate(DocumentEvent e) {
             if (editor != null) {
                 popupOpen = true;
                 showPopup();
             }
-
+            
         }
-
+        
         @Override
         public void changedUpdate(DocumentEvent e) {
         }
     };
-
+    
     public void closePopup() {
         popup.setVisible(false);
         popupOpen = false;
     }
-
+    
     public void showPopup() {
         if (popupOpen) {
             if (!popup.isVisible()) {
@@ -215,17 +215,17 @@ public class AppUserAutoCompleter implements KeyListener {
                     if (textComp instanceof JTextField) {
                         textComp.getDocument().addDocumentListener(documentListener);
                     }
-
+                    
                     textComp.registerKeyboardAction(acceptAction, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
                             JComponent.WHEN_FOCUSED);
                     if (x == 0) {
                         x = textComp.getCaretPosition();
                     }
-
+                    
                     popup.show(textComp, x, textComp.getHeight());
                     log.info("Show Popup...");
                     popupOpen = false;
-
+                    
                 } else {
                     popup.setVisible(false);
                     popupOpen = false;
@@ -271,18 +271,18 @@ public class AppUserAutoCompleter implements KeyListener {
             }
         }
     };
-
+    
     protected void selectNextPossibleValue() {
         int si = table.getSelectedRow();
-
+        
         if (si < table.getRowCount() - 1) {
             try {
                 table.setRowSelectionInterval(si + 1, si + 1);
             } catch (Exception ex) {
-
+                
             }
         }
-
+        
         Rectangle rect = table.getCellRect(table.getSelectedRow(), 0, true);
         table.scrollRectToVisible(rect);
     }
@@ -293,26 +293,28 @@ public class AppUserAutoCompleter implements KeyListener {
      */
     protected void selectPreviousPossibleValue() {
         int si = table.getSelectedRow();
-
+        
         if (si > 0) {
             try {
                 table.setRowSelectionInterval(si - 1, si - 1);
             } catch (Exception ex) {
-
+                
             }
         }
-
+        
         Rectangle rect = table.getCellRect(table.getSelectedRow(), 0, true);
         table.scrollRectToVisible(rect);
     }
-
+    
     public AppUser getAppUser() {
         return appUser;
     }
-
+    
     public void setAppUser(AppUser appUser) {
         this.appUser = appUser;
-        this.textComp.setText(appUser.getUserName());
+        if (appUser != null) {
+            this.textComp.setText(appUser.getUserName());
+        }
     }
 
     /*
@@ -338,7 +340,7 @@ public class AppUserAutoCompleter implements KeyListener {
     @Override
     public void keyReleased(KeyEvent e) {
         String filter = textComp.getText();
-
+        
         if (filter.length() == 0) {
             sorter.setRowFilter(null);
         } else {
@@ -352,7 +354,7 @@ public class AppUserAutoCompleter implements KeyListener {
             /* if (e.getKeyCode() != KeyEvent.VK_DOWN && e.getKeyCode() != KeyEvent.VK_UP) {
             table.setRowSelectionInterval(0, 0);
             }*/
-
+            
         }
     }
     private final RowFilter<Object, Object> startsWithFilter = new RowFilter<Object, Object>() {
@@ -370,13 +372,13 @@ public class AppUserAutoCompleter implements KeyListener {
              * textComp.getText().toUpperCase())) { return true; }
              }
              */
-
+            
             String tmp1 = entry.getStringValue(0).toUpperCase();
             String tmp2 = entry.getStringValue(1).toUpperCase();
             String tmp3 = entry.getStringValue(3).toUpperCase();
             String tmp4 = entry.getStringValue(4).toUpperCase();
             String text = textComp.getText().toUpperCase();
-
+            
             return tmp1.startsWith(text) || tmp2.startsWith(text) || tmp3.startsWith(text) || tmp4.startsWith(text);
         }
     };

@@ -5,6 +5,7 @@
  */
 package com.cv.accountswing.ui.report;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.view.VGl;
@@ -252,7 +253,7 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Sel
             }
         });
 
-        jPanel1.setBackground(Global.mainColor);
+        jPanel1.setBackground(ColorUtil.mainColor);
 
         lblName.setFont(Global.menuFont);
         lblName.setForeground(new java.awt.Color(255, 255, 255));
