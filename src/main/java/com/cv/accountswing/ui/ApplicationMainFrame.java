@@ -693,7 +693,10 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             //Defatult Loction
             String locId = Global.sysProperties.get("system.default.location");
             Global.defaultLocation = locationService.findById(locId);
+<<<<<<< HEAD
+=======
             // getMachinceInfo();
+>>>>>>> be1a975ccac423ca581e8aa460bf52a15fb3820e
         } catch (Exception e) {
             LOGGER.error("Initialize Data :" + e.getMessage());
             JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Initialize Data", JOptionPane.ERROR_MESSAGE);

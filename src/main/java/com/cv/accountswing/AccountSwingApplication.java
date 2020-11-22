@@ -13,6 +13,7 @@ import java.util.TimeZone;
 import java.util.UUID;
 import javax.annotation.PostConstruct;
 import javax.swing.ImageIcon;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import org.slf4j.Logger;
@@ -44,7 +45,7 @@ public class AccountSwingApplication {
         try {
             IntelliJTheme.install(AccountSwingApplication.class.getResourceAsStream(
                     "/theme/light_theme.json"));
-            //JFrame.setDefaultLookAndFeelDecorated(true);
+            JDialog.setDefaultLookAndFeelDecorated(true);
 
             /*UIManager.setLookAndFeel(new FlatLightLaf());
             /*UIManager.getDefaults().entrySet().stream().sorted((o1, o2) -> {

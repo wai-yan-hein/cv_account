@@ -240,6 +240,7 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
         traderAutoCompleter = new TraderAutoCompleter(txtSupplier, Global.listTrader, null);
         traderAutoCompleter.setSelectionObserver(this);
     }
+<<<<<<< HEAD
 
     private void addPurTableModelListener() {
         tblPurchase.getModel().addTableModelListener((TableModelEvent e) -> {
@@ -258,6 +259,8 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
         });
     }
 
+=======
+>>>>>>> 04ef77bd6fdcc031330c61edf180251124a4e4ef
     private void assignDefalutValue() {
         try {
             txtPurDate.setDate(Util1.getTodayDate());
