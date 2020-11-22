@@ -44,13 +44,14 @@ public class AccountSwingApplication {
         try {
             IntelliJTheme.install(AccountSwingApplication.class.getResourceAsStream(
                     "/theme/light_theme.json"));
-            //UIManager.setLookAndFeel(new FlatLightLaf());
+            //JFrame.setDefaultLookAndFeelDecorated(true);
+
+            /*UIManager.setLookAndFeel(new FlatLightLaf());
             /*UIManager.getDefaults().entrySet().stream().sorted((o1, o2) -> {
             return o1.getKey().toString().compareTo(o2.getKey().toString());
             }).forEach(entry -> {
             LOGGER.info("Key :" + entry.getKey().toString() + "---" + "Value" + gson.toJson(entry.getValue()));
             });*/
-
         } catch (Exception ex) {
             LOGGER.error("Theme Error :" + ex.getMessage());
         }

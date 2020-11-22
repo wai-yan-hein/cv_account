@@ -5,11 +5,15 @@
  */
 package com.cv.inv.service;
 
+import com.cv.accountswing.common.Global;
+import com.cv.accountswing.entity.Gl;
+import com.cv.accountswing.util.Util1;
 import com.cv.inv.dao.PurchaseHisDao;
 import com.cv.inv.dao.PurchaseDetailDao;
 import com.cv.inv.entity.PurDetailKey;
 import com.cv.inv.entity.PurHis;
 import com.cv.inv.entity.PurchaseDetail;
+import java.util.Date;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,11 +30,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class PurchaseDetatilServiceImpl implements PurchaseDetailService {
 
     private static final Logger logger = LoggerFactory.getLogger(RetInServiceImpl.class);
+    
 
     @Autowired
     private PurchaseDetailDao dao;
     @Autowired
-    private PurchaseHisDao glDao;
+    private PurchaseHisDao purchaseHisDao;
 
     @Override
     public PurchaseDetail save(PurchaseDetail pd) {
@@ -44,18 +49,16 @@ public class PurchaseDetatilServiceImpl implements PurchaseDetailService {
     }
 
     @Override
-    public void save(PurHis gl, List<PurchaseDetail> listPD, List<String> delList) {
+    public void save(PurHis pur, List<PurchaseDetail> listPD, List<String> delList) {
         String retInDetailId;
-
         try {
-
             if (delList != null) {
-                for (String detailId : delList) {
+                delList.forEach(detailId -> {
                     dao.delete(detailId);
-                }
+                });
             }
-            glDao.save(gl);
-            String vouNo = gl.getPurInvId();
+            purchaseHisDao.save(pur);
+            String vouNo = pur.getPurInvId();
             for (PurchaseDetail pd : listPD) {
                 if (pd.getStock() != null) {
                     if (pd.getPurDetailKey() != null) {
@@ -64,7 +67,7 @@ public class PurchaseDetatilServiceImpl implements PurchaseDetailService {
                         retInDetailId = vouNo + '-' + pd.getUniqueId();
                         pd.setPurDetailKey(new PurDetailKey(vouNo, retInDetailId));
                     }
-                  //  pd.setLocation(gl.getLocationId());
+                    //  pd.setLocation(pur.getLocationId());
                     dao.save(pd);
                 }
             }
@@ -74,5 +77,7 @@ public class PurchaseDetatilServiceImpl implements PurchaseDetailService {
 
         }
     }
+
+    
 
 }

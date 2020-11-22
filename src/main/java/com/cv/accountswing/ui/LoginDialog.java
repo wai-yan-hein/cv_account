@@ -279,7 +279,9 @@ public class LoginDialog extends javax.swing.JDialog implements KeyListener {
         butClear.setName("butClear"); // NOI18N
 
         butLogin.setFont(Global.lableFont);
+        butLogin.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/login-button.png"))); // NOI18N
         butLogin.setText("Login");
+        butLogin.setHorizontalAlignment(javax.swing.SwingConstants.LEADING);
         butLogin.setName("butLogin"); // NOI18N
         butLogin.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -298,7 +300,7 @@ public class LoginDialog extends javax.swing.JDialog implements KeyListener {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 173, Short.MAX_VALUE)
+                        .addGap(0, 191, Short.MAX_VALUE)
                         .addComponent(butLogin)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(butClear))
@@ -308,8 +310,8 @@ public class LoginDialog extends javax.swing.JDialog implements KeyListener {
                             .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtPassword, javax.swing.GroupLayout.DEFAULT_SIZE, 211, Short.MAX_VALUE)
-                            .addComponent(txtLoginName, javax.swing.GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE))))
+                            .addComponent(txtPassword, javax.swing.GroupLayout.DEFAULT_SIZE, 239, Short.MAX_VALUE)
+                            .addComponent(txtLoginName, javax.swing.GroupLayout.DEFAULT_SIZE, 239, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
