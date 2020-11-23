@@ -25,4 +25,6 @@ public interface StockDao {
     public Object getMax(String sql);
 
     public List<Stock> findActiveStock();
+
+    public List<Stock> search(String stockType);
 }

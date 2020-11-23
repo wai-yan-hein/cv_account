@@ -51,5 +51,25 @@ public class StockDaoImpl extends AbstractDao<String, Stock> implements StockDao
         return findHSQL(hsql);
         
     }
+ @Override
+    public List<Stock> search(String saleInvId) {
+        String strFilter = "";
+          if (!saleInvId.equals("-")) {
+            if (strFilter.isEmpty()) {
+                strFilter = "v.stockType = '" + saleInvId+"'";
+            } else {
+                strFilter = strFilter + " and v.stockType = '" + saleInvId+"'";
+            }
+        }
+            String strSql = "select v from Stock v";
+
+        List<Stock> listDH = null;
+        if (!strFilter.isEmpty()) {
+            strSql = strSql + " where " + strFilter;
+            listDH = findHSQL(strSql);
+        }
+
+        return listDH;
+    }
 
 }

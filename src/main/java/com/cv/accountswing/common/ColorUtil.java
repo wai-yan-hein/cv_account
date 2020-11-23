@@ -15,7 +15,7 @@ public class ColorUtil {
 
     public static Color mainColor = new Color(8, 113, 194);
     public static Color btnSave;
-    public static Color btnDelete;
+    public static Color btnDelete = new Color(204, 51, 0);
     public static Color btnEdit = new Color(129, 135, 145);
     public static Color foreground = new Color(255, 255, 255);
     public static Color backgoround;

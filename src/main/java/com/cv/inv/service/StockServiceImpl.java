@@ -134,4 +134,9 @@ public class StockServiceImpl implements StockService {
         return medCode;
     }
 
+    @Override
+    public List<Stock> search(String stockType) {
+        return dao.search(stockType);
+    }
+
 }

@@ -5,13 +5,15 @@
  */
 package com.cv.inv.setup.dialog;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.StartWithRowFilter;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.util.Util1;
+import com.cv.inv.entity.Stock;
 import com.cv.inv.entity.StockType;
+import com.cv.inv.service.StockService;
 import com.cv.inv.setup.common.StockTypeTableModel;
-import java.awt.Frame;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import javax.swing.JButton;
@@ -26,6 +28,7 @@ import javax.swing.table.TableRowSorter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import com.cv.inv.service.StockTypeService;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +46,9 @@ public class StockTypeSetupDialog extends javax.swing.JDialog implements KeyList
     private StockTypeService itemTypeService;
     @Autowired
     private StockTypeTableModel itemTypeTableModel;
+     @Autowired
+    private StockService stockService;
+    
     private TableRowSorter<TableModel> sorter;
     private StartWithRowFilter swrf;
 
@@ -135,12 +141,18 @@ public class StockTypeSetupDialog extends javax.swing.JDialog implements KeyList
 
     private void delete() {
         StockType item = itemTypeTableModel.getItemType(selectRow);
-        int delete = itemTypeService.delete(item.getItemTypeCode());
+        List<Stock> stockList=stockService.search(item.getItemTypeCode());
+        if(stockList.size()>=0){
+            JOptionPane.showMessageDialog(Global.parentForm, "Cannot Delete!");
+        }else{
+           int delete = itemTypeService.delete(item.getItemTypeCode());
         if (delete == 1) {
             JOptionPane.showMessageDialog(Global.parentForm, "Deleted");
         } else {
             JOptionPane.showMessageDialog(Global.parentForm, "Error in server.");
+        }  
         }
+       
     }
 
     private boolean isValidEntry() {
@@ -259,7 +271,9 @@ public class StockTypeSetupDialog extends javax.swing.JDialog implements KeyList
         txtAccId.setFont(Global.textFont);
         txtAccId.setName("txtAccId"); // NOI18N
 
+        btnSave.setBackground(ColorUtil.mainColor);
         btnSave.setFont(Global.lableFont);
+        btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save-button-white.png"))); // NOI18N
         btnSave.setText("Save");
         btnSave.setName("btnSave"); // NOI18N
         btnSave.addActionListener(new java.awt.event.ActionListener() {
@@ -268,7 +282,9 @@ public class StockTypeSetupDialog extends javax.swing.JDialog implements KeyList
             }
         });
 
+        btnDelete.setBackground(ColorUtil.btnDelete);
         btnDelete.setFont(Global.lableFont);
+        btnDelete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/delete-button-white.png"))); // NOI18N
         btnDelete.setText("Delete");
         btnDelete.setName("btnDelete"); // NOI18N
         btnDelete.addActionListener(new java.awt.event.ActionListener() {
@@ -277,7 +293,9 @@ public class StockTypeSetupDialog extends javax.swing.JDialog implements KeyList
             }
         });
 
+        btnClear.setBackground(ColorUtil.btnEdit);
         btnClear.setFont(Global.lableFont);
+        btnClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/clear-button-white.png"))); // NOI18N
         btnClear.setText("Clear");
         btnClear.setName("btnClear"); // NOI18N
         btnClear.addActionListener(new java.awt.event.ActionListener() {
