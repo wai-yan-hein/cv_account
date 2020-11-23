@@ -129,7 +129,7 @@ public class AllCashTableModel extends AbstractTableModel {
                         if (vgi.getDrAmt() == 0) {
                             return null;
                         } else {
-                            return vgi.getCrAmt();
+                            return vgi.getDrAmt();
                         }
                     } else {
                         return vgi.getDrAmt();
@@ -290,7 +290,7 @@ public class AllCashTableModel extends AbstractTableModel {
                 parent.setRowSelectionInterval(row, row);
             }
         }
-        if (vgl.getDrAmt() == null && vgl.getCrAmt() == null) {
+        if (Util1.getDouble(vgl.getDrAmt()) + Util1.getDouble(vgl.getCrAmt()) <= 0) {
             status = false;
             /*JOptionPane.showMessageDialog(Global.parentForm, "Dr / Cr missing.");
             parent.setColumnSelectionInterval(7, 7);
@@ -376,15 +376,18 @@ public class AllCashTableModel extends AbstractTableModel {
 
     public void deleteVGl(int row) {
         if (!listVGl.isEmpty()) {
-
             VGl vgl = listVGl.get(row);
             try {
-                int delete = glService.delete(vgl.getGlId());
-                if (delete == 1) {
-                    listVGl.remove(row);
-                    trader = traderService.findById(vgl.getTraderId().intValue());
-                    sendDeletePaymentToInv(trader, vgl.getGlId());
-                    fireTableRowsDeleted(0, listVGl.size());
+                if (vgl.getGlId() != null) {
+                    int delete = glService.delete(vgl.getGlId());
+                    if (delete == 1) {
+                        listVGl.remove(row);
+                        if (vgl.getTraderId() != null) {
+                            trader = traderService.findById(vgl.getTraderId().intValue());
+                            sendDeletePaymentToInv(trader, vgl.getGlId());
+                        }
+                        fireTableRowsDeleted(0, listVGl.size());
+                    }
                 }
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(Global.parentForm, ex.getMessage());

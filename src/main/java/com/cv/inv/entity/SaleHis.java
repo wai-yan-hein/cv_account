@@ -5,12 +5,14 @@
  */
 package com.cv.inv.entity;
 
+import com.cv.accountswing.entity.Currency;
 import com.cv.accountswing.entity.Trader;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -39,8 +41,12 @@ public class SaleHis implements java.io.Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "credit_term")
     private Date creditTerm;
-    @Column(name = "from_cur_id")
-    private String fromCurId;
+    @ManyToOne
+    @JoinColumns({
+        @JoinColumn(name = "from_cur_id"),
+        @JoinColumn(name = "comp_code")
+    })
+    private Currency currency;
     @ManyToOne
     @JoinColumn(name = "vou_status_id")
     private VouStatus vouStatusId;
@@ -122,12 +128,12 @@ public class SaleHis implements java.io.Serializable {
         this.creditTerm = creditTerm;
     }
 
-    public String getFromCurId() {
-        return fromCurId;
+    public Currency getCurrency() {
+        return currency;
     }
 
-    public void setFromCurId(String fromCurId) {
-        this.fromCurId = fromCurId;
+    public void setCurrency(Currency currency) {
+        this.currency = currency;
     }
 
     public VouStatus getVouStatusId() {

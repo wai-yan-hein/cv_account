@@ -410,7 +410,7 @@ public class SaleEntry1 extends javax.swing.JPanel implements SelectionObserver,
             saleHis.setPaid(NumberUtil.getDouble(txtVouPaid.getText()));
             saleHis.setVouBalance(NumberUtil.getDouble(txtVouBalance.getText()));
 
-            saleHis.setFromCurId(currAutoCompleter.getCurrency().getKey().getCode());
+            saleHis.setCurrency(currAutoCompleter.getCurrency());
 
             if (lblStatus.getText().equals("NEW")) {
                 saleHis.setSaleDate(txtSaleDate.getDate());
@@ -1051,20 +1051,20 @@ public class SaleEntry1 extends javax.swing.JPanel implements SelectionObserver,
             case "CustomerList":
                 try {
 
-                    if (selectObj != null) {
-                        Trader cus = (Trader) selectObj;
-                        txtCus.setText(cus.getTraderName());
+                if (selectObj != null) {
+                    Trader cus = (Trader) selectObj;
+                    txtCus.setText(cus.getTraderName());
 
-                        if (cus.getTraderType() != null) {
-                            saleTableModel.setCusType(cus.getTraderType().getDescription());
-                        } else {
-                            txtCus.setText(null);
-                        }
+                    if (cus.getTraderType() != null) {
+                        saleTableModel.setCusType(cus.getTraderType().getDescription());
+                    } else {
+                        txtCus.setText(null);
                     }
-                } catch (Exception ex) {
-                    LOGGER.error("selected CustomerList : " + selectObj.toString() + " - " + ex.getMessage());
                 }
-                break;
+            } catch (Exception ex) {
+                LOGGER.error("selected CustomerList : " + selectObj.toString() + " - " + ex.getMessage());
+            }
+            break;
             case "StockList":
                 Stock stock = (Stock) selectObj;
                 int selectRow = tblSale.getSelectedRow();

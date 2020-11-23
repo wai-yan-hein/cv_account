@@ -309,6 +309,7 @@ public class SaleEntryTableModel extends AbstractTableModel {
                     break;
             }
             calculateAmount(record);
+            selectionObserver.selected("SALE-TOTAL", "SALE-TOTAL");
             fireTableRowsUpdated(row, row);
             parent.requestFocusInWindow();
             //   fireTableCellUpdated(row, 8);

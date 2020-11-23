@@ -169,10 +169,10 @@ public class COAOpeningDaoImpl extends AbstractDao<Long, AccOpeningH> implements
         if (!dept.equals("-") && !currCode.equals("-")) {
             String strSql = "insert into coa_opening(op_date, source_acc_id, cur_code, dr_amt, "
                     + "cr_amt, user_id, comp_id, tran_source, created_date, dept_code) "
-                    + "select '" + opDate + "', child_coa_code, cur_code, 0, 0, '" + userId + "', '"
+                    + "select '" + opDate + "', child_coa_code, '" + currCode + "', 0, 0, '" + userId + "', '"
                     + compCode + "', 'OPENING', sysdate(), '" + dept
-                    + "' from v_coa_tree where level2 >= 3 and cur_code = '" + currCode
-                    + "' and coa_code not in (select coa_code from coa_excludion where option_desp = 'COAOPENING')"
+                    + "' from v_coa_tree where level2 >= 3 \n"
+                    + "and coa_code not in (select coa_code from coa_excludion where option_desp = 'COAOPENING')"
                     + " and comp_code1 = '" + compCode + "' and coa_parent1 in (" + coaGroup + ")";
             execSQL(strSql);
 

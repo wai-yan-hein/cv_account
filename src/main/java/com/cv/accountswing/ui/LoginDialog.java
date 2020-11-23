@@ -5,6 +5,7 @@
  */
 package com.cv.accountswing.ui;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.entity.AppUser;
 import com.cv.accountswing.service.UserService;
@@ -274,12 +275,17 @@ public class LoginDialog extends javax.swing.JDialog implements KeyListener {
         txtPassword.setFont(Global.lableFont);
         txtPassword.setName("txtPassword"); // NOI18N
 
+        butClear.setBackground(ColorUtil.btnEdit);
         butClear.setFont(Global.lableFont);
+        butClear.setForeground(ColorUtil.foreground);
+        butClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/button_clear_white.png"))); // NOI18N
         butClear.setText("Clear");
         butClear.setName("butClear"); // NOI18N
 
+        butLogin.setBackground(ColorUtil.mainColor);
         butLogin.setFont(Global.lableFont);
-        butLogin.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/login-button.png"))); // NOI18N
+        butLogin.setForeground(ColorUtil.foreground);
+        butLogin.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save-button-white.png"))); // NOI18N
         butLogin.setText("Login");
         butLogin.setHorizontalAlignment(javax.swing.SwingConstants.LEADING);
         butLogin.setName("butLogin"); // NOI18N
@@ -300,7 +306,7 @@ public class LoginDialog extends javax.swing.JDialog implements KeyListener {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 191, Short.MAX_VALUE)
+                        .addGap(0, 184, Short.MAX_VALUE)
                         .addComponent(butLogin)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(butClear))
@@ -317,7 +323,7 @@ public class LoginDialog extends javax.swing.JDialog implements KeyListener {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(26, 26, 26)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(txtLoginName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -329,7 +335,7 @@ public class LoginDialog extends javax.swing.JDialog implements KeyListener {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(butClear)
                     .addComponent(butLogin))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(14, 14, 14)
                 .addComponent(lblStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );

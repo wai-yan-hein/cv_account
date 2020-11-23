@@ -277,10 +277,10 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
 
     private void deleteVoucher() {
         VGl vgl;
+        int selectRow = tblCash.convertRowIndexToModel(tblCash.getSelectedRow());
         int yes_no;
-
         if (tblCash.getSelectedRow() >= 0) {
-            vgl = allCashTableModel.getVGl(tblCash.convertRowIndexToModel(tblCash.getSelectedRow()));
+            vgl = allCashTableModel.getVGl(selectRow);
 
             if (vgl.getGlId() != null) {
                 yes_no = JOptionPane.showConfirmDialog(Global.parentForm, "Are you sure to delete?",
@@ -289,7 +289,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
                     tblCash.getCellEditor().stopCellEditing();
                 }
                 if (yes_no == 0) {
-                    allCashTableModel.deleteVGl(tblCash.getSelectedRow());
+                    allCashTableModel.deleteVGl(selectRow);
                     calDebitCredit();
                 }
             }

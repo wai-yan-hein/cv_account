@@ -824,7 +824,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     public void startNetworkDetector() {
         NetworkDetector detector = new NetworkDetector();
         detector.setNetworkObserver(this);
-        scheduler.scheduleAtFixedRate(detector, Duration.ofSeconds(5));
+        scheduler.scheduleAtFixedRate(detector, Duration.ofSeconds(10));
     }
 
     private void addMargin() {
