@@ -22,7 +22,9 @@ public interface StockService {
     public List<Stock> findAll();
 
     public int delete(String id);
-    
+
     public List<Stock> findActiveStock();
+
+    public List<Stock> search(String stockType);
 
 }
