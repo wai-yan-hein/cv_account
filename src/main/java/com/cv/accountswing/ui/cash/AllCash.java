@@ -16,12 +16,14 @@ import com.cv.accountswing.entity.SystemProperty;
 import com.cv.accountswing.entity.SystemPropertyKey;
 import com.cv.accountswing.entity.temp.TmpOpeningClosing;
 import com.cv.accountswing.entity.view.VGl;
+import com.cv.accountswing.service.AutoTextService;
 import com.cv.accountswing.service.COAOpeningDService;
 import com.cv.accountswing.service.CompanyInfoService;
 import com.cv.accountswing.service.ReportService;
 import com.cv.accountswing.service.SystemPropertyService;
 import com.cv.accountswing.service.VGlService;
 import com.cv.accountswing.ui.ApplicationMainFrame;
+import com.cv.accountswing.ui.cash.common.AllCashTableHandler;
 import com.cv.accountswing.ui.editor.CurrencyEditor;
 import com.cv.accountswing.ui.editor.DepartmentCellEditor;
 import com.cv.accountswing.ui.editor.TraderCellEditor;
@@ -29,6 +31,7 @@ import com.cv.accountswing.ui.cash.common.AllCashTableModel;
 import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.editor.COACellEditor;
+import com.cv.accountswing.ui.editor.RefCellEditor;
 import com.cv.accountswing.ui.filter.FilterPanel;
 import com.cv.accountswing.util.Util1;
 import java.awt.BorderLayout;
@@ -44,6 +47,7 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.DropMode;
 import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -100,6 +104,8 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
     @Autowired
     private ApplicationContext applicationContext;
     @Autowired
+    private AutoTextService autoTextService;
+    @Autowired
     private ApplicationMainFrame mainFrame;
     private TableRowSorter<TableModel> sorter;
     private SelectionObserver selectionObserver;
@@ -143,6 +149,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
     public AllCash() {
         initComponents();
         initPopup();
+        initKeyListener();
     }
 
     public AllCash newInstance() {
@@ -199,7 +206,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
         tblCash.getColumnModel().getColumn(0).setCellEditor(new AutoClearEditor());
         tblCash.getColumnModel().getColumn(1).setCellEditor(new DepartmentCellEditor());
         tblCash.getColumnModel().getColumn(2).setCellEditor(new AutoClearEditor());
-        tblCash.getColumnModel().getColumn(3).setCellEditor(new AutoClearEditor());
+        tblCash.getColumnModel().getColumn(3).setCellEditor(new RefCellEditor(autoTextService));
         tblCash.getColumnModel().getColumn(4).setCellEditor(new TraderCellEditor());
         tblCash.getColumnModel().getColumn(5).setCellEditor(new COACellEditor());
         tblCash.getColumnModel().getColumn(6).setCellEditor(new CurrencyEditor());
@@ -227,6 +234,23 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
         tblCash.getActionMap().put("ENTER-Action", actionTblCash);*/
         tblCash.getInputMap().put(KeyStroke.getKeyStroke("F8"), "F8-Action");
         tblCash.getActionMap().put("F8-Action", actionItemDeleteExp);
+        tblCash.setDragEnabled(true);
+        tblCash.setDropMode(DropMode.INSERT_ROWS);
+        tblCash.setTransferHandler(new AllCashTableHandler(allCashTableModel));
+    }
+
+    private void initKeyListener() {
+        tblCash.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if (e.isControlDown()) {
+                    if (e.getKeyCode() == KeyEvent.VK_V) {
+                        allCashTableModel.copyRow();
+                    }
+                }
+            }
+
+        });
     }
 
     private void initPopup() {

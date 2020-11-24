@@ -202,8 +202,8 @@ public class GlDaoImpl extends AbstractDao<Long, Gl> implements GlDao {
     }
 
     @Override
-    public int delete(Long glId) throws Exception {
-        String strBakSql = getGlLogSql(glId, "GL-DELETE");
+    public int delete(Long glId, String option) throws Exception {
+        String strBakSql = getGlLogSql(glId, option);
         execSQL(strBakSql);
 
         String strSql = "delete from Gl o where o.glId = " + glId;

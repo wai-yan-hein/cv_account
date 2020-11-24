@@ -7,12 +7,14 @@ package com.cv.accountswing.ui.cash.common;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.ReloadData;
 import com.cv.accountswing.common.SelectionObserver;
+import com.cv.accountswing.entity.AutoText;
 import com.cv.accountswing.entity.ChartOfAccount;
 import com.cv.accountswing.entity.Currency;
 import com.cv.accountswing.entity.Department;
 import com.cv.accountswing.entity.Gl;
 import com.cv.accountswing.entity.Trader;
 import com.cv.accountswing.entity.view.VGl;
+import com.cv.accountswing.service.AutoTextService;
 import com.cv.accountswing.service.GlService;
 import com.cv.accountswing.service.MessagingService;
 import com.cv.accountswing.service.TraderService;
@@ -25,6 +27,7 @@ import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
+import org.apache.commons.lang.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +45,8 @@ public class AllCashTableModel extends AbstractTableModel {
     private List<VGl> listVGl = new ArrayList();
     private String[] columnNames = {"Date", "Dept:", "Description", "Ref", "Person", "Account", "Curr", "Cash In / Dr", "Cash Out / Cr"};
     Gson gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
+    @Autowired
+    private AutoTextService autoTextService;
 
     @Autowired
     private GlService glService;
@@ -188,14 +193,36 @@ public class AllCashTableModel extends AbstractTableModel {
                 break;
             case 2:
                 if (value != null) {
-                    vgl.setDescription(value.toString());
+                    if (value instanceof AutoText) {
+                        AutoText autoText = (AutoText) value;
+                        vgl.setDescription(autoText.getDesp());
+                    } else {
+                        vgl.setDescription(value.toString());
+                        AutoText success = autoTextService.save(new AutoText(vgl.getDescription(), "DESP"));
+                    if (success != null) {
+                        Global.listDesp.add(success);
+                    }
+                    }
+                    
                 }
                 parent.setColumnSelectionInterval(3, 3);
 
                 break;
             case 3:
                 if (value != null) {
-                    vgl.setReference(value.toString());
+                    if (value instanceof AutoText) {
+                        AutoText autoText = (AutoText) value;
+                        vgl.setReference(autoText.getDesp());
+                    } else {
+                        vgl.setReference(value.toString());
+                        if (!vgl.getReference().isEmpty()) {
+                            AutoText success = autoTextService.save(new AutoText(vgl.getReference(), "REF"));
+                            if (success != null) {
+                                Global.listRef.add(success);
+                            }
+                        }
+                    }
+
                 }
                 parent.setColumnSelectionInterval(4, 4);
                 break;
@@ -379,7 +406,7 @@ public class AllCashTableModel extends AbstractTableModel {
             VGl vgl = listVGl.get(row);
             try {
                 if (vgl.getGlId() != null) {
-                    int delete = glService.delete(vgl.getGlId());
+                    int delete = glService.delete(vgl.getGlId(), "GL-DELETE");
                     if (delete == 1) {
                         listVGl.remove(row);
                         if (vgl.getTraderId() != null) {
@@ -455,6 +482,24 @@ public class AllCashTableModel extends AbstractTableModel {
     public void setColumnName(int i, String name) {
         columnNames[i] = name;
         fireTableStructureChanged();
+    }
+
+    public void copyRow() {
+        int selectRow = parent.convertRowIndexToModel(parent.getSelectedRow());
+        if (listVGl != null) {
+            VGl newVGl;
+            VGl vgl = listVGl.get(selectRow - 1);
+            if (vgl.getGlId() != null) {
+                newVGl = (VGl) SerializationUtils.clone(vgl);
+                newVGl.setGlId(null);
+                newVGl.setDrAmt(null);
+                newVGl.setCrAmt(null);
+                listVGl.set(selectRow, newVGl);
+                parent.setRowSelectionInterval(selectRow, selectRow);
+                parent.setColumnSelectionInterval(7, 7);
+                parent.requestFocus();
+            }
+        }
     }
 
     public void clear() {
