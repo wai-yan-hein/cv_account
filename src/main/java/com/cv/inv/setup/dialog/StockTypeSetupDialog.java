@@ -46,9 +46,9 @@ public class StockTypeSetupDialog extends javax.swing.JDialog implements KeyList
     private StockTypeService itemTypeService;
     @Autowired
     private StockTypeTableModel itemTypeTableModel;
-     @Autowired
+    @Autowired
     private StockService stockService;
-    
+
     private TableRowSorter<TableModel> sorter;
     private StartWithRowFilter swrf;
 
@@ -141,18 +141,18 @@ public class StockTypeSetupDialog extends javax.swing.JDialog implements KeyList
 
     private void delete() {
         StockType item = itemTypeTableModel.getItemType(selectRow);
-        List<Stock> stockList=stockService.search(item.getItemTypeCode());
-        if(stockList.size()>=0){
+        List<Stock> stockList = stockService.search(item.getItemTypeCode());
+        if (stockList.size() >= 0) {
             JOptionPane.showMessageDialog(Global.parentForm, "Cannot Delete!");
-        }else{
-           int delete = itemTypeService.delete(item.getItemTypeCode());
-        if (delete == 1) {
-            JOptionPane.showMessageDialog(Global.parentForm, "Deleted");
         } else {
-            JOptionPane.showMessageDialog(Global.parentForm, "Error in server.");
-        }  
+            int delete = itemTypeService.delete(item.getItemTypeCode());
+            if (delete == 1) {
+                JOptionPane.showMessageDialog(Global.parentForm, "Deleted");
+            } else {
+                JOptionPane.showMessageDialog(Global.parentForm, "Error in server.");
+            }
         }
-       
+
     }
 
     private boolean isValidEntry() {

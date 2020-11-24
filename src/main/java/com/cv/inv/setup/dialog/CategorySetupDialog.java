@@ -5,15 +5,19 @@
  */
 package com.cv.inv.setup.dialog;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.StartWithRowFilter;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.Category;
+import com.cv.inv.entity.Stock;
 import com.cv.inv.service.CategoryService;
+import com.cv.inv.service.StockService;
 import com.cv.inv.setup.common.CategoryTableModel;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
@@ -43,6 +47,9 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
     private CategoryService categoryService;
     @Autowired
     private CategoryTableModel categoryTableModel;
+    @Autowired
+    private StockService stockService;
+
     private TableRowSorter<TableModel> sorter;
     private StartWithRowFilter swrf;
 
@@ -128,14 +135,19 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
     }
 
     private void delete() {
-        
-            Category cat = categoryTableModel.getCategory(selectRow);
+
+        Category cat = categoryTableModel.getCategory(selectRow);
+        List<Stock> stockList = stockService.searchC(cat.getCatId().toString());
+        if (stockList.size() >= 0) {
+            JOptionPane.showMessageDialog(Global.parentForm, "Cannot Delete!");
+        } else {
             int delete = categoryService.delete(cat.getCatId().toString());
             if (delete == 1) {
                 Global.listCategory.remove(selectRow);
                 JOptionPane.showMessageDialog(Global.parentForm, "Deleted");
                 clear();
             }
+        }
     }
 
     private boolean isValidEntry() {
@@ -229,7 +241,9 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
             }
         });
 
+        btnSave.setBackground(ColorUtil.mainColor);
         btnSave.setFont(Global.lableFont);
+        btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save-button-white.png"))); // NOI18N
         btnSave.setText("Save");
         btnSave.setName("btnSave"); // NOI18N
         btnSave.addActionListener(new java.awt.event.ActionListener() {
@@ -238,7 +252,9 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
             }
         });
 
+        btnDelete.setBackground(ColorUtil.btnDelete);
         btnDelete.setFont(Global.lableFont);
+        btnDelete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/delete-button-white.png"))); // NOI18N
         btnDelete.setText("Delete");
         btnDelete.setName("btnDelete"); // NOI18N
         btnDelete.addActionListener(new java.awt.event.ActionListener() {
@@ -247,7 +263,9 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
             }
         });
 
+        btnClear.setBackground(ColorUtil.btnEdit);
         btnClear.setFont(Global.lableFont);
+        btnClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/clear-button-white.png"))); // NOI18N
         btnClear.setText("Clear");
         btnClear.setName("btnClear"); // NOI18N
         btnClear.addActionListener(new java.awt.event.ActionListener() {
@@ -293,7 +311,7 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
                         .addComponent(lblStatus))
                     .addComponent(btnDelete)
                     .addComponent(btnClear))
-                .addContainerGap(303, Short.MAX_VALUE))
+                .addContainerGap(299, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -303,7 +321,7 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtFilter, javax.swing.GroupLayout.DEFAULT_SIZE, 278, Short.MAX_VALUE)
+                    .addComponent(txtFilter, javax.swing.GroupLayout.DEFAULT_SIZE, 212, Short.MAX_VALUE)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)

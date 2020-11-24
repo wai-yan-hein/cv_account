@@ -5,10 +5,10 @@
  */
 package com.cv.inv.entry.dialog;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.util.Util1;
-import com.cv.inv.entity.TransferDetailHis;
 import com.cv.inv.entity.TransferHis;
 import com.cv.inv.entry.Transfer;
 import com.cv.inv.entry.common.TransferSearchTableModel;
@@ -272,6 +272,8 @@ public class TransferSearchDialog extends javax.swing.JDialog implements Selecti
         });
         jScrollPane1.setViewportView(tblVoucher);
 
+        butSearch.setBackground(ColorUtil.mainColor);
+        butSearch.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/search-button-white.png"))); // NOI18N
         butSearch.setText("Search");
         butSearch.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -279,6 +281,8 @@ public class TransferSearchDialog extends javax.swing.JDialog implements Selecti
             }
         });
 
+        butSelect.setBackground(ColorUtil.mainColor);
+        butSelect.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/select-button.png"))); // NOI18N
         butSelect.setText("Select");
         butSelect.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

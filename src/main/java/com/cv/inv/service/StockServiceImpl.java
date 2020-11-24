@@ -139,4 +139,14 @@ public class StockServiceImpl implements StockService {
         return dao.search(stockType);
     }
 
+    @Override
+    public List<Stock> searchC(String stockCat) {
+        return dao.searchC(stockCat);
+    }
+
+    @Override
+    public List<Stock> searchB(String stockBrand) {
+        return dao.searchB(stockBrand);
+    }
+
 }

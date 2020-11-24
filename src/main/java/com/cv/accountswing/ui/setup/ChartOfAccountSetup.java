@@ -5,6 +5,7 @@
  */
 package com.cv.accountswing.ui.setup;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
@@ -413,7 +414,9 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
         chkActive.setEnabled(false);
         chkActive.setName("chkActive"); // NOI18N
 
+        btnSave.setBackground(ColorUtil.mainColor);
         btnSave.setFont(Global.textFont);
+        btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save-button-white.png"))); // NOI18N
         btnSave.setText("Save");
         btnSave.setEnabled(false);
         btnSave.setName("btnSave"); // NOI18N
@@ -426,7 +429,9 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
         lblStatus.setFont(Global.lableFont);
         lblStatus.setText("NEW");
 
+        btnClear.setBackground(ColorUtil.btnEdit);
         btnClear.setFont(Global.textFont);
+        btnClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/clear-button-white.png"))); // NOI18N
         btnClear.setText("Clear");
         btnClear.setEnabled(false);
         btnClear.setName("btnClear"); // NOI18N

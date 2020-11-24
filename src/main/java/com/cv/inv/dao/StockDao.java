@@ -27,4 +27,9 @@ public interface StockDao {
     public List<Stock> findActiveStock();
 
     public List<Stock> search(String stockType);
+
+    public List<Stock> searchC(String stockType);
+
+    public List<Stock> searchB(String stockType);
+
 }

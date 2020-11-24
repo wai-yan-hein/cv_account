@@ -27,4 +27,8 @@ public interface StockService {
 
     public List<Stock> search(String stockType);
 
+    public List<Stock> searchC(String stockCat);
+
+    public List<Stock> searchB(String stockBrand);
+
 }
