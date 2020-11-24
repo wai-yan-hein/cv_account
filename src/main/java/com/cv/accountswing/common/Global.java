@@ -7,6 +7,7 @@ package com.cv.accountswing.common;
 
 import com.cv.accountswing.configuration.MQTransportListener;
 import com.cv.accountswing.entity.AppUser;
+import com.cv.accountswing.entity.AutoText;
 import com.cv.accountswing.entity.ChartOfAccount;
 import com.cv.accountswing.entity.DateModel;
 import com.cv.accountswing.entity.Department;
@@ -86,11 +87,14 @@ public class Global {
     public static List<ChargeType> listChargeType;
     public static List<UnitRelation> listRelation = new ArrayList<>();
     public static List<MachineInfo> listMachine;
+    public static List<AutoText> listRef = new ArrayList<>();
+    public static List<AutoText> listDesp = new ArrayList<>();
     public static HashMap<String, String> sysProperties;
     public static HashMap<String, String> hmCashFilter = new HashMap<>();
     public static HashMap<RelationKey, Float> hmRelation = new HashMap<>();
     public static HashMap<String, List<StockPriceList>> hasPrice = new HashMap<>();
     public static HashMap<String, List<StockUnit>> hasUnit = new HashMap<>();
+
     public static String sourceAcId;
     public static String finicialPeriodFrom;
     public static String finicialPeriodTo;
@@ -107,9 +111,9 @@ public class Global {
     public static VouStatus defaultVouStatus;
     //default saleMan
     public static SaleMan defaultSaleMan;
-     //default saleMan
+    //default saleMan
     public static Trader defaultTrader;
-    
+
     public static HashMap<String, Float> hasQtyInSmallest = new HashMap();
 
 }

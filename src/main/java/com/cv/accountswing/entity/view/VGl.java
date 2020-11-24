@@ -67,6 +67,9 @@ public class VGl implements java.io.Serializable {
     private String naration;
     private Long projectId;
 
+    public VGl() {
+    }
+    
     @Id
     @Column(name = "gl_id", unique = true, nullable = false)
     public Long getGlId() {

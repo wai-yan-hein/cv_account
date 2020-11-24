@@ -29,30 +29,31 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class SaleDetailServiceImpl implements SaleDetailService {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(SaleDetailServiceImpl.class);
     private final String SOURCE_PROG = "ACCOUNT";
     private final String tranSource = "ACCOUNT-SALE";
     private final int split_id = 2;
-    
+    private final String DELETE_OPTION = "INV_DELETE";
+
     @Autowired
     private SaleDetailDao dao;
-    
+
     @Autowired
     private SaleHisDao hisDao;
     @Autowired
     private GlDao glDao;
-    
+
     @Override
     public SaleDetailHis save(SaleDetailHis sdh) {
         return dao.save(sdh);
     }
-    
+
     @Override
     public List<SaleDetailHis> search(String vouId) {
         return dao.search(vouId);
     }
-    
+
     @Override
     public void save(SaleHis saleHis, List<SaleDetailHis> listSaleDetail,
             String vouStatus, List<String> deleteList) throws Exception {
@@ -64,9 +65,9 @@ public class SaleDetailServiceImpl implements SaleDetailService {
                     });
                 }
             }
-            
+
             hisDao.save(saleHis);
-            
+
             for (SaleDetailHis sdh : listSaleDetail) {
                 if (sdh.getStock().getStockCode() != null) {
                     String vouNo = saleHis.getVouNo();
@@ -76,12 +77,11 @@ public class SaleDetailServiceImpl implements SaleDetailService {
             }
         } catch (Exception ex) {
             logger.error("saveSaleDetail : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
-            
+
         }
     }
-    
-    private void saveInGl() {
-        List<Gl> listGL = new ArrayList<>();
+
+    private void saveInGl() throws Exception {
         String sourceAccId = "";
         String vouTtlAccId = "";
         Double vouTotal = 0.0;
@@ -97,6 +97,82 @@ public class SaleDetailServiceImpl implements SaleDetailService {
         String discAccId = "";
         String payAccId = "";
         String taxAccId = "";
+        boolean isDeleted = false;
+        List<Gl> listGL = glDao.search("-", "-", "-", "-", "-", "-", "-", "-", "-", vouNo,
+                "-", "-", Global.compId.toString(), tranSource, "-", "-", "-");
+        boolean vTtlNeed = true;
+        boolean discNeed = true;
+        boolean payNeed = true;
+        boolean taxNeed = true;
+
+        if (depId == null) {
+            depId = Global.defaultDepartment.getDeptCode();
+        } else if (depId.equals("-")) {
+            depId = Global.defaultDepartment.getDeptCode();
+        }
+
+        if (listGL != null) {
+            if (!listGL.isEmpty()) {
+                for (Gl gl : listGL) {
+                    if (isDeleted) {
+                        glDao.delete(gl.getGlId(), DELETE_OPTION);
+                    } else {
+                        if (gl.getAccountId().equals(vouTtlAccId)) {
+                            vTtlNeed = false;
+                            if (vouTotal != 0) {
+                                glDao.delete(gl.getGlId(), "Update");
+                                gl.setDrAmt(vouTotal);
+                                gl.setDescription(vouNo + remark);
+                            } else {
+                                glDao.delete(gl.getGlId(), DELETE_OPTION);
+                            }
+                        } else if (gl.getAccountId().equals(discAccId)) {
+                            discNeed = false;
+                            if (discount != 0) {
+                                glDao.delete(gl.getGlId(), "Update");
+                                gl.setCrAmt(discount);
+                                gl.setDescription(vouNo + remark);
+                            } else {
+                                glDao.delete(gl.getGlId(), DELETE_OPTION);
+                            }
+                        } else if (gl.getAccountId().equals(payAccId)) {
+                            payNeed = false;
+                            if (payment != 0) {
+                                glDao.delete(gl.getGlId(), "Update");
+                                gl.setCrAmt(payment);
+                                gl.setDescription(vouNo + remark);
+                            } else {
+                                glDao.delete(gl.getGlId(), DELETE_OPTION);
+                            }
+                        } else if (gl.getAccountId().equals(taxAccId)) {
+                            taxNeed = false;
+                            if (tax != 0) {
+                                glDao.delete(gl.getGlId(), "Update");
+                                gl.setDrAmt(tax);
+                                gl.setDescription(vouNo + remark);
+                            } else {
+                                glDao.delete(gl.getGlId(), DELETE_OPTION);
+                            }
+                        }
+
+                        gl.setGlDate(saleDate);
+                        gl.setTraderId(cusId);
+                        gl.setFromCurId(curCode);
+                    }
+                }
+            } else {
+                listGL = new ArrayList();
+            }
+        } else {
+            listGL = new ArrayList();
+        }
+
+        if (isDeleted) {
+            vTtlNeed = false;
+            discNeed = false;
+            payNeed = false;
+            taxNeed = false;
+        }
         if (vouTotal != 0) {
             Gl glVouTotal = new Gl();
             glVouTotal.setSourceAcId(sourceAccId);
@@ -116,7 +192,7 @@ public class SaleDetailServiceImpl implements SaleDetailService {
             glVouTotal.setDeptId(depId);
             listGL.add(glVouTotal);
         }
-        
+
         if (discount != 0) {
             Gl glDiscount = new Gl();
             glDiscount.setSourceAcId(sourceAccId);
@@ -136,7 +212,7 @@ public class SaleDetailServiceImpl implements SaleDetailService {
             glDiscount.setFromCurId(curCode);
             listGL.add(glDiscount);
         }
-        
+
         if (payment != 0) {
             Gl glVouPay = new Gl();
             glVouPay.setSourceAcId(sourceAccId);
@@ -156,7 +232,7 @@ public class SaleDetailServiceImpl implements SaleDetailService {
             glVouPay.setFromCurId(curCode);
             listGL.add(glVouPay);
         }
-        
+
         if (tax != 0) {
             Gl glVouTax = new Gl();
             glVouTax.setSourceAcId(sourceAccId);
@@ -176,7 +252,7 @@ public class SaleDetailServiceImpl implements SaleDetailService {
             glVouTax.setFromCurId(curCode);
             listGL.add(glVouTax);
         }
-        
+
         if (!listGL.isEmpty()) {
             listGL.forEach((gl) -> {
                 try {
@@ -186,6 +262,6 @@ public class SaleDetailServiceImpl implements SaleDetailService {
                 }
             });
         }
-        
+
     }
 }

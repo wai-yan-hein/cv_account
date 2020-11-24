@@ -344,7 +344,7 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
                         String[] ids = deleteIds.split(",");
                         for (String id : ids) {
                             Long lid = Long.parseLong(id);
-                            glService.delete(lid);
+                            glService.delete(lid,"GL-DELETE");
                         }
                     }
                 } catch (Exception ex) {
