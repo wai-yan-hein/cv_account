@@ -70,6 +70,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
     public boolean isCellEditable(int rowIndex, int columnIndex) {
         return columnIndex != 9; //To change body of generated methods, choose Tools | Templates.
     }
+
     @Override
     public int getRowCount() {
         if (listPurDetail == null) {
@@ -214,6 +215,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                             Float calAmount = calPrice(pur, toUnit);
                             //  pur.setPurPrice(calAmount);
                             pur.setPurAmt(calAmount);
+                            isAmount=true;
                             parent.setColumnSelectionInterval(5, 5);
                         } else {
                             showMessageBox("Input value must be positive");
@@ -247,6 +249,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                             pur.setAvgWeight(avgWt);
                             pur.setAvgPrice(avgPrice);
                             pur.setPurAmt(avgPrice);
+                            isAmount=true;
                             parent.setColumnSelectionInterval(7, 7);
                         } else {
                             showMessageBox("Input value must be positive");
@@ -276,10 +279,11 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
 
                     break;
             }
+            if (!isAmount) {
+                calculateAmount(pur);
+            }
 
-            calculateAmount(pur);
             //   fireTableCellUpdated(rowIndex, 9);
-
             //    calTotalAmount(pur);
             fireTableRowsUpdated(rowIndex, rowIndex);
             callBack.selected("STM-TOTAL", "STM-TOTAL");

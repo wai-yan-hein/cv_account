@@ -5,23 +5,19 @@
  */
 package com.cv.accountswing.ui.journal;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.entity.CompanyInfo;
 import com.cv.accountswing.entity.Gl;
 import com.cv.accountswing.entity.SystemProperty;
 import com.cv.accountswing.entity.SystemPropertyKey;
 import com.cv.accountswing.entity.view.VGl;
-import com.cv.accountswing.service.COAService;
 import com.cv.accountswing.service.CompanyInfoService;
-import com.cv.accountswing.service.CurrencyService;
-import com.cv.accountswing.service.DepartmentService;
 import com.cv.accountswing.service.GlService;
 import com.cv.accountswing.service.ReportService;
 import com.cv.accountswing.service.SeqTableService;
 import com.cv.accountswing.service.SystemPropertyService;
-import com.cv.accountswing.service.TraderService;
 import com.cv.accountswing.service.VGlService;
-import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.editor.COAAutoCompleter;
 import com.cv.accountswing.ui.editor.COACellEditor;
@@ -586,7 +582,9 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
         jLabel9.setFont(Global.lableFont);
         jLabel9.setText("Total Amt");
 
+        btnSave.setBackground(ColorUtil.mainColor);
         btnSave.setFont(Global.textFont);
+        btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save-button-white.png"))); // NOI18N
         btnSave.setText("Save");
         btnSave.setName("btnSave"); // NOI18N
         btnSave.addActionListener(new java.awt.event.ActionListener() {
@@ -629,7 +627,7 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 154, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtFTotolAmt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)

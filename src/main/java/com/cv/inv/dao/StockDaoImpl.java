@@ -49,19 +49,20 @@ public class StockDaoImpl extends AbstractDao<String, Stock> implements StockDao
     public List<Stock> findActiveStock() {
         String hsql = "select o from Stock o where o.isActive=true";
         return findHSQL(hsql);
-        
+
     }
- @Override
+
+    @Override
     public List<Stock> search(String saleInvId) {
         String strFilter = "";
-          if (!saleInvId.equals("-")) {
+        if (!saleInvId.equals("-")) {
             if (strFilter.isEmpty()) {
-                strFilter = "v.stockType = '" + saleInvId+"'";
+                strFilter = "v.stockType = '" + saleInvId + "'";
             } else {
-                strFilter = strFilter + " and v.stockType = '" + saleInvId+"'";
+                strFilter = strFilter + " and v.stockType = '" + saleInvId + "'";
             }
         }
-            String strSql = "select v from Stock v";
+        String strSql = "select v from Stock v";
 
         List<Stock> listDH = null;
         if (!strFilter.isEmpty()) {
@@ -72,4 +73,45 @@ public class StockDaoImpl extends AbstractDao<String, Stock> implements StockDao
         return listDH;
     }
 
+    @Override
+    public List<Stock> searchC(String saleInvId) {
+        String strFilter = "";
+        if (!saleInvId.equals("-")) {
+            if (strFilter.isEmpty()) {
+                strFilter = "v.category = '" + saleInvId + "'";
+            } else {
+                strFilter = strFilter + " and v.category = '" + saleInvId + "'";
+            }
+        }
+        String strSql = "select v from Stock v";
+
+        List<Stock> listDH = null;
+        if (!strFilter.isEmpty()) {
+            strSql = strSql + " where " + strFilter;
+            listDH = findHSQL(strSql);
+        }
+
+        return listDH;
+    }
+
+    @Override
+    public List<Stock> searchB(String saleInvId) {
+        String strFilter = "";
+        if (!saleInvId.equals("-")) {
+            if (strFilter.isEmpty()) {
+                strFilter = "v.brand = '" + saleInvId + "'";
+            } else {
+                strFilter = strFilter + " and v.brand = '" + saleInvId + "'";
+            }
+        }
+        String strSql = "select v from Stock v";
+
+        List<Stock> listDH = null;
+        if (!strFilter.isEmpty()) {
+            strSql = strSql + " where " + strFilter;
+            listDH = findHSQL(strSql);
+        }
+
+        return listDH;
+    }
 }

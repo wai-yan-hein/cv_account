@@ -5,8 +5,8 @@
  */
 package com.cv.accountswing.ui.setup;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
-import com.cv.accountswing.dao.FontDao;
 import com.cv.accountswing.entity.Customer;
 import com.cv.accountswing.entity.Font;
 import com.cv.accountswing.service.CustomerService;
@@ -14,7 +14,6 @@ import com.cv.accountswing.service.FontService;
 import com.cv.accountswing.ui.setup.common.CustomerImportTableModel;
 import com.cv.accountswing.util.Util1;
 import java.awt.FileDialog;
-import java.awt.Image;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -221,6 +220,8 @@ public class CustomerImportDialog extends javax.swing.JDialog {
         ));
         jScrollPane1.setViewportView(tblCustomer);
 
+        jButton1.setBackground(ColorUtil.mainColor);
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save-button-white.png"))); // NOI18N
         jButton1.setText("Save");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -237,6 +238,8 @@ public class CustomerImportDialog extends javax.swing.JDialog {
 
         chkIntegra.setText("Integra Font");
 
+        jButton3.setBackground(ColorUtil.btnEdit);
+        jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/clear-button-white.png"))); // NOI18N
         jButton3.setText("Clear");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -269,7 +272,7 @@ public class CustomerImportDialog extends javax.swing.JDialog {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 304, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton1)
