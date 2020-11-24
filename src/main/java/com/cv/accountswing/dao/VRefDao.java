@@ -5,16 +5,15 @@
  */
 package com.cv.accountswing.dao;
 
-import com.cv.accountswing.entity.AutoText;
+import com.cv.accountswing.entity.view.VRef;
 import java.util.List;
 
 /**
  *
  * @author Lenovo
  */
-public interface AutoTextDao {
+public interface VRefDao {
 
-    public AutoText save(AutoText autoText);
+    public List<VRef> getRefrences();
 
-    public List<AutoText> search(String option);
 }

@@ -6,9 +6,9 @@
 package com.cv.accountswing.ui.editor;
 
 import com.cv.accountswing.common.Global;
-import com.cv.accountswing.entity.view.VRef;
-import com.cv.accountswing.service.VRefService;
-import com.cv.accountswing.ui.cash.common.RefTableModel;
+import com.cv.accountswing.entity.view.VDescription;
+import com.cv.accountswing.service.VDescriptionService;
+import com.cv.accountswing.ui.cash.common.DespTableModel;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import java.awt.Color;
 import java.awt.Rectangle;
@@ -42,40 +42,40 @@ import org.slf4j.LoggerFactory;
  *
  * @author Lenovo
  */
-public class RefAutoCompleter implements KeyListener {
+public class DespAutoCompleter implements KeyListener {
 
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(RefAutoCompleter.class);
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(DespAutoCompleter.class);
     private JTable table = new JTable();
     private JPopupMenu popup = new JPopupMenu();
     private JTextComponent textComp;
     private static final String AUTOCOMPLETER = "AUTOCOMPLETER"; //NOI18N
-    private RefTableModel refModel;
-    private VRef autoText;
+    private DespTableModel despModel;
+    private VDescription autoText;
     public AbstractCellEditor editor;
     private TableRowSorter<TableModel> sorter;
     private int x = 0;
     boolean popupOpen = false;
-    private VRefService refService;
+    private VDescriptionService descriptionService;
 
-    public RefAutoCompleter(VRefService refService) {
-        this.refService = refService;
-        if (Global.listRef == null) {
-            Global.listRef = this.refService.getRefrences();
+    public DespAutoCompleter(VDescriptionService descriptionService) {
+        this.descriptionService = descriptionService;
+        if (Global.listDesp == null) {
+            Global.listDesp = this.descriptionService.getDescriptions();
         }
     }
 
     //private CashFilter cashFilter = Global.allCash;
-    public RefAutoCompleter() {
+    public DespAutoCompleter() {
     }
 
-    public RefAutoCompleter(JTextComponent comp, List<VRef> list,
+    public DespAutoCompleter(JTextComponent comp, List<VDescription> list,
             AbstractCellEditor editor) {
         this.textComp = comp;
         this.editor = editor;
         textComp.putClientProperty(AUTOCOMPLETER, this);
         textComp.setFont(Global.textFont);
-        refModel = new RefTableModel(Global.listRef);
-        table.setModel(refModel);
+        despModel = new DespTableModel(Global.listDesp);
+        table.setModel(despModel);
         table.setSize(25, 25);
         table.getTableHeader().setFont(Global.lableFont);
         table.setFont(Global.textFont); // NOI18N
@@ -163,9 +163,9 @@ public class RefAutoCompleter implements KeyListener {
 
     public void mouseSelect() {
         if (table.getSelectedRow() != -1) {
-            autoText = refModel.getRemark(table.convertRowIndexToModel(
+            autoText = despModel.getRemark(table.convertRowIndexToModel(
                     table.getSelectedRow()));
-            ((JTextField) textComp).setText(autoText.getReference());
+            ((JTextField) textComp).setText(autoText.getDescription());
             if (editor == null) {
             }
         }
@@ -241,7 +241,7 @@ public class RefAutoCompleter implements KeyListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             JComponent tf = (JComponent) e.getSource();
-            RefAutoCompleter completer = (RefAutoCompleter) tf.getClientProperty(AUTOCOMPLETER);
+            DespAutoCompleter completer = (DespAutoCompleter) tf.getClientProperty(AUTOCOMPLETER);
             if (tf.isEnabled()) {
                 if (completer.popup.isVisible()) {
                     completer.selectNextPossibleValue();
@@ -258,7 +258,7 @@ public class RefAutoCompleter implements KeyListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             JComponent tf = (JComponent) e.getSource();
-            RefAutoCompleter completer = (RefAutoCompleter) tf.getClientProperty(AUTOCOMPLETER);
+            DespAutoCompleter completer = (DespAutoCompleter) tf.getClientProperty(AUTOCOMPLETER);
             if (tf.isEnabled()) {
                 if (completer.popup.isVisible()) {
                     completer.selectPreviousPossibleValue();
@@ -270,7 +270,7 @@ public class RefAutoCompleter implements KeyListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             JComponent tf = (JComponent) e.getSource();
-            RefAutoCompleter completer = (RefAutoCompleter) tf.getClientProperty(AUTOCOMPLETER);
+            DespAutoCompleter completer = (DespAutoCompleter) tf.getClientProperty(AUTOCOMPLETER);
             if (tf.isEnabled()) {
                 completer.popup.setVisible(false);
                 popupOpen = false;
@@ -312,14 +312,14 @@ public class RefAutoCompleter implements KeyListener {
         table.scrollRectToVisible(rect);
     }
 
-    public VRef getAutoText() {
+    public VDescription getAutoText() {
         return autoText;
 
     }
 
-    public void setAutoText(VRef autoText) {
+    public void setAutoText(VDescription autoText) {
         this.autoText = autoText;
-        textComp.setText(autoText.getReference());
+        textComp.setText(autoText.getDescription());
 
     }
 

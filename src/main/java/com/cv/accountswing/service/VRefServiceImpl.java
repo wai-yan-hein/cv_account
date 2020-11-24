@@ -5,8 +5,9 @@
  */
 package com.cv.accountswing.service;
 
-import com.cv.accountswing.dao.AutoTextDao;
-import com.cv.accountswing.entity.AutoText;
+import com.cv.accountswing.dao.VRefDao;
+import com.cv.accountswing.entity.view.VGl;
+import com.cv.accountswing.entity.view.VRef;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,19 +19,14 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-public class AutoTextServiceImpl implements AutoTextService {
+public class VRefServiceImpl implements VRefService {
 
     @Autowired
-    private AutoTextDao dao;
+    private VRefDao dao;
 
     @Override
-    public AutoText save(AutoText autoText) {
-        return dao.save(autoText);
-    }
-
-    @Override
-    public List<AutoText> search(String option) {
-        return dao.search(option);
+    public List<VRef> getRefrences() {
+        return dao.getRefrences();
     }
 
 }

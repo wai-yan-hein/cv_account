@@ -7,7 +7,6 @@ package com.cv.accountswing.common;
 
 import com.cv.accountswing.configuration.MQTransportListener;
 import com.cv.accountswing.entity.AppUser;
-import com.cv.accountswing.entity.AutoText;
 import com.cv.accountswing.entity.ChartOfAccount;
 import com.cv.accountswing.entity.DateModel;
 import com.cv.accountswing.entity.Department;
@@ -18,6 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import javax.swing.JFrame;
 import com.cv.accountswing.entity.Currency;
+import com.cv.accountswing.entity.view.VDescription;
+import com.cv.accountswing.entity.view.VRef;
 import com.cv.inv.entity.Category;
 import com.cv.inv.entity.CharacterNo;
 import com.cv.inv.entity.ChargeType;
@@ -87,8 +88,8 @@ public class Global {
     public static List<ChargeType> listChargeType;
     public static List<UnitRelation> listRelation = new ArrayList<>();
     public static List<MachineInfo> listMachine;
-    public static List<AutoText> listRef = new ArrayList<>();
-    public static List<AutoText> listDesp = new ArrayList<>();
+    public static List<VRef> listRef = new ArrayList<>();
+    public static List<VDescription> listDesp = new ArrayList<>();
     public static HashMap<String, String> sysProperties;
     public static HashMap<String, String> hmCashFilter = new HashMap<>();
     public static HashMap<RelationKey, Float> hmRelation = new HashMap<>();

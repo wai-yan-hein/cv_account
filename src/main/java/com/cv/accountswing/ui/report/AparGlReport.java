@@ -625,7 +625,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         txtFOFB.setFont(Global.amtFont);
 
         jLabel5.setFont(Global.lableFont);
-        jLabel5.setText("Difference");
+        jLabel5.setText("Out Of Balance");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);

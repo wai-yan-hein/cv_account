@@ -5,16 +5,15 @@
  */
 package com.cv.accountswing.service;
 
-import com.cv.accountswing.entity.AutoText;
+import com.cv.accountswing.entity.view.VDescription;
+import com.cv.accountswing.entity.view.VGl;
 import java.util.List;
 
 /**
  *
  * @author Lenovo
  */
-public interface AutoTextService {
+public interface VDescriptionService {
 
-    public AutoText save(AutoText autoText);
-
-    public List<AutoText> search(String option);
+    public List<VDescription> getDescriptions();
 }

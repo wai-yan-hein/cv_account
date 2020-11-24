@@ -6,8 +6,8 @@
 package com.cv.accountswing.ui.editor;
 
 import com.cv.accountswing.common.Global;
-import com.cv.accountswing.entity.view.VRef;
-import com.cv.accountswing.service.VRefService;
+import com.cv.accountswing.entity.view.VDescription;
+import com.cv.accountswing.service.VDescriptionService;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
@@ -26,12 +26,12 @@ import org.slf4j.LoggerFactory;
  *
  * @author Lenovo
  */
-public class RefCellEditor extends AbstractCellEditor implements TableCellEditor {
+public class DespEditor extends AbstractCellEditor implements TableCellEditor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RefCellEditor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DespEditor.class);
     private JComponent component = null;
-    private RefAutoCompleter completer;
-    private VRefService refService;
+    private DespAutoCompleter completer;
+    private VDescriptionService descriptionService;
     private final FocusAdapter fa = new FocusAdapter() {
         @Override
         public void focusLost(FocusEvent e) {
@@ -46,14 +46,14 @@ public class RefCellEditor extends AbstractCellEditor implements TableCellEditor
     };
     //private List<Medicine> listCOA = new ArrayList();
 
-    public RefCellEditor() {
+    public DespEditor() {
 
     }
 
-    public RefCellEditor(VRefService refService) {
-        this.refService = refService;
-        if (Global.listRef.isEmpty()) {
-            Global.listRef = this.refService.getRefrences();
+    public DespEditor(VDescriptionService descriptionService) {
+        this.descriptionService = descriptionService;
+        if (Global.listDesp.isEmpty()) {
+            Global.listDesp = this.descriptionService.getDescriptions();
         }
     }
 
@@ -93,14 +93,14 @@ public class RefCellEditor extends AbstractCellEditor implements TableCellEditor
         if (value != null) {
             jtf.setText(value.toString());
         }
-        completer = new RefAutoCompleter(jtf, Global.listRef, this);
+        completer = new DespAutoCompleter(jtf, Global.listDesp, this);
         return component;
     }
 
     @Override
     public Object getCellEditorValue() {
         Object obj;
-        VRef coa = completer.getAutoText();
+        VDescription coa = completer.getAutoText();
 
         if (coa != null) {
             obj = coa;

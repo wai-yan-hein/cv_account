@@ -7,14 +7,14 @@ package com.cv.accountswing.ui.cash.common;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.ReloadData;
 import com.cv.accountswing.common.SelectionObserver;
-import com.cv.accountswing.entity.AutoText;
 import com.cv.accountswing.entity.ChartOfAccount;
 import com.cv.accountswing.entity.Currency;
 import com.cv.accountswing.entity.Department;
 import com.cv.accountswing.entity.Gl;
 import com.cv.accountswing.entity.Trader;
+import com.cv.accountswing.entity.view.VDescription;
 import com.cv.accountswing.entity.view.VGl;
-import com.cv.accountswing.service.AutoTextService;
+import com.cv.accountswing.entity.view.VRef;
 import com.cv.accountswing.service.GlService;
 import com.cv.accountswing.service.MessagingService;
 import com.cv.accountswing.service.TraderService;
@@ -44,9 +44,7 @@ public class AllCashTableModel extends AbstractTableModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(AllCashTableModel.class);
     private List<VGl> listVGl = new ArrayList();
     private String[] columnNames = {"Date", "Dept:", "Description", "Ref", "Person", "Account", "Curr", "Cash In / Dr", "Cash Out / Cr"};
-    Gson gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
-    @Autowired
-    private AutoTextService autoTextService;
+    private final Gson gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
 
     @Autowired
     private GlService glService;
@@ -193,33 +191,29 @@ public class AllCashTableModel extends AbstractTableModel {
                 break;
             case 2:
                 if (value != null) {
-                    if (value instanceof AutoText) {
-                        AutoText autoText = (AutoText) value;
-                        vgl.setDescription(autoText.getDesp());
+                    if (value instanceof VDescription) {
+                        VDescription autoText = (VDescription) value;
+                        vgl.setDescription(autoText.getDescription());
                     } else {
                         vgl.setDescription(value.toString());
-                        AutoText success = autoTextService.save(new AutoText(vgl.getDescription(), "DESP"));
-                    if (success != null) {
-                        Global.listDesp.add(success);
+                        if (!vgl.getDescription().isEmpty()) {
+                            Global.listDesp.add(new VDescription(vgl.getDescription()));
+                        }
                     }
-                    }
-                    
+
                 }
                 parent.setColumnSelectionInterval(3, 3);
 
                 break;
             case 3:
                 if (value != null) {
-                    if (value instanceof AutoText) {
-                        AutoText autoText = (AutoText) value;
-                        vgl.setReference(autoText.getDesp());
+                    if (value instanceof VRef) {
+                        VRef autoText = (VRef) value;
+                        vgl.setReference(autoText.getReference());
                     } else {
                         vgl.setReference(value.toString());
                         if (!vgl.getReference().isEmpty()) {
-                            AutoText success = autoTextService.save(new AutoText(vgl.getReference(), "REF"));
-                            if (success != null) {
-                                Global.listRef.add(success);
-                            }
+                            Global.listRef.add(new VRef(vgl.getReference()));
                         }
                     }
 

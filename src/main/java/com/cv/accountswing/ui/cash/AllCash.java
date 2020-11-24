@@ -16,12 +16,13 @@ import com.cv.accountswing.entity.SystemProperty;
 import com.cv.accountswing.entity.SystemPropertyKey;
 import com.cv.accountswing.entity.temp.TmpOpeningClosing;
 import com.cv.accountswing.entity.view.VGl;
-import com.cv.accountswing.service.AutoTextService;
 import com.cv.accountswing.service.COAOpeningDService;
 import com.cv.accountswing.service.CompanyInfoService;
 import com.cv.accountswing.service.ReportService;
 import com.cv.accountswing.service.SystemPropertyService;
+import com.cv.accountswing.service.VDescriptionService;
 import com.cv.accountswing.service.VGlService;
+import com.cv.accountswing.service.VRefService;
 import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.AllCashTableHandler;
 import com.cv.accountswing.ui.editor.CurrencyEditor;
@@ -31,6 +32,7 @@ import com.cv.accountswing.ui.cash.common.AllCashTableModel;
 import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.editor.COACellEditor;
+import com.cv.accountswing.ui.editor.DespEditor;
 import com.cv.accountswing.ui.editor.RefCellEditor;
 import com.cv.accountswing.ui.filter.FilterPanel;
 import com.cv.accountswing.util.Util1;
@@ -104,7 +106,9 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
     @Autowired
     private ApplicationContext applicationContext;
     @Autowired
-    private AutoTextService autoTextService;
+    private VRefService refService;
+    @Autowired
+    private VDescriptionService descriptionService;
     @Autowired
     private ApplicationMainFrame mainFrame;
     private TableRowSorter<TableModel> sorter;
@@ -205,8 +209,8 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
         tblCash.getColumnModel().getColumn(8).setPreferredWidth(90);// Cr-Amt  
         tblCash.getColumnModel().getColumn(0).setCellEditor(new AutoClearEditor());
         tblCash.getColumnModel().getColumn(1).setCellEditor(new DepartmentCellEditor());
-        tblCash.getColumnModel().getColumn(2).setCellEditor(new AutoClearEditor());
-        tblCash.getColumnModel().getColumn(3).setCellEditor(new RefCellEditor(autoTextService));
+        tblCash.getColumnModel().getColumn(2).setCellEditor(new DespEditor(descriptionService));
+        tblCash.getColumnModel().getColumn(3).setCellEditor(new RefCellEditor(refService));
         tblCash.getColumnModel().getColumn(4).setCellEditor(new TraderCellEditor());
         tblCash.getColumnModel().getColumn(5).setCellEditor(new COACellEditor());
         tblCash.getColumnModel().getColumn(6).setCellEditor(new CurrencyEditor());
@@ -521,7 +525,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        tblCash.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
+        tblCash.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         tblCash.setRowHeight(Global.tblRowHeight);
         jScrollPane2.setViewportView(tblCash);
 

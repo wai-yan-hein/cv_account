@@ -5,7 +5,7 @@
  */
 package com.cv.accountswing.ui.cash.common;
 
-import com.cv.accountswing.entity.AutoText;
+import com.cv.accountswing.entity.view.VRef;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
@@ -16,13 +16,13 @@ import org.slf4j.LoggerFactory;
  *
  * @author Lenovo
  */
-public class RemarkTableModel extends AbstractTableModel {
+public class RefTableModel extends AbstractTableModel {
 
     private static final Logger log = LoggerFactory.getLogger(TraderTableModel.class);
-    private List<AutoText> listAutoText = new ArrayList<>();
+    private List<VRef> listAutoText = new ArrayList<>();
     private final String[] columnNames = {"Reference"};
 
-    public RemarkTableModel(List<AutoText> listAutoText) {
+    public RefTableModel(List<VRef> listAutoText) {
         this.listAutoText = listAutoText;
     }
 
@@ -52,11 +52,11 @@ public class RemarkTableModel extends AbstractTableModel {
         }
 
         try {
-            AutoText auto = listAutoText.get(row);
+            VRef auto = listAutoText.get(row);
 
             switch (column) {
                 case 0: //Code
-                    return auto.getDesp();
+                    return auto.getReference();
                 default:
                     return null;
             }
@@ -85,7 +85,7 @@ public class RemarkTableModel extends AbstractTableModel {
         return columnNames.length;
     }
 
-    public AutoText getRemark(int row) {
+    public VRef getRemark(int row) {
         if (listAutoText == null) {
             return null;
         } else if (listAutoText.isEmpty()) {
