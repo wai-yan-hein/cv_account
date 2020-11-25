@@ -5,6 +5,7 @@
  */
 package com.cv.accountswing.ui.journal;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.Gl;
@@ -107,6 +108,8 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
         journalTablModel.setTtlCrdAmt(txtFCrdAmt);
         journalTablModel.setTtlDrAmt(txtFDrAmt);
         tblJournal.getTableHeader().setFont(Global.lableFont);
+        tblJournal.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblJournal.getTableHeader().setForeground(ColorUtil.foreground);
         tblJournal.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         tblJournal.getColumnModel().getColumn(0).setCellEditor(new DepartmentCellEditor());

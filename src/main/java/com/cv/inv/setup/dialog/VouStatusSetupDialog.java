@@ -65,6 +65,8 @@ public class VouStatusSetupDialog extends javax.swing.JDialog implements KeyList
         sorter = new TableRowSorter<>(tblVouStatus.getModel());
         tblVouStatus.setRowSorter(sorter);
         tblVouStatus.getTableHeader().setFont(Global.lableFont);
+        tblVouStatus.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblVouStatus.getTableHeader().setForeground(ColorUtil.foreground);
         tblVouStatus.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblVouStatus.setDefaultRenderer(Object.class, new TableCellRender());
         tblVouStatus.getSelectionModel().addListSelectionListener((ListSelectionEvent e) -> {

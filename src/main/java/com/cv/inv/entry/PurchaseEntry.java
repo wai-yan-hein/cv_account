@@ -5,6 +5,7 @@
  */
 package com.cv.inv.entry;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
@@ -128,6 +129,8 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
         purTableModel.setCallBack(this);
         purTableModel.setTxtTotalAmt(txtVouTotal);
         tblPurchase.getTableHeader().setFont(Global.lableFont);
+        tblPurchase.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblPurchase.getTableHeader().setForeground(ColorUtil.foreground);
 
         tblPurchase.setCellSelectionEnabled(true);
         tblPurchase.getColumnModel().getColumn(0).setPreferredWidth(50);//code
@@ -224,7 +227,7 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
     private void assignDefalutValue() {
         try {
             txtPurDate.setDate(Util1.getTodayDate());
-            currAutoCompleter.setCurrency(Global.defalutCurrency );
+            currAutoCompleter.setCurrency(Global.defalutCurrency);
             vouCompleter.setVouStatus(Global.defaultVouStatus);
             genVouNo();
         } catch (Exception e) {

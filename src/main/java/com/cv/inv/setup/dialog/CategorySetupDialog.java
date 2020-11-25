@@ -88,6 +88,8 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
         sorter = new TableRowSorter<>(tblCategory.getModel());
         tblCategory.setRowSorter(sorter);
         tblCategory.getTableHeader().setFont(Global.lableFont);
+        tblCategory.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblCategory.getTableHeader().setForeground(ColorUtil.foreground);
         tblCategory.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblCategory.setDefaultRenderer(Object.class, new TableCellRender());
         tblCategory.getSelectionModel().addListSelectionListener((ListSelectionEvent e) -> {

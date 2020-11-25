@@ -72,6 +72,8 @@ public class SystemPropertySetup extends javax.swing.JPanel implements KeyListen
     private void initTable() {
         tblSystemProper.setDefaultRenderer(Object.class, new TableCellRender());
         tblSystemProper.setModel(systemPropertyTableModel);
+        tblSystemProper.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblSystemProper.getTableHeader().setForeground(ColorUtil.foreground);
         tblSystemProper.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblSystemProper.getSelectionModel().addListSelectionListener((ListSelectionEvent e) -> {
             if (e.getValueIsAdjusting()) {

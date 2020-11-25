@@ -79,6 +79,8 @@ public class CurrencySetup extends javax.swing.JPanel implements KeyListener, Pa
     private void initTable() {
         tblCurrency.setModel(currencyTabelModel);
         tblCurrency.getTableHeader().setFont(Global.textFont);
+        tblCurrency.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblCurrency.getTableHeader().setForeground(ColorUtil.foreground);
         tblCurrency.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblCurrency.getColumnModel().getColumn(0).setPreferredWidth(20);// Code
         tblCurrency.getColumnModel().getColumn(1).setPreferredWidth(320);// Name

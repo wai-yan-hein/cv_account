@@ -5,6 +5,7 @@
  */
 package com.cv.accountswing.ui.journal;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
@@ -109,6 +110,8 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
         tblOpening.setModel(journalStockOpeningTableModel);
         journalStockOpeningTableModel.setParent(tblOpening);
         tblOpening.getTableHeader().setFont(Global.textFont);
+        tblOpening.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblOpening.getTableHeader().setForeground(ColorUtil.foreground);
         tblOpening.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblOpening.setDefaultRenderer(Double.class, new TableCellRender());
         tblOpening.setDefaultRenderer(Object.class, new TableCellRender());

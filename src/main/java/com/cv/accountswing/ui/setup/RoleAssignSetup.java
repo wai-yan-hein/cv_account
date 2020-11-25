@@ -5,6 +5,7 @@
  */
 package com.cv.accountswing.ui.setup;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
@@ -104,7 +105,12 @@ public class RoleAssignSetup extends javax.swing.JPanel implements KeyListener, 
         tblUser.setModel(userTableModel);
         tblRoleAssign.setModel(compRoleTableModel);
         tblUser.getTableHeader().setFont(Global.textFont);
+        tblUser.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblUser.getTableHeader().setForeground(ColorUtil.foreground);
+
         tblRoleAssign.getTableHeader().setFont(Global.textFont);
+        tblRoleAssign.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblRoleAssign.getTableHeader().setForeground(ColorUtil.foreground);
         tblUser.setDefaultRenderer(Object.class, new TableCellRender());
         tblRoleAssign.setDefaultRenderer(Double.class, new TableCellRender());
         tblRoleAssign.setDefaultRenderer(Object.class, new TableCellRender());

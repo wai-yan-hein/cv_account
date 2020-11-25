@@ -84,6 +84,8 @@ public class Journal extends javax.swing.JPanel implements KeyListener, Selectio
     private void initTable() {
         tblJournal.setModel(journalTableModel);
         tblJournal.getTableHeader().setFont(Global.lableFont);
+        tblJournal.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblJournal.getTableHeader().setForeground(ColorUtil.foreground);
         tblJournal.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblJournal.getColumnModel().getColumn(0).setPreferredWidth(10);//Date
         tblJournal.getColumnModel().getColumn(1).setPreferredWidth(300);//Vou

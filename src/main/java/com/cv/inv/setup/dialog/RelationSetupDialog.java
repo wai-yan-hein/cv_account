@@ -5,6 +5,7 @@
  */
 package com.cv.inv.setup.dialog;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.StartWithRowFilter;
 import com.cv.accountswing.ui.cash.common.AutoClearEditor;
@@ -66,6 +67,8 @@ public class RelationSetupDialog extends javax.swing.JDialog implements KeyListe
         tblRelation.setModel(relationTableModel);
         relationTableModel.setParent(tblRelation);
         tblRelation.getTableHeader().setFont(Global.lableFont);
+        tblRelation.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblRelation.getTableHeader().setForeground(ColorUtil.foreground);
         tblRelation.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblRelation.getColumnModel().getColumn(0).setCellEditor(new StockUnitEditor());
         tblRelation.getColumnModel().getColumn(1).setCellEditor(new StockUnitEditor());

@@ -58,6 +58,8 @@ public class SaleManSetupDialog extends javax.swing.JDialog implements KeyListen
         //sorter = new TableRowSorter<>(tblSaleMan.getModel());
         //tblSaleMan.setRowSorter(sorter);
         tblSaleMan.getTableHeader().setFont(Global.lableFont);
+        tblSaleMan.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblSaleMan.getTableHeader().setForeground(ColorUtil.foreground);
         tblSaleMan.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblSaleMan.getColumnModel().getColumn(0).setPreferredWidth(1);
         tblSaleMan.getColumnModel().getColumn(1).setPreferredWidth(100);

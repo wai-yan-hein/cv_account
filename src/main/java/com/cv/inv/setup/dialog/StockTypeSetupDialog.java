@@ -91,6 +91,8 @@ public class StockTypeSetupDialog extends javax.swing.JDialog implements KeyList
         sorter = new TableRowSorter<>(tblItemType.getModel());
         tblItemType.setRowSorter(sorter);
         tblItemType.getTableHeader().setFont(Global.lableFont);
+        tblItemType.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblItemType.getTableHeader().setForeground(ColorUtil.foreground);
         tblItemType.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblItemType.setDefaultRenderer(Object.class, new TableCellRender());
         tblItemType.getSelectionModel().addListSelectionListener((ListSelectionEvent e) -> {

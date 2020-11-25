@@ -53,6 +53,8 @@ public class DamageSearchDialog extends javax.swing.JDialog implements Selection
 
     private void initTableVoucher() {
         tblVoucher.getTableHeader().setFont(Global.lableFont);
+        tblVoucher.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblVoucher.getTableHeader().setForeground(ColorUtil.foreground);
         tblVoucher.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblVoucher.getColumnModel().getColumn(0).setPreferredWidth(30);
         tblVoucher.getColumnModel().getColumn(1).setPreferredWidth(60);

@@ -79,6 +79,8 @@ public class Company extends javax.swing.JPanel implements KeyListener, PanelCon
     private void initTable() {
         tblCompany.setModel(companyTableModel);
         tblCompany.getTableHeader().setFont(Global.textFont);
+        tblCompany.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblCompany.getTableHeader().setForeground(ColorUtil.foreground);
         tblCompany.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblCompany.getSelectionModel().addListSelectionListener((ListSelectionEvent e) -> {
             if (e.getValueIsAdjusting()) {

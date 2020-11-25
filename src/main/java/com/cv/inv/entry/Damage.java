@@ -5,6 +5,7 @@
  */
 package com.cv.inv.entry;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
@@ -106,6 +107,8 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
         damageTableModel.addEmptyRow();
         damageTableModel.setCallBack(this);
         tblDamage.getTableHeader().setFont(Global.lableFont);
+        tblDamage.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblDamage.getTableHeader().setForeground(ColorUtil.foreground);
         tblDamage.setCellSelectionEnabled(true);
 
         tblDamage.getColumnModel().getColumn(0).setPreferredWidth(50);

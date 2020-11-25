@@ -139,6 +139,8 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
         saleTableModel.setTxtTotalItem(txtTotalItem);
         saleTableModel.setSelectionObserver(this);
         tblSale.getTableHeader().setFont(Global.tblHeaderFont);
+        tblSale.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblSale.getTableHeader().setForeground(ColorUtil.foreground);
         tblSale.getTableHeader().setBackground(ColorUtil.btnEdit);
         tblSale.getTableHeader().setForeground(ColorUtil.foreground);
         tblSale.getTableHeader().setPreferredSize(new Dimension(30, 30));

@@ -5,6 +5,7 @@
  */
 package com.cv.inv.entry;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
@@ -93,6 +94,8 @@ public class StockReceive extends javax.swing.JPanel implements SelectionObserve
         tblStockReceive.setModel(receiveTableModel);
         receiveTableModel.setParent(tblStockReceive);
         tblStockReceive.getTableHeader().setFont(Global.lableFont);
+        tblStockReceive.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblStockReceive.getTableHeader().setForeground(ColorUtil.foreground);
         receiveTableModel.addEmptyRow();
         receiveTableModel.setCallBack(this);
         tblStockReceive.setCellSelectionEnabled(true);

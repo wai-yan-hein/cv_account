@@ -155,6 +155,8 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
         voucherEntryTableModel.setTxtFTotalAmt(txtFTotolAmt);
         tblCredit.setModel(voucherEntryTableModel);
         tblCredit.getTableHeader().setFont(Global.lableFont);
+        tblCredit.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblCredit.getTableHeader().setForeground(ColorUtil.foreground);
         tblCredit.setCellSelectionEnabled(true);
         tblCredit.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblCredit.getColumnModel().getColumn(0).setCellEditor(new TraderCellEditor());

@@ -87,6 +87,8 @@ public class UserSetup extends javax.swing.JPanel implements KeyListener, PanelC
         tblUser.setDefaultRenderer(Object.class, new TableCellRender());
         tblUser.setModel(userTableModel);
         tblUser.getTableHeader().setFont(Global.textFont);
+        tblUser.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblUser.getTableHeader().setForeground(ColorUtil.foreground);
         tblUser.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblUser.getSelectionModel().addListSelectionListener((ListSelectionEvent e) -> {
             if (e.getValueIsAdjusting()) {

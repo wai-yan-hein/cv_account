@@ -5,6 +5,7 @@
  */
 package com.cv.accountswing.ui.setup;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
@@ -123,6 +124,8 @@ public class ManageProjectSetup extends javax.swing.JPanel implements KeyListene
     private void tblUser() {
         tblUser.setModel(projectUserTableModel);
         tblUser.getTableHeader().setFont(Global.textFont);
+        tblUser.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblUser.getTableHeader().setForeground(ColorUtil.foreground);
         tblUser.getColumnModel().getColumn(0).setPreferredWidth(15);// Code
         tblUser.getColumnModel().getColumn(1).setPreferredWidth(450);// Name
         tblUser.getColumnModel().getColumn(0).setCellEditor(new AppUserCellEditor());
@@ -133,6 +136,8 @@ public class ManageProjectSetup extends javax.swing.JPanel implements KeyListene
     private void tblCOA() {
         tblCOA.setModel(cOATableModel);
         tblCOA.getTableHeader().setFont(Global.textFont);
+        tblCOA.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblCOA.getTableHeader().setForeground(ColorUtil.foreground);
         tblCOA.getColumnModel().getColumn(0).setPreferredWidth(15);// Code
         tblCOA.getColumnModel().getColumn(1).setPreferredWidth(450);// Name
         tblCOA.getColumnModel().getColumn(2).setPreferredWidth(15);// Active    
@@ -145,6 +150,8 @@ public class ManageProjectSetup extends javax.swing.JPanel implements KeyListene
     private void tblTrader() {
         tblTrader.setModel(projectTraderTableModel);
         tblTrader.getTableHeader().setFont(Global.textFont);
+        tblTrader.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblTrader.getTableHeader().setForeground(ColorUtil.foreground);
         tblTrader.getColumnModel().getColumn(0).setPreferredWidth(15);// Code
         tblTrader.getColumnModel().getColumn(1).setPreferredWidth(450);// Name
         tblTrader.getColumnModel().getColumn(0).setCellEditor(new TraderCellEditor());
@@ -155,6 +162,8 @@ public class ManageProjectSetup extends javax.swing.JPanel implements KeyListene
     private void tblProject() {
         tblProject.setModel(projectTableModel);
         tblProject.getTableHeader().setFont(Global.textFont);
+        tblProject.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblProject.getTableHeader().setForeground(ColorUtil.foreground);
         tblProject.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblProject.getSelectionModel().addListSelectionListener((ListSelectionEvent e) -> {
             if (e.getValueIsAdjusting()) {
