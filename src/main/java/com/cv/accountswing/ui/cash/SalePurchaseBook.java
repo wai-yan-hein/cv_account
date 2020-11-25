@@ -5,6 +5,7 @@
  */
 package com.cv.accountswing.ui.cash;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
@@ -149,8 +150,10 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
         spTableModel.setSelectionObserver(this);
         tblCash.setModel(spTableModel);
         tblCash.getTableHeader().setFont(Global.tblHeaderFont);
-        tblCash.getTableHeader().setPreferredSize(new Dimension(40, 40));
-        //tblCash.getTableHeader().setBackground(Global.tblHeaderColor);
+        tblCash.getTableHeader().setPreferredSize(new Dimension(25, 25));
+        
+        tblCash.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblCash.getTableHeader().setForeground(ColorUtil.foreground);
         sorter = new TableRowSorter<>(tblCash.getModel());
         tblCash.setRowSorter(sorter);
         tblCash.setCellSelectionEnabled(true);
@@ -532,7 +535,7 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
         } else {
             purchaseEntry.initMain();
             saleEntryDialog.add(purchaseEntry, BorderLayout.CENTER);
-            saleEntryDialog.setName("Purchase Entry"); 
+            saleEntryDialog.setName("Purchase Entry");
         }
         saleEntryDialog.setSize(Global.width - 100, Global.height - 100);
         saleEntryDialog.setLocationRelativeTo(null);

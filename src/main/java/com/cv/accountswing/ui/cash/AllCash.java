@@ -5,6 +5,7 @@
  */
 package com.cv.accountswing.ui.cash;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.FilterObserver;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
@@ -189,8 +190,9 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
         allCashTableModel.setReloadData(reloadData);
         tblCash.setModel(allCashTableModel);
         tblCash.getTableHeader().setFont(Global.tblHeaderFont);
-        tblCash.getTableHeader().setPreferredSize(new Dimension(30, 30));
-        //tblCash.getTableHeader().setBackground(Global.tblHeaderColor);
+        tblCash.getTableHeader().setPreferredSize(new Dimension(25, 25));
+        tblCash.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblCash.getTableHeader().setForeground(ColorUtil.foreground);
         sorter = new TableRowSorter<>(tblCash.getModel());
         tblCash.setRowSorter(sorter);
         tblCash.setCellSelectionEnabled(true);

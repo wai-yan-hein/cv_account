@@ -175,10 +175,16 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener, Pa
             customer.setPhone(txtCusPhone.getText());
             customer.setEmail(txtCusEmail.getText());
             customer.setAddress(txtCusAddress.getText());
-            customer.setRegion((Region) cboRegion.getSelectedItem());
-            customer.setTraderType((TraderType) cboPriceType.getSelectedItem());
+            if (cboRegion.getSelectedItem() instanceof Region) {
+                customer.setRegion((Region) cboRegion.getSelectedItem());
+            }
+            if (cboPriceType.getSelectedItem() instanceof TraderType) {
+                customer.setTraderType((TraderType) cboPriceType.getSelectedItem());
+            }
+            if (cboAccount.getSelectedItem() instanceof ChartOfAccount) {
+                customer.setAccount((ChartOfAccount) cboAccount.getSelectedItem());
+            }
             customer.setActive(chkActive.isSelected());
-            customer.setAccount((ChartOfAccount) cboAccount.getSelectedItem());
             customer.setCompCode(Global.compId);
             customer.setUpdatedDate(Util1.getTodayDate());
             //customer.setCreditLimit(Util1.getInteger(txtCreditLimit.getText()));

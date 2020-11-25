@@ -5,6 +5,7 @@
  */
 package com.cv.accountswing.ui.report;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.FilterObserver;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
@@ -151,6 +152,8 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
             tblAPAR.setModel(glListingTableModel);
         }
         tblAPAR.getTableHeader().setFont(Global.lableFont);
+        tblAPAR.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblAPAR.getTableHeader().setForeground(ColorUtil.foreground);
         tblAPAR.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblAPAR.getColumnModel().getColumn(0).setPreferredWidth(20);
         tblAPAR.getColumnModel().getColumn(1).setPreferredWidth(400);

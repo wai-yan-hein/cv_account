@@ -32,7 +32,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Customer save(Customer cus) {
-        if (cus.getTraderId() == null) {
+        if (cus.getTraderId() == null || cus.getTraderId().isEmpty()) {
             String tmpTraderId = getTraderId("CUS", "-", Global.compId.toString());
             cus.setTraderId(tmpTraderId);
             cus.setCreatedBy(Global.loginUser.getUserId().toString());

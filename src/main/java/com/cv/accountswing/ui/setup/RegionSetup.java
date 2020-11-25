@@ -139,6 +139,7 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
     private void setRegion(Region region) {
         txtRegionCode.setText(Util1.getString(region.getRegId()));
         txtRegionName.setText(region.getRegionName());
+        txtRegionName.selectAll();
         labelStatus.setText("EDIT");
     }
 
@@ -304,12 +305,18 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
         txtRegionName.setFont(Global.textFont);
         txtRegionName.setEnabled(false);
         txtRegionName.setName("txtRegionName"); // NOI18N
+        txtRegionName.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtRegionNameFocusGained(evt);
+            }
+        });
 
         labelStatus.setFont(Global.lableFont);
         labelStatus.setText("NEW");
 
         btnClearR.setBackground(ColorUtil.btnEdit);
         btnClearR.setFont(Global.lableFont);
+        btnClearR.setForeground(ColorUtil.foreground);
         btnClearR.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/clear-button-white.png"))); // NOI18N
         btnClearR.setText("Clear");
         btnClearR.setEnabled(false);
@@ -322,6 +329,7 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
 
         btnSaveR.setBackground(ColorUtil.mainColor);
         btnSaveR.setFont(Global.lableFont);
+        btnSaveR.setForeground(ColorUtil.foreground);
         btnSaveR.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save-button-white.png"))); // NOI18N
         btnSaveR.setText("Save");
         btnSaveR.setEnabled(false);
@@ -431,6 +439,11 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
         // TODO add your handling code here:
         clear();
     }//GEN-LAST:event_btnClearRActionPerformed
+
+    private void txtRegionNameFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtRegionNameFocusGained
+        // TODO add your handling code here:
+        txtRegionName.selectAll();
+    }//GEN-LAST:event_txtRegionNameFocusGained
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

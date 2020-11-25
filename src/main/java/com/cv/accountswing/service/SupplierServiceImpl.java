@@ -32,7 +32,7 @@ public class SupplierServiceImpl implements SupplierService {
 
     @Override
     public Supplier save(Supplier sup) {
-        if (sup.getTraderId().isEmpty()) {
+        if (sup.getTraderId().isEmpty() || sup.getTraderId() == null) {
             String tmpTraderId = getTraderId("SUP", "-", String.valueOf(Global.compId));
             sup.setTraderId(tmpTraderId);
             sup.setCreatedBy(Global.loginUser.getUserId().toString());

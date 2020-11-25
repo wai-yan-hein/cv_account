@@ -42,14 +42,13 @@ import java.util.ArrayList;
  */
 public class Global {
 
-    public static Font lableFont = new java.awt.Font("Arial", 1, 12);
-    public static Font amtFont = new java.awt.Font("Arial", 1, 14);
+    public static Font lableFont = new java.awt.Font("Arial Nova Light", 1, 12);
+    public static Font amtFont = new java.awt.Font("Arial Nova Light", 1, 14);
     public static Font textFont = new java.awt.Font("Zawgyi-One", 0, 12);
     public static Font menuFont = new java.awt.Font("Zawgyi-One", 1, 13);
-    public static Font shortCutFont = new java.awt.Font("Arial", 0, 12);
+    public static Font shortCutFont = new java.awt.Font("Arial Nova Light", 0, 12);
     public static int tblRowHeight = 24;
-    public static Color tblHeaderColor = new Color(83, 133, 255);
-    public static Font tblHeaderFont = new java.awt.Font("Arial", 1, 13);
+    public static Font tblHeaderFont = new java.awt.Font("Arial Nova Light", 1, 13);
     public static String uuid;
     public static boolean synceFinish = true;
     public static AppUser loginUser;
