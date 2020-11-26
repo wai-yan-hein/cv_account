@@ -84,8 +84,7 @@ public class PurchaseDetatilServiceImpl implements PurchaseDetailService {
         }
     }
 
-    private void processPurchase() throws Exception {
-        String sourceAccId = "";
+    private void processPurchase(String sourceAccId) throws Exception {
         boolean isDeleted = false;
         String deptId = "";
         int split_id = 3;
@@ -109,12 +108,6 @@ public class PurchaseDetatilServiceImpl implements PurchaseDetailService {
         boolean discNeed = true;
         boolean payNeed = true;
         boolean taxNeed = true;
-
-        if (deptId == null) {
-            deptId = Global.defaultDepartment.getDeptCode();
-        } else if (deptId.equals("-")) {
-            deptId = Global.defaultDepartment.getDeptCode();
-        }
 
         if (listGL != null) {
             if (!listGL.isEmpty()) {

@@ -38,6 +38,7 @@ import com.cv.accountswing.ui.editor.RefCellEditor;
 import com.cv.accountswing.ui.filter.FilterPanel;
 import com.cv.accountswing.util.Util1;
 import java.awt.BorderLayout;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
@@ -55,6 +56,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
@@ -488,7 +491,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
     private void initComponents() {
 
         panelFilter = new javax.swing.JPanel();
-        jScrollPane2 = new javax.swing.JScrollPane();
+        tblScrollPane = new javax.swing.JScrollPane();
         tblCash = new javax.swing.JTable();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
@@ -527,9 +530,10 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tblCash.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
         tblCash.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         tblCash.setRowHeight(Global.tblRowHeight);
-        jScrollPane2.setViewportView(tblCash);
+        tblScrollPane.setViewportView(tblCash);
 
         jLabel1.setFont(Global.lableFont);
         jLabel1.setText("Opening Balance");
@@ -611,7 +615,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane2))
+                    .addComponent(tblScrollPane))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -619,7 +623,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
             .addGroup(layout.createSequentialGroup()
                 .addComponent(panelFilter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 261, Short.MAX_VALUE)
+                .addComponent(tblScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 261, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -648,9 +652,9 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JPanel panelFilter;
     private javax.swing.JTable tblCash;
+    private javax.swing.JScrollPane tblScrollPane;
     private javax.swing.JFormattedTextField txtFClosing;
     private javax.swing.JFormattedTextField txtFCreditAmt;
     private javax.swing.JFormattedTextField txtFDebitAmt;

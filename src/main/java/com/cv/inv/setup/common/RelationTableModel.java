@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 public class RelationTableModel extends AbstractTableModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RelationTableModel.class);
-    private String[] columnNames = {"From Unit", "To Unit", "Factor"};
+    private final String[] columnNames = {"From Unit", "To Unit", "Factor"};
     private List<UnitRelation> listRelation = new ArrayList<>();
     private JTable parent;
     @Autowired
@@ -179,7 +179,7 @@ public class RelationTableModel extends AbstractTableModel {
     private boolean isEmptyRow() {
         if (!listRelation.isEmpty()) {
             UnitRelation get = listRelation.get(listRelation.size() - 1);
-            return get.getUnitKey() == null ? false : true;
+            return get.getUnitKey() != null;
         } else {
             return true;
         }

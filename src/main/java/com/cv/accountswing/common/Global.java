@@ -33,7 +33,6 @@ import com.cv.inv.entity.StockUnit;
 import com.cv.inv.entity.UnitRelation;
 import com.cv.inv.entity.VouStatus;
 import com.cv.inv.entry.common.StockPriceList;
-import java.awt.Color;
 import java.util.ArrayList;
 
 /**
@@ -100,7 +99,7 @@ public class Global {
     public static String finicialPeriodTo;
     public static String dateFormat;
     //active messaging on / off
-    public static boolean useActiveMQ = true;
+    public static boolean useActiveMQ = false;
     //default currency
     public static Currency defalutCurrency;
     //default department

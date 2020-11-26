@@ -168,7 +168,7 @@ public class OtherSetup extends javax.swing.JPanel {
         // TODO add your handling code here:
         relationSetupDialog.initMain();
         relationSetupDialog.setIconImage(image);
-        relationSetupDialog.setSize(Global.width - 200, Global.height - 400);
+        relationSetupDialog.setSize(Global.width - 400, Global.height - 400);
         relationSetupDialog.setLocationRelativeTo(null);
         relationSetupDialog.setVisible(true);
 

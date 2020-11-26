@@ -63,10 +63,11 @@ public class SupplierServiceImpl implements SupplierService {
     }
 
     private String getTraderId(String option, String period, String compCode) {
-        SystemPropertyKey spk = new SystemPropertyKey("system.trader.id.length",
-                Integer.parseInt(compCode));
-        SystemProperty sp = spService.findById(spk);
-        int ttlLength = Integer.parseInt(sp.getPropValue());
+        int ttlLength = 5;
+        String get = Global.sysProperties.get("system.trader.id.length");
+        if (get != null) {
+            ttlLength = Integer.parseInt(get);
+        }
         int seqNo = seqService.getSequence(option, period, compCode);
         String tmpTraderId = option.toUpperCase() + String.format("%0" + ttlLength + "d", seqNo);
         return tmpTraderId;
