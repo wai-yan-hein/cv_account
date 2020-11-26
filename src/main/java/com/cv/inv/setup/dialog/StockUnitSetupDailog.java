@@ -84,6 +84,8 @@ public class StockUnitSetupDailog extends javax.swing.JDialog implements KeyList
         sorter = new TableRowSorter<>(tblUnit.getModel());
         tblUnit.setRowSorter(sorter);
         tblUnit.getTableHeader().setFont(Global.lableFont);
+        tblUnit.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblUnit.getTableHeader().setForeground(ColorUtil.foreground);
         tblUnit.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblUnit.setDefaultRenderer(Object.class, new TableCellRender());
         tblUnit.getSelectionModel().addListSelectionListener((ListSelectionEvent e) -> {

@@ -95,6 +95,8 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
     private void initTableVoucher() {
         tblVoucher.setModel(saleVouTableModel);
         tblVoucher.getTableHeader().setFont(Global.tblHeaderFont);
+        tblVoucher.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblVoucher.getTableHeader().setForeground(ColorUtil.foreground);
         tblVoucher.getColumnModel().getColumn(0).setPreferredWidth(30);
         tblVoucher.getColumnModel().getColumn(1).setPreferredWidth(70);
         tblVoucher.getColumnModel().getColumn(2).setPreferredWidth(40);

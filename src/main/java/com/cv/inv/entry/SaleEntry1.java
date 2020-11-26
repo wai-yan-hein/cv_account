@@ -5,6 +5,7 @@
  */
 package com.cv.inv.entry;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.inv.entry.dialog.SaleVouSearch;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.KeyPropagate;
@@ -161,6 +162,8 @@ public class SaleEntry1 extends javax.swing.JPanel implements SelectionObserver,
         saleTableModel.setTxtTotalItem(txtTotalItem);
         saleTableModel.setSelectionObserver(this);
         tblSale.getTableHeader().setFont(Global.tblHeaderFont);
+        tblSale.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblSale.getTableHeader().setForeground(ColorUtil.foreground);
         tblSale.getTableHeader().setPreferredSize(new Dimension(30, 30));
         tblSale.setCellSelectionEnabled(true);
         tblSale.getColumnModel().getColumn(0).setPreferredWidth(50);//Code

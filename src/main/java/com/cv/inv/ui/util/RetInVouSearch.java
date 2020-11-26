@@ -121,6 +121,8 @@ public class RetInVouSearch extends javax.swing.JDialog implements KeyListener, 
         tblStock.setModel(codeTableModel);
         codeTableModel.setParent(tblStock);
         codeTableModel.addNewRow();
+        tblStock.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblStock.getTableHeader().setForeground(ColorUtil.foreground);
         tblStock.getColumnModel().getColumn(0).setPreferredWidth(30);
         tblStock.getColumnModel().getColumn(1).setPreferredWidth(60);
         tblStock.setDefaultRenderer(String.class, new TableCellRender());
@@ -143,6 +145,8 @@ public class RetInVouSearch extends javax.swing.JDialog implements KeyListener, 
         }
 
         retInVouSearchTableModel.setParent(tblVou);
+        tblVou.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblVou.getTableHeader().setForeground(ColorUtil.foreground);
         tblVou.getColumnModel().getColumn(0).setPreferredWidth(30);
         tblVou.getColumnModel().getColumn(1).setPreferredWidth(60);
         tblVou.getColumnModel().getColumn(2).setPreferredWidth(150);

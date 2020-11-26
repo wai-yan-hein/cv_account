@@ -111,6 +111,8 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
 
     private void initTable() {
         tblStock.getTableHeader().setFont(Global.tblHeaderFont);
+        tblStock.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblStock.getTableHeader().setForeground(ColorUtil.foreground);
         tblStock.setModel(stockTableModel);
         sorter = new TableRowSorter<>(tblStock.getModel());
         tblStock.setRowSorter(sorter);

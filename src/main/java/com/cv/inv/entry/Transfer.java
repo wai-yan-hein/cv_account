@@ -5,6 +5,7 @@
  */
 package com.cv.inv.entry;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
@@ -98,6 +99,8 @@ public class Transfer extends javax.swing.JPanel implements SelectionObserver, K
         tblTransfer.setModel(tranTableModel);
         tranTableModel.setParent(tblTransfer);
         tblTransfer.getTableHeader().setFont(Global.lableFont);
+        tblTransfer.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblTransfer.getTableHeader().setForeground(ColorUtil.foreground);
         tranTableModel.setCallBack(this);
         tranTableModel.addEmptyRow();
         tblTransfer.setCellSelectionEnabled(true);

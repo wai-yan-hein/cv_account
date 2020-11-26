@@ -5,6 +5,7 @@
  */
 package com.cv.accountswing.ui.setup;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.FilterObserver;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
@@ -112,6 +113,8 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
         openingTableModel.setSelectionObserver(this);
         openingTableModel.setParent(tblOpening);
         tblOpening.getTableHeader().setFont(Global.textFont);
+        tblOpening.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblOpening.getTableHeader().setForeground(ColorUtil.foreground);
         tblOpening.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblOpening.getColumnModel().getColumn(0).setPreferredWidth(10);
         tblOpening.getColumnModel().getColumn(1).setPreferredWidth(250);

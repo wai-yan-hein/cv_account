@@ -57,6 +57,8 @@ public class ChargeTypeSetupDialog extends javax.swing.JDialog implements KeyLis
         //sorter = new TableRowSorter<>(tblChargeType.getModel());
         //tblChargeType.setRowSorter(sorter);
         tblChargeType.getTableHeader().setFont(Global.lableFont);
+        tblChargeType.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblChargeType.getTableHeader().setForeground(ColorUtil.foreground);
         tblChargeType.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblChargeType.getColumnModel().getColumn(0).setPreferredWidth(50);
         tblChargeType.setDefaultRenderer(Object.class, new TableCellRender());

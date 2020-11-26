@@ -5,6 +5,7 @@
  */
 package com.cv.inv.entry;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
@@ -98,6 +99,8 @@ public class Issue extends javax.swing.JPanel implements SelectionObserver, KeyL
         tblIssue.setModel(issueTableModel);
         issueTableModel.setParent(tblIssue);
         tblIssue.getTableHeader().setFont(Global.lableFont);
+        tblIssue.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblIssue.getTableHeader().setForeground(ColorUtil.foreground);
         issueTableModel.addEmptyRow();
         issueTableModel.setCallBack(this);
         tblIssue.setCellSelectionEnabled(true);

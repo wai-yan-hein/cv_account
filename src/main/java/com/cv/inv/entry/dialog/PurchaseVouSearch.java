@@ -78,6 +78,8 @@ public class PurchaseVouSearch extends javax.swing.JDialog implements KeyListene
     private void initTableVoucher() {
         tblVoucher.setModel(purVouTableModel);
         tblVoucher.getTableHeader().setFont(Global.tblHeaderFont);
+        tblVoucher.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblVoucher.getTableHeader().setForeground(ColorUtil.foreground);
         tblVoucher.getColumnModel().getColumn(0).setPreferredWidth(30);
         tblVoucher.getColumnModel().getColumn(1).setPreferredWidth(70);
         tblVoucher.getColumnModel().getColumn(2).setPreferredWidth(40);

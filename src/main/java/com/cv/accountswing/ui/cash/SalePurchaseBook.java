@@ -150,6 +150,8 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
         spTableModel.setSelectionObserver(this);
         tblCash.setModel(spTableModel);
         tblCash.getTableHeader().setFont(Global.tblHeaderFont);
+        tblCash.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblCash.getTableHeader().setForeground(ColorUtil.foreground);
         tblCash.getTableHeader().setPreferredSize(new Dimension(25, 25));
         
         tblCash.getTableHeader().setBackground(ColorUtil.tblHeaderColor);

@@ -5,6 +5,7 @@
  */
 package com.cv.accountswing.ui.setup;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
@@ -77,6 +78,8 @@ public class COASetup extends javax.swing.JPanel implements KeyListener, PanelCo
     private void tblCOAHead() {
         tblCoaHead.setModel(coaHeadTableModel);
         tblCoaHead.getTableHeader().setFont(Global.tblHeaderFont);
+        tblCoaHead.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblCoaHead.getTableHeader().setForeground(ColorUtil.foreground);
         tblCoaHead.getSelectionModel().addListSelectionListener((ListSelectionEvent e) -> {
             if (e.getValueIsAdjusting()) {
                 if (tblCoaHead.getSelectedRow() >= 0) {

@@ -5,6 +5,7 @@
  */
 package com.cv.accountswing.ui.system.setup;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.SelectionObserver;
@@ -86,6 +87,8 @@ public class RoleSetup extends javax.swing.JPanel implements KeyListener, PanelC
     private void initTable() {
         tblRole.setModel(userRoleTableModel);
         tblRole.getTableHeader().setFont(Global.lableFont);
+        tblRole.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblRole.getTableHeader().setForeground(ColorUtil.foreground);
         tblRole.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblRole.setDefaultRenderer(Object.class, new TableCellRender());
         tblRole.getColumnModel().getColumn(0).setCellEditor(new AutoClearEditor());

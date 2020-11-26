@@ -5,6 +5,7 @@
  */
 package com.cv.inv.entry;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
@@ -122,6 +123,8 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
         returnInTableModel.setParent(tblReturnIn);
         returnInTableModel.addNewRow();
         tblReturnIn.getTableHeader().setFont(Global.lableFont);
+        tblReturnIn.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblReturnIn.getTableHeader().setForeground(ColorUtil.foreground);
         tblReturnIn.setCellSelectionEnabled(true);
         tblReturnIn.getColumnModel().getColumn(0).setPreferredWidth(50);
         tblReturnIn.getColumnModel().getColumn(1).setPreferredWidth(300);
@@ -142,7 +145,7 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
         tblReturnIn.setDefaultRenderer(Double.class, new TableCellRender());
         tblReturnIn.setDefaultRenderer(Object.class, new TableCellRender());
 
-         addRetInTableModelListener();
+        addRetInTableModelListener();
         tblReturnIn.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                 .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
         tblReturnIn.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);

@@ -107,6 +107,8 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener, Pa
     private void initTable() {
         tblCustomer.setModel(supplierTabelModel);
         tblCustomer.getTableHeader().setFont(Global.textFont);
+        tblCustomer.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblCustomer.getTableHeader().setForeground(ColorUtil.foreground);
         tblCustomer.getColumnModel().getColumn(0).setPreferredWidth(40);// Code
         tblCustomer.getColumnModel().getColumn(1).setPreferredWidth(320);// Name
         tblCustomer.getColumnModel().getColumn(2).setPreferredWidth(40);// Active 

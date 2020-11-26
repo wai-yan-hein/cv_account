@@ -5,6 +5,7 @@
  */
 package com.cv.inv.entry;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
@@ -132,6 +133,8 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
         tblRetOut.setModel(retOutTableModel);
         retOutTableModel.setParent(tblRetOut);
         tblRetOut.getTableHeader().setFont(Global.lableFont);
+        tblRetOut.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblRetOut.getTableHeader().setForeground(ColorUtil.foreground);
         tblRetOut.setCellSelectionEnabled(true);
         tblRetOut.getColumnModel().getColumn(0).setPreferredWidth(50);
         tblRetOut.getColumnModel().getColumn(1).setPreferredWidth(300);
