@@ -278,12 +278,13 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
      * @param context
      */
     public ApplicationMainFrame(ConfigurableApplicationContext context) {
-        System.setProperty("java.awt.headless", "false");
+        //System.setProperty("java.awt.headless", "false");
         initComponents();
         initKeyFoucsManager();
         initToolBar();
+        initPopup();
+        showCloseAllPopup();
         this.context = context;
-
     }
 
     private void initToolBar() {
@@ -561,7 +562,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     }
 
     private void showCloseAllPopup() {
-        initPopup();
         tabMain.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -667,7 +667,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             Global.listCurrency = currencyService.search("-", "-", Global.compId.toString());
             Global.listDepartment = departmentService.search("-", "-", Global.compId.toString(),
                     "-", "-");
-            Global.listTrader = traderService.searchTrader("-", "-", "-", "-", "-", Global.compId.toString());
+            Global.listTrader = traderService.searchTrader("-", "-", "-", "-", "-", Global.compId.toString(), "-");
             Global.listLocation = locationService.findAll();
             Global.listVou = vouService.findAll();
             Global.listSaleMan = saleManService.findAll();
@@ -716,7 +716,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
 
     public void initMenu() {
         LOGGER.info("init menu.");
-        showCloseAllPopup();
         menuBar.removeAll();
         taskExecutor.execute(() -> {
             List<VRoleMenu> listVRM = menuService.getParentChildMenu(Global.roleId.toString());
@@ -892,7 +891,8 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         });
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel1.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(204, 204, 204), 1, true));
+        jPanel1.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        jPanel1.setFocusable(false);
 
         lblCompanyName.setFont(Global.lableFont);
         lblCompanyName.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
@@ -1005,11 +1005,10 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(toolBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(toolBar, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(lblCompanyName, javax.swing.GroupLayout.PREFERRED_SIZE, 194, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(lblCompanyName, javax.swing.GroupLayout.DEFAULT_SIZE, 264, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel1)
@@ -1021,16 +1020,18 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addComponent(lblCompanyName, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addComponent(toolBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblCompanyName, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(toolBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(0, 0, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addGap(6, 6, 6)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(lblNeworkPing)
-                    .addComponent(lblNeworkImage)
-                    .addComponent(jLabel1))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(lblNeworkPing, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblNeworkImage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -1092,8 +1093,8 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
         //LOGGER.info("formWindowOpened");
         assignWindoInfo();
-        initMenu();
         initializeData();
+        initMenu();
         //tabChangeListener();
     }//GEN-LAST:event_formWindowOpened
 

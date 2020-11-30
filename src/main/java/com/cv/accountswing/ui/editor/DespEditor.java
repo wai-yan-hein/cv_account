@@ -93,7 +93,7 @@ public class DespEditor extends AbstractCellEditor implements TableCellEditor {
         if (value != null) {
             jtf.setText(value.toString());
         }
-        completer = new DespAutoCompleter(jtf, Global.listDesp, this);
+        completer = new DespAutoCompleter(jtf, Global.listDesp, this, descriptionService);
         return component;
     }
 

@@ -195,6 +195,8 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Sel
         tblDr.setRowHeight(Global.tblRowHeight);
         tblDr.getTableHeader().setFont(Global.lableFont);
         tblDr.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tblDr.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblDr.getTableHeader().setForeground(ColorUtil.foreground);
         tblDr.getColumnModel().getColumn(0).setPreferredWidth(10);
         tblDr.getColumnModel().getColumn(0).setPreferredWidth(80);
         tblDr.getColumnModel().getColumn(0).setPreferredWidth(80);

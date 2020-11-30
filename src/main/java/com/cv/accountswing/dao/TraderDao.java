@@ -17,7 +17,7 @@ public interface TraderDao {
     public Trader findById(Integer id);
 
     public List<Trader> searchTrader(String code, String name, String address,
-            String phone, String parentCode, String compCode);
+            String phone, String parentCode, String compCode, String appTraderCode);
 
     public Trader saveTrader(Trader trader);
 

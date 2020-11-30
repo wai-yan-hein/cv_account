@@ -89,6 +89,8 @@ public class LoginDialog extends javax.swing.JDialog implements KeyListener {
             }
         } catch (Exception ex) {
             LOGGER.error("getMachineInfo Error : {}", ex.getMessage());
+            JOptionPane.showMessageDialog(this, "Database not found.", "System Error", JOptionPane.ERROR_MESSAGE);
+            System.exit(1);
         }
     }
 

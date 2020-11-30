@@ -5,7 +5,9 @@
  */
 package com.cv.accountswing.ui.editor;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
+import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.view.VDescription;
 import com.cv.accountswing.service.VDescriptionService;
 import com.cv.accountswing.ui.cash.common.DespTableModel;
@@ -50,18 +52,21 @@ public class DespAutoCompleter implements KeyListener {
     private JTextComponent textComp;
     private static final String AUTOCOMPLETER = "AUTOCOMPLETER"; //NOI18N
     private DespTableModel despModel;
-    private VDescription autoText;
+    private VDescription desp;
     public AbstractCellEditor editor;
     private TableRowSorter<TableModel> sorter;
     private int x = 0;
+    private int y = 0;
     boolean popupOpen = false;
     private VDescriptionService descriptionService;
+    private SelectionObserver selectionObserver;
 
-    public DespAutoCompleter(VDescriptionService descriptionService) {
-        this.descriptionService = descriptionService;
-        if (Global.listDesp == null) {
-            Global.listDesp = this.descriptionService.getDescriptions();
-        }
+    public SelectionObserver getSelectionObserver() {
+        return selectionObserver;
+    }
+
+    public void setSelectionObserver(SelectionObserver selectionObserver) {
+        this.selectionObserver = selectionObserver;
     }
 
     //private CashFilter cashFilter = Global.allCash;
@@ -69,17 +74,22 @@ public class DespAutoCompleter implements KeyListener {
     }
 
     public DespAutoCompleter(JTextComponent comp, List<VDescription> list,
-            AbstractCellEditor editor) {
+            AbstractCellEditor editor, VDescriptionService descriptionService) {
         this.textComp = comp;
         this.editor = editor;
+        this.descriptionService = descriptionService;
+        if (Global.listDesp.isEmpty()) {
+            Global.listDesp = this.descriptionService.getDescriptions();
+        }
         textComp.putClientProperty(AUTOCOMPLETER, this);
         textComp.setFont(Global.textFont);
         despModel = new DespTableModel(Global.listDesp);
         table.setModel(despModel);
-        table.setSize(25, 25);
         table.getTableHeader().setFont(Global.lableFont);
         table.setFont(Global.textFont); // NOI18N
         table.setRowHeight(Global.tblRowHeight);
+        table.getTableHeader().setFont(Global.lableFont);
+        table.getTableHeader().setBackground(ColorUtil.btnEdit);
         table.setDefaultRenderer(Object.class, new TableCellRender());
 
         sorter = new TableRowSorter(table.getModel());
@@ -93,7 +103,7 @@ public class DespAutoCompleter implements KeyListener {
         table.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                if (evt.getClickCount() == 2) {
+                if (evt.getClickCount() == 1) {
                     mouseSelect();
                 }
             }
@@ -102,7 +112,7 @@ public class DespAutoCompleter implements KeyListener {
         scroll.getVerticalScrollBar().setFocusable(false);
         scroll.getHorizontalScrollBar().setFocusable(false);
 
-        popup.setBorder(BorderFactory.createLineBorder(Color.black));
+        popup.setBorder(BorderFactory.createLineBorder(ColorUtil.mainColor));
         popup.setPopupSize(300, 300);
 
         popup.add(scroll);
@@ -163,10 +173,13 @@ public class DespAutoCompleter implements KeyListener {
 
     public void mouseSelect() {
         if (table.getSelectedRow() != -1) {
-            autoText = despModel.getRemark(table.convertRowIndexToModel(
+            desp = despModel.getRemark(table.convertRowIndexToModel(
                     table.getSelectedRow()));
-            ((JTextField) textComp).setText(autoText.getDescription());
+            ((JTextField) textComp).setText(desp.getDescription());
             if (editor == null) {
+                if (selectionObserver != null) {
+                    selectionObserver.selected("Description", desp.getDescription());
+                }
             }
         }
 
@@ -224,9 +237,10 @@ public class DespAutoCompleter implements KeyListener {
                     textComp.registerKeyboardAction(acceptAction, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
                             JComponent.WHEN_FOCUSED);
                     if (x == 0) {
-                        x = textComp.getCaretPosition();
+                        x = textComp.getWidth();
+                        y = textComp.getHeight();
                     }
-                    popup.show(textComp, x, textComp.getHeight());
+                    popup.show(textComp, x, y);
                     popupOpen = false;
 
                 } else {
@@ -313,13 +327,13 @@ public class DespAutoCompleter implements KeyListener {
     }
 
     public VDescription getAutoText() {
-        return autoText;
+        return desp;
 
     }
 
-    public void setAutoText(VDescription autoText) {
-        this.autoText = autoText;
-        textComp.setText(autoText.getDescription());
+    public void setAutoText(VDescription desp) {
+        this.desp = desp;
+        textComp.setText(desp.getDescription());
 
     }
 

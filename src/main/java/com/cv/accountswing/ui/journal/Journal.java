@@ -17,6 +17,8 @@ import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.journal.common.JournalTableModel;
 import com.cv.accountswing.util.Util1;
 import com.toedter.calendar.JTextFieldDateEditor;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
@@ -28,6 +30,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import net.sf.jasperreports.components.barcode4j.FourStateBarcodeComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -113,7 +116,7 @@ public class Journal extends javax.swing.JPanel implements KeyListener, Selectio
     }
 
     private void searchGV() {
-        LOGGER.info("searchGV");
+        LOGGER.info("Searching General Voucher.");
         loadingObserver.load(this.getName(), "Start");
         taskExecutor.execute(() -> {
             try {
@@ -143,6 +146,14 @@ public class Journal extends javax.swing.JPanel implements KeyListener, Selectio
         txtVouNo.addKeyListener(this);
         txtRefrence.addKeyListener(this);
         btnEntry.addKeyListener(this);
+        txtToDate.getDateEditor().getUiComponent().addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                searchGV();
+            }
+
+        });
+
     }
 
     /*private void initPropertyChangeListener() {
@@ -249,8 +260,9 @@ public class Journal extends javax.swing.JPanel implements KeyListener, Selectio
 
         btnEntry.setBackground(ColorUtil.mainColor);
         btnEntry.setFont(Global.lableFont);
-        btnEntry.setForeground(new java.awt.Color(255, 255, 255));
-        btnEntry.setText("+");
+        btnEntry.setForeground(ColorUtil.foreground);
+        btnEntry.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/new-button.png"))); // NOI18N
+        btnEntry.setText("New Journal");
         btnEntry.setToolTipText("New Journal");
         btnEntry.setName("btnEntry"); // NOI18N
         btnEntry.addActionListener(new java.awt.event.ActionListener() {
@@ -409,25 +421,29 @@ public class Journal extends javax.swing.JPanel implements KeyListener, Selectio
         switch (ctrlName) {
             case "txtFromDate":
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    String date = ((JTextFieldDateEditor) sourceObj).getText();
-                    if (date.length() == 8) {
-                        String toFormatDate = Util1.toFormatDate(date);
-                        txtFromDate.setDate(Util1.toDate(toFormatDate, "dd/MM/yyyy"));
+                    if (sourceObj != null) {
+                        String date = ((JTextFieldDateEditor) sourceObj).getText();
+                        if (date.length() == 8) {
+                            String toFormatDate = Util1.toFormatDate(date);
+                            txtFromDate.setDate(Util1.toDate(toFormatDate, "dd/MM/yyyy"));
+                        }
+                        txtToDate.getDateEditor().getUiComponent().requestFocusInWindow();
+                        searchGV();
                     }
-                    txtToDate.getDateEditor().getUiComponent().requestFocusInWindow();
-                    searchGV();
                 }
                 tabToTable(e);
                 break;
             case "txtToDate":
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    String date = ((JTextFieldDateEditor) sourceObj).getText();
-                    if (date.length() == 8) {
-                        String toFormatDate = Util1.toFormatDate(date);
-                        txtToDate.setDate(Util1.toDate(toFormatDate, "dd/MM/yyyy"));
+                    if (sourceObj != null) {
+                        String date = ((JTextFieldDateEditor) sourceObj).getText();
+                        if (date.length() == 8) {
+                            String toFormatDate = Util1.toFormatDate(date);
+                            txtToDate.setDate(Util1.toDate(toFormatDate, "dd/MM/yyyy"));
+                        }
+                        txtVouNo.requestFocus();
+                        searchGV();
                     }
-                    txtVouNo.requestFocus();
-                    searchGV();
                 }
                 tabToTable(e);
                 break;

@@ -36,6 +36,8 @@ import com.cv.accountswing.ui.report.common.APARTableModel;
 import com.cv.accountswing.ui.report.common.GLListingTableModel;
 import com.cv.accountswing.util.Util1;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
@@ -44,6 +46,7 @@ import java.util.Map;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
 import javax.swing.SwingUtilities;
@@ -59,7 +62,8 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-public class AparGlReport extends javax.swing.JPanel implements SelectionObserver, PanelControl, FilterObserver {
+public class AparGlReport extends javax.swing.JPanel implements SelectionObserver,
+        PanelControl, FilterObserver, KeyListener {
 
     private int selectRow = -1;
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(AparGlReport.class);
@@ -97,6 +101,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
     private boolean isShown = false;
     private LoadingObserver loadingObserver;
     private JPopupMenu popup;
+    private DepartmentAutoCompleter departmentAutoCompleter;
     private String stDate;
     private String enDate;
     private String cvId;
@@ -117,6 +122,12 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
     public AparGlReport() {
         initComponents();
         initPopup();
+        initKeyListener();
+    }
+
+    private void initKeyListener() {
+        txtDep.addKeyListener(this);
+        txtPerson.addKeyListener(this);
     }
 
     private void initMain() {
@@ -370,11 +381,10 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
 
     private void calGLTotlaAmount(List<VTriBalance> listTB) {
         if (!listTB.isEmpty()) {
-            String curr = listTB.get(0).getKey().getCurrId();
             double ttlDrAmt = 0.0;
             double ttlCrAmt = 0.0;
             double ttlNet = 0.0;
-            double outBal = 0.0;
+            double outBal;
             for (VTriBalance tb : listTB) {
                 ttlDrAmt += Util1.getDouble(tb.getDrAmt());
                 ttlCrAmt += Util1.getDouble(tb.getCrAmt());
@@ -393,9 +403,9 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
     }
 
     private void initializeParameter() {
-        dept = Util1.isNull(txtDep.getText(), "-");
-        cvId = Util1.isNull(txtPerson.getText(), "-1");
-        currency = Global.sysProperties.get("system.default.currency");
+        dept = Util1.isNull(dept, "-");
+        cvId = Util1.isNull(cvId, "-1");
+        currency = Global.defalutCurrency.getKey().getCode();
         stDate = Util1.isNull(stDate, Util1.toDateStr(Util1.getTodayDate(), "dd/MM/yyyy"));
         enDate = Util1.isNull(enDate, Util1.toDateStr(Util1.getTodayDate(), "dd/MM/yyyy"));
         userId = Global.loginUser.getUserId().toString();
@@ -410,7 +420,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                 Global.listTrader, null);
         traderAutoCompleter.setSelectionObserver(this);
 
-        DepartmentAutoCompleter departmentAutoCompleter = new DepartmentAutoCompleter(txtDep,
+        departmentAutoCompleter = new DepartmentAutoCompleter(txtDep,
                 Global.listDepartment, null);
         departmentAutoCompleter.setSelectionObserver(this);
         CurrencyAutoCompleter currencyAutoCompleter = new CurrencyAutoCompleter(txtCurrency,
@@ -526,6 +536,11 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
 
         txtDep.setFont(Global.textFont);
         txtDep.setName("txtDep"); // NOI18N
+        txtDep.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtDepFocusGained(evt);
+            }
+        });
         txtDep.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtDepActionPerformed(evt);
@@ -534,6 +549,11 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
 
         txtPerson.setFont(Global.textFont);
         txtPerson.setName("txtPerson"); // NOI18N
+        txtPerson.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtPersonFocusGained(evt);
+            }
+        });
         txtPerson.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtPersonActionPerformed(evt);
@@ -717,6 +737,16 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         search();
     }//GEN-LAST:event_txtCurrencyActionPerformed
 
+    private void txtDepFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtDepFocusGained
+        // TODO add your handling code here:
+        txtDep.selectAll();
+    }//GEN-LAST:event_txtDepFocusGained
+
+    private void txtPersonFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtPersonFocusGained
+        // TODO add your handling code here:
+        txtPerson.selectAll();
+    }//GEN-LAST:event_txtPersonFocusGained
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
@@ -796,5 +826,43 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
     @Override
     public void sendFilter(String filter) {
         setTableFilter(filter);
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        Object source = e.getSource();
+        String ctrlName = "-";
+        if (source instanceof JTextField) {
+            ctrlName = ((JTextField) source).getName();
+        }
+        switch (ctrlName) {
+            case "txtDep":
+                switch (e.getKeyCode()) {
+                    case KeyEvent.VK_BACK_SPACE:
+                        if (txtDep.getText().isEmpty()) {
+                            dept = "-";
+                            departmentAutoCompleter.closePopup();
+                            search();
+                        }
+                        break;
+                    case KeyEvent.VK_DELETE: {
+                        if (txtDep.getText().isEmpty()) {
+                            dept = "-";
+                            departmentAutoCompleter.closePopup();
+                            search();
+                        }
+                        break;
+                    }
+                }
+        }
+
     }
 }

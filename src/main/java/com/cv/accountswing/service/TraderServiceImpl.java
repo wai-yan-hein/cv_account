@@ -5,10 +5,7 @@
  */
 package com.cv.accountswing.service;
 
-import com.cv.accountswing.common.Global;
 import com.cv.accountswing.dao.TraderDao;
-import com.cv.accountswing.entity.SystemProperty;
-import com.cv.accountswing.entity.SystemPropertyKey;
 import com.cv.accountswing.entity.Trader;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,9 +34,9 @@ public class TraderServiceImpl implements TraderService {
 
     @Override
     public List<Trader> searchTrader(String code, String name, String address,
-            String phone, String parentCode, String compCode) {
+            String phone, String parentCode, String compCode, String appTraderCode) {
         List<Trader> listTR = dao.searchTrader(code, name, address, phone,
-                parentCode, compCode);
+                parentCode, compCode, appTraderCode);
         return listTR;
     }
 

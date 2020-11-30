@@ -230,6 +230,7 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
             menu.setMenuName(menuName);
             menu.setParent(parentCode);
             menu.setMenuUrl(txtMenuUrl.getText());
+            menu.setSoureAccCode(txtAccount.getText());
             if (txtOrder.getValue() != null) {
                 menu.setOrderBy(Util1.getInteger(txtOrder.getText()));
             }
@@ -269,12 +270,14 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
         txtMenuName.setText(menu.getMenuName());
         txtMenuUrl.setText(menu.getMenuUrl());
         txtOrder.setText(menu.getOrderBy() == null ? null : menu.getOrderBy().toString());
+        txtAccount.setText(menu.getSoureAccCode());
     }
 
     private void clear() {
         txtMenuName.setText(null);
         txtMenuUrl.setText(null);
         txtOrder.setText(null);
+        txtAccount.setText(null);
     }
 
     /**
@@ -296,6 +299,8 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
         jButton1 = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
         txtOrder = new javax.swing.JFormattedTextField();
+        jLabel4 = new javax.swing.JLabel();
+        txtAccount = new javax.swing.JTextField();
 
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentShown(java.awt.event.ComponentEvent evt) {
@@ -322,9 +327,15 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
         jLabel2.setText("Url");
 
         txtMenuUrl.setFont(Global.textFont);
+        txtMenuUrl.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtMenuUrlFocusGained(evt);
+            }
+        });
 
         jButton1.setBackground(ColorUtil.mainColor);
         jButton1.setFont(Global.textFont);
+        jButton1.setForeground(ColorUtil.foreground);
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save-button-white.png"))); // NOI18N
         jButton1.setText("Save");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -337,6 +348,21 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
         jLabel3.setText("Order");
 
         txtOrder.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0"))));
+        txtOrder.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtOrderFocusGained(evt);
+            }
+        });
+
+        jLabel4.setFont(Global.textFont);
+        jLabel4.setText("Account Id");
+
+        txtAccount.setFont(Global.textFont);
+        txtAccount.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtAccountFocusGained(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -349,12 +375,14 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtMenuUrl, javax.swing.GroupLayout.DEFAULT_SIZE, 208, Short.MAX_VALUE)
                             .addComponent(txtMenuName)
-                            .addComponent(txtOrder)))
+                            .addComponent(txtOrder)
+                            .addComponent(txtAccount, javax.swing.GroupLayout.DEFAULT_SIZE, 208, Short.MAX_VALUE)))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(jButton1)))
@@ -372,12 +400,16 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
                     .addComponent(jLabel2)
                     .addComponent(txtMenuUrl, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(txtAccount, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel3)
                     .addComponent(txtOrder, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jButton1)
-                .addContainerGap(236, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -425,15 +457,32 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
         txtMenuName.selectAll();
     }//GEN-LAST:event_txtMenuNameFocusGained
 
+    private void txtMenuUrlFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtMenuUrlFocusGained
+        // TODO add your handling code here:
+        txtMenuUrl.selectAll();
+    }//GEN-LAST:event_txtMenuUrlFocusGained
+
+    private void txtAccountFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtAccountFocusGained
+        // TODO add your handling code here:
+        txtAccount.selectAll();
+    }//GEN-LAST:event_txtAccountFocusGained
+
+    private void txtOrderFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtOrderFocusGained
+        // TODO add your handling code here:
+        txtOrder.selectAll();
+    }//GEN-LAST:event_txtOrderFocusGained
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTree treeCOA;
+    private javax.swing.JTextField txtAccount;
     private javax.swing.JTextField txtMenuName;
     private javax.swing.JTextField txtMenuUrl;
     private javax.swing.JFormattedTextField txtOrder;

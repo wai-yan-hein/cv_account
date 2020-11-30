@@ -416,6 +416,7 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
 
         btnSave.setBackground(ColorUtil.mainColor);
         btnSave.setFont(Global.textFont);
+        btnSave.setForeground(ColorUtil.foreground);
         btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save-button-white.png"))); // NOI18N
         btnSave.setText("Save");
         btnSave.setEnabled(false);
@@ -431,6 +432,7 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
 
         btnClear.setBackground(ColorUtil.btnEdit);
         btnClear.setFont(Global.textFont);
+        btnClear.setForeground(ColorUtil.foreground);
         btnClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/clear-button-white.png"))); // NOI18N
         btnClear.setText("Clear");
         btnClear.setEnabled(false);

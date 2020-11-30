@@ -144,7 +144,7 @@ public class AccessFileServiceImpl implements AccessFileService {
                             if (tmpId.equals("198")) {
                                 tmpId = "001";
                             }
-                            List<Trader> listTrd = trdDao.searchTrader(tmpId, "-", "-", "-", "-", "-");
+                            List<Trader> listTrd = trdDao.searchTrader(tmpId, "-", "-", "-", "-", "-", "-");
                             if (listTrd == null) {
                                 throw new Exception("Invalid trader id : " + tmpId);
                             } else if (listTrd.isEmpty()) {

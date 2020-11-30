@@ -453,7 +453,6 @@ public class CurrencySetup extends javax.swing.JPanel implements KeyListener, Pa
         } else if (sourceObj instanceof JTable) {
             ctrlName = ((JTable) sourceObj).getName();
         }
-        LOGGER.info("Control Name Key Released:" + ctrlName);
         switch (ctrlName) {
             case "txtCurrCode":
                 if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_DOWN) {

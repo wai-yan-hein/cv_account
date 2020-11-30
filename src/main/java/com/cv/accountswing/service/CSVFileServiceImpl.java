@@ -132,7 +132,7 @@ public class CSVFileServiceImpl implements CSVFileService {
                         if (tmpId.equals("198")) {
                             tmpId = "001";
                         }
-                        List<Trader> listTrd = trdDao.searchTrader(tmpId, "-", "-", "-", "-", "-");
+                        List<Trader> listTrd = trdDao.searchTrader(tmpId, "-", "-", "-", "-", "-", "-");
                         if (listTrd == null) {
                             //throw new Exception("Invalid trader id : " + tmpId);
                             logger.error("Invalid trader id : " + tmpId);

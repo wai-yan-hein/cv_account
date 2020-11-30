@@ -2,9 +2,9 @@ package com.cv.accountswing;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.ui.ApplicationMainFrame;
-import com.cv.accountswing.ui.LoginDialog;
 import com.cv.accountswing.entity.view.VUsrCompAssign;
 import com.cv.accountswing.service.UsrCompRoleService;
+import com.cv.accountswing.ui.LoginDialog;
 import com.formdev.flatlaf.FlatLightLaf;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -116,9 +116,6 @@ public class AccountSwingApplication {
 
                     ApplicationMainFrame appMain = context.getBean(ApplicationMainFrame.class);
                     java.awt.EventQueue.invokeLater(() -> {
-                        //appMain.initGlobalData();
-                        //appMain.initProperty();
-                        //appMain.autoSyncStart();
                         appMain.startNetworkDetector();
                         appMain.setIconImage(new ImageIcon(AccountSwingApplication.class.getResource("/images/logo.png")).getImage());
                         appMain.setExtendedState(JFrame.MAXIMIZED_BOTH);

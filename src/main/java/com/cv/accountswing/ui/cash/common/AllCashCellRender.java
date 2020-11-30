@@ -24,11 +24,11 @@ import javax.swing.table.DefaultTableCellRenderer;
  */
 public class AllCashCellRender extends DefaultTableCellRenderer {
 
-    private JCheckBox check = new JCheckBox();
+    private final JCheckBox check = new JCheckBox();
     private JLabel labelIcon;
     private JLabel labelText;
     private JPanel panel;
-    private Color bgColor = new Color(232, 232, 232);
+    private final Color bgColor = new Color(232, 232, 232);
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {

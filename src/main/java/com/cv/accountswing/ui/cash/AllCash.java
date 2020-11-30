@@ -25,7 +25,6 @@ import com.cv.accountswing.service.VDescriptionService;
 import com.cv.accountswing.service.VGlService;
 import com.cv.accountswing.service.VRefService;
 import com.cv.accountswing.ui.ApplicationMainFrame;
-import com.cv.accountswing.ui.cash.common.AllCashTableHandler;
 import com.cv.accountswing.ui.editor.CurrencyEditor;
 import com.cv.accountswing.ui.editor.DepartmentCellEditor;
 import com.cv.accountswing.ui.editor.TraderCellEditor;
@@ -38,7 +37,7 @@ import com.cv.accountswing.ui.editor.RefCellEditor;
 import com.cv.accountswing.ui.filter.FilterPanel;
 import com.cv.accountswing.util.Util1;
 import java.awt.BorderLayout;
-import java.awt.Container;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
@@ -51,18 +50,14 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.DropMode;
-import javax.swing.ImageIcon;
-import javax.swing.JMenuItem;
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
-import javax.swing.JScrollBar;
-import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
-import javax.swing.SwingUtilities;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import org.slf4j.Logger;
@@ -120,7 +115,8 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
     private LoadingObserver loadingObserver;
     private ReloadData reloadData;
     private String sourceAccId;
-    private JPopupMenu popupmenu;
+    private final JPopupMenu popupmenu = new JPopupMenu();
+    private final JLabel lblMessage = new JLabel();
     private boolean isShown = false;
 
     public void setIsShown(boolean isShown) {
@@ -158,6 +154,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
         initComponents();
         initPopup();
         initKeyListener();
+        initMouseLisener();
     }
 
     public AllCash newInstance() {
@@ -243,9 +240,9 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
         tblCash.getActionMap().put("ENTER-Action", actionTblCash);*/
         tblCash.getInputMap().put(KeyStroke.getKeyStroke("F8"), "F8-Action");
         tblCash.getActionMap().put("F8-Action", actionItemDeleteExp);
-        tblCash.setDragEnabled(true);
+        /*tblCash.setDragEnabled(true);
         tblCash.setDropMode(DropMode.INSERT_ROWS);
-        tblCash.setTransferHandler(new AllCashTableHandler(allCashTableModel));
+        tblCash.setTransferHandler(new AllCashTableHandler(allCashTableModel));*/
     }
 
     private void initKeyListener() {
@@ -263,32 +260,61 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
     }
 
     private void initPopup() {
-        popupmenu = new JPopupMenu("Edit");
-        ImageIcon printIcon = new ImageIcon(this.getClass().getResource("/images/printer.png"));
-        JMenuItem print = new JMenuItem("Print");
-        print.setIcon(printIcon);
-        print.addActionListener((ActionEvent e) -> {
-            printVoucher();
-        });
-        popupmenu.add(print);
-        initMouseLisener();
+        lblMessage.setForeground(ColorUtil.foreground);
+        lblMessage.setFont(Global.textFont);
+        lblMessage.setHorizontalAlignment(JLabel.CENTER);
+        popupmenu.setBorder(BorderFactory.createLineBorder(Color.black));
+        popupmenu.setBackground(ColorUtil.btnEdit);
+        popupmenu.setFocusable(false);
+        popupmenu.add(lblMessage);
     }
 
     private void initMouseLisener() {
         tblCash.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (SwingUtilities.isRightMouseButton(e)) {
-                    popupmenu.show(tblCash, e.getX(), e.getY());
-                } else if (e.getClickCount() == 2) {
-                    int row = tblCash.getSelectedRow();
-                    int col = tblCash.getSelectedColumn();
-                    tblCash.requestFocus();
-                    tblCash.editCellAt(row, col);
+                if (e.getClickCount() == 1) {
+                    String message = getMessage();
+                    if (message != null) {
+                        lblMessage.setText(message);
+                        popupmenu.show(tblCash, e.getX(), e.getY());
+                    }
                 }
             }
 
         });
+    }
+
+    private String getMessage() {
+        String msg = null;
+        int selectRow = tblCash.convertRowIndexToModel(tblCash.getSelectedRow());
+        int column = tblCash.getSelectedColumn();
+        VGl vGl = allCashTableModel.getVGl(selectRow);
+        switch (column) {
+            case 0://date
+                msg = Util1.toDateStr(vGl.getGlDate(), "dd/MM/yyyy");
+                break;
+            case 1://dep
+                msg = vGl.getDeptName();
+                break;
+            case 2://desp
+                msg = vGl.getDescription();
+                break;
+            case 3://ref
+                msg = vGl.getReference();
+                break;
+            case 4://person
+                msg = vGl.getTraderCode();
+                break;
+            case 5://account
+                msg = vGl.getAccountId();
+                break;
+            case 6://curr
+                msg = vGl.getfCurName();
+                break;
+        }
+
+        return msg;
     }
 
     private void filterPanel() {
@@ -521,15 +547,16 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
         tblCash.setFont(Global.textFont);
         tblCash.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {},
+                {},
+                {},
+                {}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+
             }
         ));
+        tblCash.setToolTipText("");
         tblCash.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
         tblCash.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         tblCash.setRowHeight(Global.tblRowHeight);

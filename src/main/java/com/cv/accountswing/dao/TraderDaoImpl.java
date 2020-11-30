@@ -24,7 +24,7 @@ public class TraderDaoImpl extends AbstractDao<Integer, Trader> implements Trade
 
     @Override
     public List<Trader> searchTrader(String code, String name, String address,
-            String phone, String parentCode, String compCode) {
+            String phone, String parentCode, String compCode, String appTraderCode) {
         String strSql = "select o from Trader o ";
         String strFilter = "";
 
@@ -73,6 +73,13 @@ public class TraderDaoImpl extends AbstractDao<Integer, Trader> implements Trade
                 strFilter = "o.parent like '%" + parentCode + "%'";
             } else {
                 strFilter = strFilter + " and o.parent like '%" + parentCode + "%'";
+            }
+        }
+        if (!appTraderCode.equals("-")) {
+            if (strFilter.isEmpty()) {
+                strFilter = "o.appTraderCode ='" + appTraderCode + "'";
+            } else {
+                strFilter = strFilter + " and o.appTraderCode  '" + appTraderCode + "'";
             }
         }
 

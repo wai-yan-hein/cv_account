@@ -5,12 +5,13 @@
  */
 package com.cv.accountswing.ui.editor;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
+import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.view.VRef;
 import com.cv.accountswing.service.VRefService;
 import com.cv.accountswing.ui.cash.common.RefTableModel;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
-import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -50,18 +51,21 @@ public class RefAutoCompleter implements KeyListener {
     private JTextComponent textComp;
     private static final String AUTOCOMPLETER = "AUTOCOMPLETER"; //NOI18N
     private RefTableModel refModel;
-    private VRef autoText;
+    private VRef ref;
     public AbstractCellEditor editor;
     private TableRowSorter<TableModel> sorter;
     private int x = 0;
+    private int y = 0;
     boolean popupOpen = false;
     private VRefService refService;
+    private SelectionObserver selectionObserver;
 
-    public RefAutoCompleter(VRefService refService) {
-        this.refService = refService;
-        if (Global.listRef == null) {
-            Global.listRef = this.refService.getRefrences();
-        }
+    public SelectionObserver getSelectionObserver() {
+        return selectionObserver;
+    }
+
+    public void setSelectionObserver(SelectionObserver selectionObserver) {
+        this.selectionObserver = selectionObserver;
     }
 
     //private CashFilter cashFilter = Global.allCash;
@@ -69,9 +73,13 @@ public class RefAutoCompleter implements KeyListener {
     }
 
     public RefAutoCompleter(JTextComponent comp, List<VRef> list,
-            AbstractCellEditor editor) {
+            AbstractCellEditor editor, VRefService refService) {
         this.textComp = comp;
         this.editor = editor;
+        this.refService = refService;
+        if (Global.listRef.isEmpty()) {
+            Global.listRef = this.refService.getRefrences();
+        }
         textComp.putClientProperty(AUTOCOMPLETER, this);
         textComp.setFont(Global.textFont);
         refModel = new RefTableModel(Global.listRef);
@@ -80,6 +88,8 @@ public class RefAutoCompleter implements KeyListener {
         table.getTableHeader().setFont(Global.lableFont);
         table.setFont(Global.textFont); // NOI18N
         table.setRowHeight(Global.tblRowHeight);
+        table.getTableHeader().setBackground(ColorUtil.btnEdit);
+        table.getTableHeader().setForeground(ColorUtil.foreground);
         table.setDefaultRenderer(Object.class, new TableCellRender());
 
         sorter = new TableRowSorter(table.getModel());
@@ -93,7 +103,7 @@ public class RefAutoCompleter implements KeyListener {
         table.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                if (evt.getClickCount() == 2) {
+                if (evt.getClickCount() == 1) {
                     mouseSelect();
                 }
             }
@@ -102,7 +112,7 @@ public class RefAutoCompleter implements KeyListener {
         scroll.getVerticalScrollBar().setFocusable(false);
         scroll.getHorizontalScrollBar().setFocusable(false);
 
-        popup.setBorder(BorderFactory.createLineBorder(Color.black));
+        popup.setBorder(BorderFactory.createLineBorder(ColorUtil.mainColor));
         popup.setPopupSize(300, 300);
 
         popup.add(scroll);
@@ -163,10 +173,13 @@ public class RefAutoCompleter implements KeyListener {
 
     public void mouseSelect() {
         if (table.getSelectedRow() != -1) {
-            autoText = refModel.getRemark(table.convertRowIndexToModel(
+            ref = refModel.getRemark(table.convertRowIndexToModel(
                     table.getSelectedRow()));
-            ((JTextField) textComp).setText(autoText.getReference());
+            ((JTextField) textComp).setText(ref.getReference());
             if (editor == null) {
+                if (selectionObserver != null) {
+                    selectionObserver.selected("Ref", ref.getReference());
+                }
             }
         }
 
@@ -224,9 +237,10 @@ public class RefAutoCompleter implements KeyListener {
                     textComp.registerKeyboardAction(acceptAction, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
                             JComponent.WHEN_FOCUSED);
                     if (x == 0) {
-                        x = textComp.getCaretPosition();
+                        x = textComp.getWidth();
+                        y = textComp.getHeight();
                     }
-                    popup.show(textComp, x, textComp.getHeight());
+                    popup.show(textComp, x, y);
                     popupOpen = false;
 
                 } else {
@@ -313,13 +327,13 @@ public class RefAutoCompleter implements KeyListener {
     }
 
     public VRef getAutoText() {
-        return autoText;
+        return ref;
 
     }
 
-    public void setAutoText(VRef autoText) {
-        this.autoText = autoText;
-        textComp.setText(autoText.getReference());
+    public void setAutoText(VRef ref) {
+        this.ref = ref;
+        textComp.setText(ref.getReference());
 
     }
 

@@ -43,7 +43,7 @@ public class AllCashTableModel extends AbstractTableModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AllCashTableModel.class);
     private List<VGl> listVGl = new ArrayList();
-    private String[] columnNames = {"Date", "Dept:", "Description", "Ref", "Person", "Account", "Curr", "Cash In / Dr", "Cash Out / Cr"};
+    private String[] columnNames = {"Date", "Dept:", "Description", "Ref :", "Person", "Account", "Curr", "Cash In / Dr", "Cash Out / Cr"};
     private final Gson gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
 
     @Autowired
@@ -224,6 +224,10 @@ public class AllCashTableModel extends AbstractTableModel {
                 if (value != null) {
                     if (value instanceof Trader) {
                         trader = (Trader) value;
+                    } else {
+                        trader = getTrader(String.valueOf(value));
+                    }
+                    if (trader != null) {
                         vgl.setTraderId(Util1.getLong(trader.getId()));
                         vgl.setTraderName(trader.getTraderName());
                         if (trader.getAccount() != null) {
@@ -233,6 +237,9 @@ public class AllCashTableModel extends AbstractTableModel {
                         } else {
                             parent.setColumnSelectionInterval(5, 5);
                         }
+                    } else {
+                        JOptionPane.showMessageDialog(Global.parentForm, "Trader Not Found.");
+                        parent.setColumnSelectionInterval(column, column);
                     }
                 }
                 break;
@@ -335,13 +342,13 @@ public class AllCashTableModel extends AbstractTableModel {
             try {
                 if (Global.useActiveMQ) {
                     if (gl.getTraderId() != null) {
-                        Trader trader = traderService.findById(gl.getTraderId().intValue());
-                        if (trader != null) {
+                        Trader fTrader = traderService.findById(gl.getTraderId().intValue());
+                        if (fTrader != null) {
 
-                            if (trader.getAppShortName() != null) {
-                                if (trader.getAppShortName().equals("INVENTORY")) {
+                            if (fTrader.getAppShortName() != null) {
+                                if (fTrader.getAppShortName().equals("INVENTORY")) {
                                     //Need to sent to inventory
-                                    messagingService.sendPaymentToInv(gl, trader);
+                                    messagingService.sendPaymentToInv(gl, fTrader);
                                     if (reloadData != null) {
                                         reloadData.reload("SENT-INV", "Suceesfully Sent to Inventory");
                                     }
@@ -500,6 +507,21 @@ public class AllCashTableModel extends AbstractTableModel {
         if (listVGl != null) {
             listVGl.clear();
         }
+    }
+
+    private Trader getTrader(String appTraderCode) {
+        Trader t = null;
+        String tmpCode = "CUS".concat(appTraderCode);
+        List<Trader> firstSearch = traderService.searchTrader("-", "-", "-", "-", "-", "-", tmpCode);
+        if (!firstSearch.isEmpty()) {
+            t = firstSearch.get(0);
+        } else {
+            List<Trader> secondSearch = traderService.searchTrader("-", "-", "-", "-", "-", "-", appTraderCode);
+            if (!secondSearch.isEmpty()) {
+                t = secondSearch.get(0);
+            }
+        }
+        return t;
     }
 
 }

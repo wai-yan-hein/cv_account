@@ -249,6 +249,8 @@ public class EditCashDialog extends javax.swing.JDialog {
         jLabel9.setText("Cash Out / Cr");
 
         jButton1.setBackground(ColorUtil.mainColor);
+        jButton1.setFont(Global.lableFont);
+        jButton1.setForeground(ColorUtil.foreground);
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save-button-white.png"))); // NOI18N
         jButton1.setText("Save");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
