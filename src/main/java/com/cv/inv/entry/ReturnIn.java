@@ -24,7 +24,7 @@ import com.cv.accountswing.ui.editor.TraderAutoCompleter;
 import com.cv.accountswing.util.NumberUtil;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.Location;
-import com.cv.inv.entity.RetInDetailHis;
+import com.cv.inv.entity.RetInHisDetail;
 import com.cv.inv.entity.RetInHis;
 import com.cv.inv.entry.common.ReturnInTableModel;
 import com.cv.inv.entry.editor.LocationAutoCompleter;
@@ -70,7 +70,7 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
      */
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(ReturnIn.class);
     private LoadingObserver loadingObserver;
-    private List<RetInDetailHis> listDetail = ObservableCollections.observableList(new ArrayList());
+    private List<RetInHisDetail> listDetail = ObservableCollections.observableList(new ArrayList());
     private TraderAutoCompleter traderAutoCompleter;
     private LocationAutoCompleter locationAutoCompleter;
     private CurrencyAutoCompleter currencyAutoCompleter;
@@ -230,7 +230,7 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
         listDetail = returnInTableModel.getRetInDetailHis();
 
         try {
-            for (RetInDetailHis sdh : listDetail) {
+            for (RetInHisDetail sdh : listDetail) {
                 totalAmount += NumberUtil.NZero(sdh.getAmount());
             }
             txtVouTotal.setValue(totalAmount);
@@ -601,7 +601,7 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
 //                traderAutoCompleter.setTrader(trader);
                 locationAutoCompleter.setLocation(retIn.getLocation());
                 currencyAutoCompleter.setCurrency(retIn.getCurrency());
-                List<RetInDetailHis> listDetail = retInDetailService.search(retIn.getRetInId());
+                List<RetInHisDetail> listDetail = retInDetailService.search(retIn.getRetInId());
                 returnInTableModel.setRetInDetailList(listDetail);
 
             } catch (Exception ex) {

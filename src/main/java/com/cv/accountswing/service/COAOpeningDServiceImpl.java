@@ -5,6 +5,7 @@
  */
 package com.cv.accountswing.service;
 
+import com.cv.accountswing.common.Global;
 import com.cv.accountswing.dao.COAOpeningDaoD;
 import com.cv.accountswing.entity.AccOpeningD;
 import com.cv.accountswing.entity.temp.TmpOpeningClosing;
@@ -64,7 +65,7 @@ public class COAOpeningDServiceImpl implements COAOpeningDService {
 
     @Override
     public void deleteTmp(String coaCode, String userId) throws Exception {
-        dao.deleteTmp(coaCode, userId);
+        
     }
 
     @Override

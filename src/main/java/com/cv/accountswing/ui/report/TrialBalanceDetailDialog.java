@@ -34,9 +34,10 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class TrialBalanceDetailDialog extends javax.swing.JDialog implements SelectionObserver {
-
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(TrialBalanceDetailDialog.class);
-
+    private final ImageIcon editIcon = new ImageIcon(getClass().getResource("/images/edit_property.png"));
+    
     @Autowired
     private CrAmtTableModel crAmtTableModel;
     @Autowired
@@ -53,31 +54,31 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Sel
     private Double openingAmt = 0.0;
     private String targetId;
     private boolean isShown = false;
-
+    
     public String getTargetId() {
         return targetId;
     }
-
+    
     public void setTargetId(String targetId) {
         this.targetId = targetId;
     }
-
+    
     public Double getOpeningAmt() {
         return openingAmt;
     }
-
+    
     public void setOpeningAmt(Double openingAmt) {
         this.openingAmt = openingAmt;
     }
-
+    
     public List<VGl> getListVGl() {
         return listVGl;
     }
-
+    
     public void setListVGl(List<VGl> listVGl) {
         this.listVGl = listVGl;
     }
-
+    
     public void setDesp(String desp) {
         this.desp = desp;
         lblName.setText(this.desp);
@@ -89,16 +90,14 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Sel
     public TrialBalanceDetailDialog() {
         super(new JFrame(), true);
         initComponents();
-        ImageIcon size = new ImageIcon(getClass().getResource("/images/logo.png"));
-        setIconImage(size.getImage());
         initTableListener();
     }
-
+    
     private void initMain() {
         initTable();
-
+        
     }
-
+    
     private void initTableListener() {
         tblCr.addMouseListener(new MouseAdapter() {
             @Override
@@ -109,7 +108,7 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Sel
                     editCash(vGl, "CR");
                 }
             }
-
+            
         });
         tblDr.addMouseListener(new MouseAdapter() {
             @Override
@@ -120,13 +119,14 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Sel
                     editCash(vGl, "DR");
                 }
             }
-
+            
         });
-
+        
     }
-
+    
     private void editCash(VGl vgl, String type) {
         if (vgl.getTranSource() == null) {
+            editCashDialog.setIconImage(editIcon.getImage());
             editCashDialog.setdType(type);
             editCashDialog.setSelectionObserver(this);
             editCashDialog.setSize(Global.width - 1000, Global.height - 380);
@@ -145,7 +145,7 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Sel
             }
         }
     }
-
+    
     private void initTable() {
         tblCR();
         tblDR();
@@ -169,7 +169,7 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Sel
             txtClosing.setValue(closingAmt);
         }
     }
-
+    
     private void tblCR() {
         crAmtTableModel.clear();
         tblCr.setModel(crAmtTableModel);
@@ -179,16 +179,16 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Sel
         tblCr.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblCr.setRowHeight(Global.tblRowHeight);
         tblCr.getColumnModel().getColumn(0).setPreferredWidth(10);
-        tblCr.getColumnModel().getColumn(0).setPreferredWidth(80);
-        tblCr.getColumnModel().getColumn(0).setPreferredWidth(80);
-        tblCr.getColumnModel().getColumn(0).setPreferredWidth(20);
+        tblCr.getColumnModel().getColumn(1).setPreferredWidth(200);
+        tblCr.getColumnModel().getColumn(2).setPreferredWidth(150);
+        tblCr.getColumnModel().getColumn(3).setPreferredWidth(10);
         tblCr.setDefaultRenderer(Double.class, new TableCellRender());
         tblCr.setDefaultRenderer(Object.class, new TableCellRender());
         sorter = new TableRowSorter<>(tblCr.getModel());
         tblCr.setRowSorter(sorter);
-
+        
     }
-
+    
     private void tblDR() {
         drAmtTableModel.clear();
         tblDr.setModel(drAmtTableModel);
@@ -198,14 +198,14 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Sel
         tblDr.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
         tblDr.getTableHeader().setForeground(ColorUtil.foreground);
         tblDr.getColumnModel().getColumn(0).setPreferredWidth(10);
-        tblDr.getColumnModel().getColumn(0).setPreferredWidth(80);
-        tblDr.getColumnModel().getColumn(0).setPreferredWidth(80);
-        tblDr.getColumnModel().getColumn(0).setPreferredWidth(20);
+        tblDr.getColumnModel().getColumn(1).setPreferredWidth(200);
+        tblDr.getColumnModel().getColumn(2).setPreferredWidth(150);
+        tblDr.getColumnModel().getColumn(3).setPreferredWidth(10);
         tblDr.setDefaultRenderer(Double.class, new TableCellRender());
         tblDr.setDefaultRenderer(Object.class, new TableCellRender());
         sorter = new TableRowSorter<>(tblDr.getModel());
         tblDr.setRowSorter(sorter);
-
+        
     }
 
     /**
@@ -458,7 +458,7 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Sel
 
     @Override
     public void selected(Object source, Object selectObj) {
-
+        
         if (source.equals("SAVE-GL-DR")) {
             int selectRow = tblDr.convertRowIndexToModel(tblDr.getSelectedRow());
             VGl vgl = (VGl) selectObj;
@@ -476,7 +476,7 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Sel
             crAmtTableModel.setVGl(selectRow, vgl);
         }
     }
-
+    
     private VGl swapDrCr(VGl vgl) {
         double tmp;
         tmp = vgl.getDrAmt();

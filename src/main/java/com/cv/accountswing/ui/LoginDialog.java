@@ -264,6 +264,11 @@ public class LoginDialog extends javax.swing.JDialog implements KeyListener {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Login Core Account");
         setFont(Global.lableFont);
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentShown(java.awt.event.ComponentEvent evt) {
+                formComponentShown(evt);
+            }
+        });
 
         jLabel1.setFont(Global.lableFont);
         jLabel1.setText("Login Name ");
@@ -350,6 +355,12 @@ public class LoginDialog extends javax.swing.JDialog implements KeyListener {
     private void butLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_butLoginActionPerformed
         login();
     }//GEN-LAST:event_butLoginActionPerformed
+
+    private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
+        // TODO add your handling code here:
+        this.requestFocusInWindow();
+        txtLoginName.requestFocus();
+    }//GEN-LAST:event_formComponentShown
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton butClear;

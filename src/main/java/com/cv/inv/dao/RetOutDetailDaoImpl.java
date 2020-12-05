@@ -6,8 +6,8 @@
 package com.cv.inv.dao;
 
 import com.cv.accountswing.dao.AbstractDao;
-import com.cv.inv.entity.RetInDetailHis;
-import com.cv.inv.entity.RetOutDetailHis;
+import com.cv.inv.entity.RetInHisDetail;
+import com.cv.inv.entity.RetOutHisDetail;
 import java.util.List;
 import org.springframework.stereotype.Repository;
 
@@ -16,10 +16,10 @@ import org.springframework.stereotype.Repository;
  * @author Lenovo
  */
 @Repository
-public class RetOutDetailDaoImpl extends AbstractDao<String, RetOutDetailHis> implements RetOutDetailDao {
+public class RetOutDetailDaoImpl extends AbstractDao<String, RetOutHisDetail> implements RetOutDetailDao {
 
     @Override
-    public List<RetOutDetailHis> search(String glId) {
+    public List<RetOutHisDetail> search(String glId) {
         String strFilter = "";
         if (!glId.equals("-")) {
             if (strFilter.isEmpty()) {
@@ -30,7 +30,7 @@ public class RetOutDetailDaoImpl extends AbstractDao<String, RetOutDetailHis> im
         }
         String strSql = "select v from RetOutDetailHis v";
 
-        List<RetOutDetailHis> listDH = null;
+        List<RetOutHisDetail> listDH = null;
         if (!strFilter.isEmpty()) {
             strSql = strSql + " where " + strFilter;
             listDH = findHSQL(strSql);
@@ -47,7 +47,7 @@ public class RetOutDetailDaoImpl extends AbstractDao<String, RetOutDetailHis> im
     }
 
     @Override
-    public RetOutDetailHis save(RetOutDetailHis pd) {
+    public RetOutHisDetail save(RetOutHisDetail pd) {
         persist(pd);
         return pd;
     }

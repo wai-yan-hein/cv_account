@@ -5,18 +5,11 @@
  */
 package com.cv.inv.entity;
 
+import com.cv.accountswing.entity.AppUser;
 import com.cv.accountswing.entity.Currency;
 import com.cv.accountswing.entity.Trader;
 import java.util.Date;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 
 /**
  *
@@ -27,7 +20,7 @@ import javax.persistence.TemporalType;
 public class SaleHis implements java.io.Serializable {
 
     @Id
-    @Column(name = "voucher_no", unique = true, nullable = false, length = 15)
+    @Column(name = "voucher_no", unique = true, nullable = false, length = 20)
     private String vouNo;
     @ManyToOne
     @JoinColumn(name = "cus_id")
@@ -70,8 +63,9 @@ public class SaleHis implements java.io.Serializable {
     private Double paid;
     @Column(name = "vou_balance")
     private Double vouBalance;
-    @Column(name = "user_id")
-    private String createdBy;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private AppUser createdBy;
     @Column(name = "session_id")
     private Integer session;
     @Column(name = "updated_by")
@@ -79,6 +73,9 @@ public class SaleHis implements java.io.Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_date")
     private Date updatedDate;
+
+    public SaleHis() {
+    }
 
     public String getVouNo() {
         return vouNo;
@@ -224,11 +221,11 @@ public class SaleHis implements java.io.Serializable {
         this.vouBalance = vouBalance;
     }
 
-    public String getCreatedBy() {
+    public AppUser getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(String createdBy) {
+    public void setCreatedBy(AppUser createdBy) {
         this.createdBy = createdBy;
     }
 

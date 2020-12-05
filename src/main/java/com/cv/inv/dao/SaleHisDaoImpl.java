@@ -31,23 +31,23 @@ public class SaleHisDaoImpl extends AbstractDao<String, SaleHis> implements Sale
 
         if (!fromDate.equals("-") && !toDate.equals("-")) {
             if (strFilter.isEmpty()) {
-                strFilter = "o.saleDate between '" + fromDate
+                strFilter = "date(o.saleDate) between '" + fromDate
                         + "' and '" + toDate + "'";
             } else {
-                strFilter = strFilter + " and o.saleDate between '"
+                strFilter = strFilter + " and date(o.saleDate) between '"
                         + fromDate + "' and '" + toDate + "'";
             }
         } else if (!fromDate.endsWith("-")) {
             if (strFilter.isEmpty()) {
-                strFilter = "o.saleDate >= '" + fromDate + "'";
+                strFilter = "date(o.saleDate) >= '" + fromDate + "'";
             } else {
-                strFilter = strFilter + " and o.saleDate >= '" + fromDate + "'";
+                strFilter = strFilter + " and date(o.saleDate) >= '" + fromDate + "'";
             }
         } else if (!toDate.equals("-")) {
             if (strFilter.isEmpty()) {
-                strFilter = "o.saleDate <= '" + toDate + "'";
+                strFilter = "date(o.saleDate) <= '" + toDate + "'";
             } else {
-                strFilter = strFilter + " and o.saleDate <= '" + toDate + "'";
+                strFilter = strFilter + " and date(o.saleDate) <= '" + toDate + "'";
             }
         }
 

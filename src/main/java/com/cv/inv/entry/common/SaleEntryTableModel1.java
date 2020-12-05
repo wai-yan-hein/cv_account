@@ -498,42 +498,41 @@ public class SaleEntryTableModel1 extends AbstractTableModel {
         float stdWt = stock.getSaleMeasure();
         String fromUnit = stock.getSaleUnit().getItemUnitCode();
 
-        if (!fromUnit.equals(toUnit)) {
-            RelationKey key = new RelationKey(fromUnit, toUnit);
-            UnitRelation unitRelation = relationService.findByKey(key);
-            if (unitRelation != null) {
-                float factor = unitRelation.getFactor();
-                float convertWt = (userWt / factor); //unit change
-                saleAmount = (convertWt / stdWt) * stdPrice; // cal price
-
-            } else {
-                key = new RelationKey(toUnit, fromUnit);
-                Float factor = Global.hmRelation.get(key);
-                if (factor != null) {
-                    float convertWt = userWt * factor; // unit change
-                    saleAmount = (convertWt / stdWt) * stdSalePrice; // cal price
-                } else {
-                    JOptionPane.showMessageDialog(Global.parentForm, "Mapping units in Relation Setup.");
-                }
-            }
+        /* if (!fromUnit.equals(toUnit)) {
+        //RelationKey key = new RelationKey(fromUnit, toUnit);
+        UnitRelation unitRelation = relationService.findByKey(key);
+        if (unitRelation != null) {
+        float factor = unitRelation.getFactor();
+        float convertWt = (userWt / factor); //unit change
+        saleAmount = (convertWt / stdWt) * stdPrice; // cal price
+        
         } else {
-            saleAmount = (userWt / stdWt) * stdSalePrice;
+        //key = new RelationKey(toUnit, fromUnit);
+        Float factor = Global.hmRelation.get(key);
+        if (factor != null) {
+        float convertWt = userWt * factor; // unit change
+        saleAmount = (convertWt / stdWt) * stdSalePrice; // cal price
+        } else {
+        JOptionPane.showMessageDialog(Global.parentForm, "Mapping units in Relation Setup.");
         }
+        }
+        } else {
+        saleAmount = (userWt / stdWt) * stdSalePrice;
+        }*/
         return saleAmount;
     }
 
     private Float getSmallestUnit(Float weight, String unit) {
         float sWt = 0.0f;
-        RelationKey key = new RelationKey(unit, "oz");
+        /*RelationKey key = new RelationKey(unit, "oz");
         Float factor = Global.hmRelation.get(key);
         if (factor != null) {
-            sWt = factor * weight;
+        sWt = factor * weight;
         } else {
-            JOptionPane.showMessageDialog(Global.parentForm, String.format("Need Relation  %s with Smallest Unit", unit));
-            listDetail.remove(parent.getSelectedRow());
+        JOptionPane.showMessageDialog(Global.parentForm, String.format("Need Relation  %s with Smallest Unit", unit));
+        listDetail.remove(parent.getSelectedRow());
         }
-        LOGGER.info("Smallest Weight :" + sWt + "From >>>" + unit + "<<<");
-        return sWt;
+        LOGGER.info("Smallest Weight :" + sWt + "From >>>" + unit + "<<<");*/        return sWt;
     }
 
     private void showMessageBox(String text) {
@@ -551,7 +550,7 @@ public class SaleEntryTableModel1 extends AbstractTableModel {
     public void setDepartment(Department dept) {
         this.department = dept;
     }
-    
+
     public void setTxtTotalItem(JTextField txtTtlItem) {
         this.txtTotalItem = txtTtlItem;
     }

@@ -13,7 +13,7 @@ import com.cv.inv.dao.PurchaseHisDao;
 import com.cv.inv.dao.PurchaseDetailDao;
 import com.cv.inv.entity.PurDetailKey;
 import com.cv.inv.entity.PurHis;
-import com.cv.inv.entity.PurchaseDetail;
+import com.cv.inv.entity.PurHisDetail;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -44,18 +44,18 @@ public class PurchaseDetatilServiceImpl implements PurchaseDetailService {
     private PurchaseHisDao purchaseHisDao;
 
     @Override
-    public PurchaseDetail save(PurchaseDetail pd) {
+    public PurHisDetail save(PurHisDetail pd) {
 
         return dao.save(pd);
     }
 
     @Override
-    public List<PurchaseDetail> search(String glId) {
+    public List<PurHisDetail> search(String glId) {
         return dao.search(glId);
     }
 
     @Override
-    public void save(PurHis pur, List<PurchaseDetail> listPD, List<String> delList) {
+    public void save(PurHis pur, List<PurHisDetail> listPD, List<String> delList) {
         String retInDetailId;
         try {
             if (delList != null) {
@@ -65,7 +65,7 @@ public class PurchaseDetatilServiceImpl implements PurchaseDetailService {
             }
             purchaseHisDao.save(pur);
             String vouNo = pur.getPurInvId();
-            for (PurchaseDetail pd : listPD) {
+            for (PurHisDetail pd : listPD) {
                 if (pd.getStock() != null) {
                     if (pd.getPurDetailKey() != null) {
                         pd.setPurDetailKey(pd.getPurDetailKey());

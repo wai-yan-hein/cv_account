@@ -27,6 +27,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 
 @SpringBootApplication
+
 public class AccountSwingApplication {
 
     private static final Logger LOGGER = Logger.getLogger(AccountSwingApplication.class);

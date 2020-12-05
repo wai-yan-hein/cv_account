@@ -5,13 +5,12 @@
  */
 package com.cv.inv.entry.editor;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
-import com.cv.inv.entity.Stock;
 import com.cv.inv.entity.StockUnit;
-import com.cv.inv.setup.common.StockTableModel;
-import com.cv.inv.setup.common.StockUnitTableModel;
+import com.cv.inv.setup.dialog.common.StockUnitTableModel;
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -79,6 +78,9 @@ public class UnitAutoCompleter implements KeyListener {
         table.getTableHeader().setFont(Global.textFont);
         table.setFont(Global.lableFont); // NOI18N
         table.setRowHeight(Global.tblRowHeight);
+        table.setFont(Global.textFont);
+        table.getTableHeader().setBackground(ColorUtil.btnEdit);
+        table.getTableHeader().setForeground(ColorUtil.foreground);
         table.setDefaultRenderer(Object.class, new TableCellRender());
         sorter = new TableRowSorter(table.getModel());
         table.setRowSorter(sorter);
@@ -92,7 +94,7 @@ public class UnitAutoCompleter implements KeyListener {
         table.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                if (evt.getClickCount() == 2) {
+                if (evt.getClickCount() == 1) {
                     mouseSelect();
                 }
             }
@@ -174,20 +176,6 @@ public class UnitAutoCompleter implements KeyListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             mouseSelect();
-            /*  JComponent tf = (JComponent) e.getSource();
-            StockAutoCompleter completer = (StockAutoCompleter) tf.getClientProperty(AUTOCOMPLETER);
-            
-            if (completer.table.getSelectedRow() != -1) {
-            stock = unitTableModel.getDepatment(completer.table.convertRowIndexToModel(
-            completer.table.getSelectedRow()));
-            ((JTextField) completer.textComp).setText(stock.getDeptName());
-            }
-            
-            completer.popup.setVisible(false);
-            if (editor != null) {
-            editor.stopCellEditing();
-            
-            }*/
         }
     };
     DocumentListener documentListener = new DocumentListener() {
@@ -369,30 +357,12 @@ public class UnitAutoCompleter implements KeyListener {
     private final RowFilter<Object, Object> startsWithFilter = new RowFilter<Object, Object>() {
         @Override
         public boolean include(RowFilter.Entry<? extends Object, ? extends Object> entry) {
-            //for (int i = entry.getValueCount() - 1; i >= 0; i--) {
-            /*
-             * if (NumberUtil.isNumber(textComp.getText())) { if
-             * (entry.getStringValue(0).toUpperCase().startsWith(
-             * textComp.getText().toUpperCase())) { return true; } } else {
-             *
-             * if (entry.getStringValue(1).toUpperCase().contains(
-             * textComp.getText().toUpperCase())) { return true; } else if
-             * (entry.getStringValue(2).toUpperCase().contains(
-             * textComp.getText().toUpperCase())) { return true; }
-             }
-             */
-
             String tmp1 = entry.getStringValue(0).toUpperCase();
             String tmp2 = entry.getStringValue(1).toUpperCase();
             String tmp3 = entry.getStringValue(3).toUpperCase();
             String tmp4 = entry.getStringValue(4).toUpperCase();
             String text = textComp.getText().toUpperCase();
-
-            if (tmp1.startsWith(text) || tmp2.startsWith(text) || tmp3.startsWith(text) || tmp4.startsWith(text)) {
-                return true;
-            } else {
-                return false;
-            }
+            return tmp1.startsWith(text) || tmp2.startsWith(text) || tmp3.startsWith(text) || tmp4.startsWith(text);
         }
     };
 }

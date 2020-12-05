@@ -6,7 +6,7 @@
 package com.cv.inv.dao;
 
 import com.cv.accountswing.dao.AbstractDao;
-import com.cv.inv.entity.RetOutDetailHis;
+import com.cv.inv.entity.RetOutHisDetail;
 import com.cv.inv.entity.RetOutHis;
 import java.util.List;
 import org.springframework.stereotype.Repository;

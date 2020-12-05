@@ -11,7 +11,7 @@ import com.cv.accountswing.common.StartWithRowFilter;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.StockUnit;
-import com.cv.inv.setup.common.StockUnitTableModel;
+import com.cv.inv.setup.dialog.common.StockUnitTableModel;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Date;
@@ -105,6 +105,8 @@ public class StockUnitSetupDailog extends javax.swing.JDialog implements KeyList
         txtUnitDesp.setText(unit.getItemUnitName());
         lblStatus.setText("EDIT");
         txtUnitShort.setEditable(false);
+        txtUnitDesp.requestFocus();
+
     }
 
     private void save() {
@@ -130,6 +132,7 @@ public class StockUnitSetupDailog extends javax.swing.JDialog implements KeyList
         lblStatus.setText("NEW");
         txtUnitShort.setEditable(true);
         itemUnitTableModel.refresh();
+        txtUnitShort.requestFocus();
 
     }
 
@@ -160,7 +163,7 @@ public class StockUnitSetupDailog extends javax.swing.JDialog implements KeyList
 
         return status;
     }
-    private RowFilter<Object, Object> startsWithFilter = new RowFilter<Object, Object>() {
+    private final RowFilter<Object, Object> startsWithFilter = new RowFilter<Object, Object>() {
         @Override
         public boolean include(RowFilter.Entry<? extends Object, ? extends Object> entry) {
             if (Util1.isNumber(txtFilter.getText())) {
@@ -199,8 +202,9 @@ public class StockUnitSetupDailog extends javax.swing.JDialog implements KeyList
         txtUnitDesp = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Item Brand Setup");
+        setTitle("Stock Unit Setup");
 
+        tblUnit.setFont(Global.textFont);
         tblUnit.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -227,6 +231,11 @@ public class StockUnitSetupDailog extends javax.swing.JDialog implements KeyList
 
         txtUnitShort.setFont(Global.textFont);
         txtUnitShort.setName("txtUnitShort"); // NOI18N
+        txtUnitShort.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtUnitShortFocusGained(evt);
+            }
+        });
         txtUnitShort.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtUnitShortActionPerformed(evt);
@@ -235,6 +244,7 @@ public class StockUnitSetupDailog extends javax.swing.JDialog implements KeyList
 
         btnSave.setBackground(ColorUtil.mainColor);
         btnSave.setFont(Global.lableFont);
+        btnSave.setForeground(ColorUtil.foreground);
         btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save-button-white.png"))); // NOI18N
         btnSave.setText("Save");
         btnSave.setName("btnSave"); // NOI18N
@@ -246,6 +256,7 @@ public class StockUnitSetupDailog extends javax.swing.JDialog implements KeyList
 
         btnDelete.setBackground(ColorUtil.btnDelete);
         btnDelete.setFont(Global.lableFont);
+        btnDelete.setForeground(ColorUtil.foreground);
         btnDelete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/delete-button-white.png"))); // NOI18N
         btnDelete.setText("Delete");
         btnDelete.setName("btnDelete"); // NOI18N
@@ -257,6 +268,7 @@ public class StockUnitSetupDailog extends javax.swing.JDialog implements KeyList
 
         btnClear.setBackground(ColorUtil.btnEdit);
         btnClear.setFont(Global.lableFont);
+        btnClear.setForeground(ColorUtil.foreground);
         btnClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/clear-button-white.png"))); // NOI18N
         btnClear.setText("Clear");
         btnClear.setName("btnClear"); // NOI18N
@@ -274,6 +286,11 @@ public class StockUnitSetupDailog extends javax.swing.JDialog implements KeyList
 
         txtUnitDesp.setFont(Global.textFont);
         txtUnitDesp.setName("txtName"); // NOI18N
+        txtUnitDesp.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtUnitDespFocusGained(evt);
+            }
+        });
         txtUnitDesp.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtUnitDespActionPerformed(evt);
@@ -393,6 +410,16 @@ public class StockUnitSetupDailog extends javax.swing.JDialog implements KeyList
     private void txtUnitDespActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtUnitDespActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtUnitDespActionPerformed
+
+    private void txtUnitShortFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtUnitShortFocusGained
+        // TODO add your handling code here:
+        txtUnitShort.selectAll();
+    }//GEN-LAST:event_txtUnitShortFocusGained
+
+    private void txtUnitDespFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtUnitDespFocusGained
+        // TODO add your handling code here:
+        txtUnitDesp.selectAll();
+    }//GEN-LAST:event_txtUnitDespFocusGained
 
     /**
      * @param args the command line arguments

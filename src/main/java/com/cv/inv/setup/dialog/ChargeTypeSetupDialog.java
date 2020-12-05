@@ -10,7 +10,7 @@ import com.cv.accountswing.common.Global;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.inv.entity.ChargeType;
 import com.cv.inv.service.ChargeTypeService;
-import com.cv.inv.setup.common.ChargeTypeTableModel;
+import com.cv.inv.setup.dialog.common.ChargeTypeTableModel;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import javax.swing.JButton;
@@ -178,6 +178,7 @@ public class ChargeTypeSetupDialog extends javax.swing.JDialog implements KeyLis
 
         btnClear.setBackground(ColorUtil.btnEdit);
         btnClear.setFont(Global.lableFont);
+        btnClear.setForeground(ColorUtil.foreground);
         btnClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/clear-button-white.png"))); // NOI18N
         btnClear.setText("Clear");
         btnClear.setName("btnClear"); // NOI18N
@@ -189,6 +190,7 @@ public class ChargeTypeSetupDialog extends javax.swing.JDialog implements KeyLis
 
         btnDelete.setBackground(ColorUtil.btnDelete);
         btnDelete.setFont(Global.lableFont);
+        btnDelete.setForeground(ColorUtil.foreground);
         btnDelete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/delete-button-white.png"))); // NOI18N
         btnDelete.setText("Delete");
         btnDelete.setName("btnDelete"); // NOI18N
@@ -200,6 +202,7 @@ public class ChargeTypeSetupDialog extends javax.swing.JDialog implements KeyLis
 
         btnSave.setBackground(ColorUtil.mainColor);
         btnSave.setFont(Global.lableFont);
+        btnSave.setForeground(ColorUtil.foreground);
         btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save-button-white.png"))); // NOI18N
         btnSave.setText("Save");
         btnSave.setName("btnSave"); // NOI18N

@@ -6,8 +6,8 @@
 package com.cv.inv.service;
 
 import com.cv.inv.entity.PurHis;
-import com.cv.inv.entity.PurchaseDetail;
-import com.cv.inv.entity.RetInDetailHis;
+import com.cv.inv.entity.PurHisDetail;
+import com.cv.inv.entity.RetInHisDetail;
 import java.util.List;
 
 /**
@@ -16,9 +16,9 @@ import java.util.List;
  */
 public interface RetInDetailService {
 
-    public RetInDetailHis save(RetInDetailHis pd);
+    public RetInHisDetail save(RetInHisDetail pd);
 
-    public List<RetInDetailHis> search(String glId);
+    public List<RetInHisDetail> search(String glId);
 
   //  public void save(PurHis gl, List<PurchaseDetail> pd,List<String> delList);
 

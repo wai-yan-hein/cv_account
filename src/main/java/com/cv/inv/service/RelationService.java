@@ -19,5 +19,7 @@ public interface RelationService {
 
     public UnitRelation findByKey(RelationKey key);
 
+    public List<UnitRelation> search(String patternId);
+
     public List<UnitRelation> findAll();
 }

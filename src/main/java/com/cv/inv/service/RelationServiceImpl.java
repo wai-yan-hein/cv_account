@@ -39,4 +39,9 @@ public class RelationServiceImpl implements RelationService {
         return dao.findAll();
     }
 
+    @Override
+    public List<UnitRelation> search(String patternId) {
+        return dao.search(patternId);
+    }
+
 }

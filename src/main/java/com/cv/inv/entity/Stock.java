@@ -62,6 +62,9 @@ public class Stock implements java.io.Serializable {
     @ManyToOne
     @JoinColumn(name = "sale_unit")
     private StockUnit saleUnit;
+    @ManyToOne
+    @JoinColumn(name = "pattern_id")
+    private UnitPattern pattern;
     @Temporal(TemporalType.DATE)
     @Column(name = "licene_exp_date")
     private Date expireDate;
@@ -262,6 +265,14 @@ public class Stock implements java.io.Serializable {
 
     public void setSttCostPrice(Double sttCostPrice) {
         this.sttCostPrice = sttCostPrice;
+    }
+
+    public UnitPattern getPattern() {
+        return pattern;
+    }
+
+    public void setPattern(UnitPattern pattern) {
+        this.pattern = pattern;
     }
 
 }

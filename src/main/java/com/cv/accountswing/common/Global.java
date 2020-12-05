@@ -56,7 +56,7 @@ public class Global {
     public static int sessionId;
     public static String sessionName;
     public static String loginDate;
-    public static int machineId;
+    public static Integer machineId;
     public static String machineName;
     public static boolean mqConStatus = false;
     public static int x;

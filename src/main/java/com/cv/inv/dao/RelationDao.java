@@ -21,4 +21,7 @@ public interface RelationDao {
     public UnitRelation findByKey(RelationKey key);
 
     public List<UnitRelation> findAll();
+
+    public List<UnitRelation> search(String patternId);
+
 }

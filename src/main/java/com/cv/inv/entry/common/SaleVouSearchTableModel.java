@@ -89,7 +89,7 @@ public class SaleVouSearchTableModel extends AbstractTableModel {
                 case 3://customer
                     return his.getTraderId().getTraderName();
                 case 4://user
-                    return his.getCreatedBy();
+                    return his.getCreatedBy().getUserName();
                 case 5://v-total
                     return his.getVouTotal();
             }

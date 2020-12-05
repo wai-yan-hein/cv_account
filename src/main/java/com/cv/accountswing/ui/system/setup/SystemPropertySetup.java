@@ -238,6 +238,7 @@ public class SystemPropertySetup extends javax.swing.JPanel implements KeyListen
 
         btnClear.setBackground(ColorUtil.btnEdit);
         btnClear.setFont(Global.textFont);
+        btnClear.setForeground(ColorUtil.foreground);
         btnClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/clear-button-white.png"))); // NOI18N
         btnClear.setText("Clear");
         btnClear.setName("btnClear"); // NOI18N
@@ -249,6 +250,7 @@ public class SystemPropertySetup extends javax.swing.JPanel implements KeyListen
 
         btnSave.setBackground(ColorUtil.mainColor);
         btnSave.setFont(Global.textFont);
+        btnSave.setForeground(ColorUtil.foreground);
         btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save-button-white.png"))); // NOI18N
         btnSave.setText("Save");
         btnSave.setName("btnSave"); // NOI18N

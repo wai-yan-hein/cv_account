@@ -5,7 +5,7 @@
  */
 package com.cv.inv.service;
 
-import com.cv.inv.entity.SaleDetailHis;
+import com.cv.inv.entity.SaleHisDetail;
 import com.cv.inv.entity.SaleHis;
 import java.util.List;
 
@@ -15,10 +15,10 @@ import java.util.List;
  */
 public interface SaleDetailService {
 
-    public SaleDetailHis save(SaleDetailHis sdh);
+    public SaleHisDetail save(SaleHisDetail sdh);
 
-    public List<SaleDetailHis> search(String vouId);
+    public List<SaleHisDetail> search(String vouId);
 
-    public void save(SaleHis saleHis, List<SaleDetailHis> listSaleDetail,
+    public void save(SaleHis saleHis, List<SaleHisDetail> listSaleDetail,
             String vouStatus, List<String> deleteList) throws Exception;
 }

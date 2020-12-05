@@ -12,7 +12,7 @@ import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.editor.TraderAutoCompleter;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.PurHis;
-import com.cv.inv.entity.PurchaseDetail;
+import com.cv.inv.entity.PurHisDetail;
 import com.cv.inv.entry.PurchaseEntry;
 import com.cv.inv.entry.common.CodeTableModel;
 import com.cv.inv.entry.common.PurVouSearchTableModel;
@@ -59,6 +59,7 @@ public class PurchaseVouSearch extends javax.swing.JDialog implements KeyListene
     public PurchaseVouSearch() {
         super(Global.parentForm, true);
         initComponents();
+        initKeyListener();
     }
 
     public void initMain() {
@@ -67,7 +68,7 @@ public class PurchaseVouSearch extends javax.swing.JDialog implements KeyListene
         initTableStock();
         assignDefaultValue();
         setTodayDate();
-        initKeyListener();
+        search();
     }
 
     private void initCombo() {
@@ -96,7 +97,6 @@ public class PurchaseVouSearch extends javax.swing.JDialog implements KeyListene
         codeTableModel.addEmptyRow();
         tblStock.getColumnModel().getColumn(0).setPreferredWidth(50);
         tblStock.getColumnModel().getColumn(1).setPreferredWidth(200);
-
         tblStock.getColumnModel().getColumn(0).setCellEditor(new StockCellEditor());
     }
 
@@ -112,10 +112,11 @@ public class PurchaseVouSearch extends javax.swing.JDialog implements KeyListene
     }
 
     private void search() {
+        LOGGER.info("Search History.");
         String customerId;
         String vouStatusId;
-        String fromDate = Util1.toDateStr(txtFromDate.getDate(), "yyyy-MM-dd HH:mm:ss");
-        String toDate = Util1.toDateStr(txtToDate.getDate(), "yyyy-MM-dd HH:mm:ss");
+        String fromDate = Util1.toDateStr(txtFromDate.getDate(), "yyyy-MM-dd");
+        String toDate = Util1.toDateStr(txtToDate.getDate(), "yyyy-MM-dd");
         if (traderAutoCompleter.getTrader() != null) {
             customerId = traderAutoCompleter.getTrader().getId().toString();
         } else {
@@ -139,7 +140,7 @@ public class PurchaseVouSearch extends javax.swing.JDialog implements KeyListene
             vouStatusId = "-";
         }
 
-        String remark = txtRemark.getText();
+        String remark = Util1.isNull(txtRemark.getText(), "-");
         List<PurHis> listHis = purHisService.search(fromDate, toDate, customerId, vouStatusId, remark);
         purVouTableModel.setListPurHis(listHis);
         calAmount();
@@ -178,7 +179,7 @@ public class PurchaseVouSearch extends javax.swing.JDialog implements KeyListene
         if (vs != null) {
             String vouNo = vs.getPurInvId();
             PurHis dmgHis = purHisService.findById(vouNo);
-            List<PurchaseDetail> listDetail = pdService.search(vouNo);
+            List<PurHisDetail> listDetail = pdService.search(vouNo);
             this.dispose();
             pur.setPurchaseVoucher(dmgHis, listDetail);
         } else {

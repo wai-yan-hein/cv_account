@@ -12,7 +12,7 @@ import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.Stock;
 import com.cv.inv.entity.StockBrand;
-import com.cv.inv.setup.common.StockBrandTableModel;
+import com.cv.inv.setup.dialog.common.StockBrandTableModel;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import javax.swing.JButton;
@@ -108,6 +108,8 @@ public class StockBrandSetupDialog extends javax.swing.JDialog implements KeyLis
 
         txtName.setText(cat.getBrandName());
         lblStatus.setText("EDIT");
+        txtName.requestFocus();
+
     }
 
     private void save() {
@@ -133,6 +135,7 @@ public class StockBrandSetupDialog extends javax.swing.JDialog implements KeyLis
         txtFilter.setText(null);
         txtName.setText(null);
         lblStatus.setText("NEW");
+        txtName.requestFocus();
         itemBrandTableModel.refresh();
 
     }
@@ -204,7 +207,7 @@ public class StockBrandSetupDialog extends javax.swing.JDialog implements KeyLis
         lblStatus = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Item Brand Setup");
+        setTitle("Stock Brand Setup");
 
         tblCategory.setFont(Global.textFont);
         tblCategory.setModel(new javax.swing.table.DefaultTableModel(
@@ -233,6 +236,11 @@ public class StockBrandSetupDialog extends javax.swing.JDialog implements KeyLis
 
         txtName.setFont(Global.textFont);
         txtName.setName("txtName"); // NOI18N
+        txtName.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtNameFocusGained(evt);
+            }
+        });
         txtName.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtNameActionPerformed(evt);
@@ -241,6 +249,7 @@ public class StockBrandSetupDialog extends javax.swing.JDialog implements KeyLis
 
         btnSave.setBackground(ColorUtil.mainColor);
         btnSave.setFont(Global.lableFont);
+        btnSave.setForeground(ColorUtil.foreground);
         btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save-button-white.png"))); // NOI18N
         btnSave.setText("Save");
         btnSave.setName("btnSave"); // NOI18N
@@ -252,6 +261,7 @@ public class StockBrandSetupDialog extends javax.swing.JDialog implements KeyLis
 
         btnDelete.setBackground(ColorUtil.btnDelete);
         btnDelete.setFont(Global.lableFont);
+        btnDelete.setForeground(ColorUtil.foreground);
         btnDelete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/delete-button-white.png"))); // NOI18N
         btnDelete.setText("Delete");
         btnDelete.setName("btnDelete"); // NOI18N
@@ -263,6 +273,7 @@ public class StockBrandSetupDialog extends javax.swing.JDialog implements KeyLis
 
         btnClear.setBackground(ColorUtil.btnEdit);
         btnClear.setFont(Global.lableFont);
+        btnClear.setForeground(ColorUtil.foreground);
         btnClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/clear-button-white.png"))); // NOI18N
         btnClear.setText("Clear");
         btnClear.setName("btnClear"); // NOI18N
@@ -378,6 +389,11 @@ public class StockBrandSetupDialog extends javax.swing.JDialog implements KeyLis
             sorter.setRowFilter(swrf);
         }
     }//GEN-LAST:event_txtFilterKeyReleased
+
+    private void txtNameFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtNameFocusGained
+        // TODO add your handling code here:
+        txtName.selectAll();
+    }//GEN-LAST:event_txtNameFocusGained
 
     /**
      * @param args the command line arguments

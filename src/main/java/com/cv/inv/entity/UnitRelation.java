@@ -5,6 +5,7 @@
  */
 package com.cv.inv.entity;
 
+import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -14,16 +15,15 @@ import javax.persistence.Table;
  *
  * @author Lenovo
  */
-
 @Entity
 @Table(name = "unit_relation")
-public class UnitRelation {
+public class UnitRelation implements Serializable {
 
     @EmbeddedId
     private RelationKey unitKey;
     @Column(name = "factor")
     private Float factor;
-
+   
     public RelationKey getUnitKey() {
         return unitKey;
     }
@@ -39,5 +39,7 @@ public class UnitRelation {
     public void setFactor(Float factor) {
         this.factor = factor;
     }
+
+   
 
 }

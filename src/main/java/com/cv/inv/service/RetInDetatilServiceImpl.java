@@ -9,8 +9,8 @@ import com.cv.inv.dao.PurchaseHisDao;
 import com.cv.inv.dao.RetInDetailDao;
 import com.cv.inv.entity.PurDetailKey;
 import com.cv.inv.entity.PurHis;
-import com.cv.inv.entity.PurchaseDetail;
-import com.cv.inv.entity.RetInDetailHis;
+import com.cv.inv.entity.PurHisDetail;
+import com.cv.inv.entity.RetInHisDetail;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,13 +34,13 @@ public class RetInDetatilServiceImpl implements RetInDetailService {
     private PurchaseHisDao glDao;
 
     @Override
-    public RetInDetailHis save(RetInDetailHis pd) {
+    public RetInHisDetail save(RetInHisDetail pd) {
 
         return dao.save(pd);
     }
 
     @Override
-    public List<RetInDetailHis> search(String glId) {
+    public List<RetInHisDetail> search(String glId) {
         return dao.search(glId);
     }
 

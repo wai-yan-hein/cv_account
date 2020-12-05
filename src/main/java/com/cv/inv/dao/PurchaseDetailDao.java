@@ -6,7 +6,7 @@
 package com.cv.inv.dao;
 
 import com.cv.inv.service.*;
-import com.cv.inv.entity.PurchaseDetail;
+import com.cv.inv.entity.PurHisDetail;
 import java.util.List;
 
 /**
@@ -15,9 +15,9 @@ import java.util.List;
  */
 public interface PurchaseDetailDao {
 
-    public PurchaseDetail save(PurchaseDetail pd);
+    public PurHisDetail save(PurHisDetail pd);
 
-    public List<PurchaseDetail> search(String glId);
+    public List<PurHisDetail> search(String glId);
 
     public int delete(String id);
 

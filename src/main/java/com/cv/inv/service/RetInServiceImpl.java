@@ -8,7 +8,7 @@ package com.cv.inv.service;
 import com.cv.inv.dao.RetInDao;
 import com.cv.inv.dao.RetInDetailDao;
 import com.cv.inv.entity.RetInCompoundKey;
-import com.cv.inv.entity.RetInDetailHis;
+import com.cv.inv.entity.RetInHisDetail;
 import com.cv.inv.entity.RetInHis;
 import java.util.List;
 import org.slf4j.Logger;
@@ -26,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class RetInServiceImpl implements RetInService {
 
     private static final Logger logger = LoggerFactory.getLogger(RetInServiceImpl.class);
-    RetInDetailHis retInDetailHis = null;
+    RetInHisDetail retInDetailHis = null;
 
     @Autowired
     private RetInDao retInDao;
@@ -35,7 +35,7 @@ public class RetInServiceImpl implements RetInService {
     private RetInDetailDao dao;
 
     @Override
-    public void save(RetInHis retIn, List<RetInDetailHis> listRetIn, List<String> delList) {
+    public void save(RetInHis retIn, List<RetInHisDetail> listRetIn, List<String> delList) {
 
         String retInDetailId;
         RetInCompoundKey key;
@@ -48,7 +48,7 @@ public class RetInServiceImpl implements RetInService {
             }
             retInDao.save(retIn);
             String vouNo = retIn.getRetInId();
-            for (RetInDetailHis rd : listRetIn) {
+            for (RetInHisDetail rd : listRetIn) {
                 if (rd.getStock() != null) {
                     if (rd.getInCompoundKey() != null) {
                         rd.setInCompoundKey(rd.getInCompoundKey());

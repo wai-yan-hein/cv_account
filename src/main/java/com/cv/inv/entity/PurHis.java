@@ -4,6 +4,7 @@
  */
 package com.cv.inv.entity;
 
+import com.cv.accountswing.entity.AppUser;
 import com.cv.accountswing.entity.Currency;
 import com.cv.accountswing.entity.Department;
 import com.cv.accountswing.entity.PaymentType;
@@ -25,13 +26,13 @@ public class PurHis implements java.io.Serializable {
     private Date purDate;
     private Date dueDate;
     private PaymentType paymentTypeId;
-    private Location locationId;
+    private Location location;
     private Boolean deleted;
     private Double vouTotal;
     private Double paid;
     private Double discount;
     private Double balance;
-    private String createdBy;
+    private AppUser createdBy;
     private Date createdDate;
     private String updatedBy;
     private Date updatedDate;
@@ -79,12 +80,13 @@ public class PurHis implements java.io.Serializable {
         this.balance = balance;
     }
 
-    @Column(name = "created_by")
-    public String getCreatedBy() {
+    @ManyToOne
+    @JoinColumn(name = "created_by")
+    public AppUser getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(String createdBy) {
+    public void setCreatedBy(AppUser createdBy) {
         this.createdBy = createdBy;
     }
 
@@ -139,13 +141,13 @@ public class PurHis implements java.io.Serializable {
     }
 
     @ManyToOne
-    @JoinColumn(name = "location")
-    public Location getLocationId() {
-        return locationId;
+    @JoinColumn(name = "ph_loc_id")
+    public Location getLocation() {
+        return location;
     }
 
-    public void setLocationId(Location locationId) {
-        this.locationId = locationId;
+    public void setLocation(Location location) {
+        this.location = location;
     }
 
     @Column(name = "paid")

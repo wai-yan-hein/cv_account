@@ -5,7 +5,7 @@
  */
 package com.cv.inv.service;
 
-import com.cv.inv.entity.RetOutDetailHis;
+import com.cv.inv.entity.RetOutHisDetail;
 import java.util.List;
 
 /**
@@ -14,9 +14,9 @@ import java.util.List;
  */
 public interface RetOutDetailService {
 
-    public RetOutDetailHis save(RetOutDetailHis pd);
+    public RetOutHisDetail save(RetOutHisDetail pd);
 
-    public List<RetOutDetailHis> search(String glId);
+    public List<RetOutHisDetail> search(String glId);
 
   //  public void save(PurHis gl, List<PurchaseDetail> pd,List<String> delList);
 

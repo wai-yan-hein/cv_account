@@ -5,9 +5,9 @@
  */
 package com.cv.inv.setup;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
-import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.inv.setup.dialog.ChargeTypeSetupDialog;
 import com.cv.inv.setup.dialog.LocationSetupDialog;
 import com.cv.inv.setup.dialog.RelationSetupDialog;
@@ -25,8 +25,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class OtherSetup extends javax.swing.JPanel {
 
-    Image image = new ImageIcon(this.getClass().getResource("/images/date.png")).getImage();
-    private LoadingObserver loadingObserver;
+    private final Image locIcon = new ImageIcon(this.getClass().getResource("/images/location.png")).getImage();
+    private final Image vouIcon = new ImageIcon(this.getClass().getResource("/images/voucher.png")).getImage();
+    private final Image saleManIcon = new ImageIcon(this.getClass().getResource("/images/sale_man.png")).getImage();
+    private final Image relationIcon = new ImageIcon(this.getClass().getResource("/images/unit.png")).getImage();
+    private final Image chIcon = new ImageIcon(this.getClass().getResource("/images/location.png")).getImage();
+
     @Autowired
     private LocationSetupDialog locationSetupDialog;
     @Autowired
@@ -37,12 +41,17 @@ public class OtherSetup extends javax.swing.JPanel {
     private RelationSetupDialog relationSetupDialog;
     @Autowired
     private ChargeTypeSetupDialog chargeTypeSetupDialog;
-    @Autowired
-    private ApplicationMainFrame mainFrame;
+
+    private LoadingObserver loadingObserver;
+
+    public LoadingObserver getLoadingObserver() {
+        return loadingObserver;
+    }
 
     public void setLoadingObserver(LoadingObserver loadingObserver) {
         this.loadingObserver = loadingObserver;
     }
+    
 
     /**
      * Creates new form OtherSetup
@@ -66,6 +75,10 @@ public class OtherSetup extends javax.swing.JPanel {
         btnRelation = new javax.swing.JButton();
         btnChargeType = new javax.swing.JButton();
 
+        jButton1.setBackground(ColorUtil.btnEdit);
+        jButton1.setFont(Global.lableFont);
+        jButton1.setForeground(ColorUtil.foreground);
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/location.png"))); // NOI18N
         jButton1.setText("Location");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -73,6 +86,10 @@ public class OtherSetup extends javax.swing.JPanel {
             }
         });
 
+        btnVouStatus.setBackground(ColorUtil.btnEdit);
+        btnVouStatus.setFont(Global.lableFont);
+        btnVouStatus.setForeground(ColorUtil.foreground);
+        btnVouStatus.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/voucher.png"))); // NOI18N
         btnVouStatus.setText("Vou Status");
         btnVouStatus.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -80,6 +97,10 @@ public class OtherSetup extends javax.swing.JPanel {
             }
         });
 
+        btnSaleMan.setBackground(ColorUtil.btnEdit);
+        btnSaleMan.setFont(Global.lableFont);
+        btnSaleMan.setForeground(ColorUtil.foreground);
+        btnSaleMan.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/sale_man.png"))); // NOI18N
         btnSaleMan.setText("Sale Man");
         btnSaleMan.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -87,6 +108,10 @@ public class OtherSetup extends javax.swing.JPanel {
             }
         });
 
+        btnRelation.setBackground(ColorUtil.btnEdit);
+        btnRelation.setFont(Global.lableFont);
+        btnRelation.setForeground(ColorUtil.foreground);
+        btnRelation.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/unit.png"))); // NOI18N
         btnRelation.setText("Relation ");
         btnRelation.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -94,6 +119,9 @@ public class OtherSetup extends javax.swing.JPanel {
             }
         });
 
+        btnChargeType.setBackground(ColorUtil.btnEdit);
+        btnChargeType.setFont(Global.lableFont);
+        btnChargeType.setForeground(ColorUtil.foreground);
         btnChargeType.setText("Charge Type");
         btnChargeType.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -117,7 +145,7 @@ public class OtherSetup extends javax.swing.JPanel {
                             .addComponent(btnVouStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(btnRelation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addComponent(btnChargeType))
-                .addContainerGap(546, Short.MAX_VALUE))
+                .addContainerGap(522, Short.MAX_VALUE))
         );
 
         layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnChargeType, btnRelation, btnSaleMan, btnVouStatus, jButton1});
@@ -135,13 +163,13 @@ public class OtherSetup extends javax.swing.JPanel {
                     .addComponent(btnRelation))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnChargeType)
-                .addContainerGap(337, Short.MAX_VALUE))
+                .addContainerGap(333, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        locationSetupDialog.setIconImage(image);
+        locationSetupDialog.setIconImage(locIcon);
         locationSetupDialog.setSize(Global.width / 2, Global.height / 2);
         locationSetupDialog.setLocationRelativeTo(null);
         locationSetupDialog.setVisible(true);
@@ -149,7 +177,7 @@ public class OtherSetup extends javax.swing.JPanel {
 
     private void btnVouStatusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVouStatusActionPerformed
         vouStatusSetupDialog.initMain();
-        vouStatusSetupDialog.setIconImage(image);
+        vouStatusSetupDialog.setIconImage(vouIcon);
         vouStatusSetupDialog.setSize(Global.width / 2, Global.height / 2);
         vouStatusSetupDialog.setLocationRelativeTo(null);
         vouStatusSetupDialog.setVisible(true);
@@ -158,7 +186,7 @@ public class OtherSetup extends javax.swing.JPanel {
 
     private void btnSaleManActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaleManActionPerformed
         saleManSetupDialog.initMain();
-        saleManSetupDialog.setIconImage(image);
+        saleManSetupDialog.setIconImage(saleManIcon);
         saleManSetupDialog.setSize(Global.width / 2, Global.height / 2);
         saleManSetupDialog.setLocationRelativeTo(null);
         saleManSetupDialog.setVisible(true);
@@ -167,7 +195,7 @@ public class OtherSetup extends javax.swing.JPanel {
     private void btnRelationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRelationActionPerformed
         // TODO add your handling code here:
         relationSetupDialog.initMain();
-        relationSetupDialog.setIconImage(image);
+        relationSetupDialog.setIconImage(relationIcon);
         relationSetupDialog.setSize(Global.width - 400, Global.height - 400);
         relationSetupDialog.setLocationRelativeTo(null);
         relationSetupDialog.setVisible(true);
@@ -176,7 +204,7 @@ public class OtherSetup extends javax.swing.JPanel {
 
     private void btnChargeTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChargeTypeActionPerformed
         chargeTypeSetupDialog.initMain();
-        chargeTypeSetupDialog.setIconImage(image);
+        chargeTypeSetupDialog.setIconImage(chIcon);
         chargeTypeSetupDialog.setSize(Global.width / 2, Global.height / 2);
         chargeTypeSetupDialog.setLocationRelativeTo(null);
         chargeTypeSetupDialog.setVisible(true);

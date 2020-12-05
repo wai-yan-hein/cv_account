@@ -30,23 +30,23 @@ public class PurchaseHisDaoImpl extends AbstractDao<String, PurHis> implements P
 
         if (!fromDate.equals("-") && !toDate.equals("-")) {
             if (strFilter.isEmpty()) {
-                strFilter = "o.purDate between '" + fromDate
+                strFilter = "date(o.purDate) between '" + fromDate
                         + "' and '" + toDate + "'";
             } else {
-                strFilter = strFilter + " and o.purDate between '"
+                strFilter = strFilter + " and date(o.purDate) between '"
                         + fromDate + "' and '" + toDate + "'";
             }
         } else if (!fromDate.endsWith("-")) {
             if (strFilter.isEmpty()) {
-                strFilter = "o.purDate >= '" + fromDate + "'";
+                strFilter = "date(o.purDate) >= '" + fromDate + "'";
             } else {
-                strFilter = strFilter + " and o.purDate >= '" + fromDate + "'";
+                strFilter = strFilter + " and date(o.purDate) >= '" + fromDate + "'";
             }
         } else if (!toDate.equals("-")) {
             if (strFilter.isEmpty()) {
-                strFilter = "o.purDate <= '" + toDate + "'";
+                strFilter = "date(o.purDate) <= '" + toDate + "'";
             } else {
-                strFilter = strFilter + " and o.purDate <= '" + toDate + "'";
+                strFilter = strFilter + " and date(o.purDate) <= '" + toDate + "'";
             }
         }
 

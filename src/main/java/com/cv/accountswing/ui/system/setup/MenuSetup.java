@@ -195,7 +195,8 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
     }
 
     private void newMenu(String type) {
-        Menu menu = new Menu();
+
+        VRoleMenu menu = new VRoleMenu();
         if (type.equals("Menu")) {
             menu.setMenuName("New Menu");
             menu.setMenuType("Menu");
@@ -226,11 +227,15 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
         if (!menuName.isEmpty()) {
             VRoleMenu vMenu = (VRoleMenu) selectedNode.getUserObject();
             Menu menu = new Menu();
-            menu.setId(vMenu.getKey().getMenuId());
+            if (vMenu.getKey() != null) {
+                menu.setId(vMenu.getKey().getMenuId());
+            }
             menu.setMenuName(menuName);
+            menu.setMenuClass(selectedNode.getParent().toString());
             menu.setParent(parentCode);
             menu.setMenuUrl(txtMenuUrl.getText());
             menu.setSoureAccCode(txtAccount.getText());
+            menu.setMenuType(vMenu.getMenuType());
             if (txtOrder.getValue() != null) {
                 menu.setOrderBy(Util1.getInteger(txtOrder.getText()));
             }

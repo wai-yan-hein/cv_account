@@ -37,4 +37,10 @@ public class RelationDaoImpl extends AbstractDao<RelationKey, UnitRelation> impl
         return listRelation;
     }
 
+    @Override
+    public List<UnitRelation> search(String patternId) {
+        String hsql = "select o from UnitRelation o where o.unitKey.patternId = '" + patternId + "'";
+        return findHSQL(hsql);
+    }
+
 }

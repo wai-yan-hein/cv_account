@@ -5,7 +5,7 @@
  */
 package com.cv.inv.service;
 
-import com.cv.inv.entity.RetInDetailHis;
+import com.cv.inv.entity.RetInHisDetail;
 import com.cv.inv.entity.RetInHis;
 import java.util.List;
 
@@ -15,7 +15,7 @@ import java.util.List;
  */
 public interface RetInService {
 
-    public void save(RetInHis retIn, List<RetInDetailHis> listRetIn, List<String> delList);
+    public void save(RetInHis retIn, List<RetInHisDetail> listRetIn, List<String> delList);
 
     public void delete(String retInId);
 

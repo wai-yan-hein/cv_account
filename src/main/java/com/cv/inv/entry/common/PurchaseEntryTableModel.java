@@ -11,7 +11,7 @@ import com.cv.accountswing.entity.Department;
 import com.cv.accountswing.util.NumberUtil;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.Location;
-import com.cv.inv.entity.PurchaseDetail;
+import com.cv.inv.entity.PurHisDetail;
 import com.cv.inv.entity.RelationKey;
 import com.cv.inv.entity.Stock;
 import com.cv.inv.entity.StockUnit;
@@ -40,16 +40,29 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
     private String[] columnNames = {"Code", "Description", "Department", "Location",
         "Qty", "Std-Wt", "Unit", "Avg-Wt", "Pur Price", "Amount"};
     private JTable parent;
-    private List<PurchaseDetail> listPurDetail = new ArrayList();
-    private List<String> delList = new ArrayList();
-    private LocationAutoCompleter locationCompleter;
+    private List<PurHisDetail> listPurDetail = new ArrayList();
+    private final List<String> delList = new ArrayList();
+    private LocationAutoCompleter locationAutoCompleter;
     private JFormattedTextField txtTotalAmt;
 
     private SelectionObserver callBack;
 
+    public JFormattedTextField getTxtTotalAmt() {
+        return txtTotalAmt;
+    }
+
     public void setTxtTotalAmt(JFormattedTextField txtTotalAmt) {
         this.txtTotalAmt = txtTotalAmt;
     }
+
+    public LocationAutoCompleter getLocationAutoCompleter() {
+        return locationAutoCompleter;
+    }
+
+    public void setLocationAutoCompleter(LocationAutoCompleter locationAutoCompleter) {
+        this.locationAutoCompleter = locationAutoCompleter;
+    }
+
 //
 //    public LocationAutoCompleter getLocationCompleter() {
 //        return locationCompleter;
@@ -58,7 +71,6 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
 //    public void setLocationCompleter(LocationAutoCompleter locationCompleter) {
 //        this.locationCompleter = locationCompleter;
 //    }
-
     @Autowired
     private RelationService relationService;
 
@@ -68,7 +80,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
 
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
-        return columnIndex != 9; //To change body of generated methods, choose Tools | Templates.
+        return columnIndex != 9 && columnIndex != 1; //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
@@ -86,6 +98,10 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                 return String.class;
             case 1:
                 return String.class;
+            case 2:
+                return Department.class;
+            case 3:
+                return Location.class;
             case 4:
                 return Float.class;
             case 5:
@@ -105,7 +121,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        PurchaseDetail pur = listPurDetail.get(rowIndex);
+        PurHisDetail pur = listPurDetail.get(rowIndex);
         switch (columnIndex) {
             case 0:
                 if (pur.getStock() != null) {
@@ -155,7 +171,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
             return;
         }
         try {
-            PurchaseDetail pur = listPurDetail.get(rowIndex);
+            PurHisDetail pur = listPurDetail.get(rowIndex);
             boolean isAmount = false;
 
             switch (columnIndex) {
@@ -215,7 +231,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                             Float calAmount = calPrice(pur, toUnit);
                             //  pur.setPurPrice(calAmount);
                             pur.setPurAmt(calAmount);
-                            isAmount=true;
+                            isAmount = true;
                             parent.setColumnSelectionInterval(5, 5);
                         } else {
                             showMessageBox("Input value must be positive");
@@ -249,7 +265,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                             pur.setAvgWeight(avgWt);
                             pur.setAvgPrice(avgPrice);
                             pur.setPurAmt(avgPrice);
-                            isAmount=true;
+                            isAmount = true;
                             parent.setColumnSelectionInterval(7, 7);
                         } else {
                             showMessageBox("Input value must be positive");
@@ -267,7 +283,8 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                     if (NumberUtil.isNumber(aValue)) {
                         if (NumberUtil.isPositive(aValue)) {
                             pur.setPurPrice(Util1.getFloat(aValue));
-                            parent.setColumnSelectionInterval(8, 8);
+                            parent.setColumnSelectionInterval(0, 0);
+                            parent.setRowSelectionInterval(rowIndex + 1, rowIndex + 1);
                         } else {
                             showMessageBox("Input value must be positive");
                             parent.setColumnSelectionInterval(columnIndex, columnIndex);
@@ -294,14 +311,24 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
         }
     }
 
-    private void calculateAmount(PurchaseDetail pur) {
+    private void calculateAmount(PurHisDetail pur) {
         if (pur.getStock() != null) {
-            float saleQty = pur.getQty();
+            float avgWt;
+            float purQty = pur.getQty();
             float purPrice = Util1.getFloat(pur.getPurPrice());
             float userWt = pur.getStdWeight();
-            pur.setSmallestWT(getSmallestUnit(userWt, pur.getPurUnit().getItemUnitCode()));
-            pur.setSmallestUnit("oz");
-            float amount = saleQty * purPrice;
+            String fromUnit = pur.getPurUnit().getItemUnitCode();
+            String toUnit = pur.getStock().getPurPriceUnit().getItemUnitCode();
+            Integer pattern = pur.getStock().getPattern().getPatternId();
+            pur.setStdSmallWeight(getSmallestWeight(userWt, fromUnit, toUnit, pattern) * purQty);
+            if (Util1.getFloat(pur.getAvgWeight()) > 0) {
+                avgWt = pur.getAvgWeight();
+            } else {
+                avgWt = pur.getStdWeight();
+            }
+            pur.setSmallestWT(getSmallestWeight(avgWt, fromUnit, toUnit, pattern) * purQty);
+            pur.setSmallestUnit(pur.getStock().getPurPriceUnit().getItemUnitCode());
+            float amount = purQty * purPrice;
             pur.setPurAmt(amount);
             //  calTotalAmount(pur);
         }
@@ -325,8 +352,8 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
 //
 //        }
 //    }
-    public List<PurchaseDetail> getListPurDetail() {
-        List<PurchaseDetail> listDetail = new ArrayList();
+    public List<PurHisDetail> getListPurDetail() {
+        List<PurHisDetail> listDetail = new ArrayList();
         listPurDetail.stream().filter(pdh2 -> (pdh2.getStock() != null)).filter(pdh2 -> (pdh2.getStock().getStockCode() != null)).forEachOrdered(pdh2 -> {
             listDetail.add(pdh2);
         });
@@ -334,7 +361,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
         return listDetail;
     }
 
-    private Float calPrice(PurchaseDetail pd, String toUnit) {
+    private Float calPrice(PurHisDetail pd, String toUnit) {
         Stock stock = pd.getStock();
         float purAmt = 0.0f;
         float stdPurPrice = stock.getPurPrice();
@@ -342,17 +369,17 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
         float userWt = pd.getStdWeight();
         float stdWt = stock.getPurPriceMeasure();
         String fromUnit = stock.getPurPriceUnit().getItemUnitCode();
+        Integer pattern = stock.getPattern().getPatternId();
 
         if (!fromUnit.equals(toUnit)) {
-            RelationKey key = new RelationKey(fromUnit, toUnit);
+            RelationKey key = new RelationKey(fromUnit, toUnit, pattern);
             UnitRelation unitRelation = relationService.findByKey(key);
             if (unitRelation != null) {
                 float factor = unitRelation.getFactor();
                 float convertWt = (userWt / factor); //unit change
                 purAmt = (convertWt / stdWt) * stdPrice; // cal price
-
             } else {
-                key = new RelationKey(toUnit, fromUnit);
+                key = new RelationKey(toUnit, fromUnit, pattern);
                 Float factor = Global.hmRelation.get(key);
                 if (factor != null) {
                     float convertWt = userWt * factor; // unit change
@@ -367,17 +394,26 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
         return purAmt;
     }
 
-    private Float getSmallestUnit(Float weight, String unit) {
+    private Float getSmallestWeight(Float weight, String unit, String purUnit, Integer pattern) {
         float sWt = 0.0f;
-        RelationKey key = new RelationKey(unit, "oz");
-        Float factor = Global.hmRelation.get(key);
-        if (factor != null) {
-            sWt = factor * weight;
+        if (!unit.equals(purUnit)) {
+            RelationKey key = new RelationKey(unit, purUnit, pattern);
+            Float factor = Global.hmRelation.get(key);
+            if (factor != null) {
+                sWt = factor * weight;
+            } else {
+                key = new RelationKey(purUnit, unit, pattern);
+                factor = Global.hmRelation.get(key);
+                if (factor != null) {
+                    sWt = weight / factor;
+                } else {
+                    JOptionPane.showMessageDialog(Global.parentForm, String.format("Need Relation  %s with Smallest Unit", unit));
+                    listPurDetail.remove(parent.getSelectedRow());
+                }
+            }
         } else {
-            JOptionPane.showMessageDialog(Global.parentForm, String.format("Need Relation  %s with Smallest Unit", unit));
-            listPurDetail.remove(parent.getSelectedRow());
+            sWt = weight;
         }
-        LOGGER.info("Smallest Weight :" + sWt + "From >>>" + unit + "<<<");
         return sWt;
     }
 
@@ -402,10 +438,10 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
     public void addNewRow() {
         if (listPurDetail != null) {
             if (hasEmptyRow()) {
-                PurchaseDetail pd = new PurchaseDetail();
+                PurHisDetail pd = new PurHisDetail();
                 pd.setStock(new Stock());
+                pd.setLocation(locationAutoCompleter.getLocation());
                 listPurDetail.add(pd);
-
                 fireTableRowsInserted(listPurDetail.size() - 1, listPurDetail.size() - 1);
                 parent.scrollRectToVisible(parent.getCellRect(parent.getRowCount() - 1, 0, true));
             }
@@ -415,7 +451,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
     private boolean hasEmptyRow() {
         boolean status = true;
         if (listPurDetail.size() > 1) {
-            PurchaseDetail get = listPurDetail.get(listPurDetail.size() - 1);
+            PurHisDetail get = listPurDetail.get(listPurDetail.size() - 1);
             if (get.getStock() == null) {
                 status = false;
             }
@@ -424,7 +460,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
     }
 
     public void clear() {
-        if (!listPurDetail.isEmpty()) {
+        if (listPurDetail != null) {
             listPurDetail.clear();
             addNewRow();
             fireTableDataChanged();
@@ -432,7 +468,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
 
     }
 
-    public void setListPurDetail(List<PurchaseDetail> listPurDetail) {
+    public void setListPurDetail(List<PurHisDetail> listPurDetail) {
         this.listPurDetail = listPurDetail;
         addNewRow();
         fireTableDataChanged();
@@ -445,7 +481,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
     public boolean isValidEntry() {
         boolean status = true;
         int uniqueId = 1;
-        for (PurchaseDetail sdh2 : listPurDetail) {
+        for (PurHisDetail sdh2 : listPurDetail) {
             if (sdh2.getStock().getStockCode() != null) {
                 if (sdh2.getLocation() == null) {
                     JOptionPane.showMessageDialog(Global.parentForm, "Invalid Location");
@@ -486,7 +522,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
             return;
         }
 
-        PurchaseDetail sdh = listPurDetail.get(row);
+        PurHisDetail sdh = listPurDetail.get(row);
         if (sdh.getPurDetailKey() != null) {
             delList.add(sdh.getPurDetailKey().getPurDetailId());
         }

@@ -11,7 +11,8 @@ import com.cv.accountswing.entity.Gl;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.dao.SaleDetailDao;
 import com.cv.inv.dao.SaleHisDao;
-import com.cv.inv.entity.SaleDetailHis;
+import com.cv.inv.entity.SaleDetailKey;
+import com.cv.inv.entity.SaleHisDetail;
 import com.cv.inv.entity.SaleHis;
 import java.util.ArrayList;
 import java.util.Date;
@@ -45,18 +46,20 @@ public class SaleDetailServiceImpl implements SaleDetailService {
     private GlDao glDao;
 
     @Override
-    public SaleDetailHis save(SaleDetailHis sdh) {
+    public SaleHisDetail save(SaleHisDetail sdh) {
         return dao.save(sdh);
     }
 
     @Override
-    public List<SaleDetailHis> search(String vouId) {
+    public List<SaleHisDetail> search(String vouId) {
         return dao.search(vouId);
     }
 
     @Override
-    public void save(SaleHis saleHis, List<SaleDetailHis> listSaleDetail,
+    public void save(SaleHis saleHis, List<SaleHisDetail> listSaleDetail,
             String vouStatus, List<String> deleteList) throws Exception {
+        String retInDetailId;
+
         try {
             if (vouStatus.equals("EDIT")) {
                 if (deleteList != null) {
@@ -68,11 +71,17 @@ public class SaleDetailServiceImpl implements SaleDetailService {
 
             hisDao.save(saleHis);
 
-            for (SaleDetailHis sdh : listSaleDetail) {
-                if (sdh.getStock().getStockCode() != null) {
-                    String vouNo = saleHis.getVouNo();
-                    sdh.setVouNo(vouNo);
-                    dao.save(sdh);
+            String vouNo = saleHis.getVouNo();
+            for (SaleHisDetail sd : listSaleDetail) {
+                if (sd.getStock() != null) {
+                    if (sd.getSaleDetailKey() != null) {
+                        sd.setSaleDetailKey(sd.getSaleDetailKey());
+                    } else {
+                        retInDetailId = vouNo + '-' + sd.getUniqueId();
+                        sd.setSaleDetailKey(new SaleDetailKey(vouNo, retInDetailId));
+                    }
+                    //  pd.setLocation(pur.getLocationId());
+                    dao.save(sd);
                 }
             }
         } catch (Exception ex) {

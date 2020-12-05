@@ -12,7 +12,7 @@ import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.CharacterNo;
 import com.cv.inv.service.CharacterNoService;
-import com.cv.inv.setup.common.CharacterNoTableModel;
+import com.cv.inv.setup.dialog.common.CharacterNoTableModel;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import javax.swing.JButton;

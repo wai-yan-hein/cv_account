@@ -10,11 +10,8 @@ import com.cv.accountswing.ui.journal.CrDrVoucherEntry;
 import com.cv.accountswing.ui.journal.common.CrDrVoucherEntryTableModel;
 import com.cv.accountswing.ui.journal.common.CrDrVoucherTableModel;
 import com.cv.accountswing.ui.report.AparGlReport;
-import java.util.Properties;
-import org.apache.log4j.PropertyConfigurator;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 
@@ -26,7 +23,6 @@ import org.springframework.context.annotation.Scope;
     "com.cv.accounts.service",
     "com.cv.accounts.accountswing.ui"
 })*/
-@ComponentScan(basePackages = "com.cv.accountswing")
 //@Import({MessagingConfiguration.class, MessagingListnerConfiguration.class})
 public class AppConfig {
 

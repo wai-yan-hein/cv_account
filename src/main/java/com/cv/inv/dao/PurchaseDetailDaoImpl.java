@@ -7,7 +7,7 @@ package com.cv.inv.dao;
 
 import com.cv.accountswing.dao.AbstractDao;
 import com.cv.inv.entity.Category;
-import com.cv.inv.entity.PurchaseDetail;
+import com.cv.inv.entity.PurHisDetail;
 import java.util.List;
 import org.springframework.stereotype.Repository;
 
@@ -16,33 +16,19 @@ import org.springframework.stereotype.Repository;
  * @author Lenovo
  */
 @Repository
-public class PurchaseDetailDaoImpl extends AbstractDao<String, PurchaseDetail> implements PurchaseDetailDao {
+public class PurchaseDetailDaoImpl extends AbstractDao<String, PurHisDetail> implements PurchaseDetailDao {
 
     @Override
-    public PurchaseDetail save(PurchaseDetail pd) {
+    public PurHisDetail save(PurHisDetail pd) {
         persist(pd);
         return pd;
     }
 
     @Override
-    public List<PurchaseDetail> search(String glId) {
-        String strFilter = "";
-        if (!glId.equals("-")) {
-            if (strFilter.isEmpty()) {
-                strFilter = "v.purDetailKey.vouId = '" + glId + "'";
-            } else {
-                strFilter = strFilter + " and v.purDetailKey.vouId = '" + glId + "'";
-            }
-        }
-        String strSql = "select v from PurchaseDetail v";
+    public List<PurHisDetail> search(String vouId) {
+        String hsql = "select o from PurHisDetail o where o.purDetailKey.vouId = '" + vouId + "'";
+        return findHSQL(hsql);
 
-        List<PurchaseDetail> listDH = null;
-        if (!strFilter.isEmpty()) {
-            strSql = strSql + " where " + strFilter;
-            listDH = findHSQL(strSql);
-        }
-
-        return listDH;
     }
 
     @Override

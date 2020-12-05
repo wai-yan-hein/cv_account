@@ -8,7 +8,7 @@ package com.cv.inv.service;
 import com.cv.inv.dao.RetOutDao;
 import com.cv.inv.dao.RetOutDetailDao;
 import com.cv.inv.entity.RetOutCompoundKey;
-import com.cv.inv.entity.RetOutDetailHis;
+import com.cv.inv.entity.RetOutHisDetail;
 import com.cv.inv.entity.RetOutHis;
 import java.util.List;
 import org.slf4j.Logger;
@@ -26,14 +26,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class RetOutServiceImpl implements RetOutService {
 
     private static final Logger logger = LoggerFactory.getLogger(RetOutServiceImpl.class);
-    private RetOutDetailHis retOutDetailHis;
+    private RetOutHisDetail retOutDetailHis;
     @Autowired
     private RetOutDao retOutDao;
     @Autowired
     private RetOutDetailDao dao;
 
     @Override
-    public void save(RetOutHis retOut, List<RetOutDetailHis> listRetIn, List<String> delList) {
+    public void save(RetOutHis retOut, List<RetOutHisDetail> listRetIn, List<String> delList) {
 
         String retInDetailId;
         RetOutCompoundKey key;
@@ -46,7 +46,7 @@ public class RetOutServiceImpl implements RetOutService {
             }
             retOutDao.save(retOut);
             String vouNo = retOut.getRetOutId();
-            for (RetOutDetailHis rd : listRetIn) {
+            for (RetOutHisDetail rd : listRetIn) {
                 if (rd.getStock() != null) {
                     if (rd.getOutCompoundKey() != null) {
                         rd.setOutCompoundKey(rd.getOutCompoundKey());

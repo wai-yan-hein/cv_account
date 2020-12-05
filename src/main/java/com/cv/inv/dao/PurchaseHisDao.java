@@ -6,7 +6,6 @@
 package com.cv.inv.dao;
 
 import com.cv.inv.entity.PurHis;
-import com.cv.inv.entity.SaleHis;
 import java.util.List;
 
 /**

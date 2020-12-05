@@ -13,7 +13,7 @@ import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.Stock;
 import com.cv.inv.entity.StockType;
 import com.cv.inv.service.StockService;
-import com.cv.inv.setup.common.StockTypeTableModel;
+import com.cv.inv.setup.dialog.common.StockTypeTableModel;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import javax.swing.JButton;
@@ -110,6 +110,7 @@ public class StockTypeSetupDialog extends javax.swing.JDialog implements KeyList
         txtAccId.setText(item.getAccountId());
         txtCode.setText(item.getItemTypeCode());
         txtName.setText(item.getItemTypeName());
+        txtCode.requestFocus();
         lblStatus.setText("EDIT");
         txtCode.setEnabled(false);
     }
@@ -255,6 +256,11 @@ public class StockTypeSetupDialog extends javax.swing.JDialog implements KeyList
 
         txtCode.setFont(Global.textFont);
         txtCode.setName("txtCode"); // NOI18N
+        txtCode.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtCodeFocusGained(evt);
+            }
+        });
 
         jLabel2.setFont(Global.lableFont);
         jLabel2.setText("Name");
@@ -275,6 +281,7 @@ public class StockTypeSetupDialog extends javax.swing.JDialog implements KeyList
 
         btnSave.setBackground(ColorUtil.mainColor);
         btnSave.setFont(Global.lableFont);
+        btnSave.setForeground(ColorUtil.foreground);
         btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save-button-white.png"))); // NOI18N
         btnSave.setText("Save");
         btnSave.setName("btnSave"); // NOI18N
@@ -286,6 +293,7 @@ public class StockTypeSetupDialog extends javax.swing.JDialog implements KeyList
 
         btnDelete.setBackground(ColorUtil.btnDelete);
         btnDelete.setFont(Global.lableFont);
+        btnDelete.setForeground(ColorUtil.foreground);
         btnDelete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/delete-button-white.png"))); // NOI18N
         btnDelete.setText("Delete");
         btnDelete.setName("btnDelete"); // NOI18N
@@ -297,6 +305,7 @@ public class StockTypeSetupDialog extends javax.swing.JDialog implements KeyList
 
         btnClear.setBackground(ColorUtil.btnEdit);
         btnClear.setFont(Global.lableFont);
+        btnClear.setForeground(ColorUtil.foreground);
         btnClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/clear-button-white.png"))); // NOI18N
         btnClear.setText("Clear");
         btnClear.setName("btnClear"); // NOI18N
@@ -427,6 +436,11 @@ public class StockTypeSetupDialog extends javax.swing.JDialog implements KeyList
             sorter.setRowFilter(swrf);
         }
     }//GEN-LAST:event_txtFilterKeyReleased
+
+    private void txtCodeFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtCodeFocusGained
+        // TODO add your handling code here:
+        txtCode.selectAll();
+    }//GEN-LAST:event_txtCodeFocusGained
 
     /**
      * @param args the command line arguments

@@ -21,13 +21,16 @@ public class RelationKey implements Serializable {
     private String fromUnit;
     @Column(name = "to_unit")
     private String toUnit;
+    @Column(name = "pattern_id")
+    private Integer patternId;
 
     public RelationKey() {
     }
 
-    public RelationKey(String fromUnit, String toUnit) {
+    public RelationKey(String fromUnit, String toUnit, Integer patternId) {
         this.fromUnit = fromUnit;
         this.toUnit = toUnit;
+        this.patternId = patternId;
     }
 
     public String getFromUnit() {
@@ -49,8 +52,8 @@ public class RelationKey implements Serializable {
     @Override
     public int hashCode() {
         int hash = 5;
-        hash = 89 * hash + Objects.hashCode(this.fromUnit);
-        hash = 89 * hash + Objects.hashCode(this.toUnit);
+        hash = 43 * hash + Objects.hashCode(this.fromUnit);
+        hash = 43 * hash + Objects.hashCode(this.patternId);
         return hash;
     }
 
@@ -72,7 +75,15 @@ public class RelationKey implements Serializable {
         if (!Objects.equals(this.toUnit, other.toUnit)) {
             return false;
         }
-        return true;
+        return Objects.equals(this.patternId, other.patternId);
+    }
+
+    public Integer getPatternId() {
+        return patternId;
+    }
+
+    public void setPatternId(Integer patternId) {
+        this.patternId = patternId;
     }
 
 }

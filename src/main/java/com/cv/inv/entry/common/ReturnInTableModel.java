@@ -9,7 +9,7 @@ import com.cv.accountswing.common.Global;
 import com.cv.accountswing.util.NumberUtil;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.RelationKey;
-import com.cv.inv.entity.RetInDetailHis;
+import com.cv.inv.entity.RetInHisDetail;
 import com.cv.inv.entity.Stock;
 import com.cv.inv.entity.StockUnit;
 import com.cv.inv.entity.UnitRelation;
@@ -37,7 +37,7 @@ public class ReturnInTableModel extends AbstractTableModel {
         "Qty", "Std-W", "Unit", "Price", "Amount"};
     private JTable parent;
     private List<String> delList = new ArrayList();
-    private List<RetInDetailHis> listRetInDtail = new ArrayList();
+    private List<RetInHisDetail> listRetInDtail = new ArrayList();
     private String deletedList;
 
     @Autowired
@@ -74,7 +74,7 @@ public class ReturnInTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int row, int column) {
-        RetInDetailHis record;
+        RetInHisDetail record;
         try {
             record = listRetInDtail.get(row);
         } catch (Exception ex) {
@@ -142,7 +142,7 @@ public class ReturnInTableModel extends AbstractTableModel {
 
     public void addNewRow() {
         if (hasEmptyRow()) {
-            RetInDetailHis detailHis = new RetInDetailHis();
+            RetInHisDetail detailHis = new RetInHisDetail();
             detailHis.setStock(new Stock());
             listRetInDtail.add(detailHis);
             fireTableRowsInserted(listRetInDtail.size() - 1, listRetInDtail.size() - 1);
@@ -192,7 +192,7 @@ public class ReturnInTableModel extends AbstractTableModel {
         }
         boolean isAmount = false;
         try {
-            RetInDetailHis record = listRetInDtail.get(row);
+            RetInHisDetail record = listRetInDtail.get(row);
 
             switch (column) {
                 case 0://code
@@ -218,7 +218,7 @@ public class ReturnInTableModel extends AbstractTableModel {
                     break;
                 case 2://Ex-date
                     if (value != null) {
-                        record.setExpireDate(((RetInDetailHis) value).getExpireDate());
+                        record.setExpireDate(((RetInHisDetail) value).getExpireDate());
                     }
                     parent.setColumnSelectionInterval(3, 3);
                     break;
@@ -315,28 +315,28 @@ public class ReturnInTableModel extends AbstractTableModel {
 
     }
 
-    public List<RetInDetailHis> getCurrentRow() {
+    public List<RetInHisDetail> getCurrentRow() {
         return this.listRetInDtail;
     }
 
-    private void calAmt(RetInDetailHis retInDetail) {
+    private void calAmt(RetInHisDetail retInDetail) {
         Double amt;
         if (retInDetail.getAmount() != null) {
             amt = retInDetail.getQty() * Double.parseDouble(retInDetail.getAmount().toString());
             retInDetail.setAmount(amt);
-        }else{
+        } else {
             amt = retInDetail.getQty() * Double.parseDouble(retInDetail.getPrice().toString());
-            retInDetail.setAmount(amt);  
+            retInDetail.setAmount(amt);
         }
     }
 
-    public List<RetInDetailHis> getRetInDetailHis() {
+    public List<RetInHisDetail> getRetInDetailHis() {
         return this.listRetInDtail;
     }
 
     public void addEmptyRow() {
         if (listRetInDtail != null) {
-            RetInDetailHis record = new RetInDetailHis();
+            RetInHisDetail record = new RetInHisDetail();
             record.setStock(new Stock());
             listRetInDtail.add(record);
             fireTableRowsInserted(listRetInDtail.size() - 1, listRetInDtail.size() - 1);
@@ -349,7 +349,7 @@ public class ReturnInTableModel extends AbstractTableModel {
         if (listRetInDtail.isEmpty() || listRetInDtail == null) {
             status = true;
         } else {
-            RetInDetailHis detailHis = listRetInDtail.get(listRetInDtail.size() - 1);
+            RetInHisDetail detailHis = listRetInDtail.get(listRetInDtail.size() - 1);
             if (detailHis.getStock() == null) {
                 status = false;
             }
@@ -363,7 +363,7 @@ public class ReturnInTableModel extends AbstractTableModel {
         addEmptyRow();
     }
 
-    private Float calPrice(RetInDetailHis pd, String toUnit) {
+    private Float calPrice(RetInHisDetail pd, String toUnit) {
         Stock stock = pd.getStock();
         float purAmt = 0.0f;
         float stdPurPrice = Util1.getFloat(stock.getPurPrice());
@@ -371,9 +371,10 @@ public class ReturnInTableModel extends AbstractTableModel {
         float userWt = pd.getStdWt();
         float stdWt = stock.getSaleMeasure();
         String fromUnit = stock.getSaleUnit().getItemUnitCode();
+        Integer pattern = stock.getPattern().getPatternId();
 
         if (!fromUnit.equals(toUnit)) {
-            RelationKey key = new RelationKey(fromUnit, toUnit);
+            RelationKey key = new RelationKey(fromUnit, toUnit, pattern);
             UnitRelation unitRelation = relationService.findByKey(key);
             if (unitRelation != null) {
                 float factor = unitRelation.getFactor();
@@ -381,7 +382,7 @@ public class ReturnInTableModel extends AbstractTableModel {
                 purAmt = (convertWt / stdWt) * stdPrice; // cal price
 
             } else {
-                key = new RelationKey(toUnit, fromUnit);
+                key = new RelationKey(toUnit, fromUnit, pattern);
                 Float factor = Global.hmRelation.get(key);
                 if (factor != null) {
                     float convertWt = userWt * factor; // unit change
@@ -396,7 +397,7 @@ public class ReturnInTableModel extends AbstractTableModel {
         return purAmt;
     }
 
-    public void setRetInDetailList(List<RetInDetailHis> listDetail) {
+    public void setRetInDetailList(List<RetInHisDetail> listDetail) {
         this.listRetInDtail = listDetail;
 
         if (hasEmptyRow()) {
@@ -415,7 +416,7 @@ public class ReturnInTableModel extends AbstractTableModel {
             return;
         }
 
-        RetInDetailHis record = listRetInDtail.get(row);
+        RetInHisDetail record = listRetInDtail.get(row);
 
         if (record != null) {
             if (record.getInCompoundKey() != null) {
@@ -451,9 +452,9 @@ public class ReturnInTableModel extends AbstractTableModel {
         return delList;
     }
 
-    public List<RetInDetailHis> getListRetInDetail() {
-        List<RetInDetailHis> listRetInDetailhis = new ArrayList();
-        for (RetInDetailHis pdh2 : listRetInDtail) {
+    public List<RetInHisDetail> getListRetInDetail() {
+        List<RetInHisDetail> listRetInDetailhis = new ArrayList();
+        for (RetInHisDetail pdh2 : listRetInDtail) {
             if (pdh2.getStock() != null) {
                 if (pdh2.getStock().getStockCode() != null) {
                     listRetInDetailhis.add(pdh2);

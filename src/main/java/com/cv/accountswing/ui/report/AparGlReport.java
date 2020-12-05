@@ -43,6 +43,7 @@ import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
@@ -67,6 +68,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
 
     private int selectRow = -1;
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(AparGlReport.class);
+    private final ImageIcon account = new ImageIcon(getClass().getResource("/images/accountant.png"));
 
     /**
      * Creates new form AparGlReport
@@ -329,6 +331,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
     }
 
     private void openTBDDialog(List<VGl> listVGl, String traderName, Double netChange) {
+        trialBalanceDetailDialog.setIconImage(account.getImage());
         trialBalanceDetailDialog.setDesp(traderName);
         trialBalanceDetailDialog.setTargetId(getTarget());
         trialBalanceDetailDialog.setListVGl(listVGl);

@@ -23,7 +23,7 @@ import com.cv.accountswing.ui.editor.TraderAutoCompleter;
 import com.cv.accountswing.util.NumberUtil;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.Location;
-import com.cv.inv.entity.RetOutDetailHis;
+import com.cv.inv.entity.RetOutHisDetail;
 import com.cv.inv.entity.RetOutHis;
 import com.cv.inv.entry.common.ReturnOutTableModel;
 import com.cv.inv.entry.editor.LocationAutoCompleter;
@@ -72,7 +72,7 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
      */
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(ReturnOut.class);
     private LoadingObserver loadingObserver;
-    private List<RetOutDetailHis> listDetail = ObservableCollections.observableList(new ArrayList());
+    private List<RetOutHisDetail> listDetail = ObservableCollections.observableList(new ArrayList());
     private TraderAutoCompleter traderAutoCompleter;
     private LocationAutoCompleter locationAutoCompleter;
     private CurrencyAutoCompleter currencyAutoCompleter;
@@ -203,7 +203,7 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
         listDetail = retOutTableModel.getRetOutDetailHis();
 
         try {
-            for (RetOutDetailHis sdh : listDetail) {
+            for (RetOutHisDetail sdh : listDetail) {
                 totalAmount += NumberUtil.NZero(sdh.getAmount());
             }
             txtVouTotal.setValue(totalAmount);
@@ -622,7 +622,7 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
                 locationAutoCompleter.setLocation(retOut.getLocation());
                 currencyAutoCompleter.setCurrency(retOut.getCurrency());
 
-                List<RetOutDetailHis> listRetOut = retOutDetailService.search(retOut.getRetOutId());
+                List<RetOutHisDetail> listRetOut = retOutDetailService.search(retOut.getRetOutId());
                 retOutTableModel.setRetOutDetailList(listRetOut);
 
             } catch (Exception ex) {

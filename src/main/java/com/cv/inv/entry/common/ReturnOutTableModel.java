@@ -9,7 +9,7 @@ import com.cv.accountswing.common.Global;
 import com.cv.accountswing.util.NumberUtil;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.RelationKey;
-import com.cv.inv.entity.RetOutDetailHis;
+import com.cv.inv.entity.RetOutHisDetail;
 import com.cv.inv.entity.Stock;
 import com.cv.inv.entity.StockUnit;
 import com.cv.inv.entity.UnitRelation;
@@ -35,14 +35,14 @@ public class ReturnOutTableModel extends AbstractTableModel {
     private String[] columnNames = {"Code", "Description", "Exp-Date",
         "Qty", "Std-W", "Unit", "Price", "Amount"};
     private JTable parent;
-    private List<RetOutDetailHis> listDetail;
+    private List<RetOutHisDetail> listDetail;
     private String deletedList;
     private List<String> delList = new ArrayList();
 
     @Autowired
     private RelationService relationService;
 
-    public ReturnOutTableModel(List<RetOutDetailHis> listDetail) {
+    public ReturnOutTableModel(List<RetOutHisDetail> listDetail) {
         this.listDetail = listDetail;
 
     }
@@ -108,7 +108,7 @@ public class ReturnOutTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int row, int column) {
-        RetOutDetailHis record;
+        RetOutHisDetail record;
         try {
             record = listDetail.get(row);
         } catch (Exception ex) {
@@ -185,7 +185,7 @@ public class ReturnOutTableModel extends AbstractTableModel {
         }
         boolean isAmount = false;
         try {
-            RetOutDetailHis record = listDetail.get(row);
+            RetOutHisDetail record = listDetail.get(row);
 
             switch (column) {
                 case 0://code
@@ -210,7 +210,7 @@ public class ReturnOutTableModel extends AbstractTableModel {
                     break;
                 case 2://Ex-date
                     if (value != null) {
-                        record.setExpireDate(((RetOutDetailHis) value).getExpireDate());
+                        record.setExpireDate(((RetOutHisDetail) value).getExpireDate());
                     }
                     // parent.setColumnSelectionInterval(3, 3);
                     break;
@@ -234,7 +234,7 @@ public class ReturnOutTableModel extends AbstractTableModel {
                         String toUnit = record.getStockUnit().getItemUnitCode();
                         Float calAmount = calPrice(record, toUnit);
                         //  record.setPrice(Util1.getDouble(calAmount));
-                       record.setAmount(Util1.getDouble(calAmount));
+                        record.setAmount(Util1.getDouble(calAmount));
                         parent.setColumnSelectionInterval(4, 4);
                     }
                     break;
@@ -287,7 +287,7 @@ public class ReturnOutTableModel extends AbstractTableModel {
         fireTableRowsUpdated(row, column);
     }
 
-    private void calAmt(RetOutDetailHis retOutDetailHis) {
+    private void calAmt(RetOutHisDetail retOutDetailHis) {
 //        Double amt = retOutDetailHis.getQty() * Double.parseDouble(retOutDetailHis.getStdWt().toString());
 //        retOutDetailHis.setAmount(amt);
         if (retOutDetailHis.getStock() != null) {
@@ -313,7 +313,7 @@ public class ReturnOutTableModel extends AbstractTableModel {
         if (listDetail.isEmpty() || listDetail == null) {
             status = true;
         } else {
-            RetOutDetailHis detailHis = listDetail.get(listDetail.size() - 1);
+            RetOutHisDetail detailHis = listDetail.get(listDetail.size() - 1);
             if (detailHis.getStock() == null) {
                 status = false;
             }
@@ -324,7 +324,7 @@ public class ReturnOutTableModel extends AbstractTableModel {
 
     public void addEmptyRow() {
         if (listDetail != null) {
-            RetOutDetailHis record = new RetOutDetailHis();
+            RetOutHisDetail record = new RetOutHisDetail();
             record.setUniqueId(listDetail.size() + 1);
             listDetail.add(record);
             fireTableRowsInserted(listDetail.size() - 1, listDetail.size() - 1);
@@ -334,7 +334,7 @@ public class ReturnOutTableModel extends AbstractTableModel {
 
     public void addNewRow() {
         if (hasEmptyRow()) {
-            RetOutDetailHis detailHis = new RetOutDetailHis();
+            RetOutHisDetail detailHis = new RetOutHisDetail();
             detailHis.setUniqueId(listDetail.size() + 1);
             listDetail.add(detailHis);
             fireTableRowsInserted(listDetail.size() - 1, listDetail.size() - 1);
@@ -348,11 +348,11 @@ public class ReturnOutTableModel extends AbstractTableModel {
         addEmptyRow();
     }
 
-    public List<RetOutDetailHis> getRetOutDetailHis() {
+    public List<RetOutHisDetail> getRetOutDetailHis() {
         return this.listDetail;
     }
 
-    private Float calPrice(RetOutDetailHis pd, String toUnit) {
+    private Float calPrice(RetOutHisDetail pd, String toUnit) {
         Stock stock = pd.getStock();
         float purAmt = 0.0f;
         float stdPurPrice = stock.getPurPrice();
@@ -360,9 +360,10 @@ public class ReturnOutTableModel extends AbstractTableModel {
         float userWt = pd.getStdWt();
         float stdWt = stock.getSaleMeasure();
         String fromUnit = stock.getPurPriceUnit().getItemUnitCode();
+        Integer pattern = stock.getPattern().getPatternId();
 
         if (!fromUnit.equals(toUnit)) {
-            RelationKey key = new RelationKey(fromUnit, toUnit);
+            RelationKey key = new RelationKey(fromUnit, toUnit, pattern);
             UnitRelation unitRelation = relationService.findByKey(key);
             if (unitRelation != null) {
                 float factor = unitRelation.getFactor();
@@ -370,7 +371,7 @@ public class ReturnOutTableModel extends AbstractTableModel {
                 purAmt = (convertWt / stdWt) * stdPrice; // cal price
 
             } else {
-                key = new RelationKey(toUnit, fromUnit);
+                key = new RelationKey(toUnit, fromUnit, pattern);
                 Float factor = Global.hmRelation.get(key);
                 if (factor != null) {
                     float convertWt = userWt * factor; // unit change
@@ -385,7 +386,7 @@ public class ReturnOutTableModel extends AbstractTableModel {
         return purAmt;
     }
 
-    public void setRetOutDetailList(List<RetOutDetailHis> listDetail) {
+    public void setRetOutDetailList(List<RetOutHisDetail> listDetail) {
         this.listDetail = listDetail;
 
         if (hasEmptyRow()) {
@@ -403,7 +404,7 @@ public class ReturnOutTableModel extends AbstractTableModel {
             return;
         }
 
-        RetOutDetailHis record = listDetail.get(row);
+        RetOutHisDetail record = listDetail.get(row);
 
         if (record != null) {
             if (record.getOutCompoundKey() != null) {
@@ -439,9 +440,9 @@ public class ReturnOutTableModel extends AbstractTableModel {
         return delList;
     }
 
-    public List<RetOutDetailHis> getListRetInDetail() {
-        List<RetOutDetailHis> listRetInDetailhis = new ArrayList();
-        for (RetOutDetailHis pdh2 : listDetail) {
+    public List<RetOutHisDetail> getListRetInDetail() {
+        List<RetOutHisDetail> listRetInDetailhis = new ArrayList();
+        for (RetOutHisDetail pdh2 : listDetail) {
             if (pdh2.getStock() != null) {
                 if (pdh2.getStock().getStockCode() != null) {
                     listRetInDetailhis.add(pdh2);

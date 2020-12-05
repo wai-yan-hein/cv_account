@@ -14,7 +14,7 @@ import com.cv.inv.entity.Category;
 import com.cv.inv.entity.Stock;
 import com.cv.inv.service.CategoryService;
 import com.cv.inv.service.StockService;
-import com.cv.inv.setup.common.CategoryTableModel;
+import com.cv.inv.setup.dialog.common.CategoryTableModel;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.List;
@@ -107,6 +107,7 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
 
         txtName.setText(cat.getCatName());
         lblStatus.setText("EDIT");
+        txtName.requestFocus();
     }
 
     private void save() {
@@ -237,6 +238,11 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
 
         txtName.setFont(Global.textFont);
         txtName.setName("txtName"); // NOI18N
+        txtName.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtNameFocusGained(evt);
+            }
+        });
         txtName.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtNameActionPerformed(evt);
@@ -245,6 +251,7 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
 
         btnSave.setBackground(ColorUtil.mainColor);
         btnSave.setFont(Global.lableFont);
+        btnSave.setForeground(new java.awt.Color(255, 255, 255));
         btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save-button-white.png"))); // NOI18N
         btnSave.setText("Save");
         btnSave.setName("btnSave"); // NOI18N
@@ -256,6 +263,7 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
 
         btnDelete.setBackground(ColorUtil.btnDelete);
         btnDelete.setFont(Global.lableFont);
+        btnDelete.setForeground(new java.awt.Color(255, 255, 255));
         btnDelete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/delete-button-white.png"))); // NOI18N
         btnDelete.setText("Delete");
         btnDelete.setName("btnDelete"); // NOI18N
@@ -267,6 +275,7 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
 
         btnClear.setBackground(ColorUtil.btnEdit);
         btnClear.setFont(Global.lableFont);
+        btnClear.setForeground(new java.awt.Color(255, 255, 255));
         btnClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/clear-button-white.png"))); // NOI18N
         btnClear.setText("Clear");
         btnClear.setName("btnClear"); // NOI18N
@@ -382,6 +391,11 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
             sorter.setRowFilter(swrf);
         }
     }//GEN-LAST:event_txtFilterKeyReleased
+
+    private void txtNameFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtNameFocusGained
+        // TODO add your handling code here:
+        txtName.selectAll();
+    }//GEN-LAST:event_txtNameFocusGained
 
     /**
      * @param args the command line arguments

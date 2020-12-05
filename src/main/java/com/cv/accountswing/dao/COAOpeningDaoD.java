@@ -27,7 +27,6 @@ public interface COAOpeningDaoD {
     public void insertFilter(String coaCode, int level, String opDate,
             String curr, String userId) throws Exception;
 
-    public void deleteTmp(String coaCode, String userId) throws Exception;
 
     public List<TmpOpeningClosing> getOpBalance(String coaCode, int level, String opDate,
             String curr, String userId) throws Exception;

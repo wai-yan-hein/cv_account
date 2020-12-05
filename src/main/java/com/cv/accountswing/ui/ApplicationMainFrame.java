@@ -35,6 +35,7 @@ import com.cv.accountswing.ui.journal.JournalStockOpening;
 import com.cv.accountswing.ui.report.AparGlReport;
 import com.cv.accountswing.ui.report.BalanceSheet;
 import com.cv.accountswing.ui.report.ProtfitAndLost;
+import com.cv.accountswing.ui.report.StockReports;
 import com.cv.accountswing.ui.setup.COAOpeningSetup;
 import com.cv.accountswing.ui.setup.ChartOfAccountSetup;
 import com.cv.accountswing.ui.setup.COASetup;
@@ -63,6 +64,7 @@ import com.cv.inv.service.SaleManService;
 import com.cv.inv.service.VouStatusService;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entry.SaleEntry;
+import com.cv.inv.entry.StockInOutEntry;
 import com.cv.inv.service.CategoryService;
 import com.cv.inv.service.ChargeTypeService;
 import com.cv.inv.service.MachineInfoService;
@@ -227,6 +229,10 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private Issue issue;
     @Autowired
     private StockReceive stockReceive;
+    @Autowired
+    private StockInOutEntry stockInOut;
+    @Autowired
+    private StockReports stockReports;
     @Autowired
     private LocationService locationService;
     @Autowired
@@ -465,7 +471,9 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                         manageProjectSetup.setName(panelName);
                         manageProjectSetup.setLoadingObserver(this);
                         return manageProjectSetup;
-
+                    case "Stock In/Out":
+                        stockInOut.setName(panelName);
+                        return stockInOut;
                     default:
                         return null;
                 }
@@ -512,6 +520,9 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                         balanceSheet.setName(panelName);
                         balanceSheet.setLoadingObserver(this);
                         return balanceSheet;
+                    case "Stock Report":
+                        stockReports.setName(panelName);
+                        return stockReports;
                     default:
                         return null;
                 }
@@ -678,9 +689,11 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             Global.listStockType = stockTypeService.findAll();
             Global.listCategory = categoryService.findAll();
             Global.listStockBrand = stockBrandService.findAll();
-            Global.listRelation.forEach(ur -> {
-                Global.hmRelation.put(ur.getUnitKey(), ur.getFactor());
-            });
+            if (Global.listRelation != null) {
+                Global.listRelation.forEach(ur -> {
+                    Global.hmRelation.put(ur.getUnitKey(), ur.getFactor());
+                });
+            }
             Global.listChargeType = chargeTypeService.findAll();
             String cuId = Global.sysProperties.get("system.default.currency");
             //Default Currency
@@ -724,7 +737,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                     if (menu.getChild() != null) {
                         if (!menu.getChild().isEmpty()) {
                             JMenu parent = new JMenu();
-                            parent.setName(menu.getMenuClass() + "," + menu.getSoureAccCode());
+                            parent.setName(menu.getMenuClass() + "," + Util1.isNull(menu.getSoureAccCode(), "-"));
                             parent.setText(menu.getMenuName());
                             parent.setFont(Global.menuFont);
 
@@ -734,7 +747,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                             addChildMenu(parent, menu.getChild());
                         } else {  //No Child
                             JMenu jmenu = new JMenu();
-                            jmenu.setName(menu.getMenuClass() + "," + menu.getSoureAccCode());
+                            jmenu.setName(menu.getMenuClass() + "," + Util1.isNull(menu.getSoureAccCode(), "-"));
 
                             jmenu.setText(menu.getMenuName());
                             jmenu.setFont(Global.menuFont);
@@ -748,7 +761,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
 
                         jmenu.setText(menu.getMenuName());
                         jmenu.setFont(Global.menuFont);
-                        jmenu.setName(menu.getMenuClass() + "," + menu.getSoureAccCode());
+                        jmenu.setName(menu.getMenuClass() + "," + Util1.isNull(menu.getSoureAccCode(), "-"));
                         //Need to add action listener
                         //====================================
                         menuBar.add(jmenu);
@@ -769,7 +782,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                         JMenu menu = new JMenu();
                         menu.setText(vrMenu.getMenuName());
                         menu.setFont(Global.menuFont);
-                        menu.setName(vrMenu.getMenuClass() + "," + vrMenu.getSoureAccCode());
+                        menu.setName(vrMenu.getMenuClass() + "," + Util1.isNull(vrMenu.getSoureAccCode(), "-"));
 
                         //Need to add action listener
                         //====================================
@@ -781,7 +794,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                         //Need to add action listener
                         menuItem.addActionListener(menuListener);
                         menuItem.setFont(Global.menuFont);
-                        menuItem.setName(vrMenu.getMenuClass() + "," + vrMenu.getSoureAccCode());
+                        menuItem.setName(vrMenu.getMenuClass() + "," + Util1.isNull(vrMenu.getSoureAccCode(), "-"));
 
                         //====================================
                         parent.add(menuItem);
@@ -789,7 +802,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                 } else {  //No Child
                     JMenuItem menuItem = new JMenuItem();
                     menuItem.setText(vrMenu.getMenuName());
-                    menuItem.setName(vrMenu.getMenuClass() + "," + vrMenu.getSoureAccCode());
+                    menuItem.setName(vrMenu.getMenuClass() + "," + Util1.isNull(vrMenu.getSoureAccCode(), "-"));
                     //Need to add action listener
                     menuItem.addActionListener(menuListener);
                     menuItem.setFont(Global.menuFont);

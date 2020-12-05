@@ -5,11 +5,12 @@
  */
 package com.cv.inv.entry.editor;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.inv.entity.Stock;
-import com.cv.inv.setup.common.StockTableModel;
+import com.cv.inv.setup.dialog.common.StockTableModel;
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -78,6 +79,9 @@ public class StockAutoCompleter implements KeyListener {
         table.getTableHeader().setFont(Global.textFont);
         table.setFont(Global.textFont); // NOI18N
         table.setRowHeight(Global.tblRowHeight);
+        table.setFont(Global.textFont);
+        table.getTableHeader().setBackground(ColorUtil.btnEdit);
+        table.getTableHeader().setForeground(ColorUtil.foreground);
         table.setDefaultRenderer(Object.class, new TableCellRender());
         sorter = new TableRowSorter(table.getModel());
         table.setRowSorter(sorter);
