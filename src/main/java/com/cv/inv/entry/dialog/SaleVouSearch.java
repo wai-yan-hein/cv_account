@@ -108,7 +108,7 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
     }
 
     private void assignDefaultValue() {
-        traderAutoCompleter.setTrader(Global.defaultTrader);
+        traderAutoCompleter.setTrader(Global.defaultCustomer);
         vouCompleter.setVouStatus(Global.defaultVouStatus);
         appUserAutoCompleter.setAppUser(Global.loginUser);
     }

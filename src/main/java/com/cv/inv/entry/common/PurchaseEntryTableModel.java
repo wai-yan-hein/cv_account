@@ -500,6 +500,10 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                     uniqueId++;
                 }
             }
+            if (Util1.getFloat(sdh2.getPurAmt()) <= 0) {
+                status = false;
+                JOptionPane.showMessageDialog(Global.parentForm, "Could not saved because purchase amount can't not be zero");
+            }
         }
 
         if (uniqueId == 1) {

@@ -78,7 +78,7 @@ public class SReportDaoImpl extends AbstractDao<Serializable, Object> implements
                 + "		where s.stock_code = tmp.stock_code and s.loc_id = tmp.loc_id and s.comp_code = tmp.comp_id\n"
                 + "		group by stock_code,loc,std_weight\n"
                 + "        ) b\n"
-                + "group by b.stock_code,b.loc";
+                + "group by b.stock_code,b.loc,b.std_wt";
         execSQL(insertSql);
         log.info("insert stock balance tmp success.");
     }

@@ -110,8 +110,10 @@ public class Global {
     public static VouStatus defaultVouStatus;
     //default saleMan
     public static SaleMan defaultSaleMan;
-    //default saleMan
-    public static Trader defaultTrader;
+    //default cusotmer
+    public static Trader defaultCustomer;
+    //defalut supplier
+    public static Trader defaultSupplier;
 
     public static HashMap<String, Float> hasQtyInSmallest = new HashMap();
 

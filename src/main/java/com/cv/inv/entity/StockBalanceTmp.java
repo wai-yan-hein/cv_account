@@ -7,8 +7,12 @@ package com.cv.inv.entity;
 
 import java.io.Serializable;
 import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import static javax.persistence.GenerationType.IDENTITY;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
@@ -19,8 +23,17 @@ import javax.persistence.Table;
 @Table(name = "tmp_stock_balance")
 public class StockBalanceTmp implements Serializable {
 
-    @EmbeddedId
-    private StockBalanceTmpKey key;
+    @Id
+    @GeneratedValue(strategy = IDENTITY)
+    @Column(name = "tran_id", unique = true, nullable = false)
+    private Integer tranId;
+    @ManyToOne
+    @JoinColumn(name = "stock_code")
+    private Stock stock;
+    @Column(name = "loc_id", nullable = false)
+    private Integer locId;
+    @Column(name = "machine_id", nullable = false)
+    private Integer machineId;
     @Column(name = "change_wt")
     private Float changeWt;
     @Column(name = "change_unit")
@@ -66,14 +79,6 @@ public class StockBalanceTmp implements Serializable {
         return unit;
     }
 
-    public StockBalanceTmpKey getKey() {
-        return key;
-    }
-
-    public void setKey(StockBalanceTmpKey key) {
-        this.key = key;
-    }
-
     public Float getChangeWt() {
         return changeWt;
     }
@@ -105,7 +110,33 @@ public class StockBalanceTmp implements Serializable {
     public void setChangeUnit2(String changeUnit2) {
         this.changeUnit2 = changeUnit2;
     }
-    
-    
+
+    public Stock getStock() {
+        return stock;
+    }
+
+    public void setStock(Stock stock) {
+        this.stock = stock;
+    }
+
+    public Integer getLocId() {
+        return locId;
+    }
+
+    public void setLocId(Integer locId) {
+        this.locId = locId;
+    }
+
+    public Integer getMachineId() {
+        return machineId;
+    }
+
+    public void setMachineId(Integer machineId) {
+        this.machineId = machineId;
+    }
+
+    public Integer getTranId() {
+        return tranId;
+    }
 
 }

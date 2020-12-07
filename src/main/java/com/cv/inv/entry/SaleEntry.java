@@ -248,8 +248,8 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
     private void assignDefaultValue() {
         try {
             txtSaleDate.setDate(Util1.getTodayDate());
-            if (Global.defaultTrader != null) {
-                traderAutoCompleter.setTrader(Global.defaultTrader);
+            if (Global.defaultCustomer != null) {
+                traderAutoCompleter.setTrader(Global.defaultCustomer);
                 //  selected("CustomerList", Global.defaultTrader);
             }
             currAutoCompleter.setCurrency(Global.defalutCurrency);
@@ -578,6 +578,7 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
         });
 
         txtVouNo.setEditable(false);
+        txtVouNo.setDisabledTextColor(new java.awt.Color(0, 0, 0));
         txtVouNo.setFont(Global.textFont);
         txtVouNo.setName("txtVouNo"); // NOI18N
 
@@ -667,15 +668,15 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
                     .addComponent(jLabel6))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(txtSaleDate, javax.swing.GroupLayout.DEFAULT_SIZE, 307, Short.MAX_VALUE)
+                    .addComponent(txtSaleDate, javax.swing.GroupLayout.DEFAULT_SIZE, 301, Short.MAX_VALUE)
                     .addComponent(txtCurrency, javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(txtDueDate, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel21)
                         .addGap(18, 18, 18)
-                        .addComponent(txtRemark, javax.swing.GroupLayout.DEFAULT_SIZE, 283, Short.MAX_VALUE))
+                        .addComponent(txtRemark, javax.swing.GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel22)
                         .addGap(18, 18, 18)
@@ -756,9 +757,9 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
                             .addComponent(chkPrintOption)
                             .addComponent(chkVouComp))
                         .addGap(18, 18, 18)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel12)
-                            .addComponent(jLabel11))
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jLabel12, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(18, 18, 18)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtTotalItem, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -937,13 +938,13 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
         tblSale.setFont(Global.textFont);
         tblSale.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {},
+                {},
+                {},
+                {}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+
             }
         ));
         tblSale.setRowHeight(Global.tblRowHeight);

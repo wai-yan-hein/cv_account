@@ -491,6 +491,10 @@ public class SaleEntryTableModel extends AbstractTableModel {
         boolean status = true;
         int uniqueId = 1;
         for (SaleHisDetail sdh : listDetail) {
+            if (Util1.getFloat(sdh.getAmount()) <= 0) {
+                status = false;
+                JOptionPane.showMessageDialog(Global.parentForm, "Could not saved because sale amount can't not be zero");
+            }
             if (uniqueId != listDetail.size()) {
                 if (Util1.NZeroDouble(sdh.getQuantity()) <= 0) {
                     JOptionPane.showMessageDialog(Global.parentForm, "Invalid quantity.",

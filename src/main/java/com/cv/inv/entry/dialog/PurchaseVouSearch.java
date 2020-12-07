@@ -101,7 +101,7 @@ public class PurchaseVouSearch extends javax.swing.JDialog implements KeyListene
     }
 
     private void assignDefaultValue() {
-        traderAutoCompleter.setTrader(Global.defaultTrader);
+        traderAutoCompleter.setTrader(Global.defaultSupplier);
         vouCompleter.setVouStatus(Global.defaultVouStatus);
 
     }

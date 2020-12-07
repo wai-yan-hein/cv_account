@@ -52,7 +52,7 @@ public class StockInOutEntry extends javax.swing.JPanel {
     }
 
     private void search() {
-        log.debug("Search Stock In Out");
+        log.info("Search Stock In Out");
         String fromDate = Util1.toDateStr(txtFromDate.getDate(), "yyyy-MM-dd");
         String toDate = Util1.toDateStr(txtToDate.getDate(), "yyyy-MM-dd");
         String option = Util1.isNull(txtOption.getText(), "-");
@@ -132,7 +132,7 @@ public class StockInOutEntry extends javax.swing.JPanel {
         txtOption = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
         txtRemark = new javax.swing.JTextField();
-        jLabel1 = new javax.swing.JLabel();
+        btnSearch = new javax.swing.JButton();
 
         setBackground(new java.awt.Color(255, 255, 255));
         addComponentListener(new java.awt.event.ComponentAdapter() {
@@ -172,9 +172,16 @@ public class StockInOutEntry extends javax.swing.JPanel {
 
         jLabel5.setText("Remark");
 
-        jLabel1.setBackground(new java.awt.Color(0, 102, 255));
-        jLabel1.setForeground(ColorUtil.mainColor);
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/search-button.png"))); // NOI18N
+        btnSearch.setBackground(ColorUtil.btnEdit);
+        btnSearch.setFont(Global.lableFont);
+        btnSearch.setForeground(ColorUtil.foreground);
+        btnSearch.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/search-button-white.png"))); // NOI18N
+        btnSearch.setText("Search");
+        btnSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSearchActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -184,21 +191,21 @@ public class StockInOutEntry extends javax.swing.JPanel {
                 .addContainerGap()
                 .addComponent(jLabel2)
                 .addGap(18, 18, 18)
-                .addComponent(txtFromDate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(txtFromDate, javax.swing.GroupLayout.DEFAULT_SIZE, 146, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel3)
                 .addGap(18, 18, 18)
-                .addComponent(txtToDate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(txtToDate, javax.swing.GroupLayout.DEFAULT_SIZE, 145, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(txtOption)
+                .addComponent(txtOption, javax.swing.GroupLayout.DEFAULT_SIZE, 110, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(txtRemark)
+                .addComponent(txtRemark, javax.swing.GroupLayout.DEFAULT_SIZE, 110, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel1)
+                .addComponent(btnSearch)
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -214,9 +221,9 @@ public class StockInOutEntry extends javax.swing.JPanel {
                         .addComponent(jLabel4)
                         .addComponent(txtOption, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jLabel5)
-                        .addComponent(txtRemark, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(txtRemark, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnSearch)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -226,7 +233,7 @@ public class StockInOutEntry extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 869, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 884, Short.MAX_VALUE)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -246,9 +253,14 @@ public class StockInOutEntry extends javax.swing.JPanel {
         initMain();
     }//GEN-LAST:event_formComponentShown
 
+    private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
+        // TODO add your handling code here:
+        search();
+    }//GEN-LAST:event_btnSearchActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JButton btnSearch;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;

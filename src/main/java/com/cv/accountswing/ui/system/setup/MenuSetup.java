@@ -10,10 +10,15 @@ import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.entity.Menu;
+import com.cv.accountswing.entity.Privilege;
+import com.cv.accountswing.entity.PrivilegeKey;
+import com.cv.accountswing.entity.UserRole;
 import com.cv.accountswing.entity.view.VRoleMenu;
 import com.cv.accountswing.entity.view.VRoleMenuKey;
 import com.cv.accountswing.service.COAService;
 import com.cv.accountswing.service.MenuService;
+import com.cv.accountswing.service.PrivilegeService;
+import com.cv.accountswing.service.UserRoleService;
 import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.util.Util1;
 import com.google.gson.Gson;
@@ -56,6 +61,10 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
     private TaskExecutor taskExecutor;
     @Autowired
     private ApplicationMainFrame mainFrame;
+    @Autowired
+    private UserRoleService userRoleService;
+    @Autowired
+    private PrivilegeService privilegeService;
     private LoadingObserver loadingObserver;
     private boolean isShown = false;
     private final String parentRootName = "Root Menu";
@@ -241,6 +250,7 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
             }
             Menu saveMenu = menuService.saveMenu(menu);
             if (saveMenu != null) {
+                savePrivileges(saveMenu.getId());
                 JOptionPane.showMessageDialog(Global.parentForm, "Saved");
                 VRoleMenu rMenu = new VRoleMenu();
                 VRoleMenuKey key = new VRoleMenuKey();
@@ -251,8 +261,27 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
                 rMenu.setParent(saveMenu.getParent());
                 rMenu.setOrderBy(saveMenu.getOrderBy());
                 selectedNode.setUserObject(rMenu);
-                treeModel.reload();
+                treeModel.reload(selectedNode);
                 clear();
+            }
+        }
+    }
+
+    private void savePrivileges(Integer menuId) {
+        if (menuId != null) {
+            List<UserRole> listUser = userRoleService.search("-", Global.compId.toString());
+            if (!listUser.isEmpty()) {
+                listUser.stream().map(role -> {
+                    Privilege p = new Privilege();
+                    PrivilegeKey key = new PrivilegeKey(role.getRoleId(), menuId);
+                    p.setKey(key);
+                    return p;
+                }).map(p -> {
+                    p.setIsAllow(Boolean.FALSE);
+                    return p;
+                }).forEachOrdered(p -> {
+                    privilegeService.save(p);
+                });
             }
         }
     }
@@ -276,6 +305,7 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
         txtMenuUrl.setText(menu.getMenuUrl());
         txtOrder.setText(menu.getOrderBy() == null ? null : menu.getOrderBy().toString());
         txtAccount.setText(menu.getSoureAccCode());
+        enableControl(true);
     }
 
     private void clear() {
@@ -283,6 +313,15 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
         txtMenuUrl.setText(null);
         txtOrder.setText(null);
         txtAccount.setText(null);
+        enableControl(false);
+
+    }
+
+    private void enableControl(boolean status) {
+        txtMenuName.setEditable(status);
+        txtMenuUrl.setEditable(status);
+        txtOrder.setEditable(status);
+        txtAccount.setEditable(status);
     }
 
     /**

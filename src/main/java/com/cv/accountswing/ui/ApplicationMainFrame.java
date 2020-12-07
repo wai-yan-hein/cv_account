@@ -716,9 +716,12 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             if (saleManId != null) {
                 Global.defaultSaleMan = saleManService.findById(saleManId);
             }
-            //Defatult Trader
-            String traderId = Global.sysProperties.get("system.default.customer");
-            Global.defaultTrader = traderService.findById(Util1.getInteger(traderId));
+            //Default Customer
+            String cusId = Global.sysProperties.get("system.default.customer");
+            Global.defaultCustomer = traderService.findById(Util1.getInteger(cusId));
+            //Default Supplier
+            String supId = Global.sysProperties.get("system.default.supplier");
+            Global.defaultSupplier = traderService.findById(Util1.getInteger(supId));
         } catch (Exception e) {
             LOGGER.error("Initialize Data :" + e.getMessage());
             JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Initialize Data", JOptionPane.ERROR_MESSAGE);
