@@ -42,7 +42,7 @@ public class AllCashCellRender extends DefaultTableCellRenderer {
 
         }
 
-        String s = "";
+        String s;
         if (value instanceof Double) {
             DecimalFormat dFormat = new DecimalFormat("#,##0.###");
             Double d = (Double) value;

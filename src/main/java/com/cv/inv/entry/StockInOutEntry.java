@@ -10,12 +10,13 @@ import com.cv.accountswing.common.Global;
 import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.util.Util1;
-import com.cv.inv.entity.StockInOut;
+import com.cv.inv.entity.StockInOutDetail;
 import com.cv.inv.entry.common.StockInOutTableModel;
 import com.cv.inv.entry.editor.LocationCellEditor;
 import com.cv.inv.entry.editor.StockCellEditor;
 import com.cv.inv.entry.editor.StockUnitEditor;
-import com.cv.inv.service.StockInOutService;
+import com.cv.inv.service.VouIdService;
+import com.cv.inv.util.GenVouNoImpl;
 import java.awt.event.KeyEvent;
 import java.util.List;
 import javax.swing.JTable;
@@ -24,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import com.cv.inv.service.StockInOutDetailService;
 
 /**
  *
@@ -36,7 +38,10 @@ public class StockInOutEntry extends javax.swing.JPanel {
     @Autowired
     private StockInOutTableModel outTableModel;
     @Autowired
-    private StockInOutService stockInOutService;
+    private StockInOutDetailService stockInOutService;
+    @Autowired
+    private VouIdService voudIdService;
+    private GenVouNoImpl vouEngine = null;
 
     /**
      * Creates new form StockInOutEntry
@@ -55,9 +60,9 @@ public class StockInOutEntry extends javax.swing.JPanel {
         log.info("Search Stock In Out");
         String fromDate = Util1.toDateStr(txtFromDate.getDate(), "yyyy-MM-dd");
         String toDate = Util1.toDateStr(txtToDate.getDate(), "yyyy-MM-dd");
-        String option = Util1.isNull(txtOption.getText(), "-");
+        String option = Util1.isNull(txtDesp.getText(), "-");
         String remak = Util1.isNull(txtRemark.getText(), "-");
-        List<StockInOut> listStock = stockInOutService.search(fromDate, toDate, "-", remak, option, remak);
+        List<StockInOutDetail> listStock = stockInOutService.search(fromDate, toDate, "-", remak, option, remak);
         outTableModel.setListStock(listStock);
         outTableModel.addEmptyRow();
         requestFocusTable();
@@ -71,6 +76,7 @@ public class StockInOutEntry extends javax.swing.JPanel {
     }
 
     private void initMain() {
+        genVouNo();
         initTable();
         search();
     }
@@ -78,6 +84,7 @@ public class StockInOutEntry extends javax.swing.JPanel {
     private void initTable() {
         outTableModel.addEmptyRow();
         outTableModel.setParent(tblStock);
+        outTableModel.setBatchCode(txtBatchNo.getText());
         tblStock.setModel(outTableModel);
         tblStock.getTableHeader().setFont(Global.tblHeaderFont);
         tblStock.getTableHeader().setForeground(ColorUtil.foreground);
@@ -109,7 +116,11 @@ public class StockInOutEntry extends javax.swing.JPanel {
         tblStock.getColumnModel().getColumn(11).setCellEditor(new AutoClearEditor());
         tblStock.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                 .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
+    }
 
+    private void genVouNo() {
+        vouEngine = new GenVouNoImpl(voudIdService, "StockInOut", Util1.getPeriod(Util1.getTodayDate()));
+        txtBatchNo.setText(vouEngine.genVouNo());
     }
 
     /**
@@ -129,10 +140,13 @@ public class StockInOutEntry extends javax.swing.JPanel {
         txtToDate = new com.toedter.calendar.JDateChooser();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        txtOption = new javax.swing.JTextField();
+        txtDesp = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
         txtRemark = new javax.swing.JTextField();
         btnSearch = new javax.swing.JButton();
+        jLabel6 = new javax.swing.JLabel();
+        txtBatchNo = new javax.swing.JTextField();
+        btnSearch1 = new javax.swing.JButton();
 
         setBackground(new java.awt.Color(255, 255, 255));
         addComponentListener(new java.awt.event.ComponentAdapter() {
@@ -168,7 +182,7 @@ public class StockInOutEntry extends javax.swing.JPanel {
 
         jLabel3.setText("ToDate");
 
-        jLabel4.setText("Option");
+        jLabel4.setText("Description");
 
         jLabel5.setText("Remark");
 
@@ -183,30 +197,49 @@ public class StockInOutEntry extends javax.swing.JPanel {
             }
         });
 
+        jLabel6.setText("BatchId");
+
+        btnSearch1.setBackground(ColorUtil.btnEdit);
+        btnSearch1.setFont(Global.lableFont);
+        btnSearch1.setForeground(ColorUtil.foreground);
+        btnSearch1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/search-button-white.png"))); // NOI18N
+        btnSearch1.setText("New");
+        btnSearch1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSearch1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
+                .addComponent(jLabel6)
+                .addGap(18, 18, 18)
+                .addComponent(txtBatchNo, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
                 .addComponent(jLabel2)
                 .addGap(18, 18, 18)
-                .addComponent(txtFromDate, javax.swing.GroupLayout.DEFAULT_SIZE, 146, Short.MAX_VALUE)
+                .addComponent(txtFromDate, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel3)
                 .addGap(18, 18, 18)
-                .addComponent(txtToDate, javax.swing.GroupLayout.DEFAULT_SIZE, 145, Short.MAX_VALUE)
+                .addComponent(txtToDate, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(txtOption, javax.swing.GroupLayout.DEFAULT_SIZE, 110, Short.MAX_VALUE)
+                .addComponent(txtDesp, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(txtRemark, javax.swing.GroupLayout.DEFAULT_SIZE, 110, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtRemark, javax.swing.GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addComponent(btnSearch1)
+                .addGap(11, 11, 11)
                 .addComponent(btnSearch)
-                .addContainerGap())
+                .addGap(12, 12, 12))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -214,15 +247,19 @@ public class StockInOutEntry extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(txtFromDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel2)
+                        .addComponent(txtBatchNo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(txtToDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel3)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jLabel4)
-                        .addComponent(txtOption, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtDesp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jLabel5)
                         .addComponent(txtRemark, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(btnSearch)))
+                        .addComponent(btnSearch)
+                        .addComponent(btnSearch1))
+                    .addComponent(jLabel6))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -233,7 +270,7 @@ public class StockInOutEntry extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 884, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -258,18 +295,26 @@ public class StockInOutEntry extends javax.swing.JPanel {
         search();
     }//GEN-LAST:event_btnSearchActionPerformed
 
+    private void btnSearch1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearch1ActionPerformed
+        // TODO add your handling code here:
+        genVouNo();
+    }//GEN-LAST:event_btnSearch1ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSearch;
+    private javax.swing.JButton btnSearch1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable tblStock;
+    private javax.swing.JTextField txtBatchNo;
+    private javax.swing.JTextField txtDesp;
     private com.toedter.calendar.JDateChooser txtFromDate;
-    private javax.swing.JTextField txtOption;
     private javax.swing.JTextField txtRemark;
     private com.toedter.calendar.JDateChooser txtToDate;
     // End of variables declaration//GEN-END:variables

@@ -113,24 +113,24 @@ public class SaleEntryTableModel extends AbstractTableModel {
     @Override
     public Class getColumnClass(int column) {
         switch (column) {
-            case 0: //Code
-                return String.class;
+            /*case 0: //Code
+            return String.class;
             case 1: //Name
-                return String.class;
+            return String.class;
             case 2: //Dept
-                return Department.class;
+            return Department.class;
             case 3://Location
-                return Location.class;
+            return Location.class;*/
             case 4: //Qty
                 return Float.class;
             case 5://Std-Wt
                 return Float.class;
-            case 6: //Unit
-                return Object.class;
+            /*case 6: //Unit
+                return Object.class;*/
             case 7: //Sale Price
-                return Double.class;
+                return Float.class;
             case 8: //Amount
-                return Double.class;
+                return Float.class;
             default:
                 return Object.class;
         }
@@ -349,7 +349,6 @@ public class SaleEntryTableModel extends AbstractTableModel {
                 detailHis.setStock(new Stock());
                 detailHis.setLocation(locationAutoCompleter.getLocation());
                 listDetail.add(detailHis);
-
                 fireTableRowsInserted(listDetail.size() - 1, listDetail.size() - 1);
                 parent.scrollRectToVisible(parent.getCellRect(parent.getRowCount() - 1, 0, true));
             }
@@ -472,13 +471,9 @@ public class SaleEntryTableModel extends AbstractTableModel {
 
     public List<SaleHisDetail> getListSaleDetail() {
         List<SaleHisDetail> listpurDetail = new ArrayList();
-        for (SaleHisDetail pdh2 : listDetail) {
-            if (pdh2.getStock() != null) {
-                if (pdh2.getStock().getStockCode() != null) {
-                    listpurDetail.add(pdh2);
-                }
-            }
-        }
+        listDetail.stream().filter(pdh2 -> (pdh2.getStock() != null)).filter(pdh2 -> (pdh2.getStock().getStockCode() != null)).forEachOrdered(pdh2 -> {
+            listpurDetail.add(pdh2);
+        });
 
         return listpurDetail;
     }
@@ -491,10 +486,7 @@ public class SaleEntryTableModel extends AbstractTableModel {
         boolean status = true;
         int uniqueId = 1;
         for (SaleHisDetail sdh : listDetail) {
-            if (Util1.getFloat(sdh.getAmount()) <= 0) {
-                status = false;
-                JOptionPane.showMessageDialog(Global.parentForm, "Could not saved because sale amount can't not be zero");
-            }
+
             if (uniqueId != listDetail.size()) {
                 if (Util1.NZeroDouble(sdh.getQuantity()) <= 0) {
                     JOptionPane.showMessageDialog(Global.parentForm, "Invalid quantity.",
@@ -536,7 +528,7 @@ public class SaleEntryTableModel extends AbstractTableModel {
         }
 
         SaleHisDetail sdh = listDetail.get(row);
-        if (sdh.getSaleDetailKey().getSaleDetailId() != null) {
+        if (sdh.getSaleDetailKey() != null) {
             deleteList.add(sdh.getSaleDetailKey().getSaleDetailId());
         }
 

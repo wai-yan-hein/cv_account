@@ -44,9 +44,9 @@ public class StockBalanceTmp implements Serializable {
     private String changeUnit2;
     @Column(name = "qty", nullable = false)
     private Float qty;
-    @Column(name = "std_wt", nullable = false)
+    @Column(name = "wt", nullable = false)
     private Float stdWt;
-    @Column(name = "std_wt_ttl", nullable = false)
+    @Column(name = "wt_ttl", nullable = false)
     private Float stdWtTotal;
     @Column(name = "small_unit", nullable = false)
     private String unit;

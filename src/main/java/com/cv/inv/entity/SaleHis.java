@@ -68,8 +68,9 @@ public class SaleHis implements java.io.Serializable {
     private AppUser createdBy;
     @Column(name = "session_id")
     private Integer session;
-    @Column(name = "updated_by")
-    private String updatedBy;
+    @ManyToOne
+    @JoinColumn(name = "updated_by")
+    private AppUser updatedBy;
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_date")
     private Date updatedDate;
@@ -229,20 +230,20 @@ public class SaleHis implements java.io.Serializable {
         this.createdBy = createdBy;
     }
 
-    public String getUpdatedBy() {
-        return updatedBy;
-    }
-
-    public void setUpdatedBy(String updatedBy) {
-        this.updatedBy = updatedBy;
-    }
-
     public Date getUpdatedDate() {
         return updatedDate;
     }
 
     public void setUpdatedDate(Date updatedDate) {
         this.updatedDate = updatedDate;
+    }
+
+    public AppUser getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(AppUser updatedBy) {
+        this.updatedBy = updatedBy;
     }
 
 }

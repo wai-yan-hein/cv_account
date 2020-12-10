@@ -42,7 +42,7 @@
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Component id="jScrollPane1" pref="334" max="32767" attributes="0"/>
+              <Component id="jScrollPane1" pref="312" max="32767" attributes="0"/>
               <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" max="-2" attributes="0">
                   <Component id="jPanel3" min="-2" max="-2" attributes="0"/>
@@ -456,7 +456,7 @@
                   </Group>
                   <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="txtGrandTotal" alignment="1" pref="206" max="32767" attributes="0"/>
+                      <Component id="txtGrandTotal" alignment="1" pref="242" max="32767" attributes="0"/>
                       <Component id="txtVouPaid" alignment="0" max="32767" attributes="0"/>
                       <Component id="txtVouBalance" alignment="0" max="32767" attributes="0"/>
                   </Group>
@@ -468,20 +468,20 @@
                   </Group>
                   <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="txtVouTotal" pref="206" max="32767" attributes="0"/>
+                      <Component id="txtVouTotal" max="32767" attributes="0"/>
                       <Group type="102" alignment="0" attributes="0">
-                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                              <Component id="txtTaxP" max="32767" attributes="0"/>
-                              <Component id="txtDiscP" max="32767" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="txtDiscP" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtTaxP" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace min="-2" pref="7" max="-2" attributes="0"/>
+                          <EmptySpace type="separate" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="jLabel7" min="-2" max="-2" attributes="0"/>
                               <Component id="jLabel15" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace min="-2" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="txtVouDiscount" max="32767" attributes="0"/>
+                              <Component id="txtVouDiscount" pref="71" max="32767" attributes="0"/>
                               <Component id="txtTax" max="32767" attributes="0"/>
                           </Group>
                           <EmptySpace min="-2" pref="1" max="-2" attributes="0"/>
@@ -507,14 +507,14 @@
                               <Component id="txtVouDiscount" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="txtDiscP" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace max="-2" attributes="0"/>
+                          <EmptySpace min="-2" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="jLabel16" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="txtTaxP" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="txtTax" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="jLabel15" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="txtVouBalance" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="jLabel8" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtTaxP" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
@@ -599,14 +599,6 @@
             <Property name="name" type="java.lang.String" value="txtVouDiscount" noResource="true"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JTextField" name="txtTaxP">
-          <Properties>
-            <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="Global.amtFont" type="code"/>
-            </Property>
-            <Property name="name" type="java.lang.String" value="txtTaxP" noResource="true"/>
-          </Properties>
-        </Component>
         <Component class="javax.swing.JFormattedTextField" name="txtTax">
           <Properties>
             <Property name="horizontalAlignment" type="int" value="4"/>
@@ -657,12 +649,23 @@
             <Property name="text" type="java.lang.String" value="%"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JTextField" name="txtDiscP">
+        <Component class="javax.swing.JFormattedTextField" name="txtDiscP">
           <Properties>
+            <Property name="horizontalAlignment" type="int" value="4"/>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="Global.amtFont" type="code"/>
             </Property>
-            <Property name="name" type="java.lang.String" value="txtDiscP" noResource="true"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtDiscPActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JFormattedTextField" name="txtTaxP">
+          <Properties>
+            <Property name="horizontalAlignment" type="int" value="4"/>
+            <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="Global.amtFont" type="code"/>
+            </Property>
           </Properties>
         </Component>
       </SubComponents>

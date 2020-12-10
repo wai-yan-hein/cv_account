@@ -5,8 +5,7 @@
  */
 package com.cv.inv.service;
 
-import com.cv.inv.dao.StockInOutDao;
-import com.cv.inv.entity.StockInOut;
+import com.cv.inv.entity.StockInOutDetail;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,28 +18,23 @@ import com.cv.inv.dao.StockInOutDetailDao;
  */
 @Service
 @Transactional
-public class StockInOutServiceImpl implements StockInOutService {
+public class StockInOutDetailServiceImpl implements StockInOutDetailService {
 
     @Autowired
-    private StockInOutDao dao;
+    private StockInOutDetailDao dao;
 
     @Override
-    public StockInOut findById(String id) {
-        return dao.findById(id);
-    }
-
-    @Override
-    public StockInOut save(StockInOut stock) {
+    public StockInOutDetail save(StockInOutDetail stock) {
         return dao.save(stock);
     }
 
     @Override
-    public List<StockInOut> search(String batchCode, String date, String desp, String remark) {
-        return dao.search(batchCode, date, desp, remark);
+    public List<StockInOutDetail> search(String fromDate, String toDate, String stockCode, String locId, String option, String remark) {
+        return dao.search(fromDate, toDate, stockCode, locId, option, remark);
     }
 
     @Override
-    public int delete(String id) {
+    public int delete(Integer id) {
         return dao.delete(id);
     }
 

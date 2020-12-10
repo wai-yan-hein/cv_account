@@ -120,36 +120,38 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
 
     private void search() {
         LOGGER.info("Search Sale History.");
-        String customerId;
-        String vouStatusId;
-        String userId;
-        String machineId;
+        String customerId = "-";
+        String vouStatusId = "-";
+        String userId = "-";
+        String machineId = "-";
         String fromDate = Util1.toDateStr(txtFromDate.getDate(), "yyyy-MM-dd");
         String toDate = Util1.toDateStr(txtToDate.getDate(), "yyyy-MM-dd");
         if (traderAutoCompleter.getTrader() != null) {
             customerId = traderAutoCompleter.getTrader().getId().toString();
-        } else {
+        }
+        if (txtCus.getText().isEmpty() || traderAutoCompleter.getTrader() == null) {
             customerId = "-";
         }
         if (vouCompleter.getVouStatus() != null) {
             vouStatusId = vouCompleter.getVouStatus().getVouStatusId().toString();
-        } else {
+        }
+        if (vouCompleter.getVouStatus() == null || txtVouNo.getText().isEmpty()) {
             vouStatusId = "-";
         }
-
-        String remark = Util1.isNull(txtRemark.getText(), "-");
-        String stockId = codeTableModel.getFilterCodeStr();
         if (appUserAutoCompleter.getAppUser() != null) {
             userId = appUserAutoCompleter.getAppUser().getUserId().toString();
-        } else {
+        }
+        if (appUserAutoCompleter.getAppUser() == null || txtUser.getText().isEmpty()) {
             userId = "-";
         }
         if (machAutoCompleter.getManchineInfo() != null) {
             machineId = machAutoCompleter.getManchineInfo().getMachineId().toString();
-        } else {
+        }
+        if (machAutoCompleter.getManchineInfo() == null || txtMachine.getText().isEmpty()) {
             machineId = "-";
         }
-
+        String remark = Util1.isNull(txtRemark.getText(), "-");
+        String stockId = codeTableModel.getFilterCodeStr();
         List<SaleHis> listHis = saleHisService.search(fromDate, toDate, customerId,
                 vouStatusId, remark, stockId, userId, machineId);
         saleVouTableModel.setListSaleHis(listHis);

@@ -21,28 +21,25 @@ import com.cv.accountswing.util.NumberUtil;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.PurHis;
 import com.cv.inv.entity.PurHisDetail;
-import com.cv.inv.entry.common.PurchaseEntryTableModel;
+import com.cv.inv.entry.common.PurchaseEntryTableModelUnit;
 import com.cv.inv.entry.dialog.PurchaseVouSearch;
 import com.cv.inv.entry.editor.LocationAutoCompleter;
 import com.cv.inv.entry.editor.LocationCellEditor;
 import com.cv.inv.entry.editor.StockCellEditor;
+import com.cv.inv.entry.editor.StockUnitEditor;
 import com.cv.inv.entry.editor.VouStatusAutoCompleter;
 import com.cv.inv.service.PurchaseDetailService;
 import com.cv.inv.service.PurchaseHisService;
 import com.cv.inv.service.VouIdService;
-import com.cv.inv.ui.commom.VouFormatFactory;
 import com.cv.inv.util.GenVouNoImpl;
 import com.toedter.calendar.JTextFieldDateEditor;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
@@ -60,16 +57,16 @@ import org.springframework.stereotype.Component;
  * @author Mg Kyaw Thura Aung
  */
 @Component
-public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserver, KeyListener, PanelControl {
+public class PurchaseEntryUnit extends javax.swing.JPanel implements SelectionObserver, KeyListener, PanelControl {
 
     /**
      * Creates new form PurchaseEntry
      *
      */
     private final Image historyIcon = new ImageIcon(this.getClass().getResource("/images/history_icon.png")).getImage();
-    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(PurchaseEntry.class);
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(PurchaseEntryUnit.class);
     @Autowired
-    private PurchaseEntryTableModel purTableModel;
+    private PurchaseEntryTableModelUnit purTableModel;
     @Autowired
     private PurchaseDetailService purchaseDetailService;
     @Autowired
@@ -85,8 +82,9 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
     private VouStatusAutoCompleter vouCompleter;
     private CurrencyAutoCompleter currAutoCompleter;
     private TraderAutoCompleter traderAutoCompleter;
+    private DepartmentAutoCompleter departmentAutoCompleter;
     private LoadingObserver loadingObserver;
-    private PurHis ph = new PurHis();
+    private final PurHis ph = new PurHis();
     //private Gl ph;
     private GenVouNoImpl vouEngine;
     private List<PurHisDetail> listDetail = new ArrayList();
@@ -104,23 +102,24 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
         this.loadingObserver = loadingObserver;
     }
 
-    public PurchaseEntry() {
+    public PurchaseEntryUnit() {
         initComponents();
         initKeyListener();
         initTextBoxValue();
         initTextBoxFormat();
-        actionMapping();
     }
 
     public void initMain() {
         initCombo();
+        actionMapping();
         assignDefalutValue();
         initPurTable();
+        isShown = true;
+        // calculateTotalAmount();
     }
 
     private void genVouNo() {
-        vouEngine = new GenVouNoImpl(vouIdService, "Purchase", Util1.getPeriod(txtPurDate.getDate()));
-        LOGGER.info("Voucher No :" + vouEngine.genVouNo());
+        vouEngine = new GenVouNoImpl(vouIdService, "RetIn", Util1.getPeriod(txtPurDate.getDate()));
         txtVouNo.setText(vouEngine.genVouNo());
     }
 
@@ -141,35 +140,27 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
         tblPurchase.getColumnModel().getColumn(3).setPreferredWidth(50);//location
         tblPurchase.getColumnModel().getColumn(4).setPreferredWidth(10);//qty
         tblPurchase.getColumnModel().getColumn(5).setPreferredWidth(10);//std-wt
-        tblPurchase.getColumnModel().getColumn(6).setPreferredWidth(30);//avg-wt
-        tblPurchase.getColumnModel().getColumn(7).setPreferredWidth(40);//pur price
-        tblPurchase.getColumnModel().getColumn(8).setPreferredWidth(40);//amount
+        tblPurchase.getColumnModel().getColumn(6).setPreferredWidth(5);//unit
+        tblPurchase.getColumnModel().getColumn(7).setPreferredWidth(30);//avg-wt
+        tblPurchase.getColumnModel().getColumn(8).setPreferredWidth(40);//pur price
+        tblPurchase.getColumnModel().getColumn(9).setPreferredWidth(40);//amount
         tblPurchase.getColumnModel().getColumn(0).setCellEditor(new StockCellEditor());//code
         tblPurchase.getColumnModel().getColumn(2).setCellEditor(new DepartmentCellEditor());
         tblPurchase.getColumnModel().getColumn(3).setCellEditor(new LocationCellEditor());//loc
         tblPurchase.getColumnModel().getColumn(4).setCellEditor(new AutoClearEditor());//qty
         tblPurchase.getColumnModel().getColumn(5).setCellEditor(new AutoClearEditor());//std-wt
-        tblPurchase.getColumnModel().getColumn(6).setCellEditor(new AutoClearEditor());//avg-wt
-        tblPurchase.getColumnModel().getColumn(7).setCellEditor(new AutoClearEditor());//pur price
-        tblPurchase.getColumnModel().getColumn(8).setCellEditor(new AutoClearEditor());//amt
+        tblPurchase.getColumnModel().getColumn(6).setCellEditor(new StockUnitEditor());//unit
+        tblPurchase.getColumnModel().getColumn(7).setCellEditor(new AutoClearEditor());//avg-wt
+        tblPurchase.getColumnModel().getColumn(8).setCellEditor(new AutoClearEditor());//pur price
+        tblPurchase.getColumnModel().getColumn(9).setCellEditor(new AutoClearEditor());//amt
         //table render
-        tblPurchase.setDefaultRenderer(Object.class, new TableCellRender());
         tblPurchase.setDefaultRenderer(Float.class, new TableCellRender());
+        tblPurchase.setDefaultRenderer(Double.class, new TableCellRender());
+        tblPurchase.setDefaultRenderer(Object.class, new TableCellRender());
         //foucs enter
         tblPurchase.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                 .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
         tblPurchase.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        focusTable();
-
-    }
-
-    private void focusTable() {
-        int rowCount = tblPurchase.getRowCount();
-        if (rowCount > 0) {
-            tblPurchase.setColumnSelectionInterval(0, 0);
-            tblPurchase.setRowSelectionInterval(rowCount - 1, rowCount - 1);
-            tblPurchase.requestFocus();
-        }
     }
 
     private void initKeyListener() {
@@ -204,17 +195,12 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
     }
 
     private void initTextBoxFormat() {
-        try {
-            txtVouNo.setFormatterFactory(new VouFormatFactory());
-            txtVouTotal.setFormatterFactory(NumberUtil.getDecimalFormat());
-            txtVouDiscount.setFormatterFactory(NumberUtil.getDecimalFormat());
-            txtTax.setFormatterFactory(NumberUtil.getDecimalFormat());
-            txtVouPaid.setFormatterFactory(NumberUtil.getDecimalFormat());
-            txtVouBalance.setFormatterFactory(NumberUtil.getDecimalFormat());
-            txtDiscP.setFormatterFactory(NumberUtil.getDecimalFormat());
-        } catch (ParseException ex) {
-            LOGGER.error("initTextBoxFormat :" + ex.getMessage());
-        }
+        txtVouTotal.setFormatterFactory(NumberUtil.getDecimalFormat());
+        txtVouDiscount.setFormatterFactory(NumberUtil.getDecimalFormat());
+        txtTax.setFormatterFactory(NumberUtil.getDecimalFormat());
+        txtVouPaid.setFormatterFactory(NumberUtil.getDecimalFormat());
+        txtVouBalance.setFormatterFactory(NumberUtil.getDecimalFormat());
+        txtDiscP.setFormatterFactory(NumberUtil.getDecimalFormat());
     }
 
     private void initCombo() {
@@ -236,7 +222,6 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
             vouCompleter.setVouStatus(Global.defaultVouStatus);
             traderAutoCompleter.setTrader(Global.defaultSupplier);
             genVouNo();
-            txtVouNo.requestFocus();
         } catch (Exception e) {
             LOGGER.info("Assign Default Value :" + e.getMessage());
             JOptionPane.showMessageDialog(Global.parentForm, "Defalut Values are missing in System Property.");
@@ -250,7 +235,6 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
         initTextBoxValue();
         purTableModel.clear();
         lblStatus.setText("NEW");
-        ph = new PurHis();
         genVouNo();
     }
 
@@ -259,10 +243,9 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
             List<String> delList = purTableModel.getDelList();
             try {
                 purchaseDetailService.save(ph, purTableModel.getListPurDetail(), delList);
-                if (lblStatus.getText().equals("NEW")) {
-                    vouEngine.updateVouNo();
-                }
                 clear();
+                vouEngine.updateVouNo();
+                genVouNo();
             } catch (Exception ex) {
                 LOGGER.error("Save Purchase :" + ex.getMessage());
                 JOptionPane.showMessageDialog(Global.parentForm, "Could'nt saved.");
@@ -353,15 +336,33 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
             locCompleter.setLocation(purHis.getLocation());
             traderAutoCompleter.setTrader(purHis.getCustomerId());
             vouCompleter.setVouStatus(purHis.getVouStatus());
+            if (purHis.getDeptCode() != null) {
+                departmentAutoCompleter.setDepartment(purHis.getDeptCode());
+            }
             currAutoCompleter.setCurrency(purHis.getCurrency());
-            txtVouTotal.setValue(purHis.getVouTotal());
+            txtVouTotal.setValue(purHis.getVouTotal()); 
             txtVouPaid.setText(purHis.getPaid().toString());
-            txtVouDiscount.setValue(Util1.getDouble(purHis.getDiscount()));
-            txtDiscP.setValue(Util1.getDouble(purHis.getDiscP()));
-            txtVouBalance.setValue(Util1.getDouble(purHis.getBalance()));
-            txtTaxP.setValue(Util1.getDouble(purHis.getTaxP()));
-            txtTax.setValue(Util1.getDouble(purHis.getTaxAmt()));
-            ph.setCreatedBy(purHis.getCreatedBy());
+            if (purHis.getDiscount() == null) {
+                txtVouDiscount.setText("0.0");
+            } else {
+                txtVouDiscount.setText(purHis.getDiscount().toString());
+            }
+            txtVouBalance.setText(purHis.getBalance().toString());
+            if (purHis.getDiscP() == null) {
+                txtDiscP.setText("0.0");
+            } else {
+                txtDiscP.setText(purHis.getDiscP().toString());
+            }
+            if (purHis.getTaxP() == null) {
+                txtTaxP.setText("0.0");
+            } else {
+                txtTaxP.setText(purHis.getTaxP().toString());
+            }
+            if (purHis.getTaxAmt() == null) {
+                txtTax.setText("0.0");
+            } else {
+                txtTax.setText(purHis.getTaxAmt().toString());
+            }
             purTableModel.setListPurDetail(listDetailHis);
         }
     }
@@ -477,11 +478,11 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
         txtDiscP = new javax.swing.JFormattedTextField();
         jLabel13 = new javax.swing.JLabel();
         txtVouDiscount = new javax.swing.JFormattedTextField();
+        txtTaxP = new javax.swing.JTextField();
         jLabel15 = new javax.swing.JLabel();
         txtTax = new javax.swing.JFormattedTextField();
         txtVouPaid = new javax.swing.JFormattedTextField();
         txtVouBalance = new javax.swing.JFormattedTextField();
-        txtTaxP = new javax.swing.JFormattedTextField();
 
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentShown(java.awt.event.ComponentEvent evt) {
@@ -726,6 +727,9 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
         txtVouDiscount.setFont(Global.amtFont);
         txtVouDiscount.setName("txtVouDiscount"); // NOI18N
 
+        txtTaxP.setFont(Global.amtFont);
+        txtTaxP.setName("txtTaxP"); // NOI18N
+
         jLabel15.setFont(Global.lableFont);
         jLabel15.setText("%");
 
@@ -740,9 +744,6 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
         txtVouBalance.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         txtVouBalance.setFont(Global.amtFont);
         txtVouBalance.setName("txtVouBalance"); // NOI18N
-
-        txtTaxP.setFont(Global.amtFont);
-        txtTaxP.setName("txtDiscP"); // NOI18N
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -761,9 +762,9 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
                     .addComponent(txtVouBalance, javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(txtVouPaid, javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel3Layout.createSequentialGroup()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtDiscP, javax.swing.GroupLayout.DEFAULT_SIZE, 138, Short.MAX_VALUE)
-                            .addComponent(txtTaxP, javax.swing.GroupLayout.DEFAULT_SIZE, 138, Short.MAX_VALUE))
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(txtTaxP, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 138, Short.MAX_VALUE)
+                            .addComponent(txtDiscP, javax.swing.GroupLayout.Alignment.LEADING))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel3Layout.createSequentialGroup()
@@ -793,9 +794,9 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel14)
+                    .addComponent(txtTaxP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel15)
-                    .addComponent(txtTax, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtTaxP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtTax, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel16)
@@ -839,6 +840,10 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         mainFrame.setControl(this);
+        if (!isShown) {
+            initMain();
+        }
+        txtVouNo.requestFocus();
     }//GEN-LAST:event_formComponentShown
 
     private void txtSupplierFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtSupplierFocusGained
@@ -890,7 +895,7 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
     private javax.swing.JTextField txtRemark;
     private javax.swing.JTextField txtSupplier;
     private javax.swing.JFormattedTextField txtTax;
-    private javax.swing.JFormattedTextField txtTaxP;
+    private javax.swing.JTextField txtTaxP;
     private javax.swing.JFormattedTextField txtVouBalance;
     private javax.swing.JFormattedTextField txtVouDiscount;
     private javax.swing.JFormattedTextField txtVouNo;

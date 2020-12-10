@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
  * @author Mg Kyaw Thura Aung
  */
 public class SaleManAutoCompleter implements KeyListener, SelectionObserver {
-
+    
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(SaleManAutoCompleter.class);
     private JTable table = new JTable();
     private JPopupMenu popup = new JPopupMenu();
@@ -56,21 +56,21 @@ public class SaleManAutoCompleter implements KeyListener, SelectionObserver {
     private int x = 0;
     private boolean popupOpen = false;
     private SelectionObserver selectionObserver;
-
+    
     public void setSelectionObserver(SelectionObserver selectionObserver) {
         this.selectionObserver = selectionObserver;
     }
-
+    
     public SaleManAutoCompleter() {
     }
-
+    
     public SaleManAutoCompleter(JTextComponent comp, List<SaleMan> list,
             AbstractCellEditor editor) {
         this.textComp = comp;
         this.editor = editor;
         textComp.putClientProperty(AUTOCOMPLETER, this);
         textComp.setFont(Global.textFont);
-
+        
         saleManTableModel = new SaleManCompleterTableModel(list);
         table.setModel(saleManTableModel);
         table.setSize(50, 50);
@@ -81,12 +81,12 @@ public class SaleManAutoCompleter implements KeyListener, SelectionObserver {
         sorter = new TableRowSorter(table.getModel());
         table.setRowSorter(sorter);
         JScrollPane scroll = new JScrollPane(table);
-
+        
         scroll.setBorder(null);
         table.setFocusable(false);
         table.getColumnModel().getColumn(0).setPreferredWidth(40);//Code
         table.getColumnModel().getColumn(1).setPreferredWidth(100);
-
+        
         table.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -95,15 +95,15 @@ public class SaleManAutoCompleter implements KeyListener, SelectionObserver {
                 }
             }
         });
-
+        
         scroll.getVerticalScrollBar().setFocusable(false);
         scroll.getHorizontalScrollBar().setFocusable(false);
-
+        
         popup.setBorder(BorderFactory.createLineBorder(Color.black));
         popup.setPopupSize(600, 300);
-
+        
         popup.add(scroll);
-
+        
         if (textComp instanceof JTextField) {
             textComp.registerKeyboardAction(showAction, KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0),
                     JComponent.WHEN_FOCUSED);
@@ -113,52 +113,54 @@ public class SaleManAutoCompleter implements KeyListener, SelectionObserver {
                     popupOpen = true;
                     showPopup();
                 }
-
+                
             });
             textComp.getDocument().addDocumentListener(documentListener);
         } else {
             textComp.registerKeyboardAction(showAction, KeyStroke.getKeyStroke(KeyEvent.VK_SPACE,
                     KeyEvent.CTRL_MASK), JComponent.WHEN_FOCUSED);
         }
-
+        
         textComp.registerKeyboardAction(upAction, KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0),
                 JComponent.WHEN_FOCUSED);
         textComp.registerKeyboardAction(hidePopupAction, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_FOCUSED);
-
+        
         popup.addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
             }
-
+            
             @Override
             public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
                 textComp.unregisterKeyboardAction(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
                 popupOpen = false;
-
+                
             }
-
+            
             @Override
             public void popupMenuCanceled(PopupMenuEvent e) {
             }
         });
-
+        
         table.setRequestFocusEnabled(false);
-
+        
         if (list.size() > 0) {
             table.setRowSelectionInterval(0, 0);
         }
     }
-
+    
     public SaleMan getSaleMan() {
         return saleMan;
     }
-
+    
     public void setSaleMan(SaleMan saleMan) {
         this.saleMan = saleMan;
-        this.textComp.setText(saleMan.getSaleManName());
+        if (this.saleMan != null) {
+            this.textComp.setText(saleMan.getSaleManName());
+        }
     }
-
+    
     public void mouseSelect() {
         if (table.getSelectedRow() != -1) {
             saleMan = saleManTableModel.getSaleMan(table.convertRowIndexToModel(
@@ -174,11 +176,11 @@ public class SaleManAutoCompleter implements KeyListener, SelectionObserver {
         popup.setVisible(false);
         if (editor != null) {
             editor.stopCellEditing();
-
+            
         }
-
+        
     }
-
+    
     private Action acceptAction = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -199,7 +201,7 @@ public class SaleManAutoCompleter implements KeyListener, SelectionObserver {
             }*/
         }
     };
-
+    
     DocumentListener documentListener = new DocumentListener() {
         @Override
         public void insertUpdate(DocumentEvent e) {
@@ -208,7 +210,7 @@ public class SaleManAutoCompleter implements KeyListener, SelectionObserver {
                 showPopup();
             }
         }
-
+        
         @Override
         public void removeUpdate(DocumentEvent e) {
             if (editor != null) {
@@ -216,17 +218,17 @@ public class SaleManAutoCompleter implements KeyListener, SelectionObserver {
                 showPopup();
             }
         }
-
+        
         @Override
         public void changedUpdate(DocumentEvent e) {
         }
     };
-
+    
     public void closePopup() {
         popup.setVisible(false);
         popupOpen = false;
     }
-
+    
     public void showPopup() {
         if (popupOpen) {
             if (!popup.isVisible()) {
@@ -236,17 +238,17 @@ public class SaleManAutoCompleter implements KeyListener, SelectionObserver {
                     if (textComp instanceof JTextField) {
                         textComp.getDocument().addDocumentListener(documentListener);
                     }
-
+                    
                     textComp.registerKeyboardAction(acceptAction, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
                             JComponent.WHEN_FOCUSED);
                     if (x == 0) {
                         x = textComp.getCaretPosition();
                     }
-
+                    
                     popup.show(textComp, x, textComp.getHeight());
                     log.info("Show Popup...");
                     popupOpen = false;
-
+                    
                 } else {
                     popup.setVisible(false);
                     popupOpen = false;
@@ -255,7 +257,7 @@ public class SaleManAutoCompleter implements KeyListener, SelectionObserver {
         }
         textComp.requestFocus();
     }
-
+    
     Action showAction = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -269,7 +271,7 @@ public class SaleManAutoCompleter implements KeyListener, SelectionObserver {
                         popupOpen = true;
                         completer.showPopup();
                     }
-
+                    
                 }
             }
         }
@@ -297,18 +299,18 @@ public class SaleManAutoCompleter implements KeyListener, SelectionObserver {
             }
         }
     };
-
+    
     protected void selectNextPossibleValue() {
         int si = table.getSelectedRow();
-
+        
         if (si < table.getRowCount() - 1) {
             try {
                 table.setRowSelectionInterval(si + 1, si + 1);
             } catch (Exception ex) {
-
+                
             }
         }
-
+        
         Rectangle rect = table.getCellRect(table.getSelectedRow(), 0, true);
         table.scrollRectToVisible(rect);
     }
@@ -319,29 +321,29 @@ public class SaleManAutoCompleter implements KeyListener, SelectionObserver {
      */
     protected void selectPreviousPossibleValue() {
         int si = table.getSelectedRow();
-
+        
         if (si > 0) {
             try {
                 table.setRowSelectionInterval(si - 1, si - 1);
             } catch (Exception ex) {
-
+                
             }
         }
-
+        
         Rectangle rect = table.getCellRect(table.getSelectedRow(), 0, true);
         table.scrollRectToVisible(rect);
     }
-
+    
     @Override
     public void keyTyped(KeyEvent e) {
-
+        
     }
-
+    
     @Override
     public void keyPressed(KeyEvent e) {
-
+        
     }
-
+    
     @Override
     public void keyReleased(KeyEvent e) {
         String filter = textComp.getText();
@@ -360,15 +362,15 @@ public class SaleManAutoCompleter implements KeyListener, SelectionObserver {
                     table.setRowSelectionInterval(0, 0);
                 }
             }
-
+            
         }
     }
-
+    
     @Override
     public void selected(Object source, Object selectObj) {
-
+        
     }
-
+    
     private final RowFilter<Object, Object> startsWithFilter = new RowFilter<Object, Object>() {
         @Override
         public boolean include(RowFilter.Entry<? extends Object, ? extends Object> entry) {
@@ -384,15 +386,15 @@ public class SaleManAutoCompleter implements KeyListener, SelectionObserver {
              * textComp.getText().toUpperCase())) { return true; }
              }
              */
-
+            
             String tmp1 = entry.getStringValue(0).toUpperCase();
             String tmp2 = entry.getStringValue(1).toUpperCase();
             String tmp3 = entry.getStringValue(3).toUpperCase();
             String tmp4 = entry.getStringValue(4).toUpperCase();
             String text = textComp.getText().toUpperCase();
-
+            
             return tmp1.startsWith(text) || tmp2.startsWith(text) || tmp3.startsWith(text) || tmp4.startsWith(text);
         }
     };
-
+    
 }

@@ -433,10 +433,12 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                 switch (panelName) {
                     case "Sale Entry":
                         saleEntry.setName(panelName);
+                        saleEntry.initMain();
                         saleEntry.setLoadingObserver(this);
                         return saleEntry;
                     case "Purchase Entry":
                         purchaseEntry.setName(panelName);
+                        purchaseEntry.initMain();
                         purchaseEntry.setLoadingObserver(this);
                         return purchaseEntry;
                     case "Return In":
@@ -906,7 +908,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             }
         });
 
-        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         jPanel1.setFocusable(false);
 
@@ -918,7 +919,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
 
         btnSave.setBackground(ColorUtil.mainColor);
         btnSave.setFont(Global.lableFont);
-        btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save.png"))); // NOI18N
+        btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save_20px.png"))); // NOI18N
         btnSave.setToolTipText("F5 - Save");
         btnSave.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -929,7 +930,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
 
         btnPrint.setBackground(ColorUtil.mainColor);
         btnPrint.setFont(Global.lableFont);
-        btnPrint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/printer.png"))); // NOI18N
+        btnPrint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/print_20px.png"))); // NOI18N
         btnPrint.setToolTipText("F6 - Print");
         btnPrint.setFocusable(false);
         btnPrint.addActionListener(new java.awt.event.ActionListener() {
@@ -940,7 +941,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         toolBar.add(btnPrint);
 
         btnRefresh.setBackground(ColorUtil.mainColor);
-        btnRefresh.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/refresh.png"))); // NOI18N
+        btnRefresh.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/refresh_20px.png"))); // NOI18N
         btnRefresh.setToolTipText("F7 - Refresh");
         btnRefresh.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -951,7 +952,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
 
         btnDelete.setBackground(ColorUtil.mainColor);
         btnDelete.setFont(Global.lableFont);
-        btnDelete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/delete.png"))); // NOI18N
+        btnDelete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/trash_20px.png"))); // NOI18N
         btnDelete.setToolTipText("F8 - Delete");
         btnDelete.setFocusable(false);
         btnDelete.addActionListener(new java.awt.event.ActionListener() {
@@ -963,7 +964,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
 
         btnHistory.setBackground(ColorUtil.mainColor);
         btnHistory.setFont(Global.lableFont);
-        btnHistory.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/history.png"))); // NOI18N
+        btnHistory.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/time_machine_20px.png"))); // NOI18N
         btnHistory.setToolTipText("F9-History");
         btnHistory.setFocusable(false);
         btnHistory.addActionListener(new java.awt.event.ActionListener() {
@@ -975,7 +976,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
 
         btnClear.setBackground(ColorUtil.mainColor);
         btnClear.setFont(Global.lableFont);
-        btnClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/clean-code.png"))); // NOI18N
+        btnClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/add_file_20px.png"))); // NOI18N
         btnClear.setToolTipText("F10 - Clear ");
         btnClear.setFocusable(false);
         btnClear.addActionListener(new java.awt.event.ActionListener() {
@@ -987,7 +988,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
 
         btnLogout.setBackground(ColorUtil.mainColor);
         btnLogout.setFont(Global.lableFont);
-        btnLogout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/logout.png"))); // NOI18N
+        btnLogout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/logout_rounded_down_20px.png"))); // NOI18N
         btnLogout.setToolTipText("Logout");
         btnLogout.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1002,6 +1003,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         lblNeworkPing.setToolTipText("Internet Connection Status");
 
         txtSearch.setFont(Global.textFont);
+        txtSearch.setFocusable(false);
         txtSearch.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 txtSearchKeyReleased(evt);
@@ -1021,9 +1023,9 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(toolBar, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(toolBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(lblCompanyName, javax.swing.GroupLayout.DEFAULT_SIZE, 264, Short.MAX_VALUE)
+                .addComponent(lblCompanyName, javax.swing.GroupLayout.PREFERRED_SIZE, 204, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1042,12 +1044,16 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                     .addComponent(toolBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(0, 0, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(lblNeworkPing, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lblNeworkImage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel1))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(lblNeworkImage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(lblNeworkPing, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))))
                 .addContainerGap())
         );
 
@@ -1068,7 +1074,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(tabMain, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 738, Short.MAX_VALUE)
+            .addComponent(tabMain, javax.swing.GroupLayout.Alignment.TRAILING)
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
@@ -1076,7 +1082,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tabMain, javax.swing.GroupLayout.DEFAULT_SIZE, 343, Short.MAX_VALUE)
+                .addComponent(tabMain, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
                 .addContainerGap())
         );
 

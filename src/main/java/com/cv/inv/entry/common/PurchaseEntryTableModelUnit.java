@@ -14,6 +14,7 @@ import com.cv.inv.entity.Location;
 import com.cv.inv.entity.PurHisDetail;
 import com.cv.inv.entity.RelationKey;
 import com.cv.inv.entity.Stock;
+import com.cv.inv.entity.StockUnit;
 import com.cv.inv.entity.UnitRelation;
 import com.cv.inv.entry.editor.LocationAutoCompleter;
 import com.cv.inv.service.RelationService;
@@ -33,11 +34,11 @@ import org.springframework.stereotype.Component;
  * @author Mg Kyaw Thura Aung
  */
 @Component
-public class PurchaseEntryTableModel extends AbstractTableModel {
+public class PurchaseEntryTableModelUnit extends AbstractTableModel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PurchaseEntryTableModel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PurchaseEntryTableModelUnit.class);
     private String[] columnNames = {"Code", "Description", "Department", "Location",
-        "Qty", "Std-Wt", "Avg-Wt", "Pur Price", "Amount"};
+        "Qty", "Std-Wt", "Unit", "Avg-Wt", "Pur Price", "Amount"};
     private JTable parent;
     private List<PurHisDetail> listPurDetail = new ArrayList();
     private final List<String> delList = new ArrayList();
@@ -79,7 +80,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
 
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
-        return columnIndex != 9 && columnIndex != 1 && columnIndex != 5; //To change body of generated methods, choose Tools | Templates.
+        return columnIndex != 9 && columnIndex != 1; //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
@@ -93,14 +94,26 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
     @Override
     public Class<?> getColumnClass(int columnIndex) {
         switch (columnIndex) {
+            case 0:
+                return String.class;
+            case 1:
+                return String.class;
+            case 2:
+                return Department.class;
+            case 3:
+                return Location.class;
             case 4:
                 return Float.class;
+            case 5:
+                return String.class;
             case 6:
                 return Float.class;
             case 7:
                 return Float.class;
             case 8:
                 return Float.class;
+            case 9:
+                return String.class;
             default:
                 return Object.class;
         }
@@ -133,16 +146,14 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
             case 4:
                 return pur.getQty();
             case 5:
-                if (pur.getStdWeight() != null && pur.getPurUnit() != null) {
-                    return pur.getStdWeight() + "-" + pur.getPurUnit();
-                } else {
-                    return null;
-                }
+                return pur.getStdWeight();
             case 6:
-                return pur.getAvgWeight();
+                return pur.getPurUnit();
             case 7:
-                return pur.getPurPrice();
+                return pur.getAvgWeight();
             case 8:
+                return pur.getPurPrice();
+            case 9:
                 return pur.getPurAmt();
 
             default:
@@ -161,6 +172,8 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
         }
         try {
             PurHisDetail pur = listPurDetail.get(rowIndex);
+            boolean isAmount = false;
+
             switch (columnIndex) {
                 case 0://Stock
                     if (aValue instanceof Stock) {
@@ -207,12 +220,52 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                         showMessageBox("Input value must be number.");
                         parent.setColumnSelectionInterval(columnIndex, columnIndex);
                     }
-                    parent.setColumnSelectionInterval(6, 6);
+                    parent.setColumnSelectionInterval(5, 5);
                     break;
-                case 6://avg-wt
+                case 5://std wt
                     if (NumberUtil.isNumber(aValue)) {
                         if (NumberUtil.isPositive(aValue)) {
-                            pur.setAvgWeight(Util1.getFloat(aValue));
+                            pur.setStdWeight(Util1.getFloat(aValue));
+                            //calculation with unit
+                            String toUnit = pur.getPurUnit().getItemUnitCode();
+                            Float calAmount = calPrice(pur, toUnit);
+                            //  pur.setPurPrice(calAmount);
+                            pur.setPurAmt(calAmount);
+                            isAmount = true;
+                            parent.setColumnSelectionInterval(5, 5);
+                        } else {
+                            showMessageBox("Input value must be positive");
+                            parent.setColumnSelectionInterval(columnIndex, columnIndex);
+                        }
+
+                    } else {
+                        showMessageBox("Input value must be number.");
+                        parent.setColumnSelectionInterval(columnIndex, columnIndex);
+                    }
+                    parent.setColumnSelectionInterval(6, 6);
+
+                    break;
+                case 6:// unit
+                    if (aValue instanceof StockUnit) {
+                        StockUnit st = (StockUnit) aValue;
+                        pur.setPurUnit(st);
+                        String toUnit = pur.getPurUnit().getItemUnitCode();
+                        Float calAmount = calPrice(pur, toUnit);
+                        pur.setPurAmt(calAmount);
+                        parent.setColumnSelectionInterval(6, 6);
+
+                    }
+                    break;
+                case 7://avg-wt
+                    if (NumberUtil.isNumber(aValue)) {
+                        if (NumberUtil.isPositive(aValue)) {
+                            Float avgWt = Util1.getFloat(aValue);
+                            Float stdWt = pur.getStdWeight();
+                            float avgPrice = (avgWt / stdWt) * pur.getPurPrice();
+                            pur.setAvgWeight(avgWt);
+                            pur.setAvgPrice(avgPrice);
+                            pur.setPurAmt(avgPrice);
+                            isAmount = true;
                             parent.setColumnSelectionInterval(7, 7);
                         } else {
                             showMessageBox("Input value must be positive");
@@ -226,7 +279,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
 
                     break;
 
-                case 7:
+                case 8:
                     if (NumberUtil.isNumber(aValue)) {
                         if (NumberUtil.isPositive(aValue)) {
                             pur.setPurPrice(Util1.getFloat(aValue));
@@ -243,7 +296,12 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
 
                     break;
             }
-            calculateAmount(pur);
+            if (!isAmount) {
+                calculateAmount(pur);
+            }
+
+            //   fireTableCellUpdated(rowIndex, 9);
+            //    calTotalAmount(pur);
             fireTableRowsUpdated(rowIndex, rowIndex);
             callBack.selected("STM-TOTAL", "STM-TOTAL");
             parent.requestFocusInWindow();
@@ -273,14 +331,6 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
             float amount = purQty * purPrice;
             pur.setPurAmt(amount);
             //  calTotalAmount(pur);
-            //cal avg wt
-            if (pur.getAvgWeight() != null) {
-                Float stdWt = pur.getStdWeight();
-                float avgPrice = (pur.getAvgWeight() / stdWt) * pur.getPurPrice();
-                pur.setAvgWeight(avgWt);
-                pur.setAvgPrice(avgPrice);
-                pur.setPurAmt(avgPrice);
-            }
         }
     }
 
@@ -392,7 +442,9 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                 pd.setStock(new Stock());
                 pd.setLocation(locationAutoCompleter.getLocation());
                 listPurDetail.add(pd);
-                fireTableRowsInserted(listPurDetail.size() - 1, listPurDetail.size() - 1);            }
+                fireTableRowsInserted(listPurDetail.size() - 1, listPurDetail.size() - 1);
+                parent.scrollRectToVisible(parent.getCellRect(parent.getRowCount() - 1, 0, true));
+            }
         }
     }
 
@@ -450,11 +502,6 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                 } else {
                     sdh2.setUniqueId(uniqueId);
                     uniqueId++;
-                }
-            }
-            if (status) {
-                if (sdh2.getAvgWeight() == null) {
-                    sdh2.setAvgWeight(sdh2.getStdWeight());
                 }
             }
 

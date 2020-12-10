@@ -1,9 +1,7 @@
 package com.cv.accountswing.dao;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import com.cv.accountswing.common.ColorUtil;
+import java.awt.Color;
 import java.io.Serializable;
 
 import java.lang.reflect.ParameterizedType;
@@ -11,21 +9,18 @@ import java.sql.Connection;
 import java.util.List;
 import java.util.Map;
 import net.sf.jasperreports.engine.DefaultJasperReportsContext;
-import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReportsContext;
-import net.sf.jasperreports.engine.export.JRPdfExporter;
 import net.sf.jasperreports.view.JasperViewer;
 
 import org.hibernate.Criteria;
 import org.hibernate.Filter;
-import org.hibernate.Query;
-import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.jdbc.Work;
 import org.hibernate.query.NativeQuery;
+import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -130,9 +125,9 @@ public abstract class AbstractDao<PK extends Serializable, T> {
     }
 
     public List<T> saveBatch(List<T> list) {
-        for (T obj : list) {
+        list.forEach(obj -> {
             persist(obj);
-        }
+        });
         return list;
     }
 
@@ -140,7 +135,7 @@ public abstract class AbstractDao<PK extends Serializable, T> {
         String strSQL = "{call " + procName + "(";
         String tmpStr = "";
 
-        for (int i = 0; i < parameters.length; i++) {
+        for (String parameter : parameters) {
             if (tmpStr.isEmpty()) {
                 tmpStr = "?";
             } else {
@@ -188,7 +183,7 @@ public abstract class AbstractDao<PK extends Serializable, T> {
     }
 
     public Object getAggregate(String sql) {
-        SQLQuery query = getSession().createSQLQuery(sql);
+        NativeQuery query = getSession().createSQLQuery(sql);
         Object obj = query.uniqueResult();
         return obj;
     }
@@ -204,12 +199,13 @@ public abstract class AbstractDao<PK extends Serializable, T> {
             try {
                 parameters.put("REPORT_CONNECTION", con);
                 JasperPrint jp = getReport(reportPath, parameters, con, fontPath);
-                JasperViewer.viewReport(jp, false);
+                JasperViewer jasperViewer = new JasperViewer(jp, false);
+                jasperViewer.setTitle("Core Account Report");
+                jasperViewer.setVisible(true);
             } catch (Exception ex) {
                 logger.error("doReportPDF : " + ex);
             }
         };
-
         doWork(work);
     }
 
@@ -230,30 +226,4 @@ public abstract class AbstractDao<PK extends Serializable, T> {
         return jp;
     }
 
-    private ByteArrayOutputStream exportPDF(JasperPrint jp) throws Exception {
-        JRPdfExporter exporter = new JRPdfExporter();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-        exporter.setParameter(JRExporterParameter.JASPER_PRINT, jp);
-        exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, baos);
-        exporter.setParameter(JRExporterParameter.CHARACTER_ENCODING, "UTF-8");
-
-        exporter.exportReport();
-        return baos;
-    }
-
-    private void writeToFile(String path, ByteArrayOutputStream baos) {
-
-        try (OutputStream outputStream = new FileOutputStream(path)) {
-            baos.writeTo(outputStream);
-        } catch (Exception ex) {
-            logger.error("writeToFile : " + ex);
-        } finally {
-            try {
-                baos.close();
-            } catch (IOException ex) {
-
-            }
-        }
-    }
 }

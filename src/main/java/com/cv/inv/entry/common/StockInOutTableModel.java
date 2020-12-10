@@ -9,10 +9,9 @@ import com.cv.accountswing.common.Global;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.Location;
 import com.cv.inv.entity.RelationKey;
-import com.cv.inv.entity.StockInOut;
+import com.cv.inv.entity.StockInOutDetail;
 import com.cv.inv.entity.Stock;
 import com.cv.inv.entity.StockUnit;
-import com.cv.inv.service.StockInOutService;
 import java.awt.HeadlessException;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import com.cv.inv.service.StockInOutDetailService;
 
 /**
  *
@@ -35,9 +35,18 @@ public class StockInOutTableModel extends AbstractTableModel {
     private String[] columnNames = {"Date", "Description", "Stock Code", "Stock Name", "Location",
         "In-Qty", "In-Weight", "In-Unit", "Out-Qty", "Out-Weight", "Out-Unit", "Remark"};
     private JTable parent;
-    private List<StockInOut> listStock = new ArrayList();
+    private List<StockInOutDetail> listStock = new ArrayList();
     @Autowired
-    private StockInOutService stockInOutService;
+    private StockInOutDetailService stockInOutService;
+    private String batchCode;
+
+    public String getBatchCode() {
+        return batchCode;
+    }
+
+    public void setBatchCode(String batchCode) {
+        this.batchCode = batchCode;
+    }
 
     public void setParent(JTable parent) {
         this.parent = parent;
@@ -71,7 +80,7 @@ public class StockInOutTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int row, int column) {
-        StockInOut stock = listStock.get(row);
+        StockInOutDetail stock = listStock.get(row);
 
         if (stock == null) {
             return null;
@@ -114,7 +123,7 @@ public class StockInOutTableModel extends AbstractTableModel {
 
     public void addNewRow() {
         if (hasEmptyRow()) {
-            StockInOut detailHis = new StockInOut();
+            StockInOutDetail detailHis = new StockInOutDetail();
             detailHis.setStock(new Stock());
             listStock.add(detailHis);
             fireTableRowsInserted(listStock.size() - 1, listStock.size() - 1);
@@ -163,7 +172,7 @@ public class StockInOutTableModel extends AbstractTableModel {
 
     @Override
     public void setValueAt(Object value, int row, int column) {
-        StockInOut stock = listStock.get(row);
+        StockInOutDetail stock = listStock.get(row);
         try {
             if (value != null) {
                 switch (column) {
@@ -241,10 +250,10 @@ public class StockInOutTableModel extends AbstractTableModel {
         parent.requestFocus();
     }
 
-    private void save(StockInOut sio) {
+    private void save(StockInOutDetail sio) {
         try {
             if (isValidEntry(sio)) {
-                StockInOut save = stockInOutService.save(sio);
+                StockInOutDetail save = stockInOutService.save(sio);
                 if (save != null) {
                     sio.setId(save.getId());
                     addNewRow();
@@ -257,8 +266,12 @@ public class StockInOutTableModel extends AbstractTableModel {
 
     }
 
-    private boolean isValidEntry(StockInOut sio) {
+    private boolean isValidEntry(StockInOutDetail sio) {
         boolean status = true;
+        if (batchCode == null || batchCode.isEmpty()) {
+            status = false;
+            JOptionPane.showMessageDialog(Global.parentForm, "Batch Code is empty.");
+        }
         if (Util1.getFloat(sio.getInQty()) <= 0 && Util1.getFloat(sio.getOutQty()) <= 0) {
             status = false;
         }
@@ -272,6 +285,7 @@ public class StockInOutTableModel extends AbstractTableModel {
             status = false;
         }
         if (status) {
+            sio.setBatchCode(batchCode);
             StockUnit toUnit = sio.getStock().getPurPriceUnit();
             Integer pattern = sio.getStock().getPattern().getPatternId();
             float inWt = Util1.getFloat(sio.getInWeight());
@@ -306,7 +320,7 @@ public class StockInOutTableModel extends AbstractTableModel {
                     sWt = weight / factor;
                 } else {
                     JOptionPane.showMessageDialog(Global.parentForm, String.format("Need Relation  %s with Smallest Unit", unit));
-                    StockInOut get = listStock.get(parent.getSelectedRow());
+                    StockInOutDetail get = listStock.get(parent.getSelectedRow());
                     if (get.getId() != null) {
                         stockInOutService.delete(get.getId());
                         listStock.remove(parent.getSelectedRow());
@@ -319,17 +333,17 @@ public class StockInOutTableModel extends AbstractTableModel {
         return sWt;
     }
 
-    public List<StockInOut> getCurrentRow() {
+    public List<StockInOutDetail> getCurrentRow() {
         return this.listStock;
     }
 
-    public List<StockInOut> getRetInDetailHis() {
+    public List<StockInOutDetail> getRetInDetailHis() {
         return this.listStock;
     }
 
     public void addEmptyRow() {
         if (listStock != null) {
-            StockInOut stock = new StockInOut();
+            StockInOutDetail stock = new StockInOutDetail();
             stock.setDate(Util1.getTodayDate());
             stock.setLocation(Global.defaultLocation);
             stock.setStock(new Stock());
@@ -343,7 +357,7 @@ public class StockInOutTableModel extends AbstractTableModel {
         if (listStock.isEmpty() || listStock == null) {
             status = true;
         } else {
-            StockInOut detailHis = listStock.get(listStock.size() - 1);
+            StockInOutDetail detailHis = listStock.get(listStock.size() - 1);
             if (detailHis.getStock() == null) {
                 status = false;
             }
@@ -352,11 +366,11 @@ public class StockInOutTableModel extends AbstractTableModel {
         return status;
     }
 
-    public List<StockInOut> getListStock() {
+    public List<StockInOutDetail> getListStock() {
         return listStock;
     }
 
-    public void setListStock(List<StockInOut> listStock) {
+    public void setListStock(List<StockInOutDetail> listStock) {
         this.listStock = listStock;
         fireTableDataChanged();
     }

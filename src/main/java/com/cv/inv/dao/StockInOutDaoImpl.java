@@ -6,7 +6,6 @@
 package com.cv.inv.dao;
 
 import com.cv.accountswing.dao.AbstractDao;
-import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.StockInOut;
 import java.util.List;
 import org.springframework.stereotype.Repository;
@@ -16,7 +15,12 @@ import org.springframework.stereotype.Repository;
  * @author Lenovo
  */
 @Repository
-public class StockInOutDaoImpl extends AbstractDao<Integer, StockInOut> implements StockInOutDao {
+public class StockInOutDaoImpl extends AbstractDao<String, StockInOut> implements StockInOutDao {
+
+    @Override
+    public StockInOut findById(String id) {
+        return getByKey(id);
+    }
 
     @Override
     public StockInOut save(StockInOut stock) {
@@ -25,68 +29,16 @@ public class StockInOutDaoImpl extends AbstractDao<Integer, StockInOut> implemen
     }
 
     @Override
-    public List<StockInOut> search(String fromDate, String toDate, String stockCode, String locId, String option, String remark) {
-        String hsql = "select o from  StockInOut o";
-        String hFilter = "";
-        if (!fromDate.equals("-") && !toDate.equals("-")) {
-            if (hFilter.isEmpty()) {
-                hFilter = "date(o.date) between '" + Util1.toDateStrMYSQL(fromDate)
-                        + "' and '" + Util1.toDateStrMYSQL(toDate) + "'";
-            } else {
-                hFilter = hFilter + " and date(o.date) between '"
-                        + Util1.toDateStrMYSQL(fromDate) + "' and '" + Util1.toDateStrMYSQL(toDate) + "'";
-            }
-        } else if (!fromDate.endsWith("-")) {
-            if (hFilter.isEmpty()) {
-                hFilter = "date(o.date) >= '" + Util1.toDateStrMYSQL(fromDate) + "'";
-            } else {
-                hFilter = hFilter + " and date(o.date) >= '" + Util1.toDateStrMYSQL(fromDate) + "'";
-            }
-        } else if (!toDate.equals("-")) {
-            if (hFilter.isEmpty()) {
-                hFilter = "date(o.date) <= '" + Util1.toDateStrMYSQL(toDate) + "'";
-            } else {
-                hFilter = hFilter + " and date(o.date) <= '" + Util1.toDateStrMYSQL(toDate) + "'";
-            }
-        }
-        if (!stockCode.equals("-")) {
-            if (hFilter.isEmpty()) {
-                hFilter = "o.stock.stockCode = '" + stockCode + "'";
-            } else {
-                hFilter = hFilter + " and o.stock.stockCode = '" + stockCode + "'";
-            }
-        }
-        if (!locId.equals("-")) {
-            if (hFilter.isEmpty()) {
-                hFilter = "o.location.locId = '" + locId + "'";
-            } else {
-                hFilter = hFilter + " and o.location.locId = '" + locId + "'";
-            }
-        }
-        if (!option.equals("-")) {
-            if (hFilter.isEmpty()) {
-                hFilter = "o.optionType = '" + option + "'";
-            } else {
-                hFilter = hFilter + " and o.optionType = '" + option + "'";
-            }
-        }
-        if (!remark.equals("-")) {
-            if (hFilter.isEmpty()) {
-                hFilter = "o.remark = '" + remark + "'";
-            } else {
-                hFilter = hFilter + " and o.remark = '" + remark + "'";
-            }
-        }
-        if (!hFilter.isEmpty()) {
-            hsql = hsql + " where " + hFilter;
-        }
-        return findHSQL(hsql);
+    public List<StockInOut> search(String batchCode, String date, String desp, String remark) {
+        String hsql;
+        return null;
     }
 
     @Override
-    public int delete(Integer id) {
-        String hsql = "delete from StockInOut o where o.id = '" + id.toString() + "'";
+    public int delete(String id) {
+        String hsql = "delete from StockInOut o where o.batchCode '" + id + "'";
         return execUpdateOrDelete(hsql);
+
     }
 
 }

@@ -14,9 +14,11 @@ import java.util.List;
  */
 public interface StockInOutService {
 
+    public StockInOut findById(String id);
+
     public StockInOut save(StockInOut stock);
 
-    public List<StockInOut> search(String fromDate, String toDate, String stockCode, String locId, String option, String remark);
+    public List<StockInOut> search(String batchCode, String date, String desp, String remark);
 
-    public int delete(Integer id);
+    public int delete(String id);
 }
