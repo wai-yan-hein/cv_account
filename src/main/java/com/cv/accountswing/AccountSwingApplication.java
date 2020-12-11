@@ -29,25 +29,25 @@ import org.springframework.context.ConfigurableApplicationContext;
 @SpringBootApplication
 
 public class AccountSwingApplication {
-
+    
     private static final Logger LOGGER = Logger.getLogger(AccountSwingApplication.class);
     private static final SplashWindow SPLASH_WINDOW = new SplashWindow();
     private static ConfigurableApplicationContext context;
     private static final ImageIcon accIcon = new ImageIcon(AccountSwingApplication.class.getResource("/images/user-account.png"));
-
+    
     @PostConstruct
     void started() {
         TimeZone.setDefault(TimeZone.getTimeZone("TimeZone"));
         SPLASH_WINDOW.run();
     }
-
+    
     public static void main(String[] args) {
         LOGGER.info("MAIN STARTED...");
         try {
             /*IntelliJTheme.install(AccountSwingApplication.class.getResourceAsStream(
             "/theme/light_theme.json"));
             JDialog.setDefaultLookAndFeelDecorated(true);*/
-
+            
             UIManager.setLookAndFeel(new FlatLightLaf());
             /*UIManager.getDefaults().entrySet().stream().sorted((o1, o2) -> {
             return o1.getKey().toString().compareTo(o2.getKey().toString());
@@ -57,7 +57,7 @@ public class AccountSwingApplication {
         } catch (UnsupportedLookAndFeelException ex) {
             LOGGER.error("Theme Error :" + ex.getMessage());
         }
-
+        
         try {
             Global.sock = new ServerSocket(10003);//Pharmacy
 
@@ -66,7 +66,7 @@ public class AccountSwingApplication {
                     "Duplicate Program running.", JOptionPane.ERROR_MESSAGE);
             System.exit(0);
         }
-
+        
         try {
             SpringApplicationBuilder builder = new SpringApplicationBuilder(AccountSwingApplication.class);
             builder.headless(false);
@@ -95,7 +95,7 @@ public class AccountSwingApplication {
                 UsrCompRoleService usrCompRoleService = context.getBean(UsrCompRoleService.class);
                 List<VUsrCompAssign> listVUCA = usrCompRoleService.
                         getAssignCompany(Global.loginUser.getUserId().toString());
-
+                
                 if (listVUCA == null) {
                     JOptionPane.showMessageDialog(new JFrame(),
                             "No company assign to the user",
@@ -107,14 +107,14 @@ public class AccountSwingApplication {
                             "Invalid Compay Access", JOptionPane.ERROR_MESSAGE);
                     System.exit(-1);
                 } else if (listVUCA.size() > 1) {
-
+                    
                 } else {
                     Global.roleId = listVUCA.get(0).getKey().getRoleId();
                     Global.compId = listVUCA.get(0).getKey().getCompCode();
                     Global.companyName = listVUCA.get(0).getCompName();
                     LOGGER.info("Role Id : " + Global.roleId);
                     LOGGER.info("Company Id : " + Global.compId);
-
+                    
                     ApplicationMainFrame appMain = context.getBean(ApplicationMainFrame.class);
                     java.awt.EventQueue.invokeLater(() -> {
                         appMain.startNetworkDetector();
@@ -134,17 +134,17 @@ public class AccountSwingApplication {
 
         //SpringApplication.run(AccountSwingApplication.class, args);
     }
-
+    
     public static void restart() {
         ApplicationArguments args = context.getBean(ApplicationArguments.class);
-
+        
         Thread thread = new Thread(() -> {
             context.close();
             main(args.getSourceArgs());
         });
-
+        
         thread.setDaemon(false);
         thread.start();
     }
-
+    
 }

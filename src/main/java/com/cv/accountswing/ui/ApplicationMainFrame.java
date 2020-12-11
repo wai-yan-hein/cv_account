@@ -290,6 +290,8 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         initToolBar();
         initPopup();
         showCloseAllPopup();
+        LOGGER.info("Methods : " + ApplicationMainFrame.class.getMethods().length);
+
         this.context = context;
     }
 
@@ -736,7 +738,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         LOGGER.info("init menu.");
         menuBar.removeAll();
         taskExecutor.execute(() -> {
-            List<VRoleMenu> listVRM = menuService.getParentChildMenu(Global.roleId.toString());
+            List<VRoleMenu> listVRM = menuService.getParentChildMenu(Global.roleId.toString(), "Menu");
             listVRM.forEach((menu) -> {
                 if (menu.getIsAllow()) {
                     if (menu.getChild() != null) {
@@ -977,7 +979,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         btnClear.setBackground(ColorUtil.mainColor);
         btnClear.setFont(Global.lableFont);
         btnClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/add_file_20px.png"))); // NOI18N
-        btnClear.setToolTipText("F10 - Clear ");
+        btnClear.setToolTipText("F10 - New");
         btnClear.setFocusable(false);
         btnClear.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

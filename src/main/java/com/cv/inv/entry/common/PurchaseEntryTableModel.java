@@ -256,7 +256,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
     private void calculateAmount(PurHisDetail pur) {
         if (pur.getStock() != null) {
             float avgWt;
-            float purQty = pur.getQty();
+            float purQty = Util1.getFloat(pur.getQty());
             float purPrice = Util1.getFloat(pur.getPurPrice());
             float userWt = pur.getStdWeight();
             String fromUnit = pur.getPurUnit().getItemUnitCode();
@@ -279,7 +279,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                 float avgPrice = (pur.getAvgWeight() / stdWt) * pur.getPurPrice();
                 pur.setAvgWeight(avgWt);
                 pur.setAvgPrice(avgPrice);
-                pur.setPurAmt(avgPrice);
+                pur.setPurAmt(avgPrice * purQty);
             }
         }
     }
@@ -392,7 +392,8 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                 pd.setStock(new Stock());
                 pd.setLocation(locationAutoCompleter.getLocation());
                 listPurDetail.add(pd);
-                fireTableRowsInserted(listPurDetail.size() - 1, listPurDetail.size() - 1);            }
+                fireTableRowsInserted(listPurDetail.size() - 1, listPurDetail.size() - 1);
+            }
         }
     }
 

@@ -295,6 +295,7 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
                 menu.setMenuClass(selectMenu.getMenuClass());
                 menu.setParent(selectMenu.getId().toString());
                 menu.setSoureAccCode(coa.getCode());
+                menu.setMenuType("Menu");
                 try {
                     Menu saveMenu = menuService.saveMenu(menu);
                     if (saveMenu != null) {

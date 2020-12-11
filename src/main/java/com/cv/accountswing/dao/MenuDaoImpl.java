@@ -84,10 +84,9 @@ public class MenuDaoImpl extends AbstractDao<String, Menu> implements MenuDao {
     public List<Menu> getParentChildMenu() {
         String strSql = "select o from Menu o where o.parent = '1'";
         List<Menu> listRootMenu = findHSQL(strSql);
-
-        for (Menu parent : listRootMenu) {
-            parent = getChild(parent);
-        }
+        listRootMenu.forEach(parent -> {
+            getChild(parent);
+        });
 
         return listRootMenu;
     }
@@ -99,10 +98,9 @@ public class MenuDaoImpl extends AbstractDao<String, Menu> implements MenuDao {
         if (listChild != null) {
             if (listChild.size() > 0) {
                 parent.setChild(listChild);
-
-                for (Menu parentMenu : listChild) {
-                    parentMenu = getChild(parentMenu);
-                }
+                listChild.forEach(parentMenu -> {
+                    getChild(parentMenu);
+                });
             }
         }
 
@@ -110,31 +108,33 @@ public class MenuDaoImpl extends AbstractDao<String, Menu> implements MenuDao {
     }
 
     @Override
-    public List getParentChildMenu(String roleId) {
+    public List getParentChildMenu(String roleId, String menuType) {
         String strSql = "select o from VRoleMenu o where o.key.roleId = " + roleId
                 + " and o.parent = '1' order by o.orderBy";
         List listRootMenu = findHSQL(strSql);
 
         for (int i = 0; i < listRootMenu.size(); i++) {
             VRoleMenu parent = (VRoleMenu) listRootMenu.get(i);
-            getChild(parent, roleId);
+            getChild(parent, roleId, menuType);
         }
 
         return listRootMenu;
     }
 
-    private void getChild(VRoleMenu parent, String roleId) {
+    private void getChild(VRoleMenu parent, String roleId, String menuType) {
         String strSql = "select o from VRoleMenu o where o.parent = '" + parent.getKey().getMenuId()
-                + "' and o.key.roleId = " + roleId;
+                + "' and o.key.roleId = " + roleId + "";
+        if (!menuType.equals("-")) {
+            strSql = strSql + " and o.menuType = '" + menuType + "'";
+        }
         List listChild = findHSQL(strSql);
 
         if (listChild != null) {
             if (listChild.size() > 0) {
                 parent.setChild(listChild);
-
                 for (int i = 0; i < listChild.size(); i++) {
                     VRoleMenu child = (VRoleMenu) listChild.get(i);
-                    getChild(child, roleId);
+                    getChild(child, roleId, menuType);
                 }
             }
         }

@@ -107,7 +107,7 @@ public class RoleSetup extends javax.swing.JPanel implements KeyListener, PanelC
 
     private void createTree(String roleId) {
         taskExecutor.execute(() -> {
-            List<VRoleMenu> listVRM = menuService.getParentChildMenu(roleId);
+            List<VRoleMenu> listVRM = menuService.getParentChildMenu(roleId, "-");
             VRoleMenu vRoleMenu = new VRoleMenu("Best-System", "System", true, listVRM);
             MyAbstractTreeTableModel treeTableModel = new MyDataModel(vRoleMenu, privilegeService, this);
             MyTreeTable treeTable = new MyTreeTable(treeTableModel);

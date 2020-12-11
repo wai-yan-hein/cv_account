@@ -162,7 +162,7 @@
             <Component class="javax.swing.JButton" name="btnPrint">
               <Properties>
                 <Property name="background" type="java.awt.Color" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="Global.mainColor" type="code"/>
+                  <Connection code="ColorUtil.mainColor" type="code"/>
                 </Property>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="Global.lableFont" type="code"/>
@@ -180,7 +180,7 @@
             <Component class="javax.swing.JButton" name="btnRefresh">
               <Properties>
                 <Property name="background" type="java.awt.Color" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="Global.mainColor" type="code"/>
+                  <Connection code="ColorUtil.mainColor" type="code"/>
                 </Property>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/images/refresh_20px.png"/>
@@ -194,7 +194,7 @@
             <Component class="javax.swing.JButton" name="btnDelete">
               <Properties>
                 <Property name="background" type="java.awt.Color" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="Global.mainColor" type="code"/>
+                  <Connection code="ColorUtil.mainColor" type="code"/>
                 </Property>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="Global.lableFont" type="code"/>
@@ -212,7 +212,7 @@
             <Component class="javax.swing.JButton" name="btnHistory">
               <Properties>
                 <Property name="background" type="java.awt.Color" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="Global.mainColor" type="code"/>
+                  <Connection code="ColorUtil.mainColor" type="code"/>
                 </Property>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="Global.lableFont" type="code"/>
@@ -230,7 +230,7 @@
             <Component class="javax.swing.JButton" name="btnClear">
               <Properties>
                 <Property name="background" type="java.awt.Color" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="Global.mainColor" type="code"/>
+                  <Connection code="ColorUtil.mainColor" type="code"/>
                 </Property>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="Global.lableFont" type="code"/>
@@ -238,7 +238,7 @@
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/images/add_file_20px.png"/>
                 </Property>
-                <Property name="toolTipText" type="java.lang.String" value="F10 - Clear "/>
+                <Property name="toolTipText" type="java.lang.String" value="F10 - New"/>
                 <Property name="focusable" type="boolean" value="false"/>
               </Properties>
               <Events>
@@ -248,7 +248,7 @@
             <Component class="javax.swing.JButton" name="btnLogout">
               <Properties>
                 <Property name="background" type="java.awt.Color" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="Global.mainColor" type="code"/>
+                  <Connection code="ColorUtil.mainColor" type="code"/>
                 </Property>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="Global.lableFont" type="code"/>

@@ -26,6 +26,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import com.cv.inv.service.StockInOutDetailService;
+import com.cv.inv.ui.commom.VouFormatFactory;
+import java.text.ParseException;
 
 /**
  *
@@ -33,7 +35,7 @@ import com.cv.inv.service.StockInOutDetailService;
  */
 @Component
 public class StockInOutEntry extends javax.swing.JPanel {
-
+    
     private static final Logger log = LoggerFactory.getLogger(StockInOutEntry.class);
     @Autowired
     private StockInOutTableModel outTableModel;
@@ -50,12 +52,18 @@ public class StockInOutEntry extends javax.swing.JPanel {
         initComponents();
         setTodayDate();
     }
-
+    
     private void setTodayDate() {
         txtFromDate.setDate(Util1.getTodayDate());
         txtToDate.setDate(Util1.getTodayDate());
+        try {
+            txtBatchNo.setFormatterFactory(new VouFormatFactory());
+        } catch (ParseException ex) {
+            log.error(ex.getMessage());
+        }
+        
     }
-
+    
     private void search() {
         log.info("Search Stock In Out");
         String fromDate = Util1.toDateStr(txtFromDate.getDate(), "yyyy-MM-dd");
@@ -66,21 +74,21 @@ public class StockInOutEntry extends javax.swing.JPanel {
         outTableModel.setListStock(listStock);
         outTableModel.addEmptyRow();
         requestFocusTable();
-
+        
     }
-
+    
     private void requestFocusTable() {
         int row = tblStock.getSelectedRowCount();
         tblStock.setRowSelectionInterval(row, row);
         tblStock.setColumnSelectionInterval(0, 0);
     }
-
+    
     private void initMain() {
         genVouNo();
         initTable();
         search();
     }
-
+    
     private void initTable() {
         outTableModel.addEmptyRow();
         outTableModel.setParent(tblStock);
@@ -117,7 +125,7 @@ public class StockInOutEntry extends javax.swing.JPanel {
         tblStock.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                 .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
     }
-
+    
     private void genVouNo() {
         vouEngine = new GenVouNoImpl(voudIdService, "StockInOut", Util1.getPeriod(Util1.getTodayDate()));
         txtBatchNo.setText(vouEngine.genVouNo());
@@ -145,8 +153,8 @@ public class StockInOutEntry extends javax.swing.JPanel {
         txtRemark = new javax.swing.JTextField();
         btnSearch = new javax.swing.JButton();
         jLabel6 = new javax.swing.JLabel();
-        txtBatchNo = new javax.swing.JTextField();
         btnSearch1 = new javax.swing.JButton();
+        txtBatchNo = new javax.swing.JFormattedTextField();
 
         setBackground(new java.awt.Color(255, 255, 255));
         addComponentListener(new java.awt.event.ComponentAdapter() {
@@ -218,8 +226,8 @@ public class StockInOutEntry extends javax.swing.JPanel {
                 .addContainerGap()
                 .addComponent(jLabel6)
                 .addGap(18, 18, 18)
-                .addComponent(txtBatchNo, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
-                .addGap(18, 18, 18)
+                .addComponent(txtBatchNo, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel2)
                 .addGap(18, 18, 18)
                 .addComponent(txtFromDate, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
@@ -230,7 +238,7 @@ public class StockInOutEntry extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(txtDesp, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
+                .addComponent(txtDesp, javax.swing.GroupLayout.DEFAULT_SIZE, 107, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -247,9 +255,7 @@ public class StockInOutEntry extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(txtFromDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel2)
-                        .addComponent(txtBatchNo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel2)
                     .addComponent(txtToDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel3)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -259,7 +265,9 @@ public class StockInOutEntry extends javax.swing.JPanel {
                         .addComponent(txtRemark, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(btnSearch)
                         .addComponent(btnSearch1))
-                    .addComponent(jLabel6))
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel6)
+                        .addComponent(txtBatchNo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -312,7 +320,7 @@ public class StockInOutEntry extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable tblStock;
-    private javax.swing.JTextField txtBatchNo;
+    private javax.swing.JFormattedTextField txtBatchNo;
     private javax.swing.JTextField txtDesp;
     private com.toedter.calendar.JDateChooser txtFromDate;
     private javax.swing.JTextField txtRemark;

@@ -9,11 +9,9 @@ import com.cv.accountswing.common.Global;
 import com.cv.accountswing.dao.AbstractDao;
 import java.io.Serializable;
 import java.util.Map;
-import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 ;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -33,6 +31,7 @@ public class SReportDaoImpl extends AbstractDao<Serializable, Object> implements
             deleteTmpFilter();
             insertTmpStockFilter(stockCode, locId, changeUnit);
             calculateBalance();
+            
         } catch (Exception ex) {
             log.error("calclate stock balance :" + ex.getMessage());
         }
@@ -78,7 +77,7 @@ public class SReportDaoImpl extends AbstractDao<Serializable, Object> implements
                 + "		where s.stock_code = tmp.stock_code and s.loc_id = tmp.loc_id and s.comp_code = tmp.comp_id\n"
                 + "		group by stock_code,loc,std_weight\n"
                 + "        ) b\n"
-                + "group by b.stock_code,b.loc,b.wt";
+                + "group by b.stock_code,b.loc";
         execSQL(insertSql);
         log.info("insert stock balance tmp success.");
     }

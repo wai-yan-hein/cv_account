@@ -48,7 +48,7 @@ public class MenuServiceImpl implements MenuService{
     }
     
     @Override
-    public List getParentChildMenu(String roleId){
-        return dao.getParentChildMenu(roleId);
+    public List getParentChildMenu(String roleId,String menuType){
+        return dao.getParentChildMenu(roleId,menuType);
     }
 }

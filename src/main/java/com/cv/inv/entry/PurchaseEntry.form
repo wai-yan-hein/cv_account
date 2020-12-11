@@ -525,6 +525,7 @@
         </Component>
         <Component class="javax.swing.JFormattedTextField" name="txtVouTotal">
           <Properties>
+            <Property name="editable" type="boolean" value="false"/>
             <Property name="formatterFactory" type="javax.swing.JFormattedTextField$AbstractFormatterFactory" editor="org.netbeans.modules.form.editors.AbstractFormatterFactoryEditor">
               <Format subtype="0" type="0"/>
             </Property>
@@ -541,6 +542,10 @@
             </Property>
             <Property name="name" type="java.lang.String" value="txtDiscP" noResource="true"/>
           </Properties>
+          <Events>
+            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtDiscPFocusLost"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtDiscPActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel13">
           <Properties>
@@ -558,6 +563,10 @@
             </Property>
             <Property name="name" type="java.lang.String" value="txtVouDiscount" noResource="true"/>
           </Properties>
+          <Events>
+            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtVouDiscountFocusLost"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtVouDiscountActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel15">
           <Properties>
@@ -575,6 +584,10 @@
             </Property>
             <Property name="name" type="java.lang.String" value="txtTax" noResource="true"/>
           </Properties>
+          <Events>
+            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtTaxFocusLost"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtTaxActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JFormattedTextField" name="txtVouPaid">
           <Properties>
@@ -584,9 +597,14 @@
             </Property>
             <Property name="name" type="java.lang.String" value="txtVouPaid" noResource="true"/>
           </Properties>
+          <Events>
+            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtVouPaidFocusLost"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtVouPaidActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JFormattedTextField" name="txtVouBalance">
           <Properties>
+            <Property name="editable" type="boolean" value="false"/>
             <Property name="horizontalAlignment" type="int" value="4"/>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="Global.amtFont" type="code"/>
@@ -596,11 +614,18 @@
         </Component>
         <Component class="javax.swing.JFormattedTextField" name="txtTaxP">
           <Properties>
+            <Property name="formatterFactory" type="javax.swing.JFormattedTextField$AbstractFormatterFactory" editor="org.netbeans.modules.form.editors.AbstractFormatterFactoryEditor">
+              <Format subtype="0" type="0"/>
+            </Property>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="Global.amtFont" type="code"/>
             </Property>
             <Property name="name" type="java.lang.String" value="txtDiscP" noResource="true"/>
           </Properties>
+          <Events>
+            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtTaxPFocusLost"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtTaxPActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>

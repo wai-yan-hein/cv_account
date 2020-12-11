@@ -14,7 +14,6 @@ import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.editor.CurrencyAutoCompleter;
-import com.cv.accountswing.ui.editor.DepartmentAutoCompleter;
 import com.cv.accountswing.ui.editor.DepartmentCellEditor;
 import com.cv.accountswing.ui.editor.TraderAutoCompleter;
 import com.cv.accountswing.util.NumberUtil;
@@ -41,8 +40,6 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
@@ -200,7 +197,7 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
         txtVouPaid.setValue(0.00);
         txtVouBalance.setValue(0.00);
         txtDiscP.setValue(0.0);
-        txtTaxP.setText("0");
+        txtTaxP.setValue(0.0);
     }
 
     private void initTextBoxFormat() {
@@ -212,6 +209,7 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
             txtVouPaid.setFormatterFactory(NumberUtil.getDecimalFormat());
             txtVouBalance.setFormatterFactory(NumberUtil.getDecimalFormat());
             txtDiscP.setFormatterFactory(NumberUtil.getDecimalFormat());
+            txtTaxP.setFormatterFactory(NumberUtil.getDecimalFormat());
         } catch (ParseException ex) {
             LOGGER.error("initTextBoxFormat :" + ex.getMessage());
         }
@@ -298,13 +296,15 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
             ph.setLocation(locCompleter.getLocation());
             ph.setVouStatus(vouCompleter.getVouStatus());
             ph.setRemark(txtRemark.getText());
-            ph.setVouTotal(NumberUtil.getDouble(txtVouTotal.getText()));
+            //ph.setVouTotal(NumberUtil.getDouble(txtVouTotal.getText()));
             ph.setPaid(NumberUtil.getDouble(txtVouPaid.getText()));
             ph.setBalance(NumberUtil.getDouble(txtVouBalance.getText()));
             ph.setTaxAmt(NumberUtil.getDouble(txtTax.getText()));
             ph.setRefNo(txtRefNo.getText());
             ph.setIntgUpdStatus(null);
             ph.setDeleted(Util1.getNullTo(ph.getDeleted()));
+            ph.setDiscount(Util1.getDouble(txtVouDiscount.getValue()));
+            ph.setBalance(Util1.getDouble(txtVouBalance.getValue()));
             if (lblStatus.getText().equals("NEW")) {
                 ph.setPurDate(txtPurDate.getDate());
             } else {
@@ -322,6 +322,10 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
                 ph.setUpdatedBy(Global.loginUser.getUserId().toString());
                 ph.setUpdatedDate(Util1.getTodayDate());
             }
+            //cal total
+            Float vouTotal = 0.0f;
+            vouTotal = purTableModel.getListPurDetail().stream().filter(pd -> (pd.getStock() != null)).map(pd -> pd.getPurAmt()).reduce(vouTotal, (accumulator, _item) -> accumulator + _item);
+            ph.setVouTotal(vouTotal.doubleValue());
 
             try {
                 if (tblPurchase.getCellEditor() != null) {
@@ -402,25 +406,30 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
 
     private void calculateTotalAmount() {
         double totalAmount = 0.0;
+        double discountAmt = 0.0;
         listDetail = purTableModel.getListPurDetail();
         totalAmount = listDetail.stream().map(pd -> Util1.getDouble(pd.getPurAmt())).reduce(totalAmount, (accumulator, _item) -> accumulator + _item);
         txtVouTotal.setValue(totalAmount);
         //cal discAmt
-        double discp = NumberUtil.NZero(txtDiscP.getText());
-        double discountAmt = (totalAmount * (discp / 100));
-        txtVouDiscount.setValue(discountAmt);
-        //calculate taxAmt
-        double taxp = NumberUtil.NZero(txtTaxP.getText());
-        double afterDiscountAmt = totalAmount - discountAmt;
-        double totalTax = (afterDiscountAmt * taxp) / 100;
-        txtTax.setValue(totalTax);
+        if (Util1.getDouble(txtDiscP.getValue()) > 0) {
+            double discp = NumberUtil.NZero(txtDiscP.getValue());
+            discountAmt = (totalAmount * (discp / 100));
+            txtVouDiscount.setValue(discountAmt);
+        }
 
-        Double grossTotal = Util1.NZeroDouble(txtVouTotal.getText());
-        Double discount = Util1.NZeroDouble(txtVouDiscount.getText());
-        Double tax = Util1.NZeroDouble(txtTax.getText());
-        Double grandTotal = (grossTotal + tax) - discount;
-        Double balance = grandTotal - (NumberUtil.NZero(txtVouPaid.getValue()));
-        txtVouBalance.setText(balance.toString());
+        //calculate taxAmt
+        if (Util1.getDouble(txtTaxP.getValue()) > 0) {
+            double afterDiscountAmt = totalAmount - discountAmt;
+            double totalTax = (afterDiscountAmt * Util1.getDouble(txtTaxP.getValue())) / 100;
+            txtTax.setValue(totalTax);
+        }
+
+        double grossTotal = Util1.getDouble(txtVouTotal.getValue());
+        double discount = Util1.getDouble(txtVouDiscount.getValue());
+        double tax = Util1.getDouble(txtTax.getValue());
+        double grandTotal = (grossTotal + tax) - discount;
+        double balance = grandTotal - (Util1.getDouble(txtVouPaid.getValue()));
+        txtVouBalance.setValue(balance);
     }
 
     private void setAllLocation() {
@@ -712,12 +721,23 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
         jLabel17.setFont(Global.lableFont);
         jLabel17.setText("Vou Balance :");
 
+        txtVouTotal.setEditable(false);
         txtVouTotal.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
         txtVouTotal.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         txtVouTotal.setFont(Global.amtFont);
 
         txtDiscP.setFont(Global.amtFont);
         txtDiscP.setName("txtDiscP"); // NOI18N
+        txtDiscP.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtDiscPFocusLost(evt);
+            }
+        });
+        txtDiscP.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtDiscPActionPerformed(evt);
+            }
+        });
 
         jLabel13.setFont(Global.lableFont);
         jLabel13.setText("%");
@@ -725,6 +745,16 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
         txtVouDiscount.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         txtVouDiscount.setFont(Global.amtFont);
         txtVouDiscount.setName("txtVouDiscount"); // NOI18N
+        txtVouDiscount.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtVouDiscountFocusLost(evt);
+            }
+        });
+        txtVouDiscount.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtVouDiscountActionPerformed(evt);
+            }
+        });
 
         jLabel15.setFont(Global.lableFont);
         jLabel15.setText("%");
@@ -732,17 +762,49 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
         txtTax.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         txtTax.setFont(Global.amtFont);
         txtTax.setName("txtTax"); // NOI18N
+        txtTax.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtTaxFocusLost(evt);
+            }
+        });
+        txtTax.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtTaxActionPerformed(evt);
+            }
+        });
 
         txtVouPaid.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         txtVouPaid.setFont(Global.amtFont);
         txtVouPaid.setName("txtVouPaid"); // NOI18N
+        txtVouPaid.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtVouPaidFocusLost(evt);
+            }
+        });
+        txtVouPaid.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtVouPaidActionPerformed(evt);
+            }
+        });
 
+        txtVouBalance.setEditable(false);
         txtVouBalance.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         txtVouBalance.setFont(Global.amtFont);
         txtVouBalance.setName("txtVouBalance"); // NOI18N
 
+        txtTaxP.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
         txtTaxP.setFont(Global.amtFont);
         txtTaxP.setName("txtDiscP"); // NOI18N
+        txtTaxP.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtTaxPFocusLost(evt);
+            }
+        });
+        txtTaxP.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtTaxPActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -854,6 +916,59 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
     private void txtLocationFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtLocationFocusGained
         // TODO add your handling code here:
     }//GEN-LAST:event_txtLocationFocusGained
+
+    private void txtVouDiscountActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtVouDiscountActionPerformed
+        // TODO add your handling code here:
+        calculateTotalAmount();
+    }//GEN-LAST:event_txtVouDiscountActionPerformed
+
+    private void txtVouDiscountFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtVouDiscountFocusLost
+        // TODO add your handling code here:
+        calculateTotalAmount();
+    }//GEN-LAST:event_txtVouDiscountFocusLost
+
+    private void txtTaxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtTaxActionPerformed
+        // TODO add your handling code here:
+        calculateTotalAmount();
+    }//GEN-LAST:event_txtTaxActionPerformed
+
+    private void txtTaxFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtTaxFocusLost
+        // TODO add your handling code here:
+        calculateTotalAmount();
+
+    }//GEN-LAST:event_txtTaxFocusLost
+
+    private void txtTaxPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtTaxPActionPerformed
+        // TODO add your handling code here:
+        calculateTotalAmount();
+
+    }//GEN-LAST:event_txtTaxPActionPerformed
+
+    private void txtTaxPFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtTaxPFocusLost
+        // TODO add your handling code here:
+        calculateTotalAmount();
+    }//GEN-LAST:event_txtTaxPFocusLost
+
+    private void txtVouPaidActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtVouPaidActionPerformed
+        // TODO add your handling code here:
+        calculateTotalAmount();
+    }//GEN-LAST:event_txtVouPaidActionPerformed
+
+    private void txtVouPaidFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtVouPaidFocusLost
+        // TODO add your handling code here:
+        calculateTotalAmount();
+    }//GEN-LAST:event_txtVouPaidFocusLost
+
+    private void txtDiscPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDiscPActionPerformed
+        // TODO add your handling code here:
+        calculateTotalAmount();
+    }//GEN-LAST:event_txtDiscPActionPerformed
+
+    private void txtDiscPFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtDiscPFocusLost
+        // TODO add your handling code here:
+        calculateTotalAmount();
+
+    }//GEN-LAST:event_txtDiscPFocusLost
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -1063,15 +1178,22 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
                 break;
             case "txtDiscP":
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    calculateTotalAmount();
                     txtTaxP.requestFocus();
                 }
                 break;
-
+            case "txtVouDiscount":
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    txtTaxP.requestFocus();
+                }
+                break;
             case "txtTaxP":
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    calculateTotalAmount();
-                    txtVouBalance.requestFocus();
+                    txtVouPaid.requestFocus();
+                }
+                break;
+            case "txtTax":
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    txtVouPaid.requestFocus();
                 }
                 break;
 

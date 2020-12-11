@@ -26,7 +26,7 @@ public class StockInOutDetailDaoImpl extends AbstractDao<Integer, StockInOutDeta
 
     @Override
     public List<StockInOutDetail> search(String fromDate, String toDate, String stockCode, String locId, String option, String remark) {
-        String hsql = "select o from  StockInOut o";
+        String hsql = "select o from  StockInOutDetail o";
         String hFilter = "";
         if (!fromDate.equals("-") && !toDate.equals("-")) {
             if (hFilter.isEmpty()) {
