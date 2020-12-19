@@ -112,7 +112,6 @@ public class MenuDaoImpl extends AbstractDao<String, Menu> implements MenuDao {
         String strSql = "select o from VRoleMenu o where o.key.roleId = " + roleId
                 + " and o.parent = '1' order by o.orderBy";
         List listRootMenu = findHSQL(strSql);
-
         for (int i = 0; i < listRootMenu.size(); i++) {
             VRoleMenu parent = (VRoleMenu) listRootMenu.get(i);
             getChild(parent, roleId, menuType);
@@ -138,5 +137,19 @@ public class MenuDaoImpl extends AbstractDao<String, Menu> implements MenuDao {
                 }
             }
         }
+    }
+
+    @Override
+    public List getReports(String roleId) {
+        String hsql = "select o from VRoleMenu o where o.key.roleId = " + roleId + " and o.menuType = 'Reports' and o.isAllow = true";
+        return findHSQL(hsql);
+    }
+
+    @Override
+    public List getReportList(String roleId, String parentCode) {
+        String hsql = "select o from VRoleMenu o where o.key.roleId = " + roleId + " and o.isAllow = true"
+                + "  and o.parent ='" + parentCode + "'";
+        return findHSQL(hsql);
+
     }
 }

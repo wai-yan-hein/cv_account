@@ -6,10 +6,13 @@
 package com.cv.inv.entity;
 
 import java.io.Serializable;
+import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
  *
@@ -23,7 +26,10 @@ public class UnitRelation implements Serializable {
     private RelationKey unitKey;
     @Column(name = "factor")
     private Float factor;
-   
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "updated_date")
+    private Date updatedDate;
+
     public RelationKey getUnitKey() {
         return unitKey;
     }
@@ -40,6 +46,12 @@ public class UnitRelation implements Serializable {
         this.factor = factor;
     }
 
-   
+    public Date getUpdatedDate() {
+        return updatedDate;
+    }
+
+    public void setUpdatedDate(Date updatedDate) {
+        this.updatedDate = updatedDate;
+    }
 
 }

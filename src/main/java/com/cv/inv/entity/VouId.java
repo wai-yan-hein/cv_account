@@ -4,10 +4,13 @@
  */
 package com.cv.inv.entity;
 
+import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
  *
@@ -21,6 +24,9 @@ public class VouId implements java.io.Serializable {
     private Integer vouNo;
     @EmbeddedId
     private CompoundKey key;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "updated_date")
+    private Date updatedDate;
 
     public VouId() {
     }
@@ -45,5 +51,14 @@ public class VouId implements java.io.Serializable {
     public void setKey(CompoundKey key) {
         this.key = key;
     }
+
+    public Date getUpdatedDate() {
+        return updatedDate;
+    }
+
+    public void setUpdatedDate(Date updatedDate) {
+        this.updatedDate = updatedDate;
+    }
+    
 
 }

@@ -37,8 +37,8 @@ public class DamageHis implements java.io.Serializable {
     private Integer session;
     private Double totalAmount;
     private String migId;
-  //  private List<DamageDetailHis> listDetail;
 
+    //  private List<DamageDetailHis> listDetail;
     @ManyToOne
     @JoinColumn(name = "created_by")
     public AppUser getCreatedBy() {
@@ -155,6 +155,7 @@ public class DamageHis implements java.io.Serializable {
     public void setMigId(String migId) {
         this.migId = migId;
     }
+    
 
 //    @Transient
 //    public List<DamageDetailHis> getListDetail() {
@@ -164,5 +165,4 @@ public class DamageHis implements java.io.Serializable {
 //    public void setListDetail(List<DamageDetailHis> listDetail) {
 //        this.listDetail = listDetail;
 //    }
-
 }

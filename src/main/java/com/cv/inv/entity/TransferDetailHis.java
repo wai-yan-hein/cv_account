@@ -29,6 +29,7 @@ public class TransferDetailHis implements java.io.Serializable {
     private String balQtyStr;
     private Double amount;
     private String tranVouId;
+    private Date updatedDate;
 
     @Temporal(TemporalType.DATE)
     @Column(name = "expire_date")
@@ -150,6 +151,16 @@ public class TransferDetailHis implements java.io.Serializable {
 
     public void setTranVouId(String tranVouId) {
         this.tranVouId = tranVouId;
+    }
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "updated_date")
+    public Date getUpdatedDate() {
+        return updatedDate;
+    }
+
+    public void setUpdatedDate(Date updatedDate) {
+        this.updatedDate = updatedDate;
     }
 
 }

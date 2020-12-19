@@ -25,4 +25,8 @@ public interface MenuService {
     public List<Menu> getParentChildMenu();
 
     public List getParentChildMenu(String roleId, String menuType);
+
+    public List getReports(String roleId);
+
+    public List getReportList(String roleId, String partentCode);
 }

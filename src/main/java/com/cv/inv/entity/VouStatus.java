@@ -5,12 +5,15 @@
  */
 package com.cv.inv.entity;
 
+import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import static javax.persistence.GenerationType.IDENTITY;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
  *
@@ -26,6 +29,9 @@ public class VouStatus implements java.io.Serializable {
     private Integer vouStatusId;
     @Column(name = "status_desp", nullable = false, length = 15, unique = true)
     private String statusDesp;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "updated_date")
+    private Date updatedDate;
 
     public Integer getVouStatusId() {
         return vouStatusId;
@@ -42,5 +48,14 @@ public class VouStatus implements java.io.Serializable {
     public void setStatusDesp(String statusDesp) {
         this.statusDesp = statusDesp;
     }
+
+    public Date getUpdatedDate() {
+        return updatedDate;
+    }
+
+    public void setUpdatedDate(Date updatedDate) {
+        this.updatedDate = updatedDate;
+    }
+    
 
 }

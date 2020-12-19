@@ -74,6 +74,12 @@ public class SaleHis implements java.io.Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_date")
     private Date updatedDate;
+    @Column(name = "address")
+    private String address;
+    @Column(name = "order_code")
+    private String orderCode;
+    @Column(name = "reg_id")
+    private Integer regionId;
 
     public SaleHis() {
     }
@@ -245,5 +251,30 @@ public class SaleHis implements java.io.Serializable {
     public void setUpdatedBy(AppUser updatedBy) {
         this.updatedBy = updatedBy;
     }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getOrderCode() {
+        return orderCode;
+    }
+
+    public void setOrderCode(String orderCode) {
+        this.orderCode = orderCode;
+    }
+
+    public Integer getRegionId() {
+        return regionId;
+    }
+
+    public void setRegionId(Integer regionId) {
+        this.regionId = regionId;
+    }
+    
 
 }

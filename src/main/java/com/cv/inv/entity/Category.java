@@ -5,12 +5,15 @@
  */
 package com.cv.inv.entity;
 
+import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import static javax.persistence.GenerationType.IDENTITY;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
  *
@@ -28,6 +31,9 @@ public class Category implements java.io.Serializable {
     private String catName;
     @Column(name = "mig_id")
     private Integer migId;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "updated_date")
+    private Date updatedDate;
     
     public Category() {
     }
@@ -60,6 +66,15 @@ public class Category implements java.io.Serializable {
     public void setMigId(Integer migId) {
         this.migId = migId;
     }
+
+    public Date getUpdatedDate() {
+        return updatedDate;
+    }
+
+    public void setUpdatedDate(Date updatedDate) {
+        this.updatedDate = updatedDate;
+    }
+    
     
 
 }

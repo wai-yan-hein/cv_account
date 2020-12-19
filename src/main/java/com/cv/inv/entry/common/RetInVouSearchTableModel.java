@@ -6,7 +6,6 @@ package com.cv.inv.entry.common;
 
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.RetInHis;
-import com.cv.inv.entity.view.VRetIn;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JTable;

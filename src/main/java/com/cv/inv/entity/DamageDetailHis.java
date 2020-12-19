@@ -35,6 +35,7 @@ public class DamageDetailHis implements java.io.Serializable {
     private Float smallestQty;
     private Double costPrice;
     private Double amount;
+    private Date updatedDate;
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -130,4 +131,15 @@ public class DamageDetailHis implements java.io.Serializable {
     public void setAmount(Double amount) {
         this.amount = amount;
     }
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "updated_date")
+    public Date getUpdatedDate() {
+        return updatedDate;
+    }
+
+    public void setUpdatedDate(Date updatedDate) {
+        this.updatedDate = updatedDate;
+    }
+
 }

@@ -29,7 +29,7 @@ public class SaleHisDetail implements java.io.Serializable {
     private Date expDate;
     private Float quantity;
     private Float saleSmallestQty;
-    private StockUnit itemUnit;
+    private StockUnit saleUnit;
     private Float price;
     private Float amount;
     private Location location;
@@ -89,13 +89,13 @@ public class SaleHisDetail implements java.io.Serializable {
     }
 
     @ManyToOne
-    @JoinColumn(name = "item_unit", nullable = false)
-    public StockUnit getItemUnit() {
-        return itemUnit;
+    @JoinColumn(name = "sale_unit", nullable = false)
+    public StockUnit getSaleUnit() {
+        return saleUnit;
     }
 
-    public void setItemUnit(StockUnit itemUnit) {
-        this.itemUnit = itemUnit;
+    public void setSaleUnit(StockUnit saleUnit) {
+        this.saleUnit = saleUnit;
     }
 
     @Column(name = "sale_price", nullable = false)

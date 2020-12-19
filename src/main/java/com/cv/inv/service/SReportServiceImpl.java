@@ -23,8 +23,8 @@ public class SReportServiceImpl implements SReportService {
     private SReportDao dao;
 
     @Override
-    public void generateStockBalance(String stockCode, String stockTypeCode, String brandId, String catId, String locId, String changeUnit) {
-        dao.generateStockBalance(stockCode, stockTypeCode, brandId, catId, locId, changeUnit);
+    public void generateStockBalance(String stockCode, String locId) {
+        dao.generateStockBalance(stockCode, locId);
     }
 
     @Override
@@ -32,6 +32,9 @@ public class SReportServiceImpl implements SReportService {
         dao.reportViewer(reportPath, filePath, fontPath, parameters);
     }
 
-   
+    @Override
+    public void generateSaleByStock(String stockCode, String regionCode) {
+        dao.generateSaleByStock(stockCode, regionCode);
+    }
 
 }

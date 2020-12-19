@@ -203,7 +203,7 @@ public abstract class AbstractDao<PK extends Serializable, T> {
                 jasperViewer.setTitle("Core Account Report");
                 jasperViewer.setVisible(true);
             } catch (Exception ex) {
-                logger.error("doReportPDF : " + ex);
+                logger.error("doReportPDF : " + ex.getMessage());
             }
         };
         doWork(work);

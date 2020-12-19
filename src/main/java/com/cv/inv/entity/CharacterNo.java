@@ -5,10 +5,13 @@
  */
 package com.cv.inv.entity;
 
+import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
  *
@@ -23,6 +26,9 @@ public class CharacterNo implements java.io.Serializable {
     private String ch;
     @Column(name = "char_no", nullable = false, length = 3, unique = true)
     private String strNumber;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "updated_date")
+    private Date updatedDate;
 
     public CharacterNo() {
 
@@ -47,6 +53,14 @@ public class CharacterNo implements java.io.Serializable {
 
     public void setStrNumber(String strNumber) {
         this.strNumber = strNumber;
+    }
+
+    public Date getUpdatedDate() {
+        return updatedDate;
+    }
+
+    public void setUpdatedDate(Date updatedDate) {
+        this.updatedDate = updatedDate;
     }
     
 

@@ -29,6 +29,7 @@ public class SaleOutstand implements java.io.Serializable {
     private String qtyStr;
     private Float outsQtySmall;
     private String outsOption;
+    private Date updatedDate;
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -77,4 +78,15 @@ public class SaleOutstand implements java.io.Serializable {
     public void setOutsOption(String outsOption) {
         this.outsOption = outsOption;
     }
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "updated_date")
+    public Date getUpdatedDate() {
+        return updatedDate;
+    }
+
+    public void setUpdatedDate(Date updatedDate) {
+        this.updatedDate = updatedDate;
+    }
+
 }

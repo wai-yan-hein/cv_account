@@ -82,6 +82,9 @@ public class Stock implements java.io.Serializable {
     private Double salePriceD;
     @Column(name = "cost_price_std")
     private Double sttCostPrice;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "updated_date")
+    private Date updatedDate;
 
     public String getStockCode() {
         return stockCode;
@@ -274,5 +277,14 @@ public class Stock implements java.io.Serializable {
     public void setPattern(UnitPattern pattern) {
         this.pattern = pattern;
     }
+
+    public Date getUpdatedDate() {
+        return updatedDate;
+    }
+
+    public void setUpdatedDate(Date updatedDate) {
+        this.updatedDate = updatedDate;
+    }
+    
 
 }

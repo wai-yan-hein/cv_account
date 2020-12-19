@@ -26,18 +26,17 @@ public class SReportDaoImpl extends AbstractDao<Serializable, Object> implements
     private static final Logger log = LoggerFactory.getLogger(SReportDaoImpl.class);
 
     @Override
-    public void generateStockBalance(String stockCode, String stockTypeCode, String brandId, String catId, String locId, String changeUnit) {
+    public void generateStockBalance(String stockCode, String locId) {
         try {
             deleteTmpFilter();
-            insertTmpStockFilter(stockCode, locId, changeUnit);
+            insertTmpStockFilter(stockCode, locId);
             calculateBalance();
-            
         } catch (Exception ex) {
             log.error("calclate stock balance :" + ex.getMessage());
         }
     }
 
-    private void insertTmpStockFilter(String stockCode, String locId, String reqUnit) throws Exception {
+    private void insertTmpStockFilter(String stockCode, String locId) throws Exception {
         String filterSql = "insert tmp_stock_filter(stock_code, comp_id, loc_id, machine_id)\n"
                 + "select stock_code," + Global.compId + ",location_id," + Global.machineId + "\n"
                 + "from v_stock_loc";
@@ -89,12 +88,46 @@ public class SReportDaoImpl extends AbstractDao<Serializable, Object> implements
         log.info("delete tmp table success.");
     }
 
+    private void insertTmpStockCode(String stockCode) throws Exception {
+        String delSql = "delete from tmp_stock_code where machine_id = " + Global.machineId + "";
+        execSQL(delSql);
+        if (!stockCode.equals("-")) {
+            String insertSql = "insert into tmp_stock_code(stock_code,machine_id)\n"
+                    + "select stock_code," + Global.machineId + " from stock where stock_code in (" + stockCode + ")";
+            execSQL(insertSql);
+        } else {
+            String inserSql = "insert into tmp_stock_code(stock_code,machine_id)\n"
+                    + "select stock_code, " + Global.machineId + "\n"
+                    + "from stock where active = 1";
+            execSQL(inserSql);        }
+    }
+
+    private void insertTmpRegionCode(String regionCode) throws Exception {
+        String delSql = "delete from tmp_region_code where machine_id = " + Global.machineId + "";
+        execSQL(delSql);
+        if (!regionCode.equals("-")) {
+            String insertSql = "insert tmp_region_code(reg_id,machine_id)\n"
+                    + "select reg_id," + Global.machineId + " from region where reg_id in (" + regionCode + ")";
+            execSQL(insertSql);
+        }
+    }
+
     @Override
     public void reportViewer(String reportPath, String filePath, String fontPath, Map<String, Object> parameters) {
         try {
             doReportPDF(reportPath, filePath, parameters, fontPath);
         } catch (Exception ex) {
             log.error("Report Viewer Error :" + ex.getMessage());
+        }
+    }
+
+    @Override
+    public void generateSaleByStock(String stockCode, String regionCode) {
+        try {
+            insertTmpStockCode(stockCode);
+            insertTmpRegionCode(regionCode);
+        } catch (Exception e) {
+            log.error("generateSaleByStock :" + e.getMessage());
         }
     }
 

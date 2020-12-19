@@ -7,6 +7,7 @@ package com.cv.accountswing.ui;
 
 import com.cv.accountswing.AccountSwingApplication;
 import com.cv.accountswing.common.ColorUtil;
+import com.cv.accountswing.common.EchoThread;
 import com.cv.accountswing.common.FilterObserver;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
@@ -63,6 +64,7 @@ import com.cv.inv.service.LocationService;
 import com.cv.inv.service.SaleManService;
 import com.cv.inv.service.VouStatusService;
 import com.cv.accountswing.util.Util1;
+import com.cv.inv.entry.CustomerGrid;
 import com.cv.inv.entry.SaleEntry;
 import com.cv.inv.entry.StockInOutEntry;
 import com.cv.inv.service.CategoryService;
@@ -86,6 +88,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.net.Socket;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
@@ -115,7 +118,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadData,
         SelectionObserver, LoadingObserver, KeyListener, NetworkObserver {
-
+    
     private final ConfigurableApplicationContext context;
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationMainFrame.class);
     private final HashMap<String, JLabel> hmTabLoading = new HashMap();
@@ -163,7 +166,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private Journal journal;
     @Autowired
     private MenuSetup menuSetup;
-
+    
     @Autowired
     private SalePurchaseBook saleBook;
     @Autowired
@@ -241,7 +244,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private SaleManService saleManService;
     @Autowired
     private StockService stockService;
-
+    
     @Autowired
     private StockUnitService stockUnitService;
     @Autowired
@@ -260,20 +263,22 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private StockBrandService stockBrandService;
     @Autowired
     private VouStatusService vouStatusService;
+    @Autowired
+    private CustomerGrid customerGrid;
     private PanelControl control;
     private FilterObserver filterObserver;
-
+    
     public void setFilterObserver(FilterObserver filterObserver) {
         this.filterObserver = filterObserver;
     }
-
+    
     @Autowired
     private ThreadPoolTaskScheduler scheduler;
-
+    
     public PanelControl getControl() {
         return control;
     }
-
+    
     public void setControl(PanelControl control) {
         this.control = control;
     }
@@ -290,23 +295,21 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         initToolBar();
         initPopup();
         showCloseAllPopup();
-        LOGGER.info("Methods : " + ApplicationMainFrame.class.getMethods().length);
-
         this.context = context;
     }
-
+    
     private void initToolBar() {
         toolBar.addSeparator();
         toolBar.setBorderPainted(true);
-
+        
     }
-
+    
     @Override
     public void setIconImage(Image image) {
         ImageIcon size = new ImageIcon(getClass().getResource("/images/logo.png"));
         super.setIconImage(size.getImage()); //To change body of generated methods, choose Tools | Templates.
     }
-
+    
     private JPanel getPanel(String className, String panelName) {
         String[] split = className.split(",");
         String cName = split[0]; // group name
@@ -374,7 +377,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                     panelBank = bank;
                     hmPanel.put(panelName, bank);
                 }
-
+                
                 return panelBank;
             case "AllCash":
                 JPanel panelCash = hmPanel.get(panelName);
@@ -478,6 +481,10 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                     case "Stock In/Out":
                         stockInOut.setName(panelName);
                         return stockInOut;
+                    case "Customer List":
+                        customerGrid.setName(panelName);
+                        customerGrid.initMain();
+                        return customerGrid;
                     default:
                         return null;
                 }
@@ -504,7 +511,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                         return roleSetup;
                     default:
                         return null;
-
+                    
                 }
             case "Report":
                 switch (panelName) {
@@ -530,12 +537,12 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                     default:
                         return null;
                 }
-
+            
             default:
                 return null;
         }
     }
-
+    
     private void initKeyFoucsManager() {
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher((KeyEvent ke) -> {
             switch (ke.getID()) {
@@ -567,7 +574,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             return false;
         });
     }
-
+    
     private void addTabMain(JPanel panel, String menuName) {
         Integer tabIndex = tabMain.getTabCount() - 1;
         //tabMain.setSelectedIndex(tabIndex);
@@ -575,7 +582,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         tabMain.setTabComponentAt(tabMain.indexOfComponent(panel), setTitlePanel(tabMain, panel, menuName));
         tabMain.setSelectedComponent(panel);
     }
-
+    
     private void showCloseAllPopup() {
         tabMain.addMouseListener(new MouseAdapter() {
             @Override
@@ -584,10 +591,10 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                     popupmenu.show(tabMain, e.getX(), e.getY());
                 }
             }
-
+            
         });
     }
-
+    
     private JPanel setTitlePanel(final JTabbedPane tabbedPane, final JPanel panel, String title) {
         JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         titlePanel.setOpaque(false);
@@ -614,26 +621,26 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                 if (control != null) {
                     control.newForm();
                 }
-
+                
             }
-
+            
             @Override
             public void mouseEntered(MouseEvent e) {
                 closeButton.setForeground(Color.RED);
             }
-
+            
             @Override
             public void mouseExited(MouseEvent e) {
                 closeButton.setForeground(Color.BLACK);
             }
-
+            
         });
-
+        
         titlePanel.setName(title);
         titlePanel.add(closeButton);
         return titlePanel;
     }
-
+    
     private void initPopup() {
         popupmenu = new JPopupMenu("Edit");
         JMenuItem closeAll = new JMenuItem("Close All");
@@ -643,16 +650,16 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             tabMain.removeAll();
         });
         clearData.addActionListener((ActionEvent e) -> {
-
+            
         });
         printReport.addActionListener((ActionEvent e) -> {
-
+            
         });
         popupmenu.add(printReport);
         popupmenu.add(clearData);
         popupmenu.add(closeAll);
     }
-
+    
     private void loadSysProperties() {
         try {
             List<SystemProperty> listSys = systemPropertyService.search("-", Global.compId.toString(), "-");
@@ -666,7 +673,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             System.exit(1);
         }
     }
-
+    
     private void initializeData() {
         this.setTitle(this.getTitle() + "(" + Global.loginUser.getUserName() + ")");
         try {
@@ -731,9 +738,9 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Initialize Data", JOptionPane.ERROR_MESSAGE);
             System.exit(1);
         }
-
+        
     }
-
+    
     public void initMenu() {
         LOGGER.info("init menu.");
         menuBar.removeAll();
@@ -755,7 +762,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                         } else {  //No Child
                             JMenu jmenu = new JMenu();
                             jmenu.setName(menu.getMenuClass() + "," + Util1.isNull(menu.getSoureAccCode(), "-"));
-
+                            
                             jmenu.setText(menu.getMenuName());
                             jmenu.setFont(Global.menuFont);
 
@@ -765,7 +772,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                         }
                     } else {  //No Child
                         JMenu jmenu = new JMenu();
-
+                        
                         jmenu.setText(menu.getMenuName());
                         jmenu.setFont(Global.menuFont);
                         jmenu.setName(menu.getMenuClass() + "," + Util1.isNull(menu.getSoureAccCode(), "-"));
@@ -778,9 +785,9 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             addMargin();
             LOGGER.info("init menu end");
         });
-
+        
     }
-
+    
     private void addChildMenu(JMenu parent, List<VRoleMenu> listVRM) {
         listVRM.forEach((vrMenu) -> {
             if (vrMenu.getIsAllow()) {
@@ -819,7 +826,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             }
         });
     }
-
+    
     private void assignWindoInfo() {
         Global.x = this.getX();
         Global.y = this.getY();
@@ -827,7 +834,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         Global.width = this.getWidth();
         lblCompanyName.setText(Global.companyName);
     }
-
+    
     @Override
     public void reload(String msg, Object data) {
         LOGGER.info("MainFrame reload : " + msg);
@@ -839,13 +846,31 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                 break;
         }
     }
-
+    
     public void startNetworkDetector() {
         NetworkDetector detector = new NetworkDetector();
         detector.setNetworkObserver(this);
         scheduler.scheduleAtFixedRate(detector, Duration.ofSeconds(10));
+        Thread socketThread = new Thread(() -> {
+            LOGGER.info("Stocket Start.");
+            Socket socket = null;
+            while (true) {
+                try {
+                    socket = Global.sock.accept();
+                    LOGGER.info("Socket Accept.");
+                } catch (IOException e) {
+                    LOGGER.error("Sockket Accept Error :" + e.getMessage());
+                }
+                // new thread for a client
+                EchoThread echoThread = new EchoThread(socket);
+                echoThread.setCustomerGrid(customerGrid);
+                echoThread.start();
+            }
+        });
+        socketThread.start();
+        
     }
-
+    
     private void addMargin() {
         java.awt.Component[] components = menuBar.getComponents();
         for (java.awt.Component component : components) {
@@ -855,7 +880,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         revalidate();
         repaint();
     }
-
+    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -1005,7 +1030,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         lblNeworkPing.setToolTipText("Internet Connection Status");
 
         txtSearch.setFont(Global.textFont);
-        txtSearch.setFocusable(false);
         txtSearch.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 txtSearchKeyReleased(evt);
@@ -1216,12 +1240,12 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
 
     @Override
     public void selected(Object source, Object selectObj) {
-
+        
     }
-
+    
     @Override
     public void load(Object source, Object selectObj) {
-
+        
         if (source != null) {
             String parent = source.toString();
             String status = selectObj.toString();
@@ -1233,7 +1257,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                         sLoading.setVisible(true);
                         LOGGER.info("Loading Visible End");
                     });
-
+                    
                     break;
                 case "Stop":
                     JLabel eLoading = hmTabLoading.get(parent);
@@ -1242,30 +1266,30 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                         eLoading.setVisible(false);
                         LOGGER.info("Loading Invisbile End");
                     });
-
+                    
                     break;
             }
         }
     }
-
+    
     @Override
     public void keyTyped(KeyEvent e
     ) {
     }
-
+    
     @Override
     public void keyPressed(KeyEvent e) {
     }
-
+    
     @Override
     public void keyReleased(KeyEvent e) {
     }
-
+    
     @Override
     public void sendPingTime(long time) {
         showNetworkIcon(time);
     }
-
+    
     private void showNetworkIcon(long time) {
         //LOGGER.info("Network Ping :" + time);
         if (time < 0) {
@@ -1277,7 +1301,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             lblNeworkImage.setIcon(onlineIcon);
             lblNeworkPing.setForeground(Color.green);
             lblNeworkPing.setText(time + "ms");
-
+            
         }
         if (time > 100) {
             lblNeworkImage.setIcon(lowIcon);

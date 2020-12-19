@@ -18,37 +18,48 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-public class MenuServiceImpl implements MenuService{
+public class MenuServiceImpl implements MenuService {
+
     @Autowired
     private MenuDao dao;
-    
+
     @Override
-    public Menu saveMenu(Menu menu){
+    public Menu saveMenu(Menu menu) {
         return dao.saveMenu(menu);
     }
-    
+
     @Override
-    public Menu findById(String id){
+    public Menu findById(String id) {
         return dao.findById(id);
     }
-    
+
     @Override
-    public List<Menu> search(String name, String nameMM, String parentId,String coaCode){
-        return dao.search(name, nameMM, parentId,coaCode);
+    public List<Menu> search(String name, String nameMM, String parentId, String coaCode) {
+        return dao.search(name, nameMM, parentId, coaCode);
     }
-    
+
     @Override
-    public int delete(String id){
+    public int delete(String id) {
         return dao.delete(id);
     }
-    
+
     @Override
-    public List<Menu> getParentChildMenu(){
+    public List<Menu> getParentChildMenu() {
         return dao.getParentChildMenu();
     }
-    
+
     @Override
-    public List getParentChildMenu(String roleId,String menuType){
-        return dao.getParentChildMenu(roleId,menuType);
+    public List getParentChildMenu(String roleId, String menuType) {
+        return dao.getParentChildMenu(roleId, menuType);
+    }
+
+    @Override
+    public List getReports(String roleId) {
+        return dao.getReports(roleId);
+    }
+
+    @Override
+    public List getReportList(String roleId, String partentCode) {
+        return dao.getReportList(roleId, partentCode);
     }
 }

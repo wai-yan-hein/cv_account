@@ -7,7 +7,6 @@ package com.cv.inv.entry.dialog;
 
 import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
-import com.cv.accountswing.service.TraderService;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.editor.TraderAutoCompleter;
 import com.cv.accountswing.util.Util1;
@@ -20,7 +19,6 @@ import com.cv.inv.entry.editor.StockCellEditor;
 import com.cv.inv.entry.editor.VouStatusAutoCompleter;
 import com.cv.inv.service.PurchaseDetailService;
 import com.cv.inv.service.PurchaseHisService;
-import com.cv.inv.service.VouStatusService;
 import com.toedter.calendar.JTextFieldDateEditor;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;

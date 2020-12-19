@@ -13,7 +13,9 @@ import java.util.Map;
  */
 public interface SReportService {
 
-    public void generateStockBalance(String stockCode, String stockTypeCode, String brandId, String catId, String locId, String changeUnit);
+    public void generateStockBalance(String stockCode, String locId);
+
+    public void generateSaleByStock(String stockCode, String regionCode);
 
     public void reportViewer(String reportPath, String filePath, String fontPath,
             Map<String, Object> parameters);

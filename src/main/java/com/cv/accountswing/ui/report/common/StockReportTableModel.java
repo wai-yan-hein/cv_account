@@ -5,7 +5,7 @@
  */
 package com.cv.accountswing.ui.report.common;
 
-import com.cv.inv.entity.StockReport;
+import com.cv.accountswing.entity.view.VRoleMenu;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
@@ -22,7 +22,7 @@ public class StockReportTableModel extends AbstractTableModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StockReportTableModel.class);
     private final String[] columnNames = {"Stock Report"};
-    private List<StockReport> listReport = new ArrayList<>();
+    private List<VRoleMenu> listReport = new ArrayList<>();
 
     @Override
     public int getRowCount() {
@@ -41,10 +41,10 @@ public class StockReportTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        StockReport report = listReport.get(rowIndex);
+        VRoleMenu report = listReport.get(rowIndex);
         switch (columnIndex) {
             case 0:
-                return report.getReportName();
+                return report.getMenuName();
             default:
                 return null;
         }
@@ -60,27 +60,27 @@ public class StockReportTableModel extends AbstractTableModel {
         return false;
     }
 
-    public List<StockReport> getListReport() {
+    public List<VRoleMenu> getListReport() {
         return listReport;
     }
 
-    public void setListReport(List<StockReport> listReport) {
+    public void setListReport(List<VRoleMenu> listReport) {
         this.listReport = listReport;
         fireTableDataChanged();
     }
 
-    public StockReport getReport(int row) {
+    public VRoleMenu getReport(int row) {
         return listReport.get(row);
     }
 
-    public void setReport(StockReport report, int row) {
+    public void setReport(VRoleMenu report, int row) {
         if (!listReport.isEmpty()) {
             listReport.set(row, report);
             fireTableRowsUpdated(row, row);
         }
     }
 
-    public void addReport(StockReport item) {
+    public void addReport(VRoleMenu item) {
         if (!listReport.isEmpty()) {
             listReport.add(item);
             fireTableRowsInserted(listReport.size() - 1, listReport.size() - 1);

@@ -5,12 +5,15 @@
  */
 package com.cv.inv.entity;
 
+import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import static javax.persistence.GenerationType.IDENTITY;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
  *
@@ -30,6 +33,9 @@ public class Location implements java.io.Serializable {
     private Integer parent;
     @Column(name = "calc_stock")
     private boolean calcStock;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "updated_date")
+    private Date updatedDate;
 
     public Location() {
     }
@@ -75,7 +81,14 @@ public class Location implements java.io.Serializable {
     public void setCalcStock(boolean calcStock) {
         this.calcStock = calcStock;
     }
-    
+
+    public Date getUpdatedDate() {
+        return updatedDate;
+    }
+
+    public void setUpdatedDate(Date updatedDate) {
+        this.updatedDate = updatedDate;
+    }
     
 
 }

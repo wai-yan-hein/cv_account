@@ -6,12 +6,15 @@
 package com.cv.inv.entity;
 
 import java.io.Serializable;
+import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import static javax.persistence.GenerationType.IDENTITY;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
  *
@@ -23,6 +26,7 @@ public class ChargeType implements Serializable {
 
     private Integer chargeTypeId;
     private String chargeTypeDesp;
+    private Date updatedDate;
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -42,6 +46,16 @@ public class ChargeType implements Serializable {
 
     public void setChargeTypeDesp(String chargeTypeDesp) {
         this.chargeTypeDesp = chargeTypeDesp;
+    }
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "updated_date")
+    public Date getUpdatedDate() {
+        return updatedDate;
+    }
+
+    public void setUpdatedDate(Date updatedDate) {
+        this.updatedDate = updatedDate;
     }
 
 }

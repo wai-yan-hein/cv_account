@@ -6,12 +6,15 @@
 package com.cv.inv.entity;
 
 import java.io.Serializable;
+import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import static javax.persistence.GenerationType.IDENTITY;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
  *
@@ -27,10 +30,13 @@ public class UnitPattern implements Serializable {
     private Integer patternId;
     @Column(name = "pattern_name")
     private String patternName;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "updated_date")
+    private Date updatedDate;
 
     public UnitPattern() {
     }
-    
+
     public Integer getPatternId() {
         return patternId;
     }
@@ -51,5 +57,14 @@ public class UnitPattern implements Serializable {
     public String toString() {
         return this.patternName;
     }
+
+    public Date getUpdatedDate() {
+        return updatedDate;
+    }
+
+    public void setUpdatedDate(Date updatedDate) {
+        this.updatedDate = updatedDate;
+    }
+    
 
 }

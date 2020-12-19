@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SaleVouSearchTableModel extends AbstractTableModel {
 
-    static Logger log = Logger.getLogger(SaleVouSearchTableModel.class.getName());
+    private final static Logger log = Logger.getLogger(SaleVouSearchTableModel.class.getName());
     private List<SaleHis> listSaleHis = new ArrayList();
     private final String[] columnNames = {"Date", "Vou No", "Ref. Vou.", "Customer", "User", "V-Total"};
 

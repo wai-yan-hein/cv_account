@@ -32,6 +32,9 @@ public class StockInOut implements Serializable {
     private String remark;
     @Column(name = "desp")
     private String description;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "updated_date")
+    private Date updatedDate;
 
     public String getBatchCode() {
         return batchCode;
@@ -64,5 +67,14 @@ public class StockInOut implements Serializable {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public Date getUpdatedDate() {
+        return updatedDate;
+    }
+
+    public void setUpdatedDate(Date updatedDate) {
+        this.updatedDate = updatedDate;
+    }
+    
 
 }

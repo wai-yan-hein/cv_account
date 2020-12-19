@@ -164,7 +164,7 @@
                               <Group type="102" attributes="0">
                                   <Component id="txtPurWt" pref="105" max="32767" attributes="0"/>
                                   <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
-                                  <Component id="cboPurPrice" pref="75" max="32767" attributes="0"/>
+                                  <Component id="cboPurUnit" pref="75" max="32767" attributes="0"/>
                                   <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
                                   <Component id="txtPurPrice" pref="86" max="32767" attributes="0"/>
                                   <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
@@ -239,7 +239,7 @@
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jLabel10" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="cboPurPrice" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="cboPurUnit" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="chkActive" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="lblStatus" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="txtPurPrice" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -542,7 +542,7 @@
             <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtPurPriceFocusGained"/>
           </Events>
         </Component>
-        <Component class="javax.swing.JComboBox" name="cboPurPrice">
+        <Component class="javax.swing.JComboBox" name="cboPurUnit">
           <Properties>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="Global.textFont" type="code"/>
@@ -553,7 +553,7 @@
             <Property name="toolTipText" type="java.lang.String" value="Choose Unit"/>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cboPurPriceActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cboPurUnitActionPerformed"/>
           </Events>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>

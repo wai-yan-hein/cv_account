@@ -8,7 +8,6 @@ package com.cv.inv.entry.common;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.PurHis;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
 import org.apache.log4j.Logger;

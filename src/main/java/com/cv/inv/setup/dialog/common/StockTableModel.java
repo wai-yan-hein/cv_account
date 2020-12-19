@@ -97,8 +97,8 @@ public class StockTableModel extends AbstractTableModel {
     }
 
     public void modifyColumn() {
-        String[] columnNames = {"Code", "Description"};
-        this.columnNames = columnNames;
+        String[] newColumn = {"Code", "Description"};
+        this.columnNames = newColumn;
         fireTableStructureChanged();
 
     }
@@ -144,7 +144,7 @@ public class StockTableModel extends AbstractTableModel {
             }
         }
     }
-    
+
     public void refresh() {
         fireTableDataChanged();
     }

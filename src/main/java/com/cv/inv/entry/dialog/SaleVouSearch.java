@@ -271,18 +271,53 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
         txtToDate.setDateFormatString("dd/MM/yyyy");
 
         txtCus.setName("txtCus"); // NOI18N
+        txtCus.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtCusFocusGained(evt);
+            }
+        });
 
         txtVouNo.setName("txtVouNo"); // NOI18N
+        txtVouNo.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtVouNoFocusGained(evt);
+            }
+        });
 
         txtVouStatus.setName("txtVouStatus"); // NOI18N
+        txtVouStatus.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtVouStatusFocusGained(evt);
+            }
+        });
 
         txtRemark.setName("txtRemark"); // NOI18N
+        txtRemark.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtRemarkFocusGained(evt);
+            }
+        });
 
         txtMachine.setName("txtMachine"); // NOI18N
+        txtMachine.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtMachineFocusGained(evt);
+            }
+        });
 
         txtUser.setName("txtUser"); // NOI18N
+        txtUser.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtUserFocusGained(evt);
+            }
+        });
 
         txtCusGroup.setName("txtCusGroup"); // NOI18N
+        txtCusGroup.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtCusGroupFocusGained(evt);
+            }
+        });
 
         tblStock.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -477,9 +512,9 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
 
     private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
         search();
-        tblVoucher.requestFocus();
         if (saleVouTableModel.getListSaleHis() != null) {
             tblVoucher.setRowSelectionInterval(0, 0);
+            tblVoucher.requestFocus();
         }
     }//GEN-LAST:event_btnSearchActionPerformed
 
@@ -492,6 +527,41 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
             select();
         }
     }//GEN-LAST:event_tblVoucherMouseClicked
+
+    private void txtCusFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtCusFocusGained
+        // TODO add your handling code here:
+        txtCus.selectAll();
+    }//GEN-LAST:event_txtCusFocusGained
+
+    private void txtVouNoFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtVouNoFocusGained
+        // TODO add your handling code here:
+        txtVouNo.selectAll();
+    }//GEN-LAST:event_txtVouNoFocusGained
+
+    private void txtVouStatusFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtVouStatusFocusGained
+        // TODO add your handling code here:
+        txtVouStatus.selectAll();
+    }//GEN-LAST:event_txtVouStatusFocusGained
+
+    private void txtRemarkFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtRemarkFocusGained
+        // TODO add your handling code here:
+        txtRemark.selectAll();
+    }//GEN-LAST:event_txtRemarkFocusGained
+
+    private void txtMachineFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtMachineFocusGained
+        // TODO add your handling code here:
+        txtMachine.selectAll();
+    }//GEN-LAST:event_txtMachineFocusGained
+
+    private void txtUserFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtUserFocusGained
+        // TODO add your handling code here:
+        txtUser.requestFocus();
+    }//GEN-LAST:event_txtUserFocusGained
+
+    private void txtCusGroupFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtCusGroupFocusGained
+        // TODO add your handling code here:
+        txtCusGroup.requestFocus();
+    }//GEN-LAST:event_txtCusGroupFocusGained
 
     /**
      * @param args the command line arguments
@@ -572,6 +642,11 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
                 if (e.getKeyCode() == KeyEvent.VK_DOWN || e.getKeyCode() == KeyEvent.VK_ENTER) {
                     txtVouNo.requestFocus();
                 }
+                if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE || e.getKeyCode() == KeyEvent.VK_DELETE) {
+                    if (txtCus.getText().isEmpty()) {
+                        traderAutoCompleter.closePopup();
+                    }
+                }
                 tabToTable(e);
                 break;
             case "txtVouNo":
@@ -581,6 +656,7 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
                 if (e.getKeyCode() == KeyEvent.VK_DOWN || e.getKeyCode() == KeyEvent.VK_ENTER) {
                     txtVouStatus.requestFocus();
                 }
+               
                 tabToTable(e);
                 break;
             case "txtVouStatus":
@@ -589,6 +665,11 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
                 }
                 if (e.getKeyCode() == KeyEvent.VK_DOWN || e.getKeyCode() == KeyEvent.VK_ENTER) {
                     txtRemark.requestFocus();
+                }
+                if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE || e.getKeyCode() == KeyEvent.VK_DELETE) {
+                    if (txtVouStatus.getText().isEmpty()) {
+                        vouCompleter.closePopup();
+                    }
                 }
                 tabToTable(e);
                 break;
@@ -599,6 +680,7 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
                 if (e.getKeyCode() == KeyEvent.VK_DOWN || e.getKeyCode() == KeyEvent.VK_ENTER) {
                     txtMachine.requestFocus();
                 }
+                
                 tabToTable(e);
                 break;
             case "txtMachine":
@@ -608,6 +690,11 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
                 if (e.getKeyCode() == KeyEvent.VK_DOWN || e.getKeyCode() == KeyEvent.VK_ENTER) {
                     txtUser.requestFocus();
                 }
+                if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE || e.getKeyCode() == KeyEvent.VK_DELETE) {
+                    if (txtMachine.getText().isEmpty()) {
+                        machAutoCompleter.closePopup();
+                    }
+                }
                 tabToTable(e);
                 break;
             case "txtUser":
@@ -616,6 +703,11 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
                 }
                 if (e.getKeyCode() == KeyEvent.VK_DOWN || e.getKeyCode() == KeyEvent.VK_ENTER) {
                     txtCusGroup.requestFocus();
+                }
+                if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE || e.getKeyCode() == KeyEvent.VK_DELETE) {
+                    if (txtUser.getText().isEmpty()) {
+                        appUserAutoCompleter.closePopup();
+                    }
                 }
                 tabToTable(e);
                 break;
@@ -639,4 +731,5 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
             }
         }
     }
+
 }

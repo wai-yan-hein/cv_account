@@ -31,6 +31,10 @@ public class MachineInfo implements java.io.Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date regDate;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "updated_date")
+    private Date updatedDate;
+
     public MachineInfo() {
     }
 
@@ -65,5 +69,13 @@ public class MachineInfo implements java.io.Serializable {
     public void setRegDate(Date regDate) {
         this.regDate = regDate;
     }
-    
+
+    public Date getUpdatedDate() {
+        return updatedDate;
+    }
+
+    public void setUpdatedDate(Date updatedDate) {
+        this.updatedDate = updatedDate;
+    }
+
 }

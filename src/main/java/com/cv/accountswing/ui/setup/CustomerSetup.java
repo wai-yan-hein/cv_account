@@ -99,7 +99,7 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener, Pa
 
     private void initCombo() {
 
-        List<ChartOfAccount> listCOA = coaService.search("-", "-", Global.compId.toString(), "3", "-", "-", "-");
+        List<ChartOfAccount> listCOA = coaService.search("-", "-", Global.compId.toString(), "2", "-", "-", "-");
         BindingUtil.BindComboFilter(cboAccount, listCOA, null, true, false);
         BindingUtil.BindComboFilter(cboPriceType, traderTypeService.findAll(), null, true, false);
         BindingUtil.BindComboFilter(cboRegion, regionService.search("-", "-", Global.compId.toString(), "-"), null, true, false);

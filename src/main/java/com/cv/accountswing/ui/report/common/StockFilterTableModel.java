@@ -95,7 +95,7 @@ public class StockFilterTableModel extends AbstractTableModel {
     private void setSelection(int row, int column) {
         table.setRowSelectionInterval(row, row);
         table.setColumnSelectionInterval(column, column);
-        table.requestFocus();
+        table.requestFocusInWindow();
     }
 
     @Override
@@ -105,7 +105,7 @@ public class StockFilterTableModel extends AbstractTableModel {
 
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
-        return true;
+        return columnIndex == 0;
     }
 
     public void refresh() {
@@ -137,6 +137,17 @@ public class StockFilterTableModel extends AbstractTableModel {
         if (listStock != null) {
             if (hasEmptyRow()) {
                 listStock.add(new Stock());
+            }
+        }
+    }
+
+    public void delete(int row) {
+        if (listStock != null) {
+            Stock s = listStock.get(row);
+            if (s.getStockCode() != null) {
+                listStock.remove(row);
+                fireTableRowsDeleted(row, row);
+                table.setRowSelectionInterval(0, 0);
             }
         }
     }
