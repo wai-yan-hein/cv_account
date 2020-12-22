@@ -16,7 +16,7 @@
     <description>Core Account</description>
 
     <properties>
-        <java.version>1.8</java.version>
+        <java.version>15</java.version>
         <hibernate.version>5.4.22.Final</hibernate.version>
         <mysql.connector.version>5.1.31</mysql.connector.version>
     </properties>
@@ -160,6 +160,11 @@
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
             <version>4.1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.cv.account</groupId>
+            <artifactId>cv-account-dal</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
     </dependencies>

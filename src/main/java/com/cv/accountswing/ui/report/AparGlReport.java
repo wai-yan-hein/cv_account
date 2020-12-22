@@ -271,7 +271,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                 coaOpDService.genTriBalance1(Global.compId.toString(),
                         Util1.toDateStrMYSQL(stDate, "dd/MM/yyyy"),
                         Global.finicialPeriodFrom, Util1.toDateStrMYSQL(enDate, "dd/MM/yyyy"),
-                        "-", currency, dept, cvId, userId);
+                        "-", currency, dept, cvId, userId, Global.machineId.toString());
                 List<VTriBalance> listVTB = vTriBalanceService.getTriBalance(userId, Global.compId.toString());
                 glListingTableModel.setListTBAL(listVTB);
                 calGLTotlaAmount(listVTB);
@@ -308,13 +308,13 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                         Global.finicialPeriodFrom,
                         stDate, 3, "MMK",
                         Global.loginUser.getUserId().toString(),
-                        Util1.isNull(dept, "-"), cvId);
+                        Util1.isNull(dept, "-"), cvId, Global.machineId.toString());
             } else {
                 opBalanceGL = coaOpDService.getOpBalanceGL1(getTarget(),
                         Global.finicialPeriodFrom,
                         stDate, 3, "MMK",
                         Global.loginUser.getUserId().toString(),
-                        Util1.isNull(dept, "-"));
+                        Util1.isNull(dept, "-"), Global.machineId.toString());
             }
             if (!opBalanceGL.isEmpty()) {
                 TmpOpeningClosing tmpOC = opBalanceGL.get(0);

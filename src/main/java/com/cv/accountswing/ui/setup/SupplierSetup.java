@@ -200,7 +200,8 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener, Pa
 
     private void saveCustomer() {
         if (isValidEntry()) {
-            Supplier save = supplierService.save(customer);
+            String traderCodeLength = Global.sysProperties.get("system.trader.id.length");
+            Supplier save = supplierService.save(customer, traderCodeLength);
             if (save.getTraderId() != null) {
                 JOptionPane.showMessageDialog(Global.parentForm, "Saved");
                 if (lblStatus.getText().equals("NEW")) {

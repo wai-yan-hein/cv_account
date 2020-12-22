@@ -64,7 +64,8 @@ public class CustomerOrderSetup extends javax.swing.JDialog implements KeyListen
     private void save() {
         if (isValidEntry()) {
             try {
-                Customer save = customerService.save(customer);
+                String traderCodeLength = Global.sysProperties.get("system.trader.id.length");
+                Customer save = customerService.save(customer, traderCodeLength);
                 gridTabelModel.addCustomer(save);
                 dispose();
             } catch (Exception e) {

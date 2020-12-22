@@ -170,11 +170,12 @@ public class CustomerImportDialog extends javax.swing.JDialog {
 
     private void saveCustomer() {
         JDialog loading = Util1.getLoading(this, loadingIcon);
+        String traderCodeLength = Global.sysProperties.get("system.trader.id.length");
         taskExecutor.execute(() -> {
             importTableModel.getListCustomer().forEach(cus -> {
                 cus.setCompCode(Global.compId);
                 cus.setActive(true);
-                customerService.save(cus);
+                customerService.save(cus, traderCodeLength);
             });
             importTableModel.clear();
             loading.setVisible(false);

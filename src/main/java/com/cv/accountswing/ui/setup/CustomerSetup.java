@@ -205,7 +205,8 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener, Pa
 
     private void saveCustomer() {
         if (isValidEntry()) {
-            Customer save = customerService.save(customer);
+            String traderCodeLength = Global.sysProperties.get("system.trader.id.length");
+            Customer save = customerService.save(customer, traderCodeLength);
             if (save.getTraderId() != null) {
                 JOptionPane.showMessageDialog(Global.parentForm, "Saved");
                 if (lblStatus.getText().equals("NEW")) {

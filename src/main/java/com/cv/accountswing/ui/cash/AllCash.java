@@ -713,7 +713,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
             }
             List<TmpOpeningClosing> opBalanceGL = coaOpDService.getOpBalanceGL1(sourceAccId, opDate, stDate, 3, "MMK",
                     Global.loginUser.getUserId().toString(),
-                    Util1.isNull(depId, "-"));
+                    Util1.isNull(depId, "-"), Global.machineId.toString());
             LOGGER.info("End calculate opening.");
             if (!opBalanceGL.isEmpty()) {
                 TmpOpeningClosing tmpOC = opBalanceGL.get(0);
