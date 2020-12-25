@@ -44,6 +44,7 @@ public class EchoThread extends Thread {
             if (!phoneNo.isEmpty()) {
                 customerGrid.setPhoneNumber(phoneNo);
                 data.close();
+                socket.close();
             }
         } catch (IOException e) {
             log.error("DataInputStream :" + e.getMessage());

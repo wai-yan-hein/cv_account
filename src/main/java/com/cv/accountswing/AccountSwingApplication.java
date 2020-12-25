@@ -62,7 +62,7 @@ public class AccountSwingApplication {
 
         try {
             Global.sock = new ServerSocket(10003);//Pharmacy
-            
+
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(new JFrame(), "You cannot run two program at the same time in the same machine.",
                     "Duplicate Program running.", JOptionPane.ERROR_MESSAGE);
@@ -119,6 +119,7 @@ public class AccountSwingApplication {
 
                     ApplicationMainFrame appMain = context.getBean(ApplicationMainFrame.class);
                     java.awt.EventQueue.invokeLater(() -> {
+                        appMain.loadSysProperties();
                         appMain.startNetworkDetector();
                         appMain.setIconImage(new ImageIcon(AccountSwingApplication.class.getResource("/images/logo.png")).getImage());
                         appMain.setExtendedState(JFrame.MAXIMIZED_BOTH);

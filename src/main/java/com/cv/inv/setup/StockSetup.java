@@ -242,12 +242,12 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
             stock.setSaleMeasure(Util1.getFloat(txtSaleWt.getText()));
             stock.setSaleUnit((StockUnit) cboSaleUnit.getSelectedItem());
             stock.setPattern((UnitPattern) cboUnitPattern.getSelectedItem());
-            stock.setSalePriceN(Util1.getDouble(txtSalePrice.getText()));
-            stock.setSalePriceA(Util1.getDouble(txtSalePriceA.getText()));
-            stock.setSalePriceB(Util1.getDouble(txtSalePriceB.getText()));
-            stock.setSalePriceC(Util1.getDouble(txtSalePriceC.getText()));
-            stock.setSalePriceD(Util1.getDouble(txtSalePriceD.getText()));
-            stock.setSttCostPrice(Util1.getDouble(txtSalePriceStd.getText()));
+            stock.setSalePriceN(Util1.getFloat(txtSalePrice.getText()));
+            stock.setSalePriceA(Util1.getFloat(txtSalePriceA.getText()));
+            stock.setSalePriceB(Util1.getFloat(txtSalePriceB.getText()));
+            stock.setSalePriceC(Util1.getFloat(txtSalePriceC.getText()));
+            stock.setSalePriceD(Util1.getFloat(txtSalePriceD.getText()));
+            stock.setSttCostPrice(Util1.getFloat(txtSalePriceStd.getText()));
             if (lblStatus.getText().equals("NEW")) {
                 stock.setCreatedBy(Global.loginUser);
             } else {

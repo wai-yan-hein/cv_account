@@ -7,8 +7,10 @@ package com.cv.inv.entry;
 
 import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
+import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.Customer;
 import com.cv.accountswing.service.CustomerService;
+import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.inv.entry.common.CustomerGridTabelModel;
 import com.cv.inv.entry.dialog.OrderDialog;
@@ -46,9 +48,20 @@ public class CustomerGrid extends javax.swing.JPanel {
     @Autowired
     private OrderDialog orderDialog;
     @Autowired
+    private ApplicationMainFrame mainFrame;
+    @Autowired
     private CustomerOrderSetup customerOrderSetup;
     private TableRowSorter<TableModel> sorter;
     private boolean isShown = false;
+    private SelectionObserver observer;
+
+    public SelectionObserver getObserver() {
+        return observer;
+    }
+
+    public void setObserver(SelectionObserver observer) {
+        this.observer = observer;
+    }
 
     /**
      * Creates new form CustomerGrid
@@ -58,9 +71,11 @@ public class CustomerGrid extends javax.swing.JPanel {
     }
 
     public void initMain() {
-        initTable();
-        searchCustomerList();
-        isShown = true;
+        if (!isShown) {
+            initTable();
+            searchCustomerList();
+            isShown = true;
+        }
     }
 
     private void initTable() {
@@ -120,18 +135,24 @@ public class CustomerGrid extends javax.swing.JPanel {
         public boolean include(RowFilter.Entry<? extends Object, ? extends Object> entry) {
             String text = txtPhone.getText().toUpperCase();
             String tmp1 = entry.getValue(2).toString().toUpperCase();
-            return tmp1.startsWith(text);
+            tmp1 = tmp1.replaceAll("[-+^]*", "");
+            boolean contains = tmp1.contains(text);
+            return contains;
 
         }
     };
 
     public void setPhoneNumber(String phoneNo) {
-        log.info("Message Recieved.");
-        int confirm = JOptionPane.showConfirmDialog(Global.parentForm, "Do you want to search customer info.",
-                "Phone call received", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, phoneIcon);
-        if (confirm == JOptionPane.YES_OPTION) {
-            txtPhone.setText(phoneNo);
-            sorter.setRowFilter(phoneFilter);
+        if (isShown) {
+            log.info("Message Recieved.");
+            if (!txtPhone.getText().equals(phoneNo)) {
+                int confirm = JOptionPane.showConfirmDialog(Global.parentForm, "Do you want to search customer info.",
+                        "Phone call received", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, phoneIcon);
+                if (confirm == JOptionPane.YES_OPTION) {
+                    txtPhone.setText(phoneNo);
+                    sorter.setRowFilter(phoneFilter);
+                }
+            }
         }
     }
 
@@ -154,6 +175,7 @@ public class CustomerGrid extends javax.swing.JPanel {
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
 
+        setName(""); // NOI18N
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentShown(java.awt.event.ComponentEvent evt) {
                 formComponentShown(evt);

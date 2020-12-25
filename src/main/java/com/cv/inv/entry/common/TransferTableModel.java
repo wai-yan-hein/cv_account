@@ -221,7 +221,7 @@ public class TransferTableModel extends AbstractTableModel {
                     break;
                 case 8: //Cost Price
                     if (value != null) {
-                        Double price = Util1.NZeroDouble(value);
+                        float price = Util1.getFloat(value);
                         if (price <= 0) {
                             JOptionPane.showMessageDialog(Global.parentForm, "Price must be positive value.",
                                     "Minus or zero qty.", JOptionPane.ERROR_MESSAGE);
@@ -258,7 +258,7 @@ public class TransferTableModel extends AbstractTableModel {
 
     private void calculateAmount(TransferDetailHis tran) {
         if (tran.getMedicineId() != null) {
-            Double amount = tran.getQty() * tran.getPrice();
+            float amount = tran.getQty() * tran.getPrice();
             tran.setAmount(amount);
         }
     }
@@ -294,10 +294,11 @@ public class TransferTableModel extends AbstractTableModel {
             return true;
         }
     }
+
     public List<TransferDetailHis> getDetail() {
         List<TransferDetailHis> listRetInDetail = new ArrayList();
         for (TransferDetailHis pdh2 : listDetail) {
-            if (pdh2.getMedicineId()!= null) {
+            if (pdh2.getMedicineId() != null) {
                 if (pdh2.getMedicineId().getStockCode() != null) {
                     listRetInDetail.add(pdh2);
                 }
@@ -339,6 +340,7 @@ public class TransferTableModel extends AbstractTableModel {
             parent.setRowSelectionInterval(0, 0);
         }
     }
+
     public void setTransferDetailList(List<TransferDetailHis> listIssueDetail) {
         this.listDetail = listIssueDetail;
 

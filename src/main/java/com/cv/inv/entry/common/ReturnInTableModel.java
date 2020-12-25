@@ -248,7 +248,7 @@ public class ReturnInTableModel extends AbstractTableModel {
 //                            record.setAmount(amount);
 //                        } else {
 //                            double amount = record.getQty() * record.getPrice();
-                        record.setAmount(Util1.NZeroDouble(calAmount));
+                        record.setAmount(Util1.getFloat(calAmount));
                         // }
                         // record.setPrice(Util1.getDouble(calAmount));
                         //  parent.setColumnSelectionInterval(4, 4);
@@ -263,7 +263,7 @@ public class ReturnInTableModel extends AbstractTableModel {
                             record.setStockUnit(st);
                             String toUnit = record.getStockUnit().getItemUnitCode();
                             Float calAmount = calPrice(record, toUnit);
-                            record.setPrice(Util1.getDouble(calAmount));
+                            record.setPrice(Util1.getFloat(calAmount));
                             parent.setColumnSelectionInterval(5, 5);
                         }
                     }
@@ -271,7 +271,7 @@ public class ReturnInTableModel extends AbstractTableModel {
                     break;
                 case 6://Price
                     if (value != null) {
-                        Double price = NumberUtil.NZero(value);
+                        Float price = Util1.getFloat(value);
                         if (price <= 0) {
                             JOptionPane.showMessageDialog(Global.parentForm, "Price must be positive value.",
                                     "Minus or zero qty.", JOptionPane.ERROR_MESSAGE);
@@ -294,17 +294,14 @@ public class ReturnInTableModel extends AbstractTableModel {
 //                        parent.setColumnSelectionInterval(0, 0); //Move to Code
 //                    }
                     if (value != null) {
-                        record.setAmount(Util1.getDouble(value));
+                        record.setAmount(Util1.getFloat(value));
                         isAmount = true;
                     }
                     break;
 
             }
             //parent.requestFocusInWindow();
-            if (!isAmount) {
-                calAmt(record);
-                fireTableCellUpdated(row, 8);
-            }
+            calAmt(record);
             fireTableRowsUpdated(row, row);
             parent.requestFocusInWindow();
 
@@ -320,14 +317,9 @@ public class ReturnInTableModel extends AbstractTableModel {
     }
 
     private void calAmt(RetInHisDetail retInDetail) {
-        Double amt;
-        if (retInDetail.getAmount() != null) {
-            amt = retInDetail.getQty() * Double.parseDouble(retInDetail.getAmount().toString());
-            retInDetail.setAmount(amt);
-        } else {
-            amt = retInDetail.getQty() * Double.parseDouble(retInDetail.getPrice().toString());
-            retInDetail.setAmount(amt);
-        }
+        Float amt;
+        amt = Util1.getFloat(retInDetail.getQty()) * Util1.getFloat(retInDetail.getAmount());
+        retInDetail.setAmount(amt);
     }
 
     public List<RetInHisDetail> getRetInDetailHis() {

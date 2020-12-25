@@ -233,7 +233,7 @@ public class SaleEntryTableModel extends AbstractTableModel {
                         stockUp.add(stock);
                         if (stock.getStockCode() != null) {
                             String stockCode = stock.getStockCode();
-                            Double salePrice = stockUp.getPrice(stockCode, getCusType());
+                            Float salePrice = stockUp.getPrice(stockCode, getCusType());
                             record.setPrice(Util1.getFloat(salePrice));
                         }
                         txtTotalItem.setText(Integer.toString(listDetail.size()));
