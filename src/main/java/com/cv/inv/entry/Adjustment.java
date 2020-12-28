@@ -5,6 +5,7 @@
  */
 package com.cv.inv.entry;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
@@ -59,6 +60,8 @@ public class Adjustment extends javax.swing.JPanel implements SelectionObserver,
         tblAdjust.setModel(adjustTableModel);
         adjustTableModel.setParent(tblAdjust);
         tblAdjust.getTableHeader().setFont(Global.lableFont);
+        tblAdjust.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblAdjust.getTableHeader().setForeground(ColorUtil.foreground);
         tblAdjust.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblAdjust.getColumnModel().getColumn(0).setPreferredWidth(50);
         tblAdjust.getColumnModel().getColumn(1).setPreferredWidth(300);

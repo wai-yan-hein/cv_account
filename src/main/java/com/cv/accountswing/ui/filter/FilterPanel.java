@@ -5,30 +5,26 @@
  */
 package com.cv.accountswing.ui.filter;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.SelectionObserver;
-import com.cv.accountswing.entity.Department;
-import com.cv.accountswing.service.COAService;
-import com.cv.accountswing.service.CurrencyService;
-import com.cv.accountswing.service.DepartmentService;
-import com.cv.accountswing.service.TraderService;
+import com.cv.accountswing.service.VDescriptionService;
+import com.cv.accountswing.service.VRefService;
 import com.cv.accountswing.ui.editor.COAAutoCompleter;
 import com.cv.accountswing.ui.editor.CurrencyAutoCompleter;
 import com.cv.accountswing.ui.editor.DateAutoCompleter;
 import com.cv.accountswing.ui.editor.DepartmentAutoCompleter;
 import com.cv.accountswing.ui.editor.TraderAutoCompleter;
 import com.cv.accountswing.ui.cash.AllCash;
+import com.cv.accountswing.ui.editor.DespAutoCompleter;
+import com.cv.accountswing.ui.editor.RefAutoCompleter;
 import com.cv.accountswing.util.Util1;
-import com.cv.inv.entry.editor.StockAutoCompleter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import javax.swing.JTextField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
 
 /**
@@ -39,23 +35,18 @@ import org.springframework.stereotype.Component;
 public class FilterPanel extends javax.swing.JPanel implements KeyListener, SelectionObserver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FilterPanel.class);
-
-    @Autowired
-    private TraderService traderService;
-    @Autowired
-    private DepartmentService departmentService;
-    @Autowired
-    private COAService cOAService;
-    @Autowired
-    private CurrencyService currencyService;
     private DateAutoCompleter dateAutoCompleter;
     private TraderAutoCompleter traderAutoCompleter;
     private DepartmentAutoCompleter departmentAutoCompleter;
     private COAAutoCompleter coaAutoCompleter;
     private CurrencyAutoCompleter currencyAutoCompleter;
     private SelectionObserver selectionObserver;
+    private DespAutoCompleter despAutoCompleter;
+    private RefAutoCompleter refAutoCompleter;
     @Autowired
-    private TaskExecutor taskExecutor;
+    private VRefService refService;
+    @Autowired
+    private VDescriptionService descriptionService;
 
     public void setSelectionObserver(SelectionObserver selectionObserver) {
         this.selectionObserver = selectionObserver;
@@ -84,21 +75,21 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
     }
 
     private void initializeData() {
-        taskExecutor.execute(() -> {
-            traderAutoCompleter = new TraderAutoCompleter(txtPerson, Global.listTrader, null);
-            departmentAutoCompleter = new DepartmentAutoCompleter(txtDepartment, Global.listDepartment, null);
-            coaAutoCompleter = new COAAutoCompleter(txtAccount, Global.listCOA, null);
-            dateAutoCompleter = new DateAutoCompleter(txtDate, Global.listDateModel, null);
-            currencyAutoCompleter = new CurrencyAutoCompleter(txtCurrency, Global.listCurrency, null);
-            dateAutoCompleter.setSelectionObserver(selectionObserver);
-            departmentAutoCompleter.setSelectionObserver(selectionObserver);
-            traderAutoCompleter.setSelectionObserver(selectionObserver);
-            coaAutoCompleter.setSelectionObserver(selectionObserver);
-            currencyAutoCompleter.setSelectionObserver(selectionObserver);
-            currencyAutoCompleter.setCurrency(Global.defalutCurrency);
-            txtDate.setText("Today");
-        });
-
+        traderAutoCompleter = new TraderAutoCompleter(txtPerson, Global.listTrader, null);
+        traderAutoCompleter.setSelectionObserver(selectionObserver);
+        departmentAutoCompleter = new DepartmentAutoCompleter(txtDepartment, Global.listDepartment, null);
+        departmentAutoCompleter.setSelectionObserver(selectionObserver);
+        coaAutoCompleter = new COAAutoCompleter(txtAccount, Global.listCOA, null);
+        dateAutoCompleter = new DateAutoCompleter(txtDate, Global.listDateModel, null);
+        currencyAutoCompleter = new CurrencyAutoCompleter(txtCurrency, Global.listCurrency, null);
+        currencyAutoCompleter.setSelectionObserver(selectionObserver);
+        dateAutoCompleter.setSelectionObserver(selectionObserver);
+        coaAutoCompleter.setSelectionObserver(selectionObserver);
+        despAutoCompleter = new DespAutoCompleter(txtDesp, Global.listDesp, null, descriptionService);
+        despAutoCompleter.setSelectionObserver(selectionObserver);
+        refAutoCompleter = new RefAutoCompleter(txtRefrence, Global.listRef, null, refService);
+        refAutoCompleter.setSelectionObserver(selectionObserver);
+        txtDate.setText("Today");
     }
 
     private void initKeyListener() {
@@ -125,11 +116,8 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
         txtDebitAmt.setText(null);
         txtDate.requestFocus();
         txtDate.setText("Today");
-        String depId = Global.sysProperties.get("system.default.department");
-        Department dep = departmentService.findById(depId);
-        if (dep != null) {
-            txtDepartment.setText(dep.getDeptName());
-        }
+        departmentAutoCompleter.setDepartment(Global.defaultDepartment);
+        currencyAutoCompleter.setCurrency(Global.defalutCurrency);
     }
 
     /**
@@ -160,6 +148,7 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
         txtCreditAmt = new javax.swing.JTextField();
         jLabel9 = new javax.swing.JLabel();
 
+        setBackground(new java.awt.Color(255, 255, 255));
         setBorder(javax.swing.BorderFactory.createTitledBorder("Filter Bar"));
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentShown(java.awt.event.ComponentEvent evt) {
@@ -249,6 +238,9 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
         txtDesp.setFont(Global.textFont);
         txtDesp.setName("txtDesp"); // NOI18N
         txtDesp.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtDespFocusGained(evt);
+            }
             public void focusLost(java.awt.event.FocusEvent evt) {
                 txtDespFocusLost(evt);
             }
@@ -265,6 +257,9 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
         txtRefrence.setFont(Global.textFont);
         txtRefrence.setName("txtRefrence"); // NOI18N
         txtRefrence.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtRefrenceFocusGained(evt);
+            }
             public void focusLost(java.awt.event.FocusEvent evt) {
                 txtRefrenceFocusLost(evt);
             }
@@ -276,6 +271,7 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
         });
 
         txtCurrency.setFont(Global.textFont);
+        txtCurrency.setDisabledTextColor(new java.awt.Color(0, 0, 0));
         txtCurrency.setEnabled(false);
         txtCurrency.setName("txtCurrency"); // NOI18N
         txtCurrency.addFocusListener(new java.awt.event.FocusAdapter() {
@@ -426,7 +422,6 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
 
     private void txtDepartmentFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtDepartmentFocusGained
         // TODO add your handling code here:
-
         txtDepartment.selectAll();
         //departmentAutoCompleter.showPopup();
 
@@ -555,6 +550,16 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
         // TODO add your handling code here:
     }//GEN-LAST:event_txtDateActionPerformed
 
+    private void txtDespFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtDespFocusGained
+        // TODO add your handling code here:
+        txtDesp.selectAll();
+    }//GEN-LAST:event_txtDespFocusGained
+
+    private void txtRefrenceFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtRefrenceFocusGained
+        // TODO add your handling code here:
+        txtRefrence.selectAll();
+    }//GEN-LAST:event_txtRefrenceFocusGained
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
@@ -579,35 +584,34 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
 
     @Override
     public void keyTyped(KeyEvent e) {
-        /* Object sourceObj = e.getSource();
+        Object sourceObj = e.getSource();
         String ctrlName;
-        
+
         if (sourceObj instanceof JTextField) {
-        ctrlName = ((JTextField) sourceObj).getName();
-        switch (ctrlName) {
-        case "txtDesp":
-        if (selectionObserver != null) {
-        selectionObserver.selected("Description", txtDesp.getText());
+            ctrlName = ((JTextField) sourceObj).getName();
+            switch (ctrlName) {
+                case "txtDepartment":
+
+                    break;
+                case "txtDesp":
+
+                    break;
+
+                case "txtPerson":
+
+                    break;
+                case "txtAccount":
+
+                    break;
+                case "txtCreditAmt":
+
+                    break;
+                case "txtDebitAmt":
+
+                    break;
+
+            }
         }
-        break;
-        case "txtRefrence":
-        if (selectionObserver != null) {
-        selectionObserver.selected("Ref", txtRefrence.getText());
-        }
-        break;
-        case "txtCreditAmt":
-        if (selectionObserver != null) {
-        selectionObserver.selected("CrdAmt", txtCreditAmt.getText());
-        }
-        break;
-        case "txtDebitAmt":
-        if (selectionObserver != null) {
-        selectionObserver.selected("DrAmt", txtDebitAmt.getText());
-        }
-        break;
-        
-        }
-        }*/
     }
 
     @Override
@@ -645,6 +649,14 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
                         closePopup();
 
                     }
+                    if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE || e.getKeyCode() == KeyEvent.VK_DELETE) {
+                        if (txtDepartment.getText().isEmpty()) {
+                            departmentAutoCompleter.closePopup();
+                            if (selectionObserver != null) {
+                                selectionObserver.selected("Department", "-");
+                            }
+                        }
+                    }
                     tabToCashTable(e);
 
                     break;
@@ -658,6 +670,14 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
                         txtRefrence.requestFocus();
                         closePopup();
 
+                    }
+                    if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE || e.getKeyCode() == KeyEvent.VK_DELETE) {
+                        if (txtPerson.getText().isEmpty()) {
+                            traderAutoCompleter.closePopup();
+                            if (selectionObserver != null) {
+                                selectionObserver.selected("Trader", "-");
+                            }
+                        }
                     }
                     tabToCashTable(e);
 
@@ -674,6 +694,14 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
                         closePopup();
 
                     }
+                    if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE || e.getKeyCode() == KeyEvent.VK_DELETE) {
+                        if (txtAccount.getText().isEmpty()) {
+                            coaAutoCompleter.closePopup();
+                            if (selectionObserver != null) {
+                                selectionObserver.selected("COA", "-");
+                            }
+                        }
+                    }
                     tabToCashTable(e);
 
                     break;
@@ -688,6 +716,14 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
                         txtDepartment.requestFocus();
                         closePopup();
 
+                    }
+                    if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE || e.getKeyCode() == KeyEvent.VK_DELETE) {
+                        if (txtDesp.getText().isEmpty()) {
+                            despAutoCompleter.closePopup();
+                            if (selectionObserver != null) {
+                                selectionObserver.selected("Description", "-");
+                            }
+                        }
                     }
                     tabToCashTable(e);
 
@@ -718,9 +754,19 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
                         closePopup();
 
                     }
+                    if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE || e.getKeyCode() == KeyEvent.VK_DELETE) {
+                        if (txtRefrence.getText().isEmpty()) {
+                            refAutoCompleter.closePopup();
+                            if (selectionObserver != null) {
+                                selectionObserver.selected("Ref", "-");
+                            }
+                        }
+                        break;
+                    }
                     tabToCashTable(e);
 
                     break;
+
                 case "txtDebitAmt":
                     txtCreditAmt.setText("");
                     if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_RIGHT) {
@@ -734,6 +780,13 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
                         txtCurrency.requestFocus();
                         closePopup();
                     }
+                    if (e.getKeyCode() == KeyEvent.VK_DELETE || e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
+                        if (txtDebitAmt.getText().isEmpty()) {
+                            if (selectionObserver != null) {
+                                selectionObserver.selected("DrAmt", "-");
+                            }
+                        }
+                    }
                     tabToCashTable(e);
 
                     break;
@@ -742,15 +795,17 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
                     if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_RIGHT) {
                         txtDate.requestFocus();
                         closePopup();
-                        if (!txtCreditAmt.getText().isEmpty()) {
-
+                    }
+                    if (e.getKeyCode() == KeyEvent.VK_DELETE || e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
+                        if (txtCreditAmt.getText().isEmpty()) {
+                            if (selectionObserver != null) {
+                                selectionObserver.selected("CrdAmt", "-");
+                            }
                         }
-
                     }
                     if (e.getKeyCode() == KeyEvent.VK_LEFT) {
                         txtDebitAmt.requestFocus();
                         closePopup();
-
                     }
                     tabToCashTable(e);
                     break;

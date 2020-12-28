@@ -5,16 +5,21 @@
  */
 package com.cv.inv.setup.dialog;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.StartWithRowFilter;
 import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
+import com.cv.inv.entity.UnitPattern;
+import com.cv.inv.entity.UnitRelation;
 import com.cv.inv.entry.editor.StockUnitEditor;
 import com.cv.inv.service.RelationService;
-import com.cv.inv.setup.common.RelationTableModel;
-import java.awt.Frame;
+import com.cv.inv.service.UnitPatternService;
+import com.cv.inv.setup.dialog.common.RelationTableModel;
+import com.cv.inv.setup.dialog.common.UnitPatternTableModel;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -34,38 +39,48 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class RelationSetupDialog extends javax.swing.JDialog implements KeyListener {
-
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(RelationSetupDialog.class);
     @Autowired
     private RelationTableModel relationTableModel;
+    @Autowired
+    private UnitPatternTableModel patternTableModel;
+    @Autowired
+    private UnitPatternService patternService;
+    @Autowired
+    private RelationService relationService;
     private TableRowSorter<TableModel> sorter;
     private StartWithRowFilter swrf;
+    private int selectRow = -1;
 
     /**
      * Creates new form ItemTypeSetupDialog
      */
     public RelationSetupDialog() {
-        super(new Frame(), true);
+        super(Global.parentForm, true);
         initComponents();
     }
-
+    
     public void initMain() {
         initTable();
         searchRelation();
         initCombo();
     }
-
+    
     private void initCombo() {
     }
-
+    
     private void searchRelation() {
         //relationTableModel.setListRelation();
     }
-
+    
     private void initTable() {
+        initTablePattern();
         tblRelation.setModel(relationTableModel);
         relationTableModel.setParent(tblRelation);
         tblRelation.getTableHeader().setFont(Global.lableFont);
+        tblRelation.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblRelation.getTableHeader().setForeground(ColorUtil.foreground);
         tblRelation.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblRelation.getColumnModel().getColumn(0).setCellEditor(new StockUnitEditor());
         tblRelation.getColumnModel().getColumn(1).setCellEditor(new StockUnitEditor());
@@ -80,12 +95,48 @@ public class RelationSetupDialog extends javax.swing.JDialog implements KeyListe
         });
         tblRelation.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                 .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
-        relationTableModel.setListRelation(Global.listRelation);
-        relationTableModel.addNewRow();
         swrf = new StartWithRowFilter(txtFilter);
         sorter = new TableRowSorter(tblRelation.getModel());
         tblRelation.setRowSorter(sorter);
-
+        
+    }
+    
+    private void initTablePattern() {
+        tblPattern.setModel(patternTableModel);
+        tblPattern.getTableHeader().setFont(Global.tblHeaderFont);
+        tblPattern.getTableHeader().setBackground(ColorUtil.btnEdit);
+        tblPattern.getTableHeader().setForeground(ColorUtil.foreground);
+        tblPattern.setDefaultRenderer(Object.class, new TableCellRender());
+        tblPattern.getColumnModel().getColumn(0).setCellEditor(new AutoClearEditor());
+        patternTableModel.setListCategory(patternService.findAll());
+        tblPattern.getSelectionModel().addListSelectionListener((ListSelectionEvent e) -> {
+            if (e.getValueIsAdjusting()) {
+                if (tblPattern.getSelectedRow() >= 0) {
+                    selectRow = tblPattern.convertRowIndexToModel(tblPattern.getSelectedRow());
+                    UnitPattern pattern = patternTableModel.getPattern(selectRow);
+                    relationTableModel.setPatternId(pattern.getPatternId());
+                    searchUnitRelation(pattern.getPatternId());
+                }
+            }
+        });
+        
+    }
+    
+    private void foucsRelationTable() {
+        int row = relationTableModel.getListRelation().size();
+        tblRelation.setColumnSelectionInterval(0, 0);
+        tblRelation.setRowSelectionInterval(row - 1, row - 1);
+    }
+    
+    private void searchUnitRelation(Integer patternId) {
+        if (patternId != null) {
+            List<UnitRelation> listRelation = relationService.search(patternId.toString());
+            relationTableModel.setListRelation(listRelation);
+            relationTableModel.addNewRow();
+            foucsRelationTable();
+        }else{
+            relationTableModel.clear();
+        }
     }
 
     /**
@@ -100,6 +151,8 @@ public class RelationSetupDialog extends javax.swing.JDialog implements KeyListe
         jScrollPane1 = new javax.swing.JScrollPane();
         tblRelation = new javax.swing.JTable();
         txtFilter = new javax.swing.JTextField();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        tblPattern = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Relation Setup");
@@ -127,24 +180,44 @@ public class RelationSetupDialog extends javax.swing.JDialog implements KeyListe
             }
         });
 
+        tblPattern.setFont(Global.textFont);
+        tblPattern.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {},
+                {},
+                {},
+                {}
+            },
+            new String [] {
+
+            }
+        ));
+        tblPattern.setRowHeight(Global.tblRowHeight);
+        jScrollPane2.setViewportView(tblPattern);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)
-                    .addComponent(txtFilter))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(txtFilter, javax.swing.GroupLayout.DEFAULT_SIZE, 283, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(txtFilter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 337, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(txtFilter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 337, Short.MAX_VALUE))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -167,24 +240,26 @@ public class RelationSetupDialog extends javax.swing.JDialog implements KeyListe
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTable tblPattern;
     private javax.swing.JTable tblRelation;
     private javax.swing.JTextField txtFilter;
     // End of variables declaration//GEN-END:variables
 
     @Override
     public void keyTyped(KeyEvent e) {
-
+        
     }
-
+    
     @Override
     public void keyPressed(KeyEvent e) {
     }
-
+    
     @Override
     public void keyReleased(KeyEvent e) {
         Object sourceObj = e.getSource();
         String ctrlName = "-";
-
+        
         if (sourceObj instanceof JTable) {
             ctrlName = ((JTable) sourceObj).getName();
         } else if (sourceObj instanceof JTextField) {
@@ -193,23 +268,23 @@ public class RelationSetupDialog extends javax.swing.JDialog implements KeyListe
             ctrlName = ((JButton) sourceObj).getName();
         }
         switch (ctrlName) {
-
+            
             case "txtName":
                 if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_DOWN) {
                 }
                 if (e.getKeyCode() == KeyEvent.VK_UP) {
                 }
                 tabToTable(e);
-
+                
                 break;
-
+            
             case "btnSave":
                 if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_DOWN) {
                 }
                 if (e.getKeyCode() == KeyEvent.VK_UP) {
                 }
                 tabToTable(e);
-
+                
                 break;
             case "btnDelete":
                 if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_DOWN) {
@@ -217,7 +292,7 @@ public class RelationSetupDialog extends javax.swing.JDialog implements KeyListe
                 if (e.getKeyCode() == KeyEvent.VK_UP) {
                 }
                 tabToTable(e);
-
+                
                 break;
             case "btnClear":
                 if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_DOWN) {
@@ -225,11 +300,11 @@ public class RelationSetupDialog extends javax.swing.JDialog implements KeyListe
                 if (e.getKeyCode() == KeyEvent.VK_UP) {
                 }
                 tabToTable(e);
-
+                
                 break;
         }
     }
-
+    
     private void tabToTable(KeyEvent e) {
         if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_RIGHT) {
             tblRelation.requestFocus();

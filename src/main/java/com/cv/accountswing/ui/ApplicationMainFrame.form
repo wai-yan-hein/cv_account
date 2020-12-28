@@ -51,7 +51,7 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="tabMain" alignment="1" pref="738" max="32767" attributes="0"/>
+          <Component id="tabMain" alignment="1" max="32767" attributes="0"/>
           <Component id="jPanel1" alignment="0" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
@@ -60,7 +60,7 @@
           <Group type="102" alignment="0" attributes="0">
               <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Component id="tabMain" pref="343" max="32767" attributes="0"/>
+              <Component id="tabMain" pref="339" max="32767" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -69,27 +69,22 @@
   <SubComponents>
     <Container class="javax.swing.JPanel" name="jPanel1">
       <Properties>
-        <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-          <Color blue="ff" green="ff" red="ff" type="rgb"/>
-        </Property>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-          <Border info="org.netbeans.modules.form.compat2.border.LineBorderInfo">
-            <LineBorder roundedCorners="true">
-              <Color PropertyName="color" blue="cc" green="cc" red="cc" type="rgb"/>
-            </LineBorder>
+          <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
+            <EmptyBorder/>
           </Border>
         </Property>
+        <Property name="focusable" type="boolean" value="false"/>
       </Properties>
 
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="toolBar" min="-2" max="-2" attributes="0"/>
+                  <Component id="toolBar" max="32767" attributes="0"/>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                  <Component id="lblCompanyName" min="-2" pref="194" max="-2" attributes="0"/>
-                  <EmptySpace max="32767" attributes="0"/>
+                  <Component id="lblCompanyName" min="-2" pref="204" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
                   <Component id="txtSearch" min="-2" pref="150" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
@@ -103,17 +98,27 @@
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="lblCompanyName" alignment="3" min="-2" pref="28" max="-2" attributes="0"/>
-                  <Component id="txtSearch" alignment="3" min="-2" max="-2" attributes="0"/>
+              <Group type="102" attributes="0">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="lblCompanyName" min="-2" pref="28" max="-2" attributes="0"/>
+                      <Component id="toolBar" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
               </Group>
-              <Component id="toolBar" min="-2" max="-2" attributes="0"/>
               <Group type="102" alignment="1" attributes="0">
-                  <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="1" attributes="0">
-                      <Component id="lblNeworkPing" alignment="1" min="-2" max="-2" attributes="0"/>
-                      <Component id="lblNeworkImage" alignment="1" min="-2" max="-2" attributes="0"/>
-                      <Component id="jLabel1" alignment="1" min="-2" max="-2" attributes="0"/>
+                      <Group type="102" attributes="0">
+                          <EmptySpace min="6" max="32767" attributes="0"/>
+                          <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <Group type="102" attributes="0">
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="1" attributes="0">
+                              <Component id="lblNeworkImage" alignment="1" max="32767" attributes="0"/>
+                              <Component id="lblNeworkPing" alignment="0" max="32767" attributes="0"/>
+                              <Component id="txtSearch" pref="0" max="32767" attributes="0"/>
+                          </Group>
+                      </Group>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -139,11 +144,14 @@
           <SubComponents>
             <Component class="javax.swing.JButton" name="btnSave">
               <Properties>
+                <Property name="background" type="java.awt.Color" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="ColorUtil.mainColor" type="code"/>
+                </Property>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="Global.lableFont" type="code"/>
                 </Property>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/images/save.png"/>
+                  <Image iconType="3" name="/images/save_20px.png"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="F5 - Save"/>
               </Properties>
@@ -153,11 +161,14 @@
             </Component>
             <Component class="javax.swing.JButton" name="btnPrint">
               <Properties>
+                <Property name="background" type="java.awt.Color" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="ColorUtil.mainColor" type="code"/>
+                </Property>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="Global.lableFont" type="code"/>
                 </Property>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/images/printer.png"/>
+                  <Image iconType="3" name="/images/print_20px.png"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="F6 - Print"/>
                 <Property name="focusable" type="boolean" value="false"/>
@@ -168,8 +179,11 @@
             </Component>
             <Component class="javax.swing.JButton" name="btnRefresh">
               <Properties>
+                <Property name="background" type="java.awt.Color" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="ColorUtil.mainColor" type="code"/>
+                </Property>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/images/refresh.png"/>
+                  <Image iconType="3" name="/images/refresh_20px.png"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="F7 - Refresh"/>
               </Properties>
@@ -179,11 +193,14 @@
             </Component>
             <Component class="javax.swing.JButton" name="btnDelete">
               <Properties>
+                <Property name="background" type="java.awt.Color" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="ColorUtil.mainColor" type="code"/>
+                </Property>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="Global.lableFont" type="code"/>
                 </Property>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/images/delete.png"/>
+                  <Image iconType="3" name="/images/trash_20px.png"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="F8 - Delete"/>
                 <Property name="focusable" type="boolean" value="false"/>
@@ -194,11 +211,14 @@
             </Component>
             <Component class="javax.swing.JButton" name="btnHistory">
               <Properties>
+                <Property name="background" type="java.awt.Color" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="ColorUtil.mainColor" type="code"/>
+                </Property>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="Global.lableFont" type="code"/>
                 </Property>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/images/history.png"/>
+                  <Image iconType="3" name="/images/time_machine_20px.png"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="F9-History"/>
                 <Property name="focusable" type="boolean" value="false"/>
@@ -209,13 +229,16 @@
             </Component>
             <Component class="javax.swing.JButton" name="btnClear">
               <Properties>
+                <Property name="background" type="java.awt.Color" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="ColorUtil.mainColor" type="code"/>
+                </Property>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="Global.lableFont" type="code"/>
                 </Property>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/images/clean-code.png"/>
+                  <Image iconType="3" name="/images/add_file_20px.png"/>
                 </Property>
-                <Property name="toolTipText" type="java.lang.String" value="F10 - Clear "/>
+                <Property name="toolTipText" type="java.lang.String" value="F10 - New"/>
                 <Property name="focusable" type="boolean" value="false"/>
               </Properties>
               <Events>
@@ -224,11 +247,14 @@
             </Component>
             <Component class="javax.swing.JButton" name="btnLogout">
               <Properties>
+                <Property name="background" type="java.awt.Color" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="ColorUtil.mainColor" type="code"/>
+                </Property>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="Global.lableFont" type="code"/>
                 </Property>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/images/logout.png"/>
+                  <Image iconType="3" name="/images/logout_rounded_down_20px.png"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="Logout"/>
               </Properties>
@@ -248,6 +274,7 @@
         <Component class="javax.swing.JLabel" name="lblNeworkPing">
           <Properties>
             <Property name="text" type="java.lang.String" value="2344ms"/>
+            <Property name="toolTipText" type="java.lang.String" value="Internet Connection Status"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="txtSearch">
@@ -265,7 +292,11 @@
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
               <Image iconType="3" name="/images/search.png"/>
             </Property>
+            <Property name="toolTipText" type="java.lang.String" value="Search"/>
           </Properties>
+          <Events>
+            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jLabel1MouseClicked"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>

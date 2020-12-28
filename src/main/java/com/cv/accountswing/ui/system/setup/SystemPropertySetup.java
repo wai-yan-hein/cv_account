@@ -5,6 +5,7 @@
  */
 package com.cv.accountswing.ui.system.setup;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
@@ -71,6 +72,8 @@ public class SystemPropertySetup extends javax.swing.JPanel implements KeyListen
     private void initTable() {
         tblSystemProper.setDefaultRenderer(Object.class, new TableCellRender());
         tblSystemProper.setModel(systemPropertyTableModel);
+        tblSystemProper.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblSystemProper.getTableHeader().setForeground(ColorUtil.foreground);
         tblSystemProper.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblSystemProper.getSelectionModel().addListSelectionListener((ListSelectionEvent e) -> {
             if (e.getValueIsAdjusting()) {
@@ -233,7 +236,10 @@ public class SystemPropertySetup extends javax.swing.JPanel implements KeyListen
         txtRemark.setFont(Global.textFont);
         txtRemark.setName("txtRemark"); // NOI18N
 
+        btnClear.setBackground(ColorUtil.btnEdit);
         btnClear.setFont(Global.textFont);
+        btnClear.setForeground(ColorUtil.foreground);
+        btnClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/clear-button-white.png"))); // NOI18N
         btnClear.setText("Clear");
         btnClear.setName("btnClear"); // NOI18N
         btnClear.addActionListener(new java.awt.event.ActionListener() {
@@ -242,7 +248,10 @@ public class SystemPropertySetup extends javax.swing.JPanel implements KeyListen
             }
         });
 
+        btnSave.setBackground(ColorUtil.mainColor);
         btnSave.setFont(Global.textFont);
+        btnSave.setForeground(ColorUtil.foreground);
+        btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save-button-white.png"))); // NOI18N
         btnSave.setText("Save");
         btnSave.setName("btnSave"); // NOI18N
         btnSave.addActionListener(new java.awt.event.ActionListener() {
@@ -268,7 +277,7 @@ public class SystemPropertySetup extends javax.swing.JPanel implements KeyListen
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(txtValue, javax.swing.GroupLayout.DEFAULT_SIZE, 367, Short.MAX_VALUE))
+                        .addComponent(txtValue, javax.swing.GroupLayout.DEFAULT_SIZE, 402, Short.MAX_VALUE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addComponent(lblStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -314,7 +323,7 @@ public class SystemPropertySetup extends javax.swing.JPanel implements KeyListen
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 428, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 393, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())

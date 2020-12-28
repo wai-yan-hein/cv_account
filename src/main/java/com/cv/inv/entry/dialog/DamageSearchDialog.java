@@ -5,9 +5,9 @@
  */
 package com.cv.inv.entry.dialog;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.SelectionObserver;
-import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.DamageDetailHis;
 import com.cv.inv.entity.DamageHis;
@@ -16,7 +16,6 @@ import com.cv.inv.entry.common.DamageSearchTableModel;
 import com.cv.inv.entry.editor.LocationAutoCompleter;
 import com.cv.inv.service.DamageDetailHisService;
 import com.cv.inv.service.DamageHisService;
-import java.awt.Frame;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
@@ -31,8 +30,7 @@ import org.springframework.stereotype.Component;
 public class DamageSearchDialog extends javax.swing.JDialog implements SelectionObserver {
 
     private final DamageSearchTableModel vouTableModel = new DamageSearchTableModel();
-    private int selectedRow = -1;
-    private SelectionObserver observer;
+
     /**
      * Creates new form DamageSearchDialog
      */
@@ -44,7 +42,7 @@ public class DamageSearchDialog extends javax.swing.JDialog implements Selection
     private DamageDetailHisService ddhService;
 
     public DamageSearchDialog() {
-        super(new Frame(), true);
+        super(Global.parentForm, true);
         initComponents();
     }
 
@@ -55,6 +53,8 @@ public class DamageSearchDialog extends javax.swing.JDialog implements Selection
 
     private void initTableVoucher() {
         tblVoucher.getTableHeader().setFont(Global.lableFont);
+        tblVoucher.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblVoucher.getTableHeader().setForeground(ColorUtil.foreground);
         tblVoucher.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblVoucher.getColumnModel().getColumn(0).setPreferredWidth(30);
         tblVoucher.getColumnModel().getColumn(1).setPreferredWidth(60);
@@ -248,6 +248,7 @@ public class DamageSearchDialog extends javax.swing.JDialog implements Selection
         });
         jScrollPane1.setViewportView(tblVoucher);
 
+        butSearch.setBackground(ColorUtil.mainColor);
         butSearch.setText("Search");
         butSearch.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -255,6 +256,7 @@ public class DamageSearchDialog extends javax.swing.JDialog implements Selection
             }
         });
 
+        butSelect.setBackground(ColorUtil.mainColor);
         butSelect.setText("Select");
         butSelect.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

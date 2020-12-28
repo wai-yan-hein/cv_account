@@ -5,6 +5,7 @@
  */
 package com.cv.accountswing.ui.setup;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
@@ -138,6 +139,7 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
     private void setRegion(Region region) {
         txtRegionCode.setText(Util1.getString(region.getRegId()));
         txtRegionName.setText(region.getRegionName());
+        txtRegionName.selectAll();
         labelStatus.setText("EDIT");
     }
 
@@ -303,11 +305,19 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
         txtRegionName.setFont(Global.textFont);
         txtRegionName.setEnabled(false);
         txtRegionName.setName("txtRegionName"); // NOI18N
+        txtRegionName.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtRegionNameFocusGained(evt);
+            }
+        });
 
         labelStatus.setFont(Global.lableFont);
         labelStatus.setText("NEW");
 
+        btnClearR.setBackground(ColorUtil.btnEdit);
         btnClearR.setFont(Global.lableFont);
+        btnClearR.setForeground(ColorUtil.foreground);
+        btnClearR.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/clear-button-white.png"))); // NOI18N
         btnClearR.setText("Clear");
         btnClearR.setEnabled(false);
         btnClearR.setName("btnClearR"); // NOI18N
@@ -317,7 +327,10 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
             }
         });
 
+        btnSaveR.setBackground(ColorUtil.mainColor);
         btnSaveR.setFont(Global.lableFont);
+        btnSaveR.setForeground(ColorUtil.foreground);
+        btnSaveR.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save-button-white.png"))); // NOI18N
         btnSaveR.setText("Save");
         btnSaveR.setEnabled(false);
         btnSaveR.setName("btnSaveR"); // NOI18N
@@ -344,7 +357,7 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
                             .addComponent(txtRegionCode)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(labelStatus)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 192, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 170, Short.MAX_VALUE)
                         .addComponent(btnSaveR)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnClearR)))
@@ -369,7 +382,7 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
                     .addComponent(labelStatus)
                     .addComponent(btnClearR)
                     .addComponent(btnSaveR))
-                .addContainerGap(321, Short.MAX_VALUE))
+                .addContainerGap(328, Short.MAX_VALUE))
         );
 
         treeRegion.setFont(Global.textFont);
@@ -386,7 +399,7 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 169, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 147, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
@@ -426,6 +439,11 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
         // TODO add your handling code here:
         clear();
     }//GEN-LAST:event_btnClearRActionPerformed
+
+    private void txtRegionNameFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtRegionNameFocusGained
+        // TODO add your handling code here:
+        txtRegionName.selectAll();
+    }//GEN-LAST:event_txtRegionNameFocusGained
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

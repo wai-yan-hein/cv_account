@@ -5,14 +5,14 @@
  */
 package com.cv.inv.setup.dialog;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.StartWithRowFilter;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.VouStatus;
 import com.cv.inv.service.VouStatusService;
-import com.cv.inv.setup.common.VouStatusTableModel;
-import java.awt.Frame;
+import com.cv.inv.setup.dialog.common.VouStatusTableModel;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import javax.swing.JButton;
@@ -48,7 +48,7 @@ public class VouStatusSetupDialog extends javax.swing.JDialog implements KeyList
     private StartWithRowFilter swrf;
 
     public VouStatusSetupDialog() {
-        super(new Frame(), true);
+        super(Global.parentForm, true);
         initComponents();
     }
 
@@ -65,6 +65,8 @@ public class VouStatusSetupDialog extends javax.swing.JDialog implements KeyList
         sorter = new TableRowSorter<>(tblVouStatus.getModel());
         tblVouStatus.setRowSorter(sorter);
         tblVouStatus.getTableHeader().setFont(Global.lableFont);
+        tblVouStatus.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblVouStatus.getTableHeader().setForeground(ColorUtil.foreground);
         tblVouStatus.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblVouStatus.setDefaultRenderer(Object.class, new TableCellRender());
         tblVouStatus.getSelectionModel().addListSelectionListener((ListSelectionEvent e) -> {
@@ -221,7 +223,10 @@ public class VouStatusSetupDialog extends javax.swing.JDialog implements KeyList
         lblStatus.setFont(Global.lableFont);
         lblStatus.setText("NEW");
 
+        btnClear.setBackground(ColorUtil.btnEdit);
         btnClear.setFont(Global.lableFont);
+        btnClear.setForeground(ColorUtil.foreground);
+        btnClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/clear-button-white.png"))); // NOI18N
         btnClear.setText("Clear");
         btnClear.setName("btnClear"); // NOI18N
         btnClear.addActionListener(new java.awt.event.ActionListener() {
@@ -230,7 +235,10 @@ public class VouStatusSetupDialog extends javax.swing.JDialog implements KeyList
             }
         });
 
+        btnDelete.setBackground(ColorUtil.btnDelete);
         btnDelete.setFont(Global.lableFont);
+        btnDelete.setForeground(ColorUtil.foreground);
+        btnDelete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/delete-button-white.png"))); // NOI18N
         btnDelete.setText("Delete");
         btnDelete.setName("btnDelete"); // NOI18N
         btnDelete.addActionListener(new java.awt.event.ActionListener() {
@@ -239,7 +247,10 @@ public class VouStatusSetupDialog extends javax.swing.JDialog implements KeyList
             }
         });
 
+        btnSave.setBackground(ColorUtil.mainColor);
         btnSave.setFont(Global.lableFont);
+        btnSave.setForeground(ColorUtil.foreground);
+        btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save-button-white.png"))); // NOI18N
         btnSave.setText("Save");
         btnSave.setName("btnSave"); // NOI18N
         btnSave.addActionListener(new java.awt.event.ActionListener() {
@@ -261,7 +272,7 @@ public class VouStatusSetupDialog extends javax.swing.JDialog implements KeyList
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(txtName)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addGap(0, 34, Short.MAX_VALUE)
+                        .addGap(0, 1, Short.MAX_VALUE)
                         .addComponent(btnSave)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnDelete)
@@ -292,8 +303,8 @@ public class VouStatusSetupDialog extends javax.swing.JDialog implements KeyList
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 290, Short.MAX_VALUE)
-                    .addComponent(txtFilter, javax.swing.GroupLayout.DEFAULT_SIZE, 290, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 257, Short.MAX_VALUE)
+                    .addComponent(txtFilter, javax.swing.GroupLayout.DEFAULT_SIZE, 257, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())

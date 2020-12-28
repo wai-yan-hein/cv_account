@@ -51,6 +51,7 @@ public class ProtfitAndLost extends javax.swing.JPanel implements SelectionObser
     private CompanyInfoService ciService;
     @Autowired
     private TaskExecutor taskExecutor;
+    private CurrencyAutoCompleter currencyAutoCompleter;
 
     public void setLoadingObserver(LoadingObserver loadingObserver) {
         this.loadingObserver = loadingObserver;
@@ -75,8 +76,9 @@ public class ProtfitAndLost extends javax.swing.JPanel implements SelectionObser
         dateAutoCompleter.setSelectionObserver(this);
         DepartmentAutoCompleter departmentAutoCompleter = new DepartmentAutoCompleter(txtDep, Global.listDepartment, null);
         departmentAutoCompleter.setSelectionObserver(this);
-        CurrencyAutoCompleter currencyAutoCompleter = new CurrencyAutoCompleter(txtCurrency, Global.listCurrency, null);
+        currencyAutoCompleter = new CurrencyAutoCompleter(txtCurrency, Global.listCurrency, null);
         currencyAutoCompleter.setSelectionObserver(this);
+        currencyAutoCompleter.setCurrency(Global.defalutCurrency);
 
     }
 
@@ -84,35 +86,29 @@ public class ProtfitAndLost extends javax.swing.JPanel implements SelectionObser
         loadingObserver.load(this.getName(), "Start");
         btnCalculate.setEnabled(false);
         taskExecutor.execute(() -> {
-            SystemPropertyKey key = new SystemPropertyKey();
-            key.setCompCode(Global.compId);
-            key.setPropKey("system.profitlost.process");
-            SystemProperty sp = spService.findById(key);
-            if (sp != null) {
-                String tmpValue = sp.getPropValue();
-                if (tmpValue != null) {
-                    if (tmpValue.isEmpty() || tmpValue.equals("-")) {
-                        JOptionPane.showMessageDialog(Global.parentForm, "Invalid profit & lost process");
-                    } else {
-                        try {
-                            rService.getProfitLost(tmpValue, stDate, enDate, depId, currency, Global.compId.toString(), Global.loginUser.getUserId().toString());
-                            //ro.setObj();
-                            btnCalculate.setEnabled(true);
-                            loadingObserver.load(this.getName(), "Stop");
-
-                        } catch (Exception ex) {
-                            btnCalculate.setEnabled(true);
-                            loadingObserver.load(this.getName(), "Stop");
-                            LOGGER.error("searchProfitAndList ----" + ex.getMessage());
-                        }
-                    }
-                } else {
+            String process = Global.sysProperties.get("system.profitlost.process");
+            currency = currencyAutoCompleter.getCurrency().getKey().getCode();
+            if (process != null) {
+                if (process.isEmpty() || process.equals("-")) {
                     JOptionPane.showMessageDialog(Global.parentForm, "Invalid profit & lost process");
+                } else {
+                    try {
+                        rService.getProfitLost(process, stDate, enDate, depId, currency, Global.compId.toString(), Global.loginUser.getUserId().toString());
+                        //ro.setObj();
+                        btnCalculate.setEnabled(true);
+                        loadingObserver.load(this.getName(), "Stop");
 
+                    } catch (Exception ex) {
+                        btnCalculate.setEnabled(true);
+                        loadingObserver.load(this.getName(), "Stop");
+                        LOGGER.error("searchProfitAndList ----" + ex.getMessage());
+                    }
                 }
             } else {
                 JOptionPane.showMessageDialog(Global.parentForm, "Invalid profit & lost process");
+
             }
+
         });
 
     }
@@ -200,6 +196,7 @@ public class ProtfitAndLost extends javax.swing.JPanel implements SelectionObser
         jLabel2.setText("Department");
 
         txtCurrency.setFont(Global.textFont);
+        txtCurrency.setEnabled(false);
 
         jLabel3.setFont(Global.lableFont);
         jLabel3.setText("Currency");

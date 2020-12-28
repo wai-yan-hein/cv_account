@@ -157,8 +157,10 @@ public class DamageTableModel extends AbstractTableModel {
                             Stock stock = (Stock) value;
                             record.setStock(stock);
                             record.setQty(1.0f);
-                            record.setCostPrice(stock.getSalePriceN());
+                            record.setCostPrice(Util1.getFloat(stock.getSalePriceN()));
                             record.setUnit(stock.getSaleUnit());
+                            float amt = record.getQty() * record.getCostPrice();
+                            record.setAmount(amt);
                             addEmptyRow();
                             parent.setColumnSelectionInterval(2, 2);
                         }
@@ -179,7 +181,7 @@ public class DamageTableModel extends AbstractTableModel {
 
                         } else {
                             record.setQty(qty);
-                            record.setAmount(Util1.getFloat(record.getQty()) * Util1.getDouble(record.getCostPrice()));
+                            record.setAmount(Util1.getFloat(record.getQty()) * Util1.getFloat(record.getCostPrice()));
                             if ((row + 1) <= listDetail.size()) {
                                 parent.setRowSelectionInterval(row + 1, row + 1);
                             }
@@ -205,7 +207,7 @@ public class DamageTableModel extends AbstractTableModel {
                     break;
                 case 5: //Amount
                     if (value != null) {
-                        record.setAmount(Util1.getDouble(value));
+                        record.setAmount(Util1.getFloat(value));
                         if ((row + 1) <= listDetail.size()) {
                             parent.setRowSelectionInterval(row + 1, row + 1);
                         }
@@ -221,7 +223,7 @@ public class DamageTableModel extends AbstractTableModel {
         }
 
         parent.requestFocusInWindow();
-        fireTableCellUpdated(row, column);
+        fireTableRowsUpdated(row, column);
         callBack.selected("STM-TOTAL", "STM-TOTAL");
     }
 
@@ -358,11 +360,12 @@ public class DamageTableModel extends AbstractTableModel {
 
         fireTableDataChanged();
     }
+
     public double getTotal() {
         double total = 0.0;
         for (DamageDetailHis sdh2 : listDetail) {
             if (sdh2.getStock() != null) {
-                if (sdh2.getStock().getStockCode()!= null) {
+                if (sdh2.getStock().getStockCode() != null) {
                     total += Util1.NZeroDouble(sdh2.getAmount());
                 }
             }

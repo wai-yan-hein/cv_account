@@ -5,9 +5,9 @@
  */
 package com.cv.inv.entry.dialog;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.inv.entry.common.SaleOutstandTableModel;
-import java.awt.Frame;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -25,7 +25,7 @@ public class SaleOutstandingDialog extends javax.swing.JDialog {
     private SaleOutstandTableModel saleOutTableModel;
 
     public SaleOutstandingDialog() {
-        super(new Frame(), true);
+        super(Global.parentForm, true);
         initComponents();
     }
 
@@ -36,6 +36,8 @@ public class SaleOutstandingDialog extends javax.swing.JDialog {
     private void initSaleOutTable() {
         tblSaleOutstand.setModel(saleOutTableModel);
         tblSaleOutstand.getTableHeader().setFont(Global.tblHeaderFont);
+        tblSaleOutstand.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblSaleOutstand.getTableHeader().setForeground(ColorUtil.foreground);
         tblSaleOutstand.getColumnModel().getColumn(0).setPreferredWidth(50);
         tblSaleOutstand.getColumnModel().getColumn(1).setPreferredWidth(50);
         tblSaleOutstand.getColumnModel().getColumn(2).setPreferredWidth(200);

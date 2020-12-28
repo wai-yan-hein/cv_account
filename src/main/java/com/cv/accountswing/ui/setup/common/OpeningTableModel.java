@@ -228,8 +228,10 @@ public class OpeningTableModel extends AbstractTableModel {
     }
 
     public void clear() {
-        listOpening.clear();
-        fireTableDataChanged();
+        if (listOpening != null) {
+            listOpening.clear();
+            fireTableDataChanged();
+        }
     }
 
 }

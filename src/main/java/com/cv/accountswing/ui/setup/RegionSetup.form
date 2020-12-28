@@ -28,7 +28,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Component id="jScrollPane2" pref="169" max="32767" attributes="0"/>
+              <Component id="jScrollPane2" pref="147" max="32767" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="jPanel1" max="32767" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -75,7 +75,7 @@
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="labelStatus" linkSize="1" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="192" max="32767" attributes="0"/>
+                          <EmptySpace pref="170" max="32767" attributes="0"/>
                           <Component id="btnSaveR" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="btnClearR" min="-2" max="-2" attributes="0"/>
@@ -104,7 +104,7 @@
                       <Component id="btnClearR" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="btnSaveR" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace pref="321" max="32767" attributes="0"/>
+                  <EmptySpace pref="328" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -142,6 +142,9 @@
             <Property name="enabled" type="boolean" value="false"/>
             <Property name="name" type="java.lang.String" value="txtRegionName" noResource="true"/>
           </Properties>
+          <Events>
+            <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtRegionNameFocusGained"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JLabel" name="labelStatus">
           <Properties>
@@ -153,8 +156,17 @@
         </Component>
         <Component class="javax.swing.JButton" name="btnClearR">
           <Properties>
+            <Property name="background" type="java.awt.Color" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="ColorUtil.btnEdit" type="code"/>
+            </Property>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="Global.lableFont" type="code"/>
+            </Property>
+            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="ColorUtil.foreground" type="code"/>
+            </Property>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/images/clear-button-white.png"/>
             </Property>
             <Property name="text" type="java.lang.String" value="Clear"/>
             <Property name="enabled" type="boolean" value="false"/>
@@ -166,8 +178,17 @@
         </Component>
         <Component class="javax.swing.JButton" name="btnSaveR">
           <Properties>
+            <Property name="background" type="java.awt.Color" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="ColorUtil.mainColor" type="code"/>
+            </Property>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="Global.lableFont" type="code"/>
+            </Property>
+            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="ColorUtil.foreground" type="code"/>
+            </Property>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/images/save-button-white.png"/>
             </Property>
             <Property name="text" type="java.lang.String" value="Save"/>
             <Property name="enabled" type="boolean" value="false"/>

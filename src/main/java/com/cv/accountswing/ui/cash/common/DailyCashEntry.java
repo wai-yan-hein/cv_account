@@ -36,12 +36,6 @@ public class DailyCashEntry extends javax.swing.JDialog {
 
     private Gl gl;
     @Autowired
-    private DepartmentService departmentService;
-    @Autowired
-    private CurrencyService currencyService;
-    @Autowired
-    private TraderService traderService;
-    @Autowired
     private COAService coaService;
     @Autowired
     private GlService glService;
@@ -56,9 +50,9 @@ public class DailyCashEntry extends javax.swing.JDialog {
 
     public void initCombo() {
         txtGlDate.setText(Util1.toDateStr(Util1.getTodayDate(), "dd-MM-yyyy"));
-        BindingUtil.BindComboFilter(cboDepartment, departmentService.search("-", "-", "-", "-", "-"), null, true, false);
-        BindingUtil.BindComboFilter(cboCurrency, currencyService.search("-", "-", "-"), null, true, false);
-        BindingUtil.BindComboFilter(cboPerson, traderService.searchTrader("-", "-", "-", "-", "-", "-"), null, true, false);
+        BindingUtil.BindComboFilter(cboDepartment, Global.listDepartment, null, true, false);
+        BindingUtil.BindComboFilter(cboCurrency, Global.listCurrency, null, true, false);
+        BindingUtil.BindComboFilter(cboPerson, Global.listTrader, null, true, false);
         BindingUtil.BindComboFilter(cboAccount, coaService.getCompanyCOA(Global.compId.toString()), null, true, false);
 
     }

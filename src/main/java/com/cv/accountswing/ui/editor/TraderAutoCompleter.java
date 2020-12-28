@@ -5,12 +5,12 @@
  */
 package com.cv.accountswing.ui.editor;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.Trader;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.cash.common.TraderTableModel;
-import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -54,6 +54,7 @@ public class TraderAutoCompleter implements KeyListener {
     public AbstractCellEditor editor;
     private TableRowSorter<TableModel> sorter;
     private int x = 0;
+    private int y = 0;
     private boolean popupOpen = false;
     private SelectionObserver selectionObserver;
 
@@ -72,10 +73,11 @@ public class TraderAutoCompleter implements KeyListener {
         textComp.setFont(Global.textFont);
         traderTableModel = new TraderTableModel(list);
         table.setModel(traderTableModel);
-        table.setSize(50, 50);
         table.getTableHeader().setFont(Global.textFont);
         table.setFont(Global.textFont); // NOI18N
         table.setRowHeight(Global.tblRowHeight);
+        table.getTableHeader().setBackground(ColorUtil.btnEdit);
+        table.getTableHeader().setForeground(ColorUtil.foreground);
         table.setDefaultRenderer(Object.class, new TableCellRender());
         sorter = new TableRowSorter(table.getModel());
         table.setRowSorter(sorter);
@@ -84,12 +86,12 @@ public class TraderAutoCompleter implements KeyListener {
         scroll.setBorder(null);
         table.setFocusable(false);
         table.getColumnModel().getColumn(0).setPreferredWidth(10);//Code
-        table.getColumnModel().getColumn(1).setPreferredWidth(30);//Name
+        table.getColumnModel().getColumn(1).setPreferredWidth(120);//Name
 
         table.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                if (evt.getClickCount() == 2) {
+                if (evt.getClickCount() == 1) {
                     mouseSelect();
                 }
             }
@@ -98,8 +100,8 @@ public class TraderAutoCompleter implements KeyListener {
         scroll.getVerticalScrollBar().setFocusable(false);
         scroll.getHorizontalScrollBar().setFocusable(false);
 
-        popup.setBorder(BorderFactory.createLineBorder(Color.black));
-        popup.setPopupSize(600, 300);
+        popup.setBorder(BorderFactory.createLineBorder(ColorUtil.mainColor));
+        popup.setPopupSize(600, 280);
 
         popup.add(scroll);
 
@@ -179,19 +181,7 @@ public class TraderAutoCompleter implements KeyListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             mouseSelect();
-            /* JComponent tf = (JComponent) e.getSource();
-            TraderAutoCompleter completer = (TraderAutoCompleter) tf.getClientProperty(AUTOCOMPLETER);
-            
-            if (completer.table.getSelectedRow() != -1) {
-            trader = traderTableModel.getTrader(completer.table.convertRowIndexToModel(
-            completer.table.getSelectedRow()));
-            ((JTextField) completer.textComp).setText(trader.getTraderName());
-            }
-            
-            completer.popup.setVisible(false);
-            if (editor != null) {
-            editor.stopCellEditing();
-            }*/
+
         }
     };
     DocumentListener documentListener = new DocumentListener() {
@@ -234,10 +224,11 @@ public class TraderAutoCompleter implements KeyListener {
                     textComp.registerKeyboardAction(acceptAction, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
                             JComponent.WHEN_FOCUSED);
                     if (x == 0) {
-                        x = textComp.getCaretPosition();
+                        x = textComp.getWidth();
+                        y = textComp.getHeight();
                     }
 
-                    popup.show(textComp, x, textComp.getHeight());
+                    popup.show(textComp, x, y);
                     log.info("Show Popup...");
                     popupOpen = false;
 
@@ -331,8 +322,9 @@ public class TraderAutoCompleter implements KeyListener {
 
     public void setTrader(Trader trader) {
         this.trader = trader;
-        this.textComp.setText(trader.getTraderName());
-
+        if (trader != null) {
+            this.textComp.setText(trader.getTraderName());
+        }
     }
 
     /*

@@ -48,8 +48,8 @@ public class StockUP {
         }
     }
 
-    public Double getPrice(String stockCode, String priceType) {
-        Double price = new Double(0);
+    public Float getPrice(String stockCode, String priceType) {
+        Float price = 0.0f;
         List<StockPriceList> priceList = getPriceList(stockCode);
         int index = -1;
 

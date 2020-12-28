@@ -5,6 +5,7 @@
  */
 package com.cv.accountswing.ui.setup;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
@@ -77,6 +78,8 @@ public class COASetup extends javax.swing.JPanel implements KeyListener, PanelCo
     private void tblCOAHead() {
         tblCoaHead.setModel(coaHeadTableModel);
         tblCoaHead.getTableHeader().setFont(Global.tblHeaderFont);
+        tblCoaHead.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblCoaHead.getTableHeader().setForeground(ColorUtil.foreground);
         tblCoaHead.getSelectionModel().addListSelectionListener((ListSelectionEvent e) -> {
             if (e.getValueIsAdjusting()) {
                 if (tblCoaHead.getSelectedRow() >= 0) {
@@ -261,13 +264,13 @@ public class COASetup extends javax.swing.JPanel implements KeyListener, PanelCo
         tblCOAGroupChild.setRowHeight(Global.tblRowHeight);
         jScrollPane3.setViewportView(tblCOAGroupChild);
 
-        jLabel1.setFont(Global.textFont);
+        jLabel1.setFont(Global.menuFont);
         jLabel1.setText("Account Head");
 
-        lblCoaChild.setFont(Global.textFont);
+        lblCoaChild.setFont(Global.menuFont);
         lblCoaChild.setText("...");
 
-        lblCoaGroup.setFont(Global.textFont);
+        lblCoaGroup.setFont(Global.menuFont);
         lblCoaGroup.setText("...");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -301,7 +304,7 @@ public class COASetup extends javax.swing.JPanel implements KeyListener, PanelCo
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(lblCoaChild, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 202, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 202, Short.MAX_VALUE))
                     .addComponent(jScrollPane1))
                 .addGap(10, 10, 10))
         );

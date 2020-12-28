@@ -5,6 +5,7 @@
  */
 package com.cv.accountswing.ui.system.setup;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.SelectionObserver;
@@ -20,11 +21,10 @@ import com.cv.accountswing.ui.system.setup.common.UserRoleTableModel;
 import com.cv.accountswing.ui.system.setup.treetable.MyAbstractTreeTableModel;
 import com.cv.accountswing.ui.system.setup.treetable.MyDataModel;
 import com.cv.accountswing.ui.system.setup.treetable.MyTreeTable;
-import com.cv.accountswing.util.Util1;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.List;
-import javax.swing.JDialog;
+import javax.swing.ImageIcon;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
@@ -55,6 +55,7 @@ public class RoleSetup extends javax.swing.JPanel implements KeyListener, PanelC
     private TaskExecutor taskExecutor;
     @Autowired
     private ApplicationMainFrame mainFrame;
+    private final ImageIcon loadingIcon = new ImageIcon(this.getClass().getResource("/images/process.gif"));
 
     private int selectRow = -1;
     private boolean isShown = false;
@@ -84,6 +85,8 @@ public class RoleSetup extends javax.swing.JPanel implements KeyListener, PanelC
     private void initTable() {
         tblRole.setModel(userRoleTableModel);
         tblRole.getTableHeader().setFont(Global.lableFont);
+        tblRole.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblRole.getTableHeader().setForeground(ColorUtil.foreground);
         tblRole.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblRole.setDefaultRenderer(Object.class, new TableCellRender());
         tblRole.getColumnModel().getColumn(0).setCellEditor(new AutoClearEditor());
@@ -103,16 +106,13 @@ public class RoleSetup extends javax.swing.JPanel implements KeyListener, PanelC
     }
 
     private void createTree(String roleId) {
-        JDialog loading = Util1.getLoading(Global.parentForm);
         taskExecutor.execute(() -> {
-            List<VRoleMenu> listVRM = menuService.getParentChildMenu(roleId);
+            List<VRoleMenu> listVRM = menuService.getParentChildMenu(roleId, "-");
             VRoleMenu vRoleMenu = new VRoleMenu("Best-System", "System", true, listVRM);
             MyAbstractTreeTableModel treeTableModel = new MyDataModel(vRoleMenu, privilegeService, this);
             MyTreeTable treeTable = new MyTreeTable(treeTableModel);
             scrollPane.getViewport().add(treeTable);
-            loading.setVisible(false);
         });
-        loading.setVisible(true);
     }
 
     private void searchAllUsers() {

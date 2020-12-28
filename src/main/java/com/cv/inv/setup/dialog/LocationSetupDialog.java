@@ -5,6 +5,7 @@
  */
 package com.cv.inv.setup.dialog;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.inv.entity.Location;
 import com.cv.inv.service.LocationService;
@@ -16,7 +17,6 @@ import java.awt.event.MouseEvent;
 import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
@@ -45,7 +45,7 @@ public class LocationSetupDialog extends javax.swing.JDialog implements KeyListe
      * Creates new form LocationSetupDialog
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(LocationSetupDialog.class);
-    private String parentRootName = "Location";
+    private final String parentRootName = "Location";
     private DefaultMutableTreeNode selectedNode;
     private DefaultMutableTreeNode child;
     private DefaultTreeModel treeModel;
@@ -74,7 +74,7 @@ public class LocationSetupDialog extends javax.swing.JDialog implements KeyListe
     };
 
     public LocationSetupDialog() {
-        super(new JFrame(), true);
+        super(Global.parentForm, true);
         initComponents();
         initPopup();
         initKeyListener();
@@ -156,9 +156,13 @@ public class LocationSetupDialog extends javax.swing.JDialog implements KeyListe
                 JOptionPane.showMessageDialog(Global.parentForm, "Saved");
                 if (lblStatus.getText().equals("EDIT")) {
                     selectedNode.setUserObject(saveLoc);
+                    Global.listLocation.add(saveLoc);
                     clear();
                     treeModel.reload(selectedNode);
+                }else{
+                    
                 }
+                
             }
         } catch (DataIntegrityViolationException e) {
             JOptionPane.showMessageDialog(Global.parentForm, "Duplicate Name.");
@@ -168,9 +172,13 @@ public class LocationSetupDialog extends javax.swing.JDialog implements KeyListe
 
     private void delLoc() {
         Location loc = (Location) selectedNode.getUserObject();
-        int delete = locationService.delete(loc.getLocationId().toString());
-        if (delete == 1) {
-            JOptionPane.showMessageDialog(Global.parentForm, "Deleted.");
+        if (loc.getLocationId() != null) {
+            int delete = locationService.delete(loc.getLocationId().toString());
+            if (delete == 1) {
+                JOptionPane.showMessageDialog(Global.parentForm, "Deleted.");
+            }
+            treeModel.removeNodeFromParent(selectedNode);
+            treeModel.reload(selectedNode);
         }
     }
 
@@ -178,6 +186,10 @@ public class LocationSetupDialog extends javax.swing.JDialog implements KeyListe
         txtName.setText(null);
         chkActive.setSelected(false);
         lblStatus.setText("NEW");
+        txtName.requestFocus();
+        btnClear.setEnabled(false);
+        btnDelete.setEnabled(false);
+        btnSave.setEnabled(false);
     }
 
     /**
@@ -222,7 +234,12 @@ public class LocationSetupDialog extends javax.swing.JDialog implements KeyListe
         chkActive.setText("Cal-Stock");
         chkActive.setName("chkActive"); // NOI18N
 
+        btnSave.setBackground(ColorUtil.mainColor);
+        btnSave.setFont(Global.lableFont);
+        btnSave.setForeground(ColorUtil.foreground);
+        btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save-button-white.png"))); // NOI18N
         btnSave.setText("Save");
+        btnSave.setEnabled(false);
         btnSave.setName("btnSave"); // NOI18N
         btnSave.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -230,7 +247,12 @@ public class LocationSetupDialog extends javax.swing.JDialog implements KeyListe
             }
         });
 
+        btnDelete.setBackground(ColorUtil.mainColor);
+        btnDelete.setFont(Global.lableFont);
+        btnDelete.setForeground(ColorUtil.foreground);
+        btnDelete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/clear-button-white.png"))); // NOI18N
         btnDelete.setText("Delete");
+        btnDelete.setEnabled(false);
         btnDelete.setName("btnDelete"); // NOI18N
         btnDelete.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -238,7 +260,12 @@ public class LocationSetupDialog extends javax.swing.JDialog implements KeyListe
             }
         });
 
+        btnClear.setBackground(ColorUtil.mainColor);
+        btnClear.setFont(Global.lableFont);
+        btnClear.setForeground(ColorUtil.foreground);
+        btnClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/clear-button-white.png"))); // NOI18N
         btnClear.setText("Clear");
+        btnClear.setEnabled(false);
         btnClear.setName("btnClear"); // NOI18N
         btnClear.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -281,12 +308,12 @@ public class LocationSetupDialog extends javax.swing.JDialog implements KeyListe
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(chkActive)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(btnSave)
-                            .addComponent(lblStatus)))
+                        .addComponent(lblStatus))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(44, 44, 44)
-                        .addComponent(btnDelete))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnDelete)
+                            .addComponent(btnSave)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(44, 44, 44)
                         .addComponent(btnClear)))
@@ -487,6 +514,9 @@ public class LocationSetupDialog extends javax.swing.JDialog implements KeyListe
                 txtName.setText(location.getLocationName());
                 lblStatus.setText("EDIT");
                 txtName.requestFocus();
+                btnClear.setEnabled(true);
+                btnDelete.setEnabled(true);
+                btnSave.setEnabled(true);
             } else {
                 txtName.setText(null);
             }

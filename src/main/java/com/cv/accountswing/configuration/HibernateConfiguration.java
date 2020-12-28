@@ -24,7 +24,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
     "com.cv.accountswing.configuration",
     "com.cv.accountswing.service",
     "com.cv.accountswing.dao",
-    "com.cv.inv"
+    "com.cv.inv",
+    "com.cv.accountswing.entity"
 })
 //@PropertySource("file:/Users/winswe/Documents/mws/BEST/AppConfig/accounts.properties")
 @PropertySource(value = {"classpath:application.properties"})

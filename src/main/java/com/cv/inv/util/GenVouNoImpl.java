@@ -19,15 +19,15 @@ import org.apache.log4j.Logger;
 public class GenVouNoImpl implements GenVouNo {
 
     static Logger log = Logger.getLogger(GenVouNoImpl.class.getName());
-    private String vouType;
+    private final String vouType;
     private String period;
     private String vouNo;
     private int lastVouNo;
     private String machineNo;
-    private int vouTotalDigit = 5;
-    private int machineTtlDigit = 2;
+    private final int vouTotalDigit = 5;
+    private final int machineTtlDigit = 2;
     private boolean isError = false;
-    private VouIdService vouIdService;
+    private final VouIdService vouIdService;
 
     public GenVouNoImpl(VouIdService vouIdService, String vouType, String period) {
         this.vouIdService = vouIdService;
@@ -78,7 +78,6 @@ public class GenVouNoImpl implements GenVouNo {
 
         } catch (Exception ex) {
             log.error("getLastVouNo : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.toString());
-            System.out.println("getLastVouNo ........... " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.toString());
             JOptionPane.showMessageDialog(Global.parentForm,
                     "Error in id generation. Please exit the program and try again", "ID Generation",
                     JOptionPane.ERROR_MESSAGE);
@@ -116,7 +115,6 @@ public class GenVouNoImpl implements GenVouNo {
 
     public void setPeriod(String period) {
         this.period = period;
-
         getLastVouNo();
     }
 

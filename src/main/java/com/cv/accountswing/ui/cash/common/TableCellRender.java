@@ -21,8 +21,8 @@ import javax.swing.table.DefaultTableCellRenderer;
  */
 public class TableCellRender extends DefaultTableCellRenderer {
 
-    private JCheckBox check = new JCheckBox();
-    private Color bgColor = new Color(245, 245, 245);
+    private final JCheckBox check = new JCheckBox();
+    private final Color bgColor = new Color(245, 245, 245);
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -35,7 +35,7 @@ public class TableCellRender extends DefaultTableCellRenderer {
             c.setBackground(new Color(38, 117, 191));
         }
 
-        String s = "";
+        String s;
         if (value instanceof Double) {
             DecimalFormat dFormat = new DecimalFormat("#,##0.###");
             Double d = (Double) value;

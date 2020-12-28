@@ -5,16 +5,19 @@
  */
 package com.cv.inv.setup.dialog;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.StartWithRowFilter;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.Category;
+import com.cv.inv.entity.Stock;
 import com.cv.inv.service.CategoryService;
-import com.cv.inv.setup.common.CategoryTableModel;
-import java.awt.Frame;
+import com.cv.inv.service.StockService;
+import com.cv.inv.setup.dialog.common.CategoryTableModel;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
@@ -44,6 +47,9 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
     private CategoryService categoryService;
     @Autowired
     private CategoryTableModel categoryTableModel;
+    @Autowired
+    private StockService stockService;
+
     private TableRowSorter<TableModel> sorter;
     private StartWithRowFilter swrf;
 
@@ -51,7 +57,7 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
      * Creates new form ItemTypeSetupDialog
      */
     public CategorySetupDialog() {
-        super(new Frame(), true);
+        super(Global.parentForm, true);
         initComponents();
     }
 
@@ -82,6 +88,8 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
         sorter = new TableRowSorter<>(tblCategory.getModel());
         tblCategory.setRowSorter(sorter);
         tblCategory.getTableHeader().setFont(Global.lableFont);
+        tblCategory.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblCategory.getTableHeader().setForeground(ColorUtil.foreground);
         tblCategory.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblCategory.setDefaultRenderer(Object.class, new TableCellRender());
         tblCategory.getSelectionModel().addListSelectionListener((ListSelectionEvent e) -> {
@@ -99,6 +107,7 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
 
         txtName.setText(cat.getCatName());
         lblStatus.setText("EDIT");
+        txtName.requestFocus();
     }
 
     private void save() {
@@ -129,14 +138,19 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
     }
 
     private void delete() {
-        
-            Category cat = categoryTableModel.getCategory(selectRow);
+
+        Category cat = categoryTableModel.getCategory(selectRow);
+        List<Stock> stockList = stockService.searchC(cat.getCatId().toString());
+        if (stockList.size() >= 0) {
+            JOptionPane.showMessageDialog(Global.parentForm, "Cannot Delete!");
+        } else {
             int delete = categoryService.delete(cat.getCatId().toString());
             if (delete == 1) {
                 Global.listCategory.remove(selectRow);
                 JOptionPane.showMessageDialog(Global.parentForm, "Deleted");
                 clear();
             }
+        }
     }
 
     private boolean isValidEntry() {
@@ -197,6 +211,7 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
         setTitle("Category Setup");
         setModalityType(java.awt.Dialog.ModalityType.DOCUMENT_MODAL);
 
+        tblCategory.setFont(Global.textFont);
         tblCategory.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -223,13 +238,21 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
 
         txtName.setFont(Global.textFont);
         txtName.setName("txtName"); // NOI18N
+        txtName.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtNameFocusGained(evt);
+            }
+        });
         txtName.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtNameActionPerformed(evt);
             }
         });
 
+        btnSave.setBackground(ColorUtil.mainColor);
         btnSave.setFont(Global.lableFont);
+        btnSave.setForeground(new java.awt.Color(255, 255, 255));
+        btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save-button-white.png"))); // NOI18N
         btnSave.setText("Save");
         btnSave.setName("btnSave"); // NOI18N
         btnSave.addActionListener(new java.awt.event.ActionListener() {
@@ -238,7 +261,10 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
             }
         });
 
+        btnDelete.setBackground(ColorUtil.btnDelete);
         btnDelete.setFont(Global.lableFont);
+        btnDelete.setForeground(new java.awt.Color(255, 255, 255));
+        btnDelete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/delete-button-white.png"))); // NOI18N
         btnDelete.setText("Delete");
         btnDelete.setName("btnDelete"); // NOI18N
         btnDelete.addActionListener(new java.awt.event.ActionListener() {
@@ -247,7 +273,10 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
             }
         });
 
+        btnClear.setBackground(ColorUtil.btnEdit);
         btnClear.setFont(Global.lableFont);
+        btnClear.setForeground(new java.awt.Color(255, 255, 255));
+        btnClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/clear-button-white.png"))); // NOI18N
         btnClear.setText("Clear");
         btnClear.setName("btnClear"); // NOI18N
         btnClear.addActionListener(new java.awt.event.ActionListener() {
@@ -293,7 +322,7 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
                         .addComponent(lblStatus))
                     .addComponent(btnDelete)
                     .addComponent(btnClear))
-                .addContainerGap(303, Short.MAX_VALUE))
+                .addContainerGap(299, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -303,7 +332,7 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtFilter, javax.swing.GroupLayout.DEFAULT_SIZE, 278, Short.MAX_VALUE)
+                    .addComponent(txtFilter, javax.swing.GroupLayout.DEFAULT_SIZE, 212, Short.MAX_VALUE)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -362,6 +391,11 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
             sorter.setRowFilter(swrf);
         }
     }//GEN-LAST:event_txtFilterKeyReleased
+
+    private void txtNameFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtNameFocusGained
+        // TODO add your handling code here:
+        txtName.selectAll();
+    }//GEN-LAST:event_txtNameFocusGained
 
     /**
      * @param args the command line arguments

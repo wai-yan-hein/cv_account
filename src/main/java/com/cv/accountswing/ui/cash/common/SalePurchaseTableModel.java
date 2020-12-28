@@ -295,7 +295,7 @@ public class SalePurchaseTableModel extends AbstractTableModel {
 
             VGl vgl = listVGl.get(row);
             try {
-                int delete = glService.delete(vgl.getGlId());
+                int delete = glService.delete(vgl.getGlId(),"GL-DELETE");
                 if (delete == 1) {
                     listVGl.remove(row);
                     fireTableRowsDeleted(0, listVGl.size());

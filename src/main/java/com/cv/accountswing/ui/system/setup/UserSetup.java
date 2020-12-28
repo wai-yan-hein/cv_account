@@ -5,6 +5,7 @@
  */
 package com.cv.accountswing.ui.system.setup;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
@@ -86,6 +87,8 @@ public class UserSetup extends javax.swing.JPanel implements KeyListener, PanelC
         tblUser.setDefaultRenderer(Object.class, new TableCellRender());
         tblUser.setModel(userTableModel);
         tblUser.getTableHeader().setFont(Global.textFont);
+        tblUser.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblUser.getTableHeader().setForeground(ColorUtil.foreground);
         tblUser.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblUser.getSelectionModel().addListSelectionListener((ListSelectionEvent e) -> {
             if (e.getValueIsAdjusting()) {
@@ -256,7 +259,9 @@ public class UserSetup extends javax.swing.JPanel implements KeyListener, PanelC
         jLabel5.setFont(Global.lableFont);
         jLabel5.setText("Phone");
 
+        btnClear.setBackground(ColorUtil.btnEdit);
         btnClear.setFont(Global.lableFont);
+        btnClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/clear-button-white.png"))); // NOI18N
         btnClear.setText("Clear");
         btnClear.setName("btnClear"); // NOI18N
         btnClear.addActionListener(new java.awt.event.ActionListener() {
@@ -265,7 +270,9 @@ public class UserSetup extends javax.swing.JPanel implements KeyListener, PanelC
             }
         });
 
+        btnSave.setBackground(ColorUtil.mainColor);
         btnSave.setFont(Global.lableFont);
+        btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save-button-white.png"))); // NOI18N
         btnSave.setText("Save");
         btnSave.setName("btnSave"); // NOI18N
         btnSave.addActionListener(new java.awt.event.ActionListener() {

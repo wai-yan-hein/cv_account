@@ -5,9 +5,9 @@
  */
 package com.cv.inv.entry.common;
 
+import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.PurHis;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
 import org.apache.log4j.Logger;
@@ -51,7 +51,7 @@ public class PurVouSearchTableModel extends AbstractTableModel {
     public Class getColumnClass(int column) {
         switch (column) {
             case 0: //Date
-                return Date.class;
+                return String.class;
             case 1: //Vou No
                 return String.class;
             case 2: //Remark
@@ -81,7 +81,7 @@ public class PurVouSearchTableModel extends AbstractTableModel {
 
             switch (column) {
                 case 0://date
-                    return his.getPurDate();
+                    return Util1.toDateStr(his.getPurDate(), "dd/MM/yyyy");
                 case 1://vou-no
                     return his.getPurInvId();
                 case 2://remark
@@ -89,7 +89,7 @@ public class PurVouSearchTableModel extends AbstractTableModel {
                 case 3://customer
                     return his.getCustomerId();
                 case 4://user
-                    return his.getCreatedBy();
+                    return his.getCreatedBy().getUserName();
                 case 5://v-total
                     return his.getVouTotal();
             }

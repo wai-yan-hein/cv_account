@@ -131,6 +131,9 @@
         </Property>
         <Property name="name" type="java.lang.String" value="txtToDate" noResource="true"/>
       </Properties>
+      <Events>
+        <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtToDateFocusGained"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>

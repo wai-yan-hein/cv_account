@@ -6,6 +6,7 @@
 package com.cv.accountswing.ui;
 
 import com.cv.accountswing.AccountSwingApplication;
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.FilterObserver;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
@@ -34,6 +35,7 @@ import com.cv.accountswing.ui.journal.JournalStockOpening;
 import com.cv.accountswing.ui.report.AparGlReport;
 import com.cv.accountswing.ui.report.BalanceSheet;
 import com.cv.accountswing.ui.report.ProtfitAndLost;
+import com.cv.accountswing.ui.report.StockReports;
 import com.cv.accountswing.ui.setup.COAOpeningSetup;
 import com.cv.accountswing.ui.setup.ChartOfAccountSetup;
 import com.cv.accountswing.ui.setup.COASetup;
@@ -61,13 +63,17 @@ import com.cv.inv.service.LocationService;
 import com.cv.inv.service.SaleManService;
 import com.cv.inv.service.VouStatusService;
 import com.cv.accountswing.util.Util1;
-import com.cv.inv.entity.MachineInfo;
+import com.cv.inv.entry.CustomerGrid;
 import com.cv.inv.entry.SaleEntry;
+import com.cv.inv.entry.StockInOutEntry;
+import com.cv.inv.service.CategoryService;
 import com.cv.inv.service.ChargeTypeService;
 import com.cv.inv.service.MachineInfoService;
 import com.cv.inv.service.RelationService;
+import com.cv.inv.service.StockBrandService;
 import com.cv.inv.service.StockUnitService;
 import com.cv.inv.service.StockService;
+import com.cv.inv.service.StockTypeService;
 import com.cv.inv.setup.OtherSetup;
 import com.cv.inv.setup.StockSetup;
 import java.awt.Color;
@@ -80,7 +86,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.DataInputStream;
 import java.io.IOException;
+import java.net.Socket;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
@@ -110,12 +118,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadData,
         SelectionObserver, LoadingObserver, KeyListener, NetworkObserver {
-    
+
     private final ConfigurableApplicationContext context;
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationMainFrame.class);
     private final HashMap<String, JLabel> hmTabLoading = new HashMap();
     private final HashMap<String, JPanel> hmPanel = new HashMap<>();
-    JPopupMenu popupmenu;
+    private JPopupMenu popupmenu;
     private final ImageIcon onlineIcon = new ImageIcon(this.getClass().getResource("/images/online-signal.png"));
     private final ImageIcon lowIcon = new ImageIcon(this.getClass().getResource("/images/low-signal.png"));
     private final ImageIcon offlineIcon = new ImageIcon(this.getClass().getResource("/images/offline-signal.png"));
@@ -158,7 +166,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private Journal journal;
     @Autowired
     private MenuSetup menuSetup;
-    
+
     @Autowired
     private SalePurchaseBook saleBook;
     @Autowired
@@ -225,6 +233,10 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     @Autowired
     private StockReceive stockReceive;
     @Autowired
+    private StockInOutEntry stockInOut;
+    @Autowired
+    private StockReports stockReports;
+    @Autowired
     private LocationService locationService;
     @Autowired
     private VouStatusService vouService;
@@ -232,8 +244,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private SaleManService saleManService;
     @Autowired
     private StockService stockService;
-    @Autowired
-    private MachineInfoService machineInfoService;
+
     @Autowired
     private StockUnitService stockUnitService;
     @Autowired
@@ -242,20 +253,32 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private ChargeTypeService chargeTypeService;
     @Autowired
     private SystemPropertyService systemPropertyService;
+    @Autowired
+    private MachineInfoService machineInfoService;
+    @Autowired
+    private StockTypeService stockTypeService;
+    @Autowired
+    private CategoryService categoryService;
+    @Autowired
+    private StockBrandService stockBrandService;
+    @Autowired
+    private VouStatusService vouStatusService;
+    @Autowired
+    private CustomerGrid customerGrid;
     private PanelControl control;
     private FilterObserver filterObserver;
-    
+
     public void setFilterObserver(FilterObserver filterObserver) {
         this.filterObserver = filterObserver;
     }
-    
+
     @Autowired
     private ThreadPoolTaskScheduler scheduler;
-    
+
     public PanelControl getControl() {
         return control;
     }
-    
+
     public void setControl(PanelControl control) {
         this.control = control;
     }
@@ -266,26 +289,27 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
      * @param context
      */
     public ApplicationMainFrame(ConfigurableApplicationContext context) {
-        System.setProperty("java.awt.headless", "false");
+        //System.setProperty("java.awt.headless", "false");
         initComponents();
         initKeyFoucsManager();
         initToolBar();
+        initPopup();
+        showCloseAllPopup();
         this.context = context;
-        
     }
-    
+
     private void initToolBar() {
         toolBar.addSeparator();
         toolBar.setBorderPainted(true);
-        
+
     }
-    
+
     @Override
     public void setIconImage(Image image) {
         ImageIcon size = new ImageIcon(getClass().getResource("/images/logo.png"));
         super.setIconImage(size.getImage()); //To change body of generated methods, choose Tools | Templates.
     }
-    
+
     private JPanel getPanel(String className, String panelName) {
         String[] split = className.split(",");
         String cName = split[0]; // group name
@@ -353,7 +377,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                     panelBank = bank;
                     hmPanel.put(panelName, bank);
                 }
-                
+
                 return panelBank;
             case "AllCash":
                 JPanel panelCash = hmPanel.get(panelName);
@@ -414,10 +438,12 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                 switch (panelName) {
                     case "Sale Entry":
                         saleEntry.setName(panelName);
+                        saleEntry.initMain();
                         saleEntry.setLoadingObserver(this);
                         return saleEntry;
                     case "Purchase Entry":
                         purchaseEntry.setName(panelName);
+                        purchaseEntry.initMain();
                         purchaseEntry.setLoadingObserver(this);
                         return purchaseEntry;
                     case "Return In":
@@ -452,7 +478,14 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                         manageProjectSetup.setName(panelName);
                         manageProjectSetup.setLoadingObserver(this);
                         return manageProjectSetup;
-                    
+                    case "Stock In/Out":
+                        stockInOut.setName(panelName);
+                        return stockInOut;
+                    case "Customer List":
+                        customerGrid.setName(panelName);
+                        customerGrid.setObserver(this);
+                        customerGrid.initMain();
+                        return customerGrid;
                     default:
                         return null;
                 }
@@ -479,11 +512,11 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                         return roleSetup;
                     default:
                         return null;
-                    
+
                 }
             case "Report":
                 switch (panelName) {
-                    case "AP/AR":
+                    case "AR/AP":
                         aPARReport.setName(panelName);
                         aPARReport.setLoadingObserver(this);
                         return aPARReport;
@@ -499,15 +532,18 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                         balanceSheet.setName(panelName);
                         balanceSheet.setLoadingObserver(this);
                         return balanceSheet;
+                    case "Stock Report":
+                        stockReports.setName(panelName);
+                        return stockReports;
                     default:
                         return null;
                 }
-            
+
             default:
                 return null;
         }
     }
-    
+
     private void initKeyFoucsManager() {
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher((KeyEvent ke) -> {
             switch (ke.getID()) {
@@ -539,7 +575,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             return false;
         });
     }
-    
+
     private void addTabMain(JPanel panel, String menuName) {
         Integer tabIndex = tabMain.getTabCount() - 1;
         //tabMain.setSelectedIndex(tabIndex);
@@ -547,9 +583,8 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         tabMain.setTabComponentAt(tabMain.indexOfComponent(panel), setTitlePanel(tabMain, panel, menuName));
         tabMain.setSelectedComponent(panel);
     }
-    
+
     private void showCloseAllPopup() {
-        initPopup();
         tabMain.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -557,10 +592,10 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                     popupmenu.show(tabMain, e.getX(), e.getY());
                 }
             }
-            
+
         });
     }
-    
+
     private JPanel setTitlePanel(final JTabbedPane tabbedPane, final JPanel panel, String title) {
         JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         titlePanel.setOpaque(false);
@@ -587,26 +622,26 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                 if (control != null) {
                     control.newForm();
                 }
-                
+
             }
-            
+
             @Override
             public void mouseEntered(MouseEvent e) {
                 closeButton.setForeground(Color.RED);
             }
-            
+
             @Override
             public void mouseExited(MouseEvent e) {
                 closeButton.setForeground(Color.BLACK);
             }
-            
+
         });
-        
+
         titlePanel.setName(title);
         titlePanel.add(closeButton);
         return titlePanel;
     }
-    
+
     private void initPopup() {
         popupmenu = new JPopupMenu("Edit");
         JMenuItem closeAll = new JMenuItem("Close All");
@@ -616,17 +651,16 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             tabMain.removeAll();
         });
         clearData.addActionListener((ActionEvent e) -> {
-            
+
         });
         printReport.addActionListener((ActionEvent e) -> {
-            
+
         });
         popupmenu.add(printReport);
         popupmenu.add(clearData);
         popupmenu.add(closeAll);
     }
-    
-    private void loadSysProperties() {
+    public void loadSysProperties() {
         try {
             List<SystemProperty> listSys = systemPropertyService.search("-", Global.compId.toString(), "-");
             HashMap<String, String> hmList = new HashMap<>();
@@ -639,11 +673,10 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             System.exit(1);
         }
     }
-    
+
     private void initializeData() {
         this.setTitle(this.getTitle() + "(" + Global.loginUser.getUserName() + ")");
         try {
-            loadSysProperties();
             List listCI = usrCompRoleService.getAssignCompany(Global.loginUser.getUserId().toString());
             if (listCI.size() > 0) {
                 VUsrCompAssign vuca = (VUsrCompAssign) listCI.get(0);
@@ -655,18 +688,22 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             Global.listCurrency = currencyService.search("-", "-", Global.compId.toString());
             Global.listDepartment = departmentService.search("-", "-", Global.compId.toString(),
                     "-", "-");
-            Global.listTrader = traderService.searchTrader("-", "-", "-", "-", "-", Global.compId.toString());
+            Global.listTrader = traderService.searchTrader("-", "-", "-", "-", "-", Global.compId.toString(), "-");
             Global.listLocation = locationService.findAll();
             Global.listVou = vouService.findAll();
             Global.listSaleMan = saleManService.findAll();
             Global.listStock = stockService.findActiveStock();
-            Global.listStock = stockService.findAll();
             Global.listStockUnit = stockUnitService.findAll();
             Global.listRelation = relationService.findAll();
             Global.listMachine = machineInfoService.findAll();
-            Global.listRelation.forEach(ur -> {
-                Global.hmRelation.put(ur.getUnitKey(), ur.getFactor());
-            });
+            Global.listStockType = stockTypeService.findAll();
+            Global.listCategory = categoryService.findAll();
+            Global.listStockBrand = stockBrandService.findAll();
+            if (Global.listRelation != null) {
+                Global.listRelation.forEach(ur -> {
+                    Global.hmRelation.put(ur.getUnitKey(), ur.getFactor());
+                });
+            }
             Global.listChargeType = chargeTypeService.findAll();
             String cuId = Global.sysProperties.get("system.default.currency");
             //Default Currency
@@ -677,27 +714,43 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             //Default department
             String depId = Global.sysProperties.get("system.default.department");
             Global.defaultDepartment = departmentService.findById(depId);
-            getMachinceInfo();
+            //Defatult Loction
+            String locId = Global.sysProperties.get("system.default.location");
+            Global.defaultLocation = locationService.findById(locId);
+
+            //Default VouStatus
+            String vouStausId = Global.sysProperties.get("system.default.vou.status");
+            Global.defaultVouStatus = vouStatusService.findById(vouStausId);
+            //Default SaleMan
+            String saleManId = Global.sysProperties.get("system.default.saleman");
+            if (saleManId != null) {
+                Global.defaultSaleMan = saleManService.findById(saleManId);
+            }
+            //Default Customer
+            String cusId = Global.sysProperties.get("system.default.customer");
+            Global.defaultCustomer = traderService.findById(Util1.getInteger(cusId));
+            //Default Supplier
+            String supId = Global.sysProperties.get("system.default.supplier");
+            Global.defaultSupplier = traderService.findById(Util1.getInteger(supId));
         } catch (Exception e) {
             LOGGER.error("Initialize Data :" + e.getMessage());
             JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Initialize Data", JOptionPane.ERROR_MESSAGE);
             System.exit(1);
         }
-        
+
     }
-    
+
     public void initMenu() {
         LOGGER.info("init menu.");
-        showCloseAllPopup();
         menuBar.removeAll();
         taskExecutor.execute(() -> {
-            List<VRoleMenu> listVRM = menuService.getParentChildMenu(Global.roleId.toString());
+            List<VRoleMenu> listVRM = menuService.getParentChildMenu(Global.roleId.toString(), "Menu");
             listVRM.forEach((menu) -> {
                 if (menu.getIsAllow()) {
                     if (menu.getChild() != null) {
                         if (!menu.getChild().isEmpty()) {
                             JMenu parent = new JMenu();
-                            parent.setName(menu.getMenuClass() + "," + menu.getSoureAccCode());
+                            parent.setName(menu.getMenuClass() + "," + Util1.isNull(menu.getSoureAccCode(), "-"));
                             parent.setText(menu.getMenuName());
                             parent.setFont(Global.menuFont);
 
@@ -707,8 +760,8 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                             addChildMenu(parent, menu.getChild());
                         } else {  //No Child
                             JMenu jmenu = new JMenu();
-                            jmenu.setName(menu.getMenuClass() + "," + menu.getSoureAccCode());
-                            
+                            jmenu.setName(menu.getMenuClass() + "," + Util1.isNull(menu.getSoureAccCode(), "-"));
+
                             jmenu.setText(menu.getMenuName());
                             jmenu.setFont(Global.menuFont);
 
@@ -718,10 +771,10 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                         }
                     } else {  //No Child
                         JMenu jmenu = new JMenu();
-                        
+
                         jmenu.setText(menu.getMenuName());
                         jmenu.setFont(Global.menuFont);
-                        jmenu.setName(menu.getMenuClass() + "," + menu.getSoureAccCode());
+                        jmenu.setName(menu.getMenuClass() + "," + Util1.isNull(menu.getSoureAccCode(), "-"));
                         //Need to add action listener
                         //====================================
                         menuBar.add(jmenu);
@@ -731,9 +784,9 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             addMargin();
             LOGGER.info("init menu end");
         });
-        
+
     }
-    
+
     private void addChildMenu(JMenu parent, List<VRoleMenu> listVRM) {
         listVRM.forEach((vrMenu) -> {
             if (vrMenu.getIsAllow()) {
@@ -742,7 +795,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                         JMenu menu = new JMenu();
                         menu.setText(vrMenu.getMenuName());
                         menu.setFont(Global.menuFont);
-                        menu.setName(vrMenu.getMenuClass() + "," + vrMenu.getSoureAccCode());
+                        menu.setName(vrMenu.getMenuClass() + "," + Util1.isNull(vrMenu.getSoureAccCode(), "-"));
 
                         //Need to add action listener
                         //====================================
@@ -754,7 +807,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                         //Need to add action listener
                         menuItem.addActionListener(menuListener);
                         menuItem.setFont(Global.menuFont);
-                        menuItem.setName(vrMenu.getMenuClass() + "," + vrMenu.getSoureAccCode());
+                        menuItem.setName(vrMenu.getMenuClass() + "," + Util1.isNull(vrMenu.getSoureAccCode(), "-"));
 
                         //====================================
                         parent.add(menuItem);
@@ -762,7 +815,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                 } else {  //No Child
                     JMenuItem menuItem = new JMenuItem();
                     menuItem.setText(vrMenu.getMenuName());
-                    menuItem.setName(vrMenu.getMenuClass() + "," + vrMenu.getSoureAccCode());
+                    menuItem.setName(vrMenu.getMenuClass() + "," + Util1.isNull(vrMenu.getSoureAccCode(), "-"));
                     //Need to add action listener
                     menuItem.addActionListener(menuListener);
                     menuItem.setFont(Global.menuFont);
@@ -772,7 +825,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             }
         });
     }
-    
+
     private void assignWindoInfo() {
         Global.x = this.getX();
         Global.y = this.getY();
@@ -780,7 +833,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         Global.width = this.getWidth();
         lblCompanyName.setText(Global.companyName);
     }
-    
+
     @Override
     public void reload(String msg, Object data) {
         LOGGER.info("MainFrame reload : " + msg);
@@ -792,13 +845,44 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                 break;
         }
     }
-    
+
     public void startNetworkDetector() {
+        LOGGER.info("Network Dector Start.");
         NetworkDetector detector = new NetworkDetector();
         detector.setNetworkObserver(this);
-        scheduler.scheduleAtFixedRate(detector, Duration.ofSeconds(5));
+        scheduler.scheduleAtFixedRate(detector, Duration.ofSeconds(10));
+        startPhoneService();
+
     }
-    
+
+    private void startPhoneService() {
+        String open = Global.sysProperties.get("system.phone.service");
+        if (open.trim().equals("1")) {
+            Thread socketThread = new Thread(() -> {
+                LOGGER.info("Socket Thread Start.");
+                try {
+                    while (true) {
+                        try (Socket s = Global.sock.accept()) {
+                            DataInputStream dis = new DataInputStream(s.getInputStream());
+                            String phoneNo = (String) dis.readUTF();
+                            if (!phoneNo.isEmpty()) {
+                                customerGrid.setPhoneNumber(phoneNo);
+                            }
+                        }
+                    }
+                    /*EchoThread echoThread = new EchoThread(socket);
+                        echoThread.setCustomerGrid(customerGrid);
+                        echoThread.start();*/
+                } catch (IOException e) {
+                    LOGGER.error("Sockket Accept Error :" + e.getMessage());
+                }
+                // new thread for a client
+
+            });
+            socketThread.start();
+        }
+    }
+
     private void addMargin() {
         java.awt.Component[] components = menuBar.getComponents();
         for (java.awt.Component component : components) {
@@ -808,7 +892,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         revalidate();
         repaint();
     }
-    
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -863,8 +947,8 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             }
         });
 
-        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel1.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(204, 204, 204), 1, true));
+        jPanel1.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        jPanel1.setFocusable(false);
 
         lblCompanyName.setFont(Global.lableFont);
         lblCompanyName.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
@@ -872,8 +956,9 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
 
         toolBar.setOpaque(false);
 
+        btnSave.setBackground(ColorUtil.mainColor);
         btnSave.setFont(Global.lableFont);
-        btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save.png"))); // NOI18N
+        btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save_20px.png"))); // NOI18N
         btnSave.setToolTipText("F5 - Save");
         btnSave.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -882,8 +967,9 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         });
         toolBar.add(btnSave);
 
+        btnPrint.setBackground(ColorUtil.mainColor);
         btnPrint.setFont(Global.lableFont);
-        btnPrint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/printer.png"))); // NOI18N
+        btnPrint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/print_20px.png"))); // NOI18N
         btnPrint.setToolTipText("F6 - Print");
         btnPrint.setFocusable(false);
         btnPrint.addActionListener(new java.awt.event.ActionListener() {
@@ -893,7 +979,8 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         });
         toolBar.add(btnPrint);
 
-        btnRefresh.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/refresh.png"))); // NOI18N
+        btnRefresh.setBackground(ColorUtil.mainColor);
+        btnRefresh.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/refresh_20px.png"))); // NOI18N
         btnRefresh.setToolTipText("F7 - Refresh");
         btnRefresh.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -902,8 +989,9 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         });
         toolBar.add(btnRefresh);
 
+        btnDelete.setBackground(ColorUtil.mainColor);
         btnDelete.setFont(Global.lableFont);
-        btnDelete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/delete.png"))); // NOI18N
+        btnDelete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/trash_20px.png"))); // NOI18N
         btnDelete.setToolTipText("F8 - Delete");
         btnDelete.setFocusable(false);
         btnDelete.addActionListener(new java.awt.event.ActionListener() {
@@ -913,8 +1001,9 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         });
         toolBar.add(btnDelete);
 
+        btnHistory.setBackground(ColorUtil.mainColor);
         btnHistory.setFont(Global.lableFont);
-        btnHistory.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/history.png"))); // NOI18N
+        btnHistory.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/time_machine_20px.png"))); // NOI18N
         btnHistory.setToolTipText("F9-History");
         btnHistory.setFocusable(false);
         btnHistory.addActionListener(new java.awt.event.ActionListener() {
@@ -924,9 +1013,10 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         });
         toolBar.add(btnHistory);
 
+        btnClear.setBackground(ColorUtil.mainColor);
         btnClear.setFont(Global.lableFont);
-        btnClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/clean-code.png"))); // NOI18N
-        btnClear.setToolTipText("F10 - Clear ");
+        btnClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/add_file_20px.png"))); // NOI18N
+        btnClear.setToolTipText("F10 - New");
         btnClear.setFocusable(false);
         btnClear.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -935,8 +1025,9 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         });
         toolBar.add(btnClear);
 
+        btnLogout.setBackground(ColorUtil.mainColor);
         btnLogout.setFont(Global.lableFont);
-        btnLogout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/logout.png"))); // NOI18N
+        btnLogout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/logout_rounded_down_20px.png"))); // NOI18N
         btnLogout.setToolTipText("Logout");
         btnLogout.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -948,6 +1039,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         lblNeworkImage.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/online-signal.png"))); // NOI18N
 
         lblNeworkPing.setText("2344ms");
+        lblNeworkPing.setToolTipText("Internet Connection Status");
 
         txtSearch.setFont(Global.textFont);
         txtSearch.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -957,17 +1049,22 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         });
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/search.png"))); // NOI18N
+        jLabel1.setToolTipText("Search");
+        jLabel1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel1MouseClicked(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(toolBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(toolBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(lblCompanyName, javax.swing.GroupLayout.PREFERRED_SIZE, 194, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(lblCompanyName, javax.swing.GroupLayout.PREFERRED_SIZE, 204, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel1)
@@ -979,16 +1076,22 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addComponent(lblCompanyName, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addComponent(toolBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblCompanyName, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(toolBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(0, 0, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addGap(6, 6, 6)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(lblNeworkPing)
-                    .addComponent(lblNeworkImage)
-                    .addComponent(jLabel1))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel1))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(lblNeworkImage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(lblNeworkPing, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))))
                 .addContainerGap())
         );
 
@@ -1009,7 +1112,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(tabMain, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 738, Short.MAX_VALUE)
+            .addComponent(tabMain, javax.swing.GroupLayout.Alignment.TRAILING)
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
@@ -1017,7 +1120,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tabMain, javax.swing.GroupLayout.DEFAULT_SIZE, 343, Short.MAX_VALUE)
+                .addComponent(tabMain, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -1044,15 +1147,14 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
 
     private void formWindowStateChanged(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowStateChanged
         //LOGGER.info("formWindowStateChanged");
-        setLocationRelativeTo(null);
         assignWindoInfo();
     }//GEN-LAST:event_formWindowStateChanged
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
         //LOGGER.info("formWindowOpened");
         assignWindoInfo();
-        initMenu();
         initializeData();
+        initMenu();
         //tabChangeListener();
     }//GEN-LAST:event_formWindowOpened
 
@@ -1124,6 +1226,11 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         }
     }//GEN-LAST:event_txtSearchKeyReleased
 
+    private void jLabel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseClicked
+        // TODO add your handling code here:
+        txtSearch.requestFocus();
+    }//GEN-LAST:event_jLabel1MouseClicked
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClear;
     private javax.swing.JButton btnDelete;
@@ -1145,12 +1252,13 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
 
     @Override
     public void selected(Object source, Object selectObj) {
-        
+        if (source.equals("DELIVERED")) {
+        }
     }
-    
+
     @Override
     public void load(Object source, Object selectObj) {
-        
+
         if (source != null) {
             String parent = source.toString();
             String status = selectObj.toString();
@@ -1162,7 +1270,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                         sLoading.setVisible(true);
                         LOGGER.info("Loading Visible End");
                     });
-                    
+
                     break;
                 case "Stop":
                     JLabel eLoading = hmTabLoading.get(parent);
@@ -1171,52 +1279,30 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                         eLoading.setVisible(false);
                         LOGGER.info("Loading Invisbile End");
                     });
-                    
+
                     break;
             }
         }
     }
-    
+
     @Override
     public void keyTyped(KeyEvent e
     ) {
     }
-    
+
     @Override
     public void keyPressed(KeyEvent e) {
     }
-    
+
     @Override
     public void keyReleased(KeyEvent e) {
     }
-    
-    private void getMachinceInfo() {
-        Global.machineName = Util1.getComputerName();
-        try {
-            Global.machineId = machineInfoService.getMax(Global.machineName);
-            if (Global.machineId == 0) {
-                String machineName = Util1.getComputerName();
-                String ipAddress = Util1.getIPAddress();
-                MachineInfo machine = new MachineInfo();
-                
-                machine.setIpAddress(ipAddress);
-                machine.setMachineName(machineName);
-                machineInfoService.save(machine);
-                Global.machineId = machineInfoService.getMax(Global.machineName);
-                
-            }
-            
-        } catch (Exception ex) {
-            LOGGER.error("getMachieInfo : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.toString());
-            
-        }
-    }
-    
+
     @Override
     public void sendPingTime(long time) {
         showNetworkIcon(time);
     }
-    
+
     private void showNetworkIcon(long time) {
         //LOGGER.info("Network Ping :" + time);
         if (time < 0) {
@@ -1228,7 +1314,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             lblNeworkImage.setIcon(onlineIcon);
             lblNeworkPing.setForeground(Color.green);
             lblNeworkPing.setText(time + "ms");
-            
+
         }
         if (time > 100) {
             lblNeworkImage.setIcon(lowIcon);

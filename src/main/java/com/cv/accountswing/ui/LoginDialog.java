@@ -5,18 +5,18 @@
  */
 package com.cv.accountswing.ui;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.entity.AppUser;
-import com.cv.accountswing.entity.SystemProperty;
-import com.cv.accountswing.service.SystemPropertyService;
 import com.cv.accountswing.service.UserService;
+import com.cv.accountswing.util.Util1;
+import com.cv.inv.entity.MachineInfo;
+import com.cv.inv.service.MachineInfoService;
+import java.awt.HeadlessException;
 //import com.cv.accounts.service.UserService;
 import java.awt.event.FocusAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.HashMap;
-import java.util.List;
-import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JOptionPane;
@@ -24,7 +24,6 @@ import javax.swing.JTextField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
 
 /**
@@ -37,6 +36,7 @@ public class LoginDialog extends javax.swing.JDialog implements KeyListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginDialog.class);
     private boolean login = false;
     private int loginAttempt = 0;
+    private boolean isRegister = false;
     private final FocusAdapter fa = new FocusAdapter() {
         @Override
         public void focusGained(java.awt.event.FocusEvent evt) {
@@ -62,11 +62,9 @@ public class LoginDialog extends javax.swing.JDialog implements KeyListener {
     };
 
     @Autowired
-    private TaskExecutor taskExecutor;
-    @Autowired
     private UserService usrService;
     @Autowired
-    private SystemPropertyService systemPropertyService;
+    private MachineInfoService machineInfoService;
 
     /**
      * Creates new form LoginDialog
@@ -77,8 +75,37 @@ public class LoginDialog extends javax.swing.JDialog implements KeyListener {
         //Init
         initKeyListener();
         initFocusListener();
-        ImageIcon size = new ImageIcon(getClass().getResource("/images/logo.png"));
-        setIconImage(size.getImage());
+    }
+
+    public void checkMachineRegister() {
+        try {
+            Global.machineName = Util1.getComputerName();
+            Global.machineId = machineInfoService.getMax(Global.machineName);
+            if (Global.machineId == 0) {
+                isRegister = false;
+                JOptionPane.showMessageDialog(Global.parentForm, "Your account is not registed in this machine");
+            } else {
+                isRegister = true;
+            }
+        } catch (Exception ex) {
+            LOGGER.error("getMachineInfo Error : {}", ex.getMessage());
+            JOptionPane.showMessageDialog(this, "Database not found.", "System Error", JOptionPane.ERROR_MESSAGE);
+            System.exit(1);
+        }
+    }
+
+    private void register() {
+        try {
+            String machineName = Util1.getComputerName();
+            String ipAddress = Util1.getIPAddress();
+            MachineInfo machine = new MachineInfo();
+            machine.setIpAddress(ipAddress);
+            machine.setMachineName(machineName);
+            machineInfoService.save(machine);
+            Global.machineId = machineInfoService.getMax(Global.machineName);
+        } catch (Exception ex) {
+            LOGGER.error("Register Error : {}", ex.getMessage());
+        }
     }
 
     //KeyListener implementation
@@ -152,44 +179,6 @@ public class LoginDialog extends javax.swing.JDialog implements KeyListener {
     }
     //======End KeyListener implementation ======
 
-    public void startThread() {
-        LOGGER.info("Status : " + Global.synceFinish);
-        try {
-            if (!Global.synceFinish) {
-                lblStatus.setText("Synce with server in progress.");
-                butClear.setEnabled(false);
-                butLogin.setEnabled(false);
-                taskExecutor.execute(new Runnable() {
-                    int cnt = 0;
-
-                    @Override
-                    public void run() {
-                        do {
-                            //LOGGER.info("Status 1 : " + Global.synceFinish);
-                            if (cnt == 30) {
-                                lblStatus.setText("Synce with server in progress.");
-                                cnt = 0;
-                            } else {
-                                lblStatus.setText(lblStatus.getText() + ".");
-                                cnt++;
-                            }
-                        } while (!Global.synceFinish);
-
-                        butClear.setEnabled(true);
-                        butLogin.setEnabled(true);
-                        lblStatus.setText("Synce with server finished.");
-                    }
-                });
-
-            } else {
-                lblStatus.setText("Synce with server finished.");
-            }
-        } catch (Exception ex) {
-            LOGGER.error("startThread : " + ex.getMessage());
-        }
-
-    }
-
     public boolean isLogin() {
         return login;
     }
@@ -204,17 +193,28 @@ public class LoginDialog extends javax.swing.JDialog implements KeyListener {
                 AppUser user = usrService.login(
                         txtLoginName.getText(), String.copyValueOf(txtPassword.getPassword())
                 );
-
                 if (user == null) {
                     JOptionPane.showMessageDialog(this, "Invalid user name or password.",
                             "Authentication error.", JOptionPane.ERROR_MESSAGE);
                     loginAttempt++;
                 } else { //Login success
-                    Global.loginUser = user;
-                    login = true;
-                    this.dispose();
+                    if (user.getUserId() == 1) {
+                        if (!isRegister) {
+                            register();
+                            isRegister = true;
+                        }
+                    }
+                    if (isRegister) {
+                        Global.loginUser = user;
+                        login = true;
+                        this.dispose();
+                    } else {
+                        JOptionPane.showMessageDialog(Global.parentForm, "This machine is not registered yet.");
+                        login = false;
+                        this.dispose();
+                    }
                 }
-            } catch (Exception ex) {
+            } catch (HeadlessException ex) {
                 LOGGER.error("login : " + ex.getMessage());
                 JOptionPane.showMessageDialog(this, ex.getMessage(),
                         "Authentication error.", JOptionPane.ERROR_MESSAGE);
@@ -264,6 +264,11 @@ public class LoginDialog extends javax.swing.JDialog implements KeyListener {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Login Core Account");
         setFont(Global.lableFont);
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentShown(java.awt.event.ComponentEvent evt) {
+                formComponentShown(evt);
+            }
+        });
 
         jLabel1.setFont(Global.lableFont);
         jLabel1.setText("Login Name ");
@@ -277,12 +282,19 @@ public class LoginDialog extends javax.swing.JDialog implements KeyListener {
         txtPassword.setFont(Global.lableFont);
         txtPassword.setName("txtPassword"); // NOI18N
 
+        butClear.setBackground(ColorUtil.btnEdit);
         butClear.setFont(Global.lableFont);
+        butClear.setForeground(ColorUtil.foreground);
+        butClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/button_clear_white.png"))); // NOI18N
         butClear.setText("Clear");
         butClear.setName("butClear"); // NOI18N
 
+        butLogin.setBackground(ColorUtil.mainColor);
         butLogin.setFont(Global.lableFont);
+        butLogin.setForeground(ColorUtil.foreground);
+        butLogin.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save-button-white.png"))); // NOI18N
         butLogin.setText("Login");
+        butLogin.setHorizontalAlignment(javax.swing.SwingConstants.LEADING);
         butLogin.setName("butLogin"); // NOI18N
         butLogin.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -301,7 +313,7 @@ public class LoginDialog extends javax.swing.JDialog implements KeyListener {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 173, Short.MAX_VALUE)
+                        .addGap(0, 184, Short.MAX_VALUE)
                         .addComponent(butLogin)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(butClear))
@@ -311,14 +323,14 @@ public class LoginDialog extends javax.swing.JDialog implements KeyListener {
                             .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtPassword, javax.swing.GroupLayout.DEFAULT_SIZE, 211, Short.MAX_VALUE)
-                            .addComponent(txtLoginName, javax.swing.GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE))))
+                            .addComponent(txtPassword, javax.swing.GroupLayout.DEFAULT_SIZE, 239, Short.MAX_VALUE)
+                            .addComponent(txtLoginName, javax.swing.GroupLayout.DEFAULT_SIZE, 239, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(26, 26, 26)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(txtLoginName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -330,7 +342,7 @@ public class LoginDialog extends javax.swing.JDialog implements KeyListener {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(butClear)
                     .addComponent(butLogin))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(14, 14, 14)
                 .addComponent(lblStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -343,6 +355,12 @@ public class LoginDialog extends javax.swing.JDialog implements KeyListener {
     private void butLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_butLoginActionPerformed
         login();
     }//GEN-LAST:event_butLoginActionPerformed
+
+    private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
+        // TODO add your handling code here:
+        this.requestFocusInWindow();
+        txtLoginName.requestFocus();
+    }//GEN-LAST:event_formComponentShown
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton butClear;

@@ -5,6 +5,7 @@
  */
 package com.cv.accountswing.ui.cash;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
@@ -21,6 +22,8 @@ import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.editor.COACellEditor;
 import com.cv.accountswing.ui.filter.FilterPanel;
 import com.cv.accountswing.util.Util1;
+import com.cv.inv.entry.PurchaseEntry;
+import com.cv.inv.entry.SaleEntry;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -72,6 +75,11 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
     private TaskExecutor taskExecutor;
     @Autowired
     private SalePurchaseTableModel spTableModel;
+    private SaleEntryDialog saleEntryDialog;
+    @Autowired
+    private SaleEntry saleEntry;
+    @Autowired
+    private PurchaseEntry purchaseEntry;
 
     private TableRowSorter<TableModel> sorter;
     private SelectionObserver selectionObserver;
@@ -142,8 +150,12 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
         spTableModel.setSelectionObserver(this);
         tblCash.setModel(spTableModel);
         tblCash.getTableHeader().setFont(Global.tblHeaderFont);
-        tblCash.getTableHeader().setPreferredSize(new Dimension(40, 40));
-        //tblCash.getTableHeader().setBackground(Global.tblHeaderColor);
+        tblCash.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblCash.getTableHeader().setForeground(ColorUtil.foreground);
+        tblCash.getTableHeader().setPreferredSize(new Dimension(25, 25));
+        
+        tblCash.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblCash.getTableHeader().setForeground(ColorUtil.foreground);
         sorter = new TableRowSorter<>(tblCash.getModel());
         tblCash.setRowSorter(sorter);
         tblCash.setCellSelectionEnabled(true);
@@ -402,6 +414,7 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
         jPanel1 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
         txtFTotalAmt = new javax.swing.JFormattedTextField();
+        jButton1 = new javax.swing.JButton();
 
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentShown(java.awt.event.ComponentEvent evt) {
@@ -445,12 +458,23 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
         txtFTotalAmt.setEnabled(false);
         txtFTotalAmt.setFont(Global.amtFont);
 
+        jButton1.setFont(Global.lableFont);
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/new-button.png"))); // NOI18N
+        jButton1.setText("Sale Entry");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap()
+                .addComponent(jButton1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel4)
                 .addGap(18, 18, 18)
                 .addComponent(txtFTotalAmt, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -462,7 +486,8 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtFTotalAmt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButton1))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -501,8 +526,27 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
 
     }//GEN-LAST:event_formComponentShown
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        saleEntryDialog = new SaleEntryDialog();
+        saleEntryDialog.setLayout(new BorderLayout());
+        if (this.getName().equals("Sale")) {
+            saleEntry.initMain();
+            saleEntryDialog.add(saleEntry, BorderLayout.CENTER);
+            saleEntryDialog.setTitle("Sale Entry");
+        } else {
+            purchaseEntry.initMain();
+            saleEntryDialog.add(purchaseEntry, BorderLayout.CENTER);
+            saleEntryDialog.setName("Purchase Entry");
+        }
+        saleEntryDialog.setSize(Global.width - 100, Global.height - 100);
+        saleEntryDialog.setLocationRelativeTo(null);
+        saleEntryDialog.setVisible(true);
+    }//GEN-LAST:event_jButton1ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane2;

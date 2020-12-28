@@ -5,6 +5,7 @@
  */
 package com.cv.inv.ui.util;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
@@ -120,6 +121,8 @@ public class RetInVouSearch extends javax.swing.JDialog implements KeyListener, 
         tblStock.setModel(codeTableModel);
         codeTableModel.setParent(tblStock);
         codeTableModel.addNewRow();
+        tblStock.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblStock.getTableHeader().setForeground(ColorUtil.foreground);
         tblStock.getColumnModel().getColumn(0).setPreferredWidth(30);
         tblStock.getColumnModel().getColumn(1).setPreferredWidth(60);
         tblStock.setDefaultRenderer(String.class, new TableCellRender());
@@ -142,6 +145,8 @@ public class RetInVouSearch extends javax.swing.JDialog implements KeyListener, 
         }
 
         retInVouSearchTableModel.setParent(tblVou);
+        tblVou.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblVou.getTableHeader().setForeground(ColorUtil.foreground);
         tblVou.getColumnModel().getColumn(0).setPreferredWidth(30);
         tblVou.getColumnModel().getColumn(1).setPreferredWidth(60);
         tblVou.getColumnModel().getColumn(2).setPreferredWidth(150);
@@ -424,6 +429,8 @@ public class RetInVouSearch extends javax.swing.JDialog implements KeyListener, 
                 .addContainerGap())
         );
 
+        btnSelect.setBackground(ColorUtil.mainColor);
+        btnSelect.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/select-button.png"))); // NOI18N
         btnSelect.setText("Select");
         btnSelect.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -431,6 +438,8 @@ public class RetInVouSearch extends javax.swing.JDialog implements KeyListener, 
             }
         });
 
+        Search.setBackground(ColorUtil.mainColor);
+        Search.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/search-button-white.png"))); // NOI18N
         Search.setText("Search");
         Search.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -458,6 +467,8 @@ public class RetInVouSearch extends javax.swing.JDialog implements KeyListener, 
         });
         jScrollPane5.setViewportView(tblVou);
 
+        btnClear.setBackground(ColorUtil.btnEdit);
+        btnClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/clear-button-white.png"))); // NOI18N
         btnClear.setText("Clear");
         btnClear.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -474,14 +485,14 @@ public class RetInVouSearch extends javax.swing.JDialog implements KeyListener, 
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(lblTtlRecord)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(Search)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnSelect)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnClear)
                         .addContainerGap())
-                    .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
+                    .addComponent(jScrollPane5)))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
