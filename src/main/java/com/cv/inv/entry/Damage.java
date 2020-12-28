@@ -5,6 +5,7 @@
  */
 package com.cv.inv.entry;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
@@ -35,6 +36,7 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
@@ -105,7 +107,9 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
         damageTableModel.addEmptyRow();
         damageTableModel.setCallBack(this);
         tblDamage.getTableHeader().setFont(Global.lableFont);
-        //  tblDamage.setCellSelectionEnabled(true);
+        tblDamage.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblDamage.getTableHeader().setForeground(ColorUtil.foreground);
+        tblDamage.setCellSelectionEnabled(true);
 
         tblDamage.getColumnModel().getColumn(0).setPreferredWidth(50);
         tblDamage.getColumnModel().getColumn(1).setPreferredWidth(300);
@@ -116,6 +120,7 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
 
         tblDamage.getColumnModel().getColumn(0).setCellEditor(new StockCellEditor());
         tblDamage.getColumnModel().getColumn(2).setCellEditor(new AutoClearEditor());
+        tblDamage.getColumnModel().getColumn(4).setCellEditor(new AutoClearEditor());
         tblDamage.getColumnModel().getColumn(3).setCellEditor(new StockUnitEditor());
 
         tblDamage.setDefaultRenderer(Boolean.class, new TableCellRender());
@@ -123,6 +128,8 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
         tblDamage.setDefaultRenderer(Float.class, new TableCellRender());
         tblDamage.setDefaultRenderer(Double.class, new TableCellRender());
         tblDamage.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tblDamage.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+                .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
         tblDamage.getSelectionModel().addListSelectionListener((ListSelectionEvent e) -> {
             //     txtRecNo.setText(Integer.toString(tblDamage.getSelectedRow() + 1));
         });
@@ -202,8 +209,6 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
             rohh2.setUpdatedBy(Global.loginUser);
             rohh2.setUpdatedDate(Util1.getTodayDate());
         }
-        rohh2.setDmgVouId(txtVouNo.getText());
-
         rohh2.setDeleted(Util1.getNullTo(rohh2.isDeleted()));
         rohh2.setTotalAmount(Util1.getDouble(txtTotalAmount.getText()));
         if (locCompleter.getLocation() != null) {
@@ -254,9 +259,6 @@ public class Damage extends javax.swing.JPanel implements SelectionObserver, Key
         tblDamage.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "DELETE");
         tblDamage.getActionMap().put("DELETE", actionItemDelete);
 
-        //Enter event on tblSale
-        tblDamage.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "ENTER-Action");
-        tblDamage.getActionMap().put("ENTER-Action", actionTblPurEnterKey);
     }
     private final Action actionItemDelete = new AbstractAction() {
         @Override

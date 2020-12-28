@@ -5,6 +5,7 @@
  */
 package com.cv.inv.entry;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
@@ -13,18 +14,31 @@ import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.util.Util1;
+import com.cv.inv.entity.StockIssueDetailHis;
+import com.cv.inv.entity.StockIssueHis;
 import com.cv.inv.entity.StockOutstanding;
 import com.cv.inv.entry.common.IssueTableModel;
+import com.cv.inv.entry.dialog.StockIssueListDialog;
 import com.cv.inv.entry.editor.LocationAutoCompleter;
 import com.cv.inv.entry.editor.StockCellEditor;
 import com.cv.inv.entry.editor.StockUnitEditor;
+import com.cv.inv.service.StockIssueDetailHisService;
+import com.cv.inv.service.StockIssueHisService;
 import com.cv.inv.service.VouIdService;
 import com.cv.inv.util.GenVouNoImpl;
 import com.toedter.calendar.JTextFieldDateEditor;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.Date;
+import java.util.List;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import org.slf4j.LoggerFactory;
@@ -45,12 +59,22 @@ public class Issue extends javax.swing.JPanel implements SelectionObserver, KeyL
     private LoadingObserver loadingObserver;
     private boolean isShown = false;
     private GenVouNoImpl vouEngine = null;
+    private StockIssueHis rohh2 = new StockIssueHis();
+    private LocationAutoCompleter locCompleter;
+    private StockIssueHis issue = new StockIssueHis();
+
     @Autowired
     private IssueTableModel issueTableModel;
     @Autowired
     private ApplicationMainFrame mainFrame;
     @Autowired
     private VouIdService voudIdService;
+    @Autowired
+    private StockIssueHisService ihService;
+    @Autowired
+    private StockIssueListDialog issueSearchDialog;
+    @Autowired
+    private StockIssueDetailHisService iDetailService;
 
     public void setLoadingObserver(LoadingObserver loadingObserver) {
         this.loadingObserver = loadingObserver;
@@ -67,6 +91,7 @@ public class Issue extends javax.swing.JPanel implements SelectionObserver, KeyL
         setTodayDate();
         initCombo();
         genVouNo();
+        actionMapping();
         isShown = true;
     }
 
@@ -74,8 +99,11 @@ public class Issue extends javax.swing.JPanel implements SelectionObserver, KeyL
         tblIssue.setModel(issueTableModel);
         issueTableModel.setParent(tblIssue);
         tblIssue.getTableHeader().setFont(Global.lableFont);
+        tblIssue.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblIssue.getTableHeader().setForeground(ColorUtil.foreground);
         issueTableModel.addEmptyRow();
         issueTableModel.setCallBack(this);
+        tblIssue.setCellSelectionEnabled(true);
         tblIssue.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         tblIssue.getColumnModel().getColumn(0).setPreferredWidth(10);
@@ -97,6 +125,8 @@ public class Issue extends javax.swing.JPanel implements SelectionObserver, KeyL
         tblIssue.setDefaultRenderer(Object.class, new TableCellRender());
         tblIssue.setDefaultRenderer(Float.class, new TableCellRender());
         tblIssue.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tblIssue.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+                .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
         tblIssue.getSelectionModel().addListSelectionListener((ListSelectionEvent e) -> {
             //     txtRecNo.setText(Integer.toString(tblDamage.getSelectedRow() + 1));
         });
@@ -127,8 +157,8 @@ public class Issue extends javax.swing.JPanel implements SelectionObserver, KeyL
     }
 
     private void initCombo() {
-        LocationAutoCompleter locAutoCompleter = new LocationAutoCompleter(txtLocation, Global.listLocation, null);
-        locAutoCompleter.setSelectionObserver(this);
+        locCompleter = new LocationAutoCompleter(txtLocation, Global.listLocation, null);
+        locCompleter.setSelectionObserver(this);
     }
 
     private void borrow() {
@@ -137,16 +167,103 @@ public class Issue extends javax.swing.JPanel implements SelectionObserver, KeyL
         outs.setTranOption("Borrow");
         outs.setInvId(txtIssueId.getText());
         outs.setTranDate(txtDate.getDate());
-        issueTableModel.add(outs);
+        //  issueTableModel.add(outs);
     }
 
     private void clear() {
         issueTableModel.removeListDetail();
+
+        lblStatus.setText("NEW");
+        if (Global.loginDate != null) {
+            txtDate.setDate(Util1.toDate(Global.loginDate, "dd/MM/yyyy"));
+        } else {
+            txtDate.setDate(Util1.getTodayDate());
+        }
+        txtRemark.setText(null);
+        genVouNo();
+        isShown = false;
     }
 
     private void genVouNo() {
         vouEngine = new GenVouNoImpl(voudIdService, "Damage", Util1.getPeriod(txtDate.getDate()));
         txtIssueId.setText(vouEngine.genVouNo());
+    }
+
+    private boolean saveIssue() {
+        boolean status = false;
+        if (isValidEntry()) {
+            List<StockIssueDetailHis> listDmgDetail = issueTableModel.getDetail();
+            List<String> delList = issueTableModel.getDelList();
+
+            try {
+                String vouStatus = lblStatus.getText();
+                ihService.save(rohh2, listDmgDetail, vouStatus, delList);
+                vouEngine.updateVouNo();
+                genVouNo();
+                status = true;
+            } catch (Exception ex) {
+                LOGGER.error("save Issue : " + rohh2.getIssueId() + " : " + ex.getMessage());
+            }
+        }
+        return status;
+    }
+
+    private boolean isValidEntry() {
+        boolean status = true;
+
+        rohh2.setIssueId(txtIssueId.getText());
+        rohh2.setRemark(txtRemark.getText());
+        if (lblStatus.getText().equals("NEW")) {
+            rohh2.setIssueDate(txtDate.getDate());
+            rohh2.setCreatedBy(Global.loginUser);
+        } else {
+            Date tmpDate = txtDate.getDate();
+            if (!Util1.isSameDate(tmpDate, rohh2.getIssueDate())) {
+                rohh2.setIssueDate(txtDate.getDate());
+            }
+            rohh2.setUpdatedBy(Global.loginUser);
+            rohh2.setUpdatedDate(Util1.getTodayDate());
+        }
+        rohh2.setDeleted(Util1.getNullTo(rohh2.isDeleted()));
+        if (locCompleter.getLocation() != null) {
+            rohh2.setLocation(locCompleter.getLocation());
+        } else {
+            JOptionPane.showMessageDialog(Global.parentForm, "Location cannot be null.",
+                    "Invalid.", JOptionPane.ERROR_MESSAGE);
+            status = false;
+        }
+
+        return status;
+    }
+
+    private void actionMapping() {
+        //F8 event on tblRetIn
+        tblIssue.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "DELETE");
+        tblIssue.getActionMap().put("DELETE", actionItemDelete);
+    }
+    private final Action actionItemDelete = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (tblIssue.getSelectedRow() >= 0) {
+                int yes_no = JOptionPane.showConfirmDialog(Global.parentForm,
+                        "Are you sure to delete?", "Return in item delete", JOptionPane.YES_NO_OPTION);
+                if (yes_no == 0) {
+                    issueTableModel.delete(tblIssue.getSelectedRow());
+                }
+            }
+        }
+    };
+
+    public void deleteIssue() {
+        int yes_no = JOptionPane.showConfirmDialog(Global.parentForm,
+                "Are you sure to delete?", "Return in item delete", JOptionPane.YES_NO_OPTION);
+        if (yes_no == 0) {
+            String vouNo = txtIssueId.getText();
+            if (lblStatus.getText().equals("EDIT")) {
+                ihService.delete(vouNo);
+                clear();
+            }
+        }
     }
 
     /**
@@ -172,6 +289,7 @@ public class Issue extends javax.swing.JPanel implements SelectionObserver, KeyL
         txtDate = new com.toedter.calendar.JDateChooser();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblIssue = new javax.swing.JTable();
+        lblStatus = new javax.swing.JLabel();
 
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentShown(java.awt.event.ComponentEvent evt) {
@@ -287,6 +405,9 @@ public class Issue extends javax.swing.JPanel implements SelectionObserver, KeyL
         ));
         jScrollPane1.setViewportView(tblIssue);
 
+        lblStatus.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
+        lblStatus.setText("NEW");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -295,7 +416,10 @@ public class Issue extends javax.swing.JPanel implements SelectionObserver, KeyL
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane1)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblStatus)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -304,7 +428,9 @@ public class Issue extends javax.swing.JPanel implements SelectionObserver, KeyL
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 294, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblStatus)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -313,6 +439,9 @@ public class Issue extends javax.swing.JPanel implements SelectionObserver, KeyL
         mainFrame.setControl(this);
         if (!isShown) {
             initMain();
+            if (txtIssueId != null) {
+                issueTableModel.setIssueId(txtIssueId.getText());
+            }
         }
         txtIssueId.requestFocus();
     }//GEN-LAST:event_formComponentShown
@@ -336,6 +465,7 @@ public class Issue extends javax.swing.JPanel implements SelectionObserver, KeyL
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblNew;
+    private javax.swing.JLabel lblStatus;
     private javax.swing.JTable tblIssue;
     private com.toedter.calendar.JDateChooser txtDate;
     private javax.swing.JTextField txtIssueId;
@@ -345,6 +475,32 @@ public class Issue extends javax.swing.JPanel implements SelectionObserver, KeyL
 
     @Override
     public void selected(Object source, Object selectObj) {
+        switch (source.toString()) {
+            case "IssueVouList":
+        try {
+                StockIssueHis vRetIn = (StockIssueHis) selectObj;
+                issue = ihService.findById(vRetIn.getIssueId());
+
+                if (Util1.getNullTo(issue.isDeleted())) {
+                    lblStatus.setText("DELETED");
+                } else {
+                    lblStatus.setText("EDIT");
+                }
+
+                txtIssueId.setText(issue.getIssueId());
+                txtRemark.setText(issue.getRemark());
+                txtDate.setDate(issue.getIssueDate());
+                locCompleter.setLocation(issue.getLocation());
+                List<StockIssueDetailHis> listDetail = iDetailService.search(issue.getIssueId());
+                issueTableModel.setStockIssueDetailList(listDetail);
+
+            } catch (Exception ex) {
+                LOGGER.error("selected : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.toString());
+
+            }
+
+            break;
+        }
 
     }
 
@@ -434,10 +590,14 @@ public class Issue extends javax.swing.JPanel implements SelectionObserver, KeyL
 
     @Override
     public void save() {
+        if (saveIssue()) {
+            clear();
+        }
     }
 
     @Override
     public void delete() {
+        deleteIssue();
     }
 
     @Override
@@ -447,6 +607,10 @@ public class Issue extends javax.swing.JPanel implements SelectionObserver, KeyL
 
     @Override
     public void history() {
+        issueSearchDialog.setSize(Global.width - 200, Global.height - 200);
+        issueSearchDialog.setLocationRelativeTo(null);
+        issueSearchDialog.setSelectionObserver(this);
+        issueSearchDialog.setVisible(true);
     }
 
     @Override

@@ -70,7 +70,7 @@ public class MyDataModel extends MyAbstractTreeTableModel {
             case 0:
                 return ((VRoleMenu) node).getMenuName();
             case 1:
-                return ((VRoleMenu) node).getMenuClass();
+                return ((VRoleMenu) node).getMenuType();
             case 2:
                 return ((VRoleMenu) node).getIsAllow();
             default:

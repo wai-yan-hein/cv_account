@@ -5,14 +5,14 @@
  */
 package com.cv.inv.setup.dialog;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.StartWithRowFilter;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.CharacterNo;
 import com.cv.inv.service.CharacterNoService;
-import com.cv.inv.setup.common.CharacterNoTableModel;
-import java.awt.Frame;
+import com.cv.inv.setup.dialog.common.CharacterNoTableModel;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import javax.swing.JButton;
@@ -51,7 +51,7 @@ public class CharacterNoSetupDialog extends javax.swing.JDialog implements KeyLi
      * Creates new form ItemTypeSetupDialog
      */
     public CharacterNoSetupDialog() {
-        super(new Frame(), true);
+        super(Global.parentForm, true);
         initComponents();
     }
 
@@ -86,6 +86,8 @@ public class CharacterNoSetupDialog extends javax.swing.JDialog implements KeyLi
         sorter = new TableRowSorter<>(tblUnit.getModel());
         tblUnit.setRowSorter(sorter);
         tblUnit.getTableHeader().setFont(Global.lableFont);
+        tblUnit.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblUnit.getTableHeader().setForeground(ColorUtil.foreground);
         tblUnit.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblUnit.setDefaultRenderer(Object.class, new TableCellRender());
         tblUnit.getSelectionModel().addListSelectionListener((ListSelectionEvent e) -> {
@@ -247,7 +249,9 @@ public class CharacterNoSetupDialog extends javax.swing.JDialog implements KeyLi
             }
         });
 
+        btnSave.setBackground(ColorUtil.mainColor);
         btnSave.setFont(Global.lableFont);
+        btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save-button-white.png"))); // NOI18N
         btnSave.setText("Save");
         btnSave.setName("btnSave"); // NOI18N
         btnSave.addActionListener(new java.awt.event.ActionListener() {
@@ -256,7 +260,9 @@ public class CharacterNoSetupDialog extends javax.swing.JDialog implements KeyLi
             }
         });
 
+        btnDelete.setBackground(ColorUtil.btnDelete);
         btnDelete.setFont(Global.lableFont);
+        btnDelete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/delete-button-white.png"))); // NOI18N
         btnDelete.setText("Delete");
         btnDelete.setName("btnDelete"); // NOI18N
         btnDelete.addActionListener(new java.awt.event.ActionListener() {
@@ -265,7 +271,9 @@ public class CharacterNoSetupDialog extends javax.swing.JDialog implements KeyLi
             }
         });
 
+        btnClear.setBackground(ColorUtil.btnEdit);
         btnClear.setFont(Global.lableFont);
+        btnClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/clear-button-white.png"))); // NOI18N
         btnClear.setText("Clear");
         btnClear.setName("btnClear"); // NOI18N
         btnClear.addActionListener(new java.awt.event.ActionListener() {
@@ -328,7 +336,7 @@ public class CharacterNoSetupDialog extends javax.swing.JDialog implements KeyLi
                         .addComponent(lblStatus))
                     .addComponent(btnDelete)
                     .addComponent(btnClear))
-                .addContainerGap(275, Short.MAX_VALUE))
+                .addContainerGap(271, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -338,7 +346,7 @@ public class CharacterNoSetupDialog extends javax.swing.JDialog implements KeyLi
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtFilter, javax.swing.GroupLayout.DEFAULT_SIZE, 278, Short.MAX_VALUE)
+                    .addComponent(txtFilter, javax.swing.GroupLayout.DEFAULT_SIZE, 212, Short.MAX_VALUE)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)

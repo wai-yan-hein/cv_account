@@ -10,11 +10,8 @@ import com.cv.accountswing.ui.journal.CrDrVoucherEntry;
 import com.cv.accountswing.ui.journal.common.CrDrVoucherEntryTableModel;
 import com.cv.accountswing.ui.journal.common.CrDrVoucherTableModel;
 import com.cv.accountswing.ui.report.AparGlReport;
-import java.util.Properties;
-import org.apache.log4j.PropertyConfigurator;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 
@@ -26,7 +23,6 @@ import org.springframework.context.annotation.Scope;
     "com.cv.accounts.service",
     "com.cv.accounts.accountswing.ui"
 })*/
-@ComponentScan(basePackages = "com.cv.accountswing")
 //@Import({MessagingConfiguration.class, MessagingListnerConfiguration.class})
 public class AppConfig {
 
@@ -92,30 +88,6 @@ public class AppConfig {
 
     public AppConfig() {
         super();
-        Properties props = new Properties();
-
-        //Console log
-        /* props.put("log4j.appender.stdout", "org.apache.log4j.ConsoleAppender");
-        props.put("log4j.appender.stdout.Target", "System.out");
-        props.put("log4j.rootLogger", "ERROR, stdout");
-        props.put("log4j.appender.stdout.layout", "org.apache.log4j.PatternLayout");
-        props.put("log4j.appender.stdout.layout.ConversionPattern", "%d{dd MMM yyyy HH:mm:ss,SSS} %-5p: %c - %m%n");
-        props.put("log4j.logger.org.springframework", "ERROR");
-        props.put("log4j.logger.com.cv.accounts.accountswing", "INFO");*/
-        //File log
-        props.put("log4j.rootLogger", "ERROR, FILE");
-        props.put("log4j.appender.FILE", "org.apache.log4j.FileAppender");
-        props.put("log4j.appender.FILE.File", "account-swing.log");
-        props.put("log4j.appender.FILE.ImmediateFlush", true);
-        props.put("og4j.appender.FILE.Threshold", "ERROR");
-        props.put("log4j.appender.FILE.Append", true);
-        props.put("og4j.appender.FILE.MaxFileSize", "5KB");
-        props.put("log4j.appender.FILE.layout", "org.apache.log4j.PatternLayout");
-        props.put("log4j.appender.FILE.layout.conversionPattern", "%d{dd MMM yyyy HH:mm:ss,SSS} %-5p: %c - %m%n");
-        props.put("og4j.appender.FILE.Threshold", "ERROR");
-        props.put("log4j.logger.org.springframework", "ERROR");
-        props.put("log4j.logger.com.cv.accountswing", "ERROR");
-        PropertyConfigurator.configure(props);
     }
 
 }

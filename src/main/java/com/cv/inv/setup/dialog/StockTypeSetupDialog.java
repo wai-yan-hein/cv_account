@@ -5,13 +5,15 @@
  */
 package com.cv.inv.setup.dialog;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.StartWithRowFilter;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.util.Util1;
+import com.cv.inv.entity.Stock;
 import com.cv.inv.entity.StockType;
-import com.cv.inv.setup.common.StockTypeTableModel;
-import java.awt.Frame;
+import com.cv.inv.service.StockService;
+import com.cv.inv.setup.dialog.common.StockTypeTableModel;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import javax.swing.JButton;
@@ -26,6 +28,7 @@ import javax.swing.table.TableRowSorter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import com.cv.inv.service.StockTypeService;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +46,9 @@ public class StockTypeSetupDialog extends javax.swing.JDialog implements KeyList
     private StockTypeService itemTypeService;
     @Autowired
     private StockTypeTableModel itemTypeTableModel;
+    @Autowired
+    private StockService stockService;
+
     private TableRowSorter<TableModel> sorter;
     private StartWithRowFilter swrf;
 
@@ -50,7 +56,7 @@ public class StockTypeSetupDialog extends javax.swing.JDialog implements KeyList
      * Creates new form ItemTypeSetupDialog
      */
     public StockTypeSetupDialog() {
-        super(new Frame(), true);
+        super(Global.parentForm, true);
         initComponents();
     }
 
@@ -85,6 +91,8 @@ public class StockTypeSetupDialog extends javax.swing.JDialog implements KeyList
         sorter = new TableRowSorter<>(tblItemType.getModel());
         tblItemType.setRowSorter(sorter);
         tblItemType.getTableHeader().setFont(Global.lableFont);
+        tblItemType.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblItemType.getTableHeader().setForeground(ColorUtil.foreground);
         tblItemType.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblItemType.setDefaultRenderer(Object.class, new TableCellRender());
         tblItemType.getSelectionModel().addListSelectionListener((ListSelectionEvent e) -> {
@@ -102,6 +110,7 @@ public class StockTypeSetupDialog extends javax.swing.JDialog implements KeyList
         txtAccId.setText(item.getAccountId());
         txtCode.setText(item.getItemTypeCode());
         txtName.setText(item.getItemTypeName());
+        txtCode.requestFocus();
         lblStatus.setText("EDIT");
         txtCode.setEnabled(false);
     }
@@ -135,12 +144,18 @@ public class StockTypeSetupDialog extends javax.swing.JDialog implements KeyList
 
     private void delete() {
         StockType item = itemTypeTableModel.getItemType(selectRow);
-        int delete = itemTypeService.delete(item.getItemTypeCode());
-        if (delete == 1) {
-            JOptionPane.showMessageDialog(Global.parentForm, "Deleted");
+        List<Stock> stockList = stockService.search(item.getItemTypeCode());
+        if (stockList.size() >= 0) {
+            JOptionPane.showMessageDialog(Global.parentForm, "Cannot Delete!");
         } else {
-            JOptionPane.showMessageDialog(Global.parentForm, "Error in server.");
+            int delete = itemTypeService.delete(item.getItemTypeCode());
+            if (delete == 1) {
+                JOptionPane.showMessageDialog(Global.parentForm, "Deleted");
+            } else {
+                JOptionPane.showMessageDialog(Global.parentForm, "Error in server.");
+            }
         }
+
     }
 
     private boolean isValidEntry() {
@@ -241,6 +256,11 @@ public class StockTypeSetupDialog extends javax.swing.JDialog implements KeyList
 
         txtCode.setFont(Global.textFont);
         txtCode.setName("txtCode"); // NOI18N
+        txtCode.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtCodeFocusGained(evt);
+            }
+        });
 
         jLabel2.setFont(Global.lableFont);
         jLabel2.setText("Name");
@@ -259,7 +279,10 @@ public class StockTypeSetupDialog extends javax.swing.JDialog implements KeyList
         txtAccId.setFont(Global.textFont);
         txtAccId.setName("txtAccId"); // NOI18N
 
+        btnSave.setBackground(ColorUtil.mainColor);
         btnSave.setFont(Global.lableFont);
+        btnSave.setForeground(ColorUtil.foreground);
+        btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save-button-white.png"))); // NOI18N
         btnSave.setText("Save");
         btnSave.setName("btnSave"); // NOI18N
         btnSave.addActionListener(new java.awt.event.ActionListener() {
@@ -268,7 +291,10 @@ public class StockTypeSetupDialog extends javax.swing.JDialog implements KeyList
             }
         });
 
+        btnDelete.setBackground(ColorUtil.btnDelete);
         btnDelete.setFont(Global.lableFont);
+        btnDelete.setForeground(ColorUtil.foreground);
+        btnDelete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/delete-button-white.png"))); // NOI18N
         btnDelete.setText("Delete");
         btnDelete.setName("btnDelete"); // NOI18N
         btnDelete.addActionListener(new java.awt.event.ActionListener() {
@@ -277,7 +303,10 @@ public class StockTypeSetupDialog extends javax.swing.JDialog implements KeyList
             }
         });
 
+        btnClear.setBackground(ColorUtil.btnEdit);
         btnClear.setFont(Global.lableFont);
+        btnClear.setForeground(ColorUtil.foreground);
+        btnClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/clear-button-white.png"))); // NOI18N
         btnClear.setText("Clear");
         btnClear.setName("btnClear"); // NOI18N
         btnClear.addActionListener(new java.awt.event.ActionListener() {
@@ -407,6 +436,11 @@ public class StockTypeSetupDialog extends javax.swing.JDialog implements KeyList
             sorter.setRowFilter(swrf);
         }
     }//GEN-LAST:event_txtFilterKeyReleased
+
+    private void txtCodeFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtCodeFocusGained
+        // TODO add your handling code here:
+        txtCode.selectAll();
+    }//GEN-LAST:event_txtCodeFocusGained
 
     /**
      * @param args the command line arguments

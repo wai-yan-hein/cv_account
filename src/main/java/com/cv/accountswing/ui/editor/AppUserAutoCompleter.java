@@ -5,12 +5,12 @@
  */
 package com.cv.accountswing.ui.editor;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.entity.AppUser;
 import com.cv.accountswing.ui.cash.common.DepartmentTableModel;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.setup.common.UserTableModel;
-import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -54,6 +54,7 @@ public class AppUserAutoCompleter implements KeyListener {
     public AbstractCellEditor editor;
     private final TableRowSorter<TableModel> sorter;
     private int x = 0;
+    private int y = 0;
     private boolean popupOpen = false;
 
     public AppUserAutoCompleter(JTextComponent comp, List<AppUser> list,
@@ -66,6 +67,8 @@ public class AppUserAutoCompleter implements KeyListener {
         table.setModel(userTableModel);
         table.setSize(50, 50);
         table.getTableHeader().setFont(Global.textFont);
+        table.getTableHeader().setBackground(ColorUtil.btnEdit);
+        table.getTableHeader().setForeground(ColorUtil.foreground);
         table.setFont(Global.textFont); // NOI18N
         table.setRowHeight(Global.tblRowHeight);
         table.setDefaultRenderer(Object.class, new TableCellRender());
@@ -90,7 +93,7 @@ public class AppUserAutoCompleter implements KeyListener {
         scroll.getVerticalScrollBar().setFocusable(false);
         scroll.getHorizontalScrollBar().setFocusable(false);
 
-        popup.setBorder(BorderFactory.createLineBorder(Color.black));
+        popup.setBorder(BorderFactory.createLineBorder(ColorUtil.mainColor));
         popup.setPopupSize(600, 300);
 
         popup.add(scroll);
@@ -219,10 +222,10 @@ public class AppUserAutoCompleter implements KeyListener {
                     textComp.registerKeyboardAction(acceptAction, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
                             JComponent.WHEN_FOCUSED);
                     if (x == 0) {
-                        x = textComp.getCaretPosition();
+                        x = textComp.getWidth();
+                        y = textComp.getHeight();
                     }
-
-                    popup.show(textComp, x, textComp.getHeight());
+                    popup.show(textComp, x, y);
                     log.info("Show Popup...");
                     popupOpen = false;
 
@@ -312,7 +315,9 @@ public class AppUserAutoCompleter implements KeyListener {
 
     public void setAppUser(AppUser appUser) {
         this.appUser = appUser;
-        this.textComp.setText(appUser.getUserName());
+        if (appUser != null) {
+            this.textComp.setText(appUser.getUserName());
+        }
     }
 
     /*

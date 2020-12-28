@@ -5,6 +5,7 @@
  */
 package com.cv.inv.entry;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
@@ -22,7 +23,7 @@ import com.cv.accountswing.ui.editor.TraderAutoCompleter;
 import com.cv.accountswing.util.NumberUtil;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.Location;
-import com.cv.inv.entity.RetOutDetailHis;
+import com.cv.inv.entity.RetOutHisDetail;
 import com.cv.inv.entity.RetOutHis;
 import com.cv.inv.entry.common.ReturnOutTableModel;
 import com.cv.inv.entry.editor.LocationAutoCompleter;
@@ -71,7 +72,7 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
      */
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(ReturnOut.class);
     private LoadingObserver loadingObserver;
-    private List<RetOutDetailHis> listDetail = ObservableCollections.observableList(new ArrayList());
+    private List<RetOutHisDetail> listDetail = ObservableCollections.observableList(new ArrayList());
     private TraderAutoCompleter traderAutoCompleter;
     private LocationAutoCompleter locationAutoCompleter;
     private CurrencyAutoCompleter currencyAutoCompleter;
@@ -132,7 +133,9 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
         tblRetOut.setModel(retOutTableModel);
         retOutTableModel.setParent(tblRetOut);
         tblRetOut.getTableHeader().setFont(Global.lableFont);
-        tblRetOut.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tblRetOut.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblRetOut.getTableHeader().setForeground(ColorUtil.foreground);
+        tblRetOut.setCellSelectionEnabled(true);
         tblRetOut.getColumnModel().getColumn(0).setPreferredWidth(50);
         tblRetOut.getColumnModel().getColumn(1).setPreferredWidth(300);
         tblRetOut.getColumnModel().getColumn(2).setPreferredWidth(60);
@@ -141,7 +144,11 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
         tblRetOut.getColumnModel().getColumn(5).setPreferredWidth(30);
         tblRetOut.getColumnModel().getColumn(6).setPreferredWidth(60);
         tblRetOut.getColumnModel().getColumn(7).setPreferredWidth(70);
+
         tblRetOut.getColumnModel().getColumn(3).setCellEditor(new AutoClearEditor());//qty
+        tblRetOut.getColumnModel().getColumn(4).setCellEditor(new AutoClearEditor());
+        tblRetOut.getColumnModel().getColumn(6).setCellEditor(new AutoClearEditor());
+
         tblRetOut.setDefaultRenderer(Double.class, new TableCellRender());
         tblRetOut.setDefaultRenderer(Boolean.class, new TableCellRender());
         tblRetOut.setDefaultRenderer(Object.class, new TableCellRender());
@@ -151,6 +158,7 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
         addRetOutTableModelListener();
         tblRetOut.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                 .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
+        tblRetOut.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         retOutTableModel.addNewRow();
 
     }
@@ -195,7 +203,7 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
         listDetail = retOutTableModel.getRetOutDetailHis();
 
         try {
-            for (RetOutDetailHis sdh : listDetail) {
+            for (RetOutHisDetail sdh : listDetail) {
                 totalAmount += NumberUtil.NZero(sdh.getAmount());
             }
             txtVouTotal.setValue(totalAmount);
@@ -256,10 +264,6 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
     }
 
     private void actionMapping() {
-        //Enter event on tblSale
-        tblRetOut.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "ENTER-Action");
-        tblRetOut.getActionMap().put("ENTER-Action", actionTblRetOutEnterKey);
-
         //F8 event on tblRetIn
         tblRetOut.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "DELETE");
         tblRetOut.getActionMap().put("DELETE", actionItemDelete);
@@ -618,7 +622,7 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
                 locationAutoCompleter.setLocation(retOut.getLocation());
                 currencyAutoCompleter.setCurrency(retOut.getCurrency());
 
-                List<RetOutDetailHis> listRetOut = retOutDetailService.search(retOut.getRetOutId());
+                List<RetOutHisDetail> listRetOut = retOutDetailService.search(retOut.getRetOutId());
                 retOutTableModel.setRetOutDetailList(listRetOut);
 
             } catch (Exception ex) {

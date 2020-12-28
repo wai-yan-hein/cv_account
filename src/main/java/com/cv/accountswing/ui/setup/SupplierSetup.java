@@ -5,6 +5,7 @@
  */
 package com.cv.accountswing.ui.setup;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.FilterObserver;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
@@ -49,7 +50,7 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-public class SupplierSetup extends javax.swing.JPanel implements KeyListener, PanelControl,FilterObserver {
+public class SupplierSetup extends javax.swing.JPanel implements KeyListener, PanelControl, FilterObserver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Supplier.class);
     private int selectRow = -1;
@@ -96,16 +97,18 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener, Pa
     }
 
     private void initCombo() {
-        List<ChartOfAccount> listCOA = coaService.search("-", "-", Global.compId.toString(), "3", "-", "-", "-");
+        String strList = Global.sysProperties.get("system.supplier.setup.account");
+        List<ChartOfAccount> listCOA = coaService.searchWhereIn(strList, Global.compId.toString());
         BindingUtil.BindComboFilter(cboAccount, listCOA, null, true, false);
         BindingUtil.BindComboFilter(cboPriceType, traderTypeService.findAll(), null, true, false);
         BindingUtil.BindComboFilter(cboRegion, regionService.search("-", "-", Global.compId.toString(), "-"), null, true, false);
-
     }
 
     private void initTable() {
         tblCustomer.setModel(supplierTabelModel);
         tblCustomer.getTableHeader().setFont(Global.textFont);
+        tblCustomer.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblCustomer.getTableHeader().setForeground(ColorUtil.foreground);
         tblCustomer.getColumnModel().getColumn(0).setPreferredWidth(40);// Code
         tblCustomer.getColumnModel().getColumn(1).setPreferredWidth(320);// Name
         tblCustomer.getColumnModel().getColumn(2).setPreferredWidth(40);// Active 
@@ -174,10 +177,16 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener, Pa
             customer.setPhone(txtCusPhone.getText());
             customer.setEmail(txtCusEmail.getText());
             customer.setAddress(txtCusAddress.getText());
-            customer.setRegion((Region) cboRegion.getSelectedItem());
-            customer.setTraderType((TraderType) cboPriceType.getSelectedItem());
+            if (cboRegion.getSelectedItem() instanceof Region) {
+                customer.setRegion((Region) cboRegion.getSelectedItem());
+            }
+            if (cboPriceType.getSelectedItem() instanceof TraderType) {
+                customer.setTraderType((TraderType) cboPriceType.getSelectedItem());
+            }
+            if (cboAccount.getSelectedItem() instanceof ChartOfAccount) {
+                customer.setAccount((ChartOfAccount) cboAccount.getSelectedItem());
+            }
             customer.setActive(chkActive.isSelected());
-            customer.setAccount((ChartOfAccount) cboAccount.getSelectedItem());
             customer.setCompCode(Global.compId);
             customer.setUpdatedDate(Util1.getTodayDate());
             //customer.setCreditLimit(Util1.getInteger(txtCreditLimit.getText()));
@@ -191,11 +200,13 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener, Pa
 
     private void saveCustomer() {
         if (isValidEntry()) {
-            Supplier save = supplierService.save(customer);
+            String traderCodeLength = Global.sysProperties.get("system.trader.id.length");
+            Supplier save = supplierService.save(customer, traderCodeLength);
             if (save.getTraderId() != null) {
                 JOptionPane.showMessageDialog(Global.parentForm, "Saved");
                 if (lblStatus.getText().equals("NEW")) {
                     supplierTabelModel.addCustomer(customer);
+                    Global.listTrader.add(customer);
                 } else {
                     supplierTabelModel.setCustomer(selectRow, customer);
                 }
@@ -239,6 +250,7 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener, Pa
         tblCustomer.addKeyListener(this);
 
     }
+
     private void setTableFilter(String filter) {
         sorter.setRowFilter(RowFilter.regexFilter(filter));
     }
@@ -330,7 +342,10 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener, Pa
         jLabel8.setFont(Global.lableFont);
         jLabel8.setText("Remark");
 
+        btnSave.setBackground(ColorUtil.mainColor);
         btnSave.setFont(Global.lableFont);
+        btnSave.setForeground(ColorUtil.foreground);
+        btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save-button-white.png"))); // NOI18N
         btnSave.setText("Save");
         btnSave.setName("btnSave"); // NOI18N
         btnSave.addActionListener(new java.awt.event.ActionListener() {
@@ -339,7 +354,10 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener, Pa
             }
         });
 
+        btnClear.setBackground(ColorUtil.btnEdit);
         btnClear.setFont(Global.lableFont);
+        btnClear.setForeground(ColorUtil.foreground);
+        btnClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/clear-button-white.png"))); // NOI18N
         btnClear.setText("Clear");
         btnClear.setName("btnClear"); // NOI18N
         btnClear.addActionListener(new java.awt.event.ActionListener() {
@@ -394,9 +412,9 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener, Pa
                 .addGroup(panelEntryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelEntryLayout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnSave)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnClear)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnSave)
                         .addContainerGap())
                     .addGroup(panelEntryLayout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -461,7 +479,7 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener, Pa
                     .addComponent(btnClear)
                     .addComponent(btnSave)
                     .addComponent(lblStatus))
-                .addContainerGap(155, Short.MAX_VALUE))
+                .addContainerGap(151, Short.MAX_VALUE))
         );
 
         panelEntryLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {txtCusAddress, txtCusCode, txtCusEmail, txtCusName, txtCusPhone, txtRemark});

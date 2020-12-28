@@ -5,7 +5,7 @@
  */
 package com.cv.inv.entry.common;
 
-import com.cv.inv.entity.SaleDetailHis;
+import com.cv.inv.entity.SaleHisDetail;
 import com.cv.inv.entity.SaleOutstand;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +22,7 @@ public class SaleOutstandTableModel extends AbstractTableModel {
 
     static Logger log = Logger.getLogger(SaleOutstandTableModel.class.getName());
     private final List<SaleOutstand> listSaleOutstand = new ArrayList();
-    private List<SaleDetailHis> listSaleDetail;
+    private List<SaleHisDetail> listSaleDetail;
     private final String[] columnNames = {"Option", "Code", "Description", "Outs-Qty"};
 
     @Override

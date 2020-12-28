@@ -17,6 +17,9 @@ import java.util.HashMap;
 import java.util.List;
 import javax.swing.JFrame;
 import com.cv.accountswing.entity.Currency;
+import com.cv.accountswing.entity.Region;
+import com.cv.accountswing.entity.view.VDescription;
+import com.cv.accountswing.entity.view.VRef;
 import com.cv.inv.entity.Category;
 import com.cv.inv.entity.CharacterNo;
 import com.cv.inv.entity.ChargeType;
@@ -31,7 +34,6 @@ import com.cv.inv.entity.StockUnit;
 import com.cv.inv.entity.UnitRelation;
 import com.cv.inv.entity.VouStatus;
 import com.cv.inv.entry.common.StockPriceList;
-import java.awt.Color;
 import java.util.ArrayList;
 
 /**
@@ -40,14 +42,13 @@ import java.util.ArrayList;
  */
 public class Global {
 
-    public static Font lableFont = new java.awt.Font("Arial", 1, 12);
-    public static Font amtFont = new java.awt.Font("Arial", 1, 14);
+    public static Font lableFont = new java.awt.Font("Arial Nova Light", 1, 12);
+    public static Font amtFont = new java.awt.Font("Arial Nova Light", 1, 14);
     public static Font textFont = new java.awt.Font("Zawgyi-One", 0, 12);
     public static Font menuFont = new java.awt.Font("Zawgyi-One", 1, 13);
-    public static Font shortCutFont = new java.awt.Font("Arial", 0, 12);
+    public static Font shortCutFont = new java.awt.Font("Arial Nova Light", 0, 12);
     public static int tblRowHeight = 24;
-    public static Color tblHeaderColor = new Color(83, 133, 255);
-    public static Font tblHeaderFont = new java.awt.Font("Arial", 1, 13);
+    public static Font tblHeaderFont = new java.awt.Font("Arial Nova Light", 1, 13);
     public static String uuid;
     public static boolean synceFinish = true;
     public static AppUser loginUser;
@@ -56,7 +57,7 @@ public class Global {
     public static int sessionId;
     public static String sessionName;
     public static String loginDate;
-    public static int machineId;
+    public static Integer machineId;
     public static String machineName;
     public static boolean mqConStatus = false;
     public static int x;
@@ -82,24 +83,40 @@ public class Global {
     public static List<CharacterNo> listCharNo = new ArrayList<>();
     public static List<VouStatus> listVou = new ArrayList<>();
     public static List<Stock> listStock = new ArrayList<>();
+    public static List<Region> listRegion = new ArrayList<>();
     public static List<SaleMan> listSaleMan;
     public static List<ChargeType> listChargeType;
     public static List<UnitRelation> listRelation = new ArrayList<>();
     public static List<MachineInfo> listMachine;
+    public static List<VRef> listRef = new ArrayList<>();
+    public static List<VDescription> listDesp = new ArrayList<>();
     public static HashMap<String, String> sysProperties;
     public static HashMap<String, String> hmCashFilter = new HashMap<>();
     public static HashMap<RelationKey, Float> hmRelation = new HashMap<>();
     public static HashMap<String, List<StockPriceList>> hasPrice = new HashMap<>();
     public static HashMap<String, List<StockUnit>> hasUnit = new HashMap<>();
+
     public static String sourceAcId;
     public static String finicialPeriodFrom;
     public static String finicialPeriodTo;
     public static String dateFormat;
     //active messaging on / off
-    public static  boolean useActiveMQ = true;
+    public static boolean useActiveMQ = false;
     //default currency
     public static Currency defalutCurrency;
     //default department
     public static Department defaultDepartment;
+    //defatult location
+    public static Location defaultLocation;
+    //default vouStatus
+    public static VouStatus defaultVouStatus;
+    //default saleMan
+    public static SaleMan defaultSaleMan;
+    //default cusotmer
+    public static Trader defaultCustomer;
+    //defalut supplier
+    public static Trader defaultSupplier;
+
+    public static HashMap<String, Float> hasQtyInSmallest = new HashMap();
 
 }

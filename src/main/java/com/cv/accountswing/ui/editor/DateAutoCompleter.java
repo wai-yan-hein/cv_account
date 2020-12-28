@@ -86,7 +86,6 @@ public class DateAutoCompleter implements KeyListener, SelectionObserver {
 
         dateTableModel = new DateTableModel(list);
         table.setModel(dateTableModel);
-        table.setSize(50, 50);
         table.setTableHeader(null);
         table.setFont(Global.textFont); // NOI18N
         table.setRowHeight(Global.tblRowHeight);

@@ -5,6 +5,7 @@
  */
 package com.cv.inv.entry;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
@@ -23,7 +24,7 @@ import com.cv.accountswing.ui.editor.TraderAutoCompleter;
 import com.cv.accountswing.util.NumberUtil;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.Location;
-import com.cv.inv.entity.RetInDetailHis;
+import com.cv.inv.entity.RetInHisDetail;
 import com.cv.inv.entity.RetInHis;
 import com.cv.inv.entry.common.ReturnInTableModel;
 import com.cv.inv.entry.editor.LocationAutoCompleter;
@@ -39,6 +40,7 @@ import com.toedter.calendar.JTextFieldDateEditor;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.text.ParseException;
 import java.util.ArrayList;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -69,7 +71,7 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
      */
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(ReturnIn.class);
     private LoadingObserver loadingObserver;
-    private List<RetInDetailHis> listDetail = ObservableCollections.observableList(new ArrayList());
+    private List<RetInHisDetail> listDetail = ObservableCollections.observableList(new ArrayList());
     private TraderAutoCompleter traderAutoCompleter;
     private LocationAutoCompleter locationAutoCompleter;
     private CurrencyAutoCompleter currencyAutoCompleter;
@@ -105,11 +107,11 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
     }
 
     private void initMain() {
-        initTable();
         actionMapping();
         initKeyListener();
         setTodayDate();
         initCombo();
+        initTable();
         assignDefaultValue();
         initTextBoxAlign();
         initTextBoxValue();
@@ -120,8 +122,11 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
     private void initTable() {
         tblReturnIn.setModel(returnInTableModel);
         returnInTableModel.setParent(tblReturnIn);
+        returnInTableModel.addNewRow();
         tblReturnIn.getTableHeader().setFont(Global.lableFont);
-        tblReturnIn.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tblReturnIn.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblReturnIn.getTableHeader().setForeground(ColorUtil.foreground);
+        tblReturnIn.setCellSelectionEnabled(true);
         tblReturnIn.getColumnModel().getColumn(0).setPreferredWidth(50);
         tblReturnIn.getColumnModel().getColumn(1).setPreferredWidth(300);
         tblReturnIn.getColumnModel().getColumn(2).setPreferredWidth(60);
@@ -130,16 +135,21 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
         tblReturnIn.getColumnModel().getColumn(5).setPreferredWidth(30);
         tblReturnIn.getColumnModel().getColumn(6).setPreferredWidth(60);
         tblReturnIn.getColumnModel().getColumn(7).setPreferredWidth(70);
+
+        tblReturnIn.getColumnModel().getColumn(0).setCellEditor(new StockCellEditor());
+        tblReturnIn.getColumnModel().getColumn(5).setCellEditor(new StockUnitEditor());
         tblReturnIn.getColumnModel().getColumn(3).setCellEditor(new AutoClearEditor());//qty
+        tblReturnIn.getColumnModel().getColumn(4).setCellEditor(new AutoClearEditor());
+        tblReturnIn.getColumnModel().getColumn(6).setCellEditor(new AutoClearEditor());
+
         tblReturnIn.setDefaultRenderer(Float.class, new TableCellRender());
         tblReturnIn.setDefaultRenderer(Double.class, new TableCellRender());
         tblReturnIn.setDefaultRenderer(Object.class, new TableCellRender());
-        returnInTableModel.addNewRow();
+
         addRetInTableModelListener();
-        tblReturnIn.getColumnModel().getColumn(0).setCellEditor(new StockCellEditor());
-        tblReturnIn.getColumnModel().getColumn(5).setCellEditor(new StockUnitEditor());
         tblReturnIn.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                 .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
+        tblReturnIn.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
     }
 
@@ -186,7 +196,7 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
             txtVouTotal.setFormatterFactory(NumberUtil.getDecimalFormat());
             txtVouPaid.setFormatterFactory(NumberUtil.getDecimalFormat());
             txtVouBalance.setFormatterFactory(NumberUtil.getDecimalFormat());
-        } catch (Exception ex) {
+        } catch (ParseException ex) {
             LOGGER.error("setFormatterFactory : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.toString());
 
         }
@@ -221,7 +231,7 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
         listDetail = returnInTableModel.getRetInDetailHis();
 
         try {
-            for (RetInDetailHis sdh : listDetail) {
+            for (RetInHisDetail sdh : listDetail) {
                 totalAmount += NumberUtil.NZero(sdh.getAmount());
             }
             txtVouTotal.setValue(totalAmount);
@@ -350,7 +360,7 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(txtRemark, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(txtVouNo, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtVouNo, javax.swing.GroupLayout.DEFAULT_SIZE, 129, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jLabel7)
                         .addGap(18, 18, 18)
@@ -359,17 +369,23 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel6)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(14, 14, 14)
+                                .addComponent(butGetSaleItem))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(18, 18, 18)
+                                .addComponent(txtCurrency))))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel5)
                         .addGap(18, 18, 18)
-                        .addComponent(txtLocation))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel6)
-                        .addGap(14, 14, 14)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(butGetSaleItem)
-                            .addComponent(txtCurrency, javax.swing.GroupLayout.DEFAULT_SIZE, 327, Short.MAX_VALUE))))
+                        .addComponent(txtLocation, javax.swing.GroupLayout.DEFAULT_SIZE, 323, Short.MAX_VALUE)))
                 .addContainerGap())
         );
+
+        jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jLabel5, jLabel6});
+
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
@@ -396,6 +412,7 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        tblReturnIn.setFont(Global.textFont);
         tblReturnIn.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -407,6 +424,7 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tblReturnIn.setRowHeight(Global.tblRowHeight);
         jScrollPane1.setViewportView(tblReturnIn);
 
         lblStatus.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
@@ -592,7 +610,7 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
 //                traderAutoCompleter.setTrader(trader);
                 locationAutoCompleter.setLocation(retIn.getLocation());
                 currencyAutoCompleter.setCurrency(retIn.getCurrency());
-                List<RetInDetailHis> listDetail = retInDetailService.search(retIn.getRetInId());
+                List<RetInHisDetail> listDetail = retInDetailService.search(retIn.getRetInId());
                 returnInTableModel.setRetInDetailList(listDetail);
 
             } catch (Exception ex) {
@@ -721,10 +739,6 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
     }
 
     private void actionMapping() {
-        //Enter event on tblSale
-        tblReturnIn.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "ENTER-Action");
-        tblReturnIn.getActionMap().put("ENTER-Action", actionTblRetInEnterKey);
-
         //F8 event on tblRetIn
         tblReturnIn.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "DELETE");
         tblReturnIn.getActionMap().put("DELETE", actionItemDelete);
@@ -1007,7 +1021,6 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
 
     @Override
     public void refresh() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

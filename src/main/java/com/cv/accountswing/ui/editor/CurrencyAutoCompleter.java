@@ -5,6 +5,7 @@
  */
 package com.cv.accountswing.ui.editor;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.Currency;
@@ -54,6 +55,7 @@ public class CurrencyAutoCompleter implements KeyListener, SelectionObserver {
     public AbstractCellEditor editor;
     private TableRowSorter<TableModel> sorter;
     private int x = 0;
+    private int y = 0;
     private boolean popupOpen = false;
     private SelectionObserver selectionObserver;
 
@@ -71,13 +73,12 @@ public class CurrencyAutoCompleter implements KeyListener, SelectionObserver {
         this.editor = editor;
         textComp.putClientProperty(AUTOCOMPLETER, this);
         textComp.setFont(Global.textFont);
-
         currencyTabelModel = new CurrencyCompleterTabelModel(list);
         table.setModel(currencyTabelModel);
-        table.setSize(50, 50);
-        table.setTableHeader(null);
         table.setFont(Global.lableFont); // NOI18N
         table.setRowHeight(Global.tblRowHeight);
+        table.getTableHeader().setFont(Global.lableFont);
+        table.getTableHeader().setBackground(ColorUtil.btnEdit);
         table.setDefaultRenderer(Object.class, new TableCellRender());
         sorter = new TableRowSorter(table.getModel());
         table.setRowSorter(sorter);
@@ -99,7 +100,7 @@ public class CurrencyAutoCompleter implements KeyListener, SelectionObserver {
         scroll.getVerticalScrollBar().setFocusable(false);
         scroll.getHorizontalScrollBar().setFocusable(false);
 
-        popup.setBorder(BorderFactory.createLineBorder(Color.black));
+        popup.setBorder(BorderFactory.createLineBorder(ColorUtil.mainColor));
         popup.setPopupSize(170, 300);
 
         popup.add(scroll);
@@ -221,11 +222,11 @@ public class CurrencyAutoCompleter implements KeyListener, SelectionObserver {
                     textComp.registerKeyboardAction(acceptAction, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
                             JComponent.WHEN_FOCUSED);
                     if (x == 0) {
-                        x = textComp.getCaretPosition();
+                        x = textComp.getWidth();
+                        y = textComp.getHeight();
                     }
 
-                    popup.show(textComp, x, textComp.getHeight());
-                    log.info("Show Popup...");
+                    popup.show(textComp, x, y);
                     popupOpen = false;
 
                 } else {
@@ -319,7 +320,7 @@ public class CurrencyAutoCompleter implements KeyListener, SelectionObserver {
 
     public void setCurrency(Currency currency) {
         this.currency = currency;
-        this.textComp.setText(this.currency.getCurrencyName());
+        textComp.setText(this.currency.getCurrencyName());
     }
 
     /*

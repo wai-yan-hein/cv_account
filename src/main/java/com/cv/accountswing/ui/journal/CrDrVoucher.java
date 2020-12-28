@@ -5,6 +5,7 @@
  */
 package com.cv.accountswing.ui.journal;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
@@ -169,6 +170,8 @@ public class CrDrVoucher extends javax.swing.JPanel implements KeyListener, Sele
         voucherTableModel.setSplidId(splitId);
         tblCredit.setModel(voucherTableModel);
         tblCredit.getTableHeader().setFont(Global.lableFont);
+        tblCredit.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblCredit.getTableHeader().setForeground(ColorUtil.foreground);
         tblCredit.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblCredit.setDefaultRenderer(Double.class, new TableCellRender());
         tblCredit.setDefaultRenderer(Object.class, new TableCellRender());

@@ -5,6 +5,7 @@
  */
 package com.cv.accountswing.ui.setup;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
@@ -345,7 +346,9 @@ public class DepartmentSetup extends javax.swing.JPanel implements TreeSelection
         chkActive.setEnabled(false);
         chkActive.setName("chkActive"); // NOI18N
 
+        btnSave.setBackground(ColorUtil.mainColor);
         btnSave.setFont(Global.lableFont        );
+        btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save-button-white.png"))); // NOI18N
         btnSave.setText("Save");
         btnSave.setEnabled(false);
         btnSave.setName("btnSave"); // NOI18N
@@ -358,7 +361,9 @@ public class DepartmentSetup extends javax.swing.JPanel implements TreeSelection
         labelStatus.setFont(Global.lableFont        );
         labelStatus.setText("NEW");
 
+        btnClear.setBackground(ColorUtil.btnEdit);
         btnClear.setFont(Global.lableFont        );
+        btnClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/clear-button-white.png"))); // NOI18N
         btnClear.setText("Clear");
         btnClear.setEnabled(false);
         btnClear.setName("btnClear"); // NOI18N
@@ -385,7 +390,7 @@ public class DepartmentSetup extends javax.swing.JPanel implements TreeSelection
                     .addComponent(txtUserCode)
                     .addComponent(txtSystemCode)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addGap(0, 80, Short.MAX_VALUE)
+                        .addGap(0, 58, Short.MAX_VALUE)
                         .addComponent(btnSave)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnClear))
@@ -431,7 +436,7 @@ public class DepartmentSetup extends javax.swing.JPanel implements TreeSelection
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 269, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 247, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())

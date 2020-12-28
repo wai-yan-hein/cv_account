@@ -5,6 +5,8 @@
  */
 package com.cv.accountswing.ui.cash;
 
+import com.cv.accountswing.common.ColorUtil;
+import com.cv.accountswing.common.FilterObserver;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
@@ -19,7 +21,9 @@ import com.cv.accountswing.service.COAOpeningDService;
 import com.cv.accountswing.service.CompanyInfoService;
 import com.cv.accountswing.service.ReportService;
 import com.cv.accountswing.service.SystemPropertyService;
+import com.cv.accountswing.service.VDescriptionService;
 import com.cv.accountswing.service.VGlService;
+import com.cv.accountswing.service.VRefService;
 import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.editor.CurrencyEditor;
 import com.cv.accountswing.ui.editor.DepartmentCellEditor;
@@ -28,9 +32,12 @@ import com.cv.accountswing.ui.cash.common.AllCashTableModel;
 import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.editor.COACellEditor;
+import com.cv.accountswing.ui.editor.DespEditor;
+import com.cv.accountswing.ui.editor.RefCellEditor;
 import com.cv.accountswing.ui.filter.FilterPanel;
 import com.cv.accountswing.util.Util1;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
@@ -43,14 +50,14 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.ImageIcon;
-import javax.swing.JMenuItem;
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
+import javax.swing.RowFilter;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import org.slf4j.Logger;
@@ -65,7 +72,8 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-public class AllCash extends javax.swing.JPanel implements SelectionObserver, PanelControl {
+public class AllCash extends javax.swing.JPanel implements SelectionObserver,
+        PanelControl, FilterObserver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AllCash.class);
     String stDate;
@@ -97,13 +105,18 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
     @Autowired
     private ApplicationContext applicationContext;
     @Autowired
+    private VRefService refService;
+    @Autowired
+    private VDescriptionService descriptionService;
+    @Autowired
     private ApplicationMainFrame mainFrame;
     private TableRowSorter<TableModel> sorter;
     private SelectionObserver selectionObserver;
     private LoadingObserver loadingObserver;
     private ReloadData reloadData;
     private String sourceAccId;
-    private JPopupMenu popupmenu;
+    private final JPopupMenu popupmenu = new JPopupMenu();
+    private final JLabel lblMessage = new JLabel();
     private boolean isShown = false;
 
     public void setIsShown(boolean isShown) {
@@ -140,6 +153,8 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
     public AllCash() {
         initComponents();
         initPopup();
+        initKeyListener();
+        initMouseLisener();
     }
 
     public AllCash newInstance() {
@@ -175,8 +190,9 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
         allCashTableModel.setReloadData(reloadData);
         tblCash.setModel(allCashTableModel);
         tblCash.getTableHeader().setFont(Global.tblHeaderFont);
-        tblCash.getTableHeader().setPreferredSize(new Dimension(30, 30));
-        //tblCash.getTableHeader().setBackground(Global.tblHeaderColor);
+        tblCash.getTableHeader().setPreferredSize(new Dimension(25, 25));
+        tblCash.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblCash.getTableHeader().setForeground(ColorUtil.foreground);
         sorter = new TableRowSorter<>(tblCash.getModel());
         tblCash.setRowSorter(sorter);
         tblCash.setCellSelectionEnabled(true);
@@ -195,8 +211,8 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
         tblCash.getColumnModel().getColumn(8).setPreferredWidth(90);// Cr-Amt  
         tblCash.getColumnModel().getColumn(0).setCellEditor(new AutoClearEditor());
         tblCash.getColumnModel().getColumn(1).setCellEditor(new DepartmentCellEditor());
-        tblCash.getColumnModel().getColumn(2).setCellEditor(new AutoClearEditor());
-        tblCash.getColumnModel().getColumn(3).setCellEditor(new AutoClearEditor());
+        tblCash.getColumnModel().getColumn(2).setCellEditor(new DespEditor(descriptionService));
+        tblCash.getColumnModel().getColumn(3).setCellEditor(new RefCellEditor(refService));
         tblCash.getColumnModel().getColumn(4).setCellEditor(new TraderCellEditor());
         tblCash.getColumnModel().getColumn(5).setCellEditor(new COACellEditor());
         tblCash.getColumnModel().getColumn(6).setCellEditor(new CurrencyEditor());
@@ -224,35 +240,81 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
         tblCash.getActionMap().put("ENTER-Action", actionTblCash);*/
         tblCash.getInputMap().put(KeyStroke.getKeyStroke("F8"), "F8-Action");
         tblCash.getActionMap().put("F8-Action", actionItemDeleteExp);
+        /*tblCash.setDragEnabled(true);
+        tblCash.setDropMode(DropMode.INSERT_ROWS);
+        tblCash.setTransferHandler(new AllCashTableHandler(allCashTableModel));*/
+    }
+
+    private void initKeyListener() {
+        tblCash.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if (e.isControlDown()) {
+                    if (e.getKeyCode() == KeyEvent.VK_V) {
+                        allCashTableModel.copyRow();
+                    }
+                }
+            }
+
+        });
     }
 
     private void initPopup() {
-        popupmenu = new JPopupMenu("Edit");
-        ImageIcon printIcon = new ImageIcon(this.getClass().getResource("/images/printer.png"));
-        JMenuItem print = new JMenuItem("Print");
-        print.setIcon(printIcon);
-        print.addActionListener((ActionEvent e) -> {
-            printVoucher();
-        });
-        popupmenu.add(print);
-        initMouseLisener();
+        lblMessage.setForeground(ColorUtil.foreground);
+        lblMessage.setFont(Global.textFont);
+        lblMessage.setHorizontalAlignment(JLabel.CENTER);
+        popupmenu.setBorder(BorderFactory.createLineBorder(Color.black));
+        popupmenu.setBackground(ColorUtil.btnEdit);
+        popupmenu.setFocusable(false);
+        popupmenu.add(lblMessage);
     }
 
     private void initMouseLisener() {
         tblCash.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (SwingUtilities.isRightMouseButton(e)) {
-                    popupmenu.show(tblCash, e.getX(), e.getY());
-                } else if (e.getClickCount() == 2) {
-                    int row = tblCash.getSelectedRow();
-                    int col = tblCash.getSelectedColumn();
-                    tblCash.requestFocus();
-                    tblCash.editCellAt(row, col);
+                if (e.getClickCount() == 1) {
+                    String message = getMessage();
+                    if (message != null) {
+                        lblMessage.setText(message);
+                        popupmenu.show(tblCash, e.getX(), e.getY());
+                    }
                 }
             }
 
         });
+    }
+
+    private String getMessage() {
+        String msg = null;
+        int selectRow = tblCash.convertRowIndexToModel(tblCash.getSelectedRow());
+        int column = tblCash.getSelectedColumn();
+        VGl vGl = allCashTableModel.getVGl(selectRow);
+        switch (column) {
+            case 0://date
+                msg = Util1.toDateStr(vGl.getGlDate(), "dd/MM/yyyy");
+                break;
+            case 1://dep
+                msg = vGl.getDeptName();
+                break;
+            case 2://desp
+                msg = vGl.getDescription();
+                break;
+            case 3://ref
+                msg = vGl.getReference();
+                break;
+            case 4://person
+                msg = vGl.getTraderCode();
+                break;
+            case 5://account
+                msg = vGl.getAccountId();
+                break;
+            case 6://curr
+                msg = vGl.getfCurName();
+                break;
+        }
+
+        return msg;
     }
 
     private void filterPanel() {
@@ -274,10 +336,10 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
 
     private void deleteVoucher() {
         VGl vgl;
+        int selectRow = tblCash.convertRowIndexToModel(tblCash.getSelectedRow());
         int yes_no;
-
         if (tblCash.getSelectedRow() >= 0) {
-            vgl = allCashTableModel.getVGl(tblCash.convertRowIndexToModel(tblCash.getSelectedRow()));
+            vgl = allCashTableModel.getVGl(selectRow);
 
             if (vgl.getGlId() != null) {
                 yes_no = JOptionPane.showConfirmDialog(Global.parentForm, "Are you sure to delete?",
@@ -286,7 +348,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
                     tblCash.getCellEditor().stopCellEditing();
                 }
                 if (yes_no == 0) {
-                    allCashTableModel.deleteVGl(tblCash.getSelectedRow());
+                    allCashTableModel.deleteVGl(selectRow);
                     calDebitCredit();
                 }
             }
@@ -455,7 +517,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
     private void initComponents() {
 
         panelFilter = new javax.swing.JPanel();
-        jScrollPane2 = new javax.swing.JScrollPane();
+        tblScrollPane = new javax.swing.JScrollPane();
         tblCash = new javax.swing.JTable();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
@@ -485,18 +547,20 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
         tblCash.setFont(Global.textFont);
         tblCash.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {},
+                {},
+                {},
+                {}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+
             }
         ));
-        tblCash.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
+        tblCash.setToolTipText("");
+        tblCash.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
+        tblCash.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         tblCash.setRowHeight(Global.tblRowHeight);
-        jScrollPane2.setViewportView(tblCash);
+        tblScrollPane.setViewportView(tblCash);
 
         jLabel1.setFont(Global.lableFont);
         jLabel1.setText("Opening Balance");
@@ -578,7 +642,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane2))
+                    .addComponent(tblScrollPane))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -586,7 +650,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
             .addGroup(layout.createSequentialGroup()
                 .addComponent(panelFilter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 261, Short.MAX_VALUE)
+                .addComponent(tblScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 261, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -596,6 +660,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
         mainFrame.setControl(this);
+        mainFrame.setFilterObserver(this);
         if (!isShown) {
             initMain();
         } else {
@@ -614,9 +679,9 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JPanel panelFilter;
     private javax.swing.JTable tblCash;
+    private javax.swing.JScrollPane tblScrollPane;
     private javax.swing.JFormattedTextField txtFClosing;
     private javax.swing.JFormattedTextField txtFCreditAmt;
     private javax.swing.JFormattedTextField txtFDebitAmt;
@@ -648,7 +713,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
             }
             List<TmpOpeningClosing> opBalanceGL = coaOpDService.getOpBalanceGL1(sourceAccId, opDate, stDate, 3, "MMK",
                     Global.loginUser.getUserId().toString(),
-                    Util1.isNull(depId, "-"));
+                    Util1.isNull(depId, "-"), Global.machineId.toString());
             LOGGER.info("End calculate opening.");
             if (!opBalanceGL.isEmpty()) {
                 TmpOpeningClosing tmpOC = opBalanceGL.get(0);
@@ -751,6 +816,15 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver, Pa
     @Override
     public void refresh() {
         searchCash();
+    }
+
+    @Override
+    public void sendFilter(String filter) {
+        setTableFilter(filter);
+    }
+
+    private void setTableFilter(String filter) {
+        sorter.setRowFilter(RowFilter.regexFilter(filter));
     }
 
 }
