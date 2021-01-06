@@ -679,7 +679,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         }
     }
 
-    private void companyUserRoleAssign() {
+    public void companyUserRoleAssign() {
         UsrCompRoleService usrCompRoleService = context.getBean(UsrCompRoleService.class);
         List<VUsrCompAssign> listVUCA = usrCompRoleService.
                 getAssignCompany(Global.loginUser.getAppUserCode());
@@ -695,7 +695,10 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                     "Invalid Compay Access", JOptionPane.ERROR_MESSAGE);
             System.exit(-1);
         } else if (listVUCA.size() > 1) {
-
+            CompanyDialog companyDialog = new CompanyDialog();
+            companyDialog.setListCompany(listVUCA);
+            companyDialog.setLocationRelativeTo(null);
+            companyDialog.setVisible(true);
         } else {
             Global.roleCode = listVUCA.get(0).getKey().getRoleCode();
             Global.compCode = listVUCA.get(0).getKey().getCompCode();

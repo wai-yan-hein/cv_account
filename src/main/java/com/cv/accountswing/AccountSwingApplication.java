@@ -90,6 +90,7 @@ public class AccountSwingApplication {
             if (loginDialog.isLogin()) {
                 ApplicationMainFrame appMain = context.getBean(ApplicationMainFrame.class);
                 java.awt.EventQueue.invokeLater(() -> {
+                    appMain.companyUserRoleAssign();
                     appMain.loadSysProperties();
                     appMain.startNetworkDetector();
                     appMain.setIconImage(new ImageIcon(AccountSwingApplication.class.getResource("/images/logo.png")).getImage());
