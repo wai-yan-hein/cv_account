@@ -162,7 +162,7 @@ public class Company extends javax.swing.JPanel implements KeyListener, PanelCon
             status = false;
         } else {
             //companyInfo = new CompanyInfo();
-            companyInfo.setCompCode(txtCode.getText());
+            companyInfo.setUserCode(txtCode.getText());
             companyInfo.setShortCode(txtShortCode.getText());
             companyInfo.setName(txtName.getText());
             companyInfo.setPhone(txtPhone.getText());
@@ -172,8 +172,7 @@ public class Company extends javax.swing.JPanel implements KeyListener, PanelCon
             companyInfo.setFinicialPeriodFrom(Util1.toDate(txtFromDate.getText(), "dd-MM-yyyy"));
             companyInfo.setFinicialPeriodTo(Util1.toDate(txtToDate.getText(), "dd-MM-yyyy"));
             companyInfo.setActive(chkActive.isSelected());
-            BusinessType businessType = (BusinessType) cboBusiness.getSelectedItem();
-            companyInfo.setBusinessType(businessType.getCode());
+            companyInfo.setBusinessType((BusinessType) cboBusiness.getSelectedItem());
             status = true;
         }
         return status;
@@ -339,11 +338,13 @@ public class Company extends javax.swing.JPanel implements KeyListener, PanelCon
         jLabel10.setText("Business");
 
         chkActive.setFont(Global.textFont);
+        chkActive.setSelected(true);
         chkActive.setText("Active");
         chkActive.setName("chkActive"); // NOI18N
 
         btnClear.setBackground(ColorUtil.btnEdit);
         btnClear.setFont(Global.textFont);
+        btnClear.setForeground(ColorUtil.foreground);
         btnClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/clear-button-white.png"))); // NOI18N
         btnClear.setText("Clear");
         btnClear.setName("btnClear"); // NOI18N
@@ -355,6 +356,7 @@ public class Company extends javax.swing.JPanel implements KeyListener, PanelCon
 
         btnSave.setBackground(ColorUtil.mainColor);
         btnSave.setFont(Global.textFont);
+        btnSave.setForeground(ColorUtil.foreground);
         btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save-button-white.png"))); // NOI18N
         btnSave.setText("Save");
         btnSave.setName("btnSave"); // NOI18N
