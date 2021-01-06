@@ -104,7 +104,7 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Sel
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
                     VGl vGl = crAmtTableModel.getVGl(tblCr.convertRowIndexToModel(tblCr.getSelectedRow()));
-                    vGl = vGlService.findById(vGl.getGlId());
+                    vGl = vGlService.findById(vGl.getGlCode());
                     editCash(vGl, "CR");
                 }
             }
@@ -115,7 +115,7 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Sel
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
                     VGl vGl = drAmtTableModel.getVGl(tblDr.convertRowIndexToModel(tblDr.getSelectedRow()));
-                    vGl = vGlService.findById(vGl.getGlId());
+                    vGl = vGlService.findById(vGl.getGlCode());
                     editCash(vGl, "DR");
                 }
             }

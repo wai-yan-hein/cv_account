@@ -9,7 +9,7 @@ import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
-import com.cv.accountswing.ui.editor.TraderAutoCompleter;
+import com.cv.accountswing.ui.editor.CustomerAutoCompleter;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.Order;
 import com.cv.inv.entry.PurchaseEntry;
@@ -47,7 +47,7 @@ public class OrderSearchDialog extends javax.swing.JDialog implements KeyListene
     private PurchaseDetailService pdService;
     @Autowired
     private OrderSearchTableModel orderSearchTableModel;
-    private TraderAutoCompleter traderAutoCompleter;
+    private CustomerAutoCompleter traderAutoCompleter;
     private SelectionObserver observer;
 
     public SelectionObserver getObserver() {
@@ -73,7 +73,7 @@ public class OrderSearchDialog extends javax.swing.JDialog implements KeyListene
     }
 
     private void initCombo() {
-        traderAutoCompleter = new TraderAutoCompleter(txtCus, Global.listTrader, null);
+        traderAutoCompleter = new CustomerAutoCompleter(txtCus, Global.listCustomer, null);
     }
 
     private void initTableVoucher() {
@@ -108,7 +108,7 @@ public class OrderSearchDialog extends javax.swing.JDialog implements KeyListene
         if (traderAutoCompleter.getTrader() == null || txtCus.getText().isEmpty()) {
             customerId = "-";
         } else {
-            customerId = traderAutoCompleter.getTrader().getId().toString();
+            customerId = traderAutoCompleter.getTrader().getCode();
         }
         orderCode = Util1.isNull(txtOrderno.getText(), "-");
         List<Order> findActiveOrder = orderService.findActiveOrder(fromDate, toDate, customerId, orderCode);

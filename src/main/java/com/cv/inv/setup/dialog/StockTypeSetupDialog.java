@@ -41,7 +41,7 @@ public class StockTypeSetupDialog extends javax.swing.JDialog implements KeyList
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StockTypeSetupDialog.class);
     private int selectRow = - 1;
-    private StockType itemType;
+    private StockType itemType = new StockType();
     @Autowired
     private StockTypeService itemTypeService;
     @Autowired
@@ -107,12 +107,12 @@ public class StockTypeSetupDialog extends javax.swing.JDialog implements KeyList
     }
 
     private void setItemType(StockType item) {
-        txtAccId.setText(item.getAccountId());
-        txtCode.setText(item.getItemTypeCode());
-        txtName.setText(item.getItemTypeName());
-        txtCode.requestFocus();
+        itemType = item;
+        txtAccId.setText(itemType.getAccountId());
+        txtName.setText(itemType.getItemTypeName());
         lblStatus.setText("EDIT");
         txtCode.setEnabled(false);
+        txtCode.requestFocus();
     }
 
     private void save() {
@@ -138,6 +138,7 @@ public class StockTypeSetupDialog extends javax.swing.JDialog implements KeyList
         txtName.setText(null);
         lblStatus.setText("NEW");
         txtCode.setEnabled(true);
+        itemType = new StockType();
         txtCode.requestFocus();
         itemTypeTableModel.refresh();
     }
@@ -177,10 +178,16 @@ public class StockTypeSetupDialog extends javax.swing.JDialog implements KeyList
                     "Code length", JOptionPane.ERROR_MESSAGE);
             txtCode.requestFocusInWindow();
         } else {
-            itemType = new StockType();
-            itemType.setItemTypeCode(txtCode.getText().trim());
-            itemType.setItemTypeName(txtName.getText().trim());
-            itemType.setAccountId(txtAccId.getText().trim());
+            if (lblStatus.getText().equals("NEW")) {
+                itemType.setItemTypeCode(txtCode.getText().trim());
+                itemType.setItemTypeName(txtName.getText().trim());
+                itemType.setAccountId(txtAccId.getText().trim());
+                itemType.setCompCode(Global.compCode);
+                itemType.setCreatedBy(Global.loginUser);
+                itemType.setCreatedDate(Util1.getTodayDate());
+            }else{
+                itemType.setUpdatedBy(Global.loginUser);
+            }
         }
 
         return status;

@@ -76,7 +76,7 @@ public class OrderSearchByCustomerDialog extends javax.swing.JDialog {
 
     private void search() {
         if (customer != null) {
-            List<Order> findActiveOrder = orderService.findActiveOrder("-", "-", customer.getId().toString(), "-");
+            List<Order> findActiveOrder = orderService.findActiveOrder("-", "-", customer.getCode(), "-");
             model.setListOrder(findActiveOrder);
         }
     }

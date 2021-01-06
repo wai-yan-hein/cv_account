@@ -62,7 +62,7 @@ public class UnitPatternTableModel extends AbstractTableModel {
         switch (columnIndex) {
             case 0:
                 if (aValue != null) {
-                    if (up.getPatternId() != null) {
+                    if (up.getPatternCode() != null) {
                         status = "EDIT";
                     }
                     up.setPatternName(aValue.toString());
@@ -135,7 +135,7 @@ public class UnitPatternTableModel extends AbstractTableModel {
         boolean has = false;
         if (listPattern != null) {
             UnitPattern get = listPattern.get(listPattern.size() - 1);
-            if (get.getPatternId() != null) {
+            if (get.getPatternCode() != null) {
                 has = true;
             }
         }

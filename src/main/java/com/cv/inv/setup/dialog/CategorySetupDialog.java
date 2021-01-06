@@ -104,17 +104,19 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
     }
 
     private void setCategory(Category cat) {
-
-        txtName.setText(cat.getCatName());
-        lblStatus.setText("EDIT");
+        category = cat;
+        category.setCatCode(category.getCatCode());
+        txtName.setText(category.getCatName());
+        txtUserCode.setText(category.getUserCode());
         txtName.requestFocus();
+        lblStatus.setText("EDIT");
     }
 
     private void save() {
         if (isValidEntry()) {
             Category saveCat = categoryService.save(category);
             if (saveCat != null) {
-                LOGGER.info("CATEGORY ID :" + saveCat.getCatId());
+                LOGGER.info("CATEGORY ID :" + saveCat.getCatCode());
                 JOptionPane.showMessageDialog(Global.parentForm, "Saved");
 
                 if (lblStatus.getText().equals("NEW")) {
@@ -129,10 +131,11 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
     }
 
     private void clear() {
-
+        txtUserCode.setText(null);
         txtFilter.setText(null);
         txtName.setText(null);
         lblStatus.setText("NEW");
+        category = new Category();
         categoryTableModel.refresh();
 
     }
@@ -140,11 +143,11 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
     private void delete() {
 
         Category cat = categoryTableModel.getCategory(selectRow);
-        List<Stock> stockList = stockService.searchC(cat.getCatId().toString());
+        List<Stock> stockList = stockService.searchC(cat.getCatCode());
         if (stockList.size() >= 0) {
             JOptionPane.showMessageDialog(Global.parentForm, "Cannot Delete!");
         } else {
-            int delete = categoryService.delete(cat.getCatId().toString());
+            int delete = categoryService.delete(cat.getCatCode());
             if (delete == 1) {
                 Global.listCategory.remove(selectRow);
                 JOptionPane.showMessageDialog(Global.parentForm, "Deleted");
@@ -155,20 +158,22 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
 
     private boolean isValidEntry() {
         boolean status = true;
-
         if (txtName.getText().isEmpty()) {
             status = false;
             JOptionPane.showMessageDialog(this, "Code length is less then 6 character.",
                     "Code length", JOptionPane.ERROR_MESSAGE);
             txtName.requestFocusInWindow();
         } else {
-            category = new Category();
-            if (lblStatus.getText().equals("EDIT")) {
-                category.setCatId(categoryTableModel.getCategory(selectRow).getCatId());
+            if (lblStatus.getText().equals("NEW")) {
+                category.setCatName(txtName.getText());
+                category.setCompCode(Global.compCode);
+                category.setCreatedBy(Global.loginUser);
+                category.setCreatedDate(Util1.getTodayDate());
+                category.setUserCode(txtUserCode.getText());
+            } else {
+                category.setUpdatedBy(Global.loginUser);
             }
-            category.setCatName(txtName.getText());
         }
-
         return status;
     }
     private RowFilter<Object, Object> startsWithFilter = new RowFilter<Object, Object>() {
@@ -206,6 +211,8 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
         btnDelete = new javax.swing.JButton();
         btnClear = new javax.swing.JButton();
         lblStatus = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        txtUserCode = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Category Setup");
@@ -288,6 +295,22 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
         lblStatus.setFont(Global.lableFont);
         lblStatus.setText("NEW");
 
+        jLabel3.setFont(Global.lableFont);
+        jLabel3.setText("Code");
+
+        txtUserCode.setFont(Global.textFont);
+        txtUserCode.setName("txtName"); // NOI18N
+        txtUserCode.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtUserCodeFocusGained(evt);
+            }
+        });
+        txtUserCode.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtUserCodeActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -296,7 +319,8 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 57, Short.MAX_VALUE)
-                    .addComponent(lblStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(lblStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, 57, Short.MAX_VALUE))
                 .addGap(12, 12, 12)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(txtName, javax.swing.GroupLayout.Alignment.LEADING)
@@ -305,13 +329,18 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnDelete)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnClear)))
+                        .addComponent(btnClear))
+                    .addComponent(txtUserCode, javax.swing.GroupLayout.Alignment.LEADING))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(txtUserCode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -322,7 +351,7 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
                         .addComponent(lblStatus))
                     .addComponent(btnDelete)
                     .addComponent(btnClear))
-                .addContainerGap(299, Short.MAX_VALUE))
+                .addContainerGap(265, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -397,6 +426,14 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
         txtName.selectAll();
     }//GEN-LAST:event_txtNameFocusGained
 
+    private void txtUserCodeFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtUserCodeFocusGained
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtUserCodeFocusGained
+
+    private void txtUserCodeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtUserCodeActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtUserCodeActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -406,12 +443,14 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
     private javax.swing.JButton btnDelete;
     private javax.swing.JButton btnSave;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblStatus;
     private javax.swing.JTable tblCategory;
     private javax.swing.JTextField txtFilter;
     private javax.swing.JTextField txtName;
+    private javax.swing.JTextField txtUserCode;
     // End of variables declaration//GEN-END:variables
 
     @Override

@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
  */
 public class RefTableModel extends AbstractTableModel {
 
-    private static final Logger log = LoggerFactory.getLogger(TraderTableModel.class);
+    private static final Logger log = LoggerFactory.getLogger(RefTableModel.class);
     private List<VRef> listAutoText = new ArrayList<>();
     private final String[] columnNames = {"Reference"};
 

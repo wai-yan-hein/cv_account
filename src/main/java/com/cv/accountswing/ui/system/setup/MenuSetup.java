@@ -131,7 +131,7 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
         treeRoot = new DefaultMutableTreeNode(parentRootName);
         loadingObserver.load(this.getName(), "Start");
         taskExecutor.execute(() -> {
-            List<VRoleMenu> listVRM = menuService.getParentChildMenu(Global.roleId.toString(), "-");
+            List<VRoleMenu> listVRM = menuService.getParentChildMenu(Global.roleCode, "-");
             listVRM.forEach(menu -> {
                 if (menu.getChild() != null) {
                     if (!menu.getChild().isEmpty()) {
@@ -229,7 +229,7 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
                 parentCode = "1";
             } else {
                 VRoleMenu menu = (VRoleMenu) parentNode.getUserObject();
-                parentCode = menu.getKey().getMenuId().toString();
+                parentCode = menu.getKey().getMenuCode();
             }
         }
         String menuName = txtMenuName.getText();
@@ -237,7 +237,7 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
             VRoleMenu vMenu = (VRoleMenu) selectedNode.getUserObject();
             Menu menu = new Menu();
             if (vMenu.getKey() != null) {
-                menu.setId(vMenu.getKey().getMenuId());
+                menu.setCode(vMenu.getKey().getMenuCode());
             }
             menu.setMenuName(menuName);
             menu.setMenuClass(selectedNode.getParent().toString());
@@ -250,12 +250,12 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
             }
             Menu saveMenu = menuService.saveMenu(menu);
             if (saveMenu != null) {
-                savePrivileges(saveMenu.getId());
+                savePrivileges(saveMenu.getCode());
                 JOptionPane.showMessageDialog(Global.parentForm, "Saved");
                 VRoleMenu rMenu = new VRoleMenu();
                 VRoleMenuKey key = new VRoleMenuKey();
-                key.setMenuId(saveMenu.getId());
-                key.setRoleId(Global.roleId);
+                key.setMenuCode(saveMenu.getCode());
+                key.setRoleCode(Global.roleCode);
                 rMenu.setKey(key);
                 rMenu.setMenuName(saveMenu.getMenuName());
                 rMenu.setParent(saveMenu.getParent());
@@ -268,13 +268,13 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
         }
     }
 
-    private void savePrivileges(Integer menuId) {
+    private void savePrivileges(String menuId) {
         if (menuId != null) {
-            List<UserRole> listUser = userRoleService.search("-", Global.compId.toString());
+            List<UserRole> listUser = userRoleService.search("-", Global.compCode);
             if (!listUser.isEmpty()) {
                 listUser.stream().map(role -> {
                     Privilege p = new Privilege();
-                    PrivilegeKey key = new PrivilegeKey(role.getRoleId(), menuId);
+                    PrivilegeKey key = new PrivilegeKey(role.getRoleCode(), menuId);
                     p.setKey(key);
                     return p;
                 }).map(p -> {
@@ -291,7 +291,7 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
         try {
             if (selectedNode != null) {
                 VRoleMenu rMenu = (VRoleMenu) selectedNode.getUserObject();
-                menuService.delete(rMenu.getKey().getMenuId().toString());
+                menuService.delete(rMenu.getKey().getMenuCode().toString());
                 treeModel.removeNodeFromParent(selectedNode);
                 treeModel.reload(selectedNode);
             }

@@ -2,15 +2,10 @@ package com.cv.accountswing;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.ui.ApplicationMainFrame;
-import com.cv.accountswing.entity.view.VUsrCompAssign;
-import com.cv.accountswing.service.UsrCompRoleService;
 import com.cv.accountswing.ui.LoginDialog;
 import com.formdev.flatlaf.FlatLightLaf;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.List;
 import java.util.TimeZone;
 import java.util.UUID;
 import javax.annotation.PostConstruct;
@@ -29,7 +24,6 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 
 @SpringBootApplication
-
 public class AccountSwingApplication {
 
     private static final Logger LOGGER = Logger.getLogger(AccountSwingApplication.class);
@@ -94,38 +88,15 @@ public class AccountSwingApplication {
             loginDialog.setLocationRelativeTo(null);
             loginDialog.setVisible(true);
             if (loginDialog.isLogin()) {
-                UsrCompRoleService usrCompRoleService = context.getBean(UsrCompRoleService.class);
-                List<VUsrCompAssign> listVUCA = usrCompRoleService.
-                        getAssignCompany(Global.loginUser.getUserId().toString());
+                ApplicationMainFrame appMain = context.getBean(ApplicationMainFrame.class);
+                java.awt.EventQueue.invokeLater(() -> {
+                    appMain.loadSysProperties();
+                    appMain.startNetworkDetector();
+                    appMain.setIconImage(new ImageIcon(AccountSwingApplication.class.getResource("/images/logo.png")).getImage());
+                    appMain.setExtendedState(JFrame.MAXIMIZED_BOTH);
+                    appMain.setVisible(true);
+                });
 
-                if (listVUCA == null) {
-                    JOptionPane.showMessageDialog(new JFrame(),
-                            "No company assign to the user",
-                            "Invalid Compay Access", JOptionPane.ERROR_MESSAGE);
-                    System.exit(-1);
-                } else if (listVUCA.isEmpty()) {
-                    JOptionPane.showMessageDialog(new JFrame(),
-                            "No company assign to the user",
-                            "Invalid Compay Access", JOptionPane.ERROR_MESSAGE);
-                    System.exit(-1);
-                } else if (listVUCA.size() > 1) {
-
-                } else {
-                    Global.roleId = listVUCA.get(0).getKey().getRoleId();
-                    Global.compId = listVUCA.get(0).getKey().getCompCode();
-                    Global.companyName = listVUCA.get(0).getCompName();
-                    LOGGER.info("Role Id : " + Global.roleId);
-                    LOGGER.info("Company Id : " + Global.compId);
-
-                    ApplicationMainFrame appMain = context.getBean(ApplicationMainFrame.class);
-                    java.awt.EventQueue.invokeLater(() -> {
-                        appMain.loadSysProperties();
-                        appMain.startNetworkDetector();
-                        appMain.setIconImage(new ImageIcon(AccountSwingApplication.class.getResource("/images/logo.png")).getImage());
-                        appMain.setExtendedState(JFrame.MAXIMIZED_BOTH);
-                        appMain.setVisible(true);
-                    });
-                }
             } else {
                 context.close();
                 System.exit(0);

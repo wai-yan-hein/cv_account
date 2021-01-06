@@ -5,7 +5,6 @@
  */
 package com.cv.msg;
 
-import com.cv.accountswing.common.Global;
 import com.cv.accountswing.entity.Customer;
 import com.cv.accountswing.entity.Gl;
 import com.cv.accountswing.entity.Supplier;
@@ -18,7 +17,6 @@ import javax.jms.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.jms.core.JmsTemplate;
@@ -62,7 +60,7 @@ public class MessagingServiceImpl implements MessagingService {
                     mm.setString("payDate", Util1.toDateStr(gl.getGlDate(), "yyyy-MM-dd"));
                     mm.setInt("locationId", locationId);
                     mm.setString("currency", "MMK");
-                    mm.setLong("glId", gl.getGlId());
+                    mm.setString("glId", gl.getGlCode());
                     double paid = 0;
                     if (trader instanceof Customer) {
                         if (gl.getDrAmt() != null) {
@@ -126,7 +124,7 @@ public class MessagingServiceImpl implements MessagingService {
                     mm.setString("payDate", Util1.toDateStr(gl.getGlDate(), "yyyy-MM-dd"));
                     mm.setInt("locationId", locationId);
                     mm.setString("currency", "MMK");
-                    mm.setLong("glId", gl.getGlId());
+                    mm.setString("glId", gl.getGlCode());
                     double paid = 0;
                     if (trader instanceof Customer) {
                         if (gl.getDrAmt() != null) {

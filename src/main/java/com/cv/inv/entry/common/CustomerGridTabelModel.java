@@ -49,7 +49,7 @@ public class CustomerGridTabelModel extends AbstractTableModel {
 
             switch (column) {
                 case 0: //Id
-                    return customer.getTraderId();
+                    return customer.getUserCode();
                 case 1: //Name
                     return customer.getTraderName();
                 case 2:

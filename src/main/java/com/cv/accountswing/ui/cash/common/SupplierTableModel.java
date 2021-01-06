@@ -5,7 +5,7 @@
  */
 package com.cv.accountswing.ui.cash.common;
 
-import com.cv.accountswing.entity.Trader;
+import com.cv.accountswing.entity.Supplier;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
@@ -16,13 +16,13 @@ import org.slf4j.LoggerFactory;
  *
  * @author Lenovo
  */
-public class TraderTableModel extends AbstractTableModel {
+public class SupplierTableModel extends AbstractTableModel {
 
-    private static final Logger log = LoggerFactory.getLogger(TraderTableModel.class);
-    private List<Trader> listTrader = new ArrayList<>();
+    private static final Logger log = LoggerFactory.getLogger(SupplierTableModel.class);
+    private List<Supplier> listTrader = new ArrayList<>();
     private final String[] columnNames = {"Code", "Name"};
 
-    public TraderTableModel(List<Trader> listTrader) {
+    public SupplierTableModel(List<Supplier> listTrader) {
         this.listTrader = listTrader;
     }
 
@@ -52,11 +52,11 @@ public class TraderTableModel extends AbstractTableModel {
         }
 
         try {
-            Trader trader = listTrader.get(row);
+            Supplier trader = listTrader.get(row);
 
             switch (column) {
                 case 0: //Code
-                    return trader.getTraderId();
+                    return trader.getUserCode();
                 case 1: //Description
                     return trader.getTraderName();
                 default:
@@ -87,7 +87,7 @@ public class TraderTableModel extends AbstractTableModel {
         return columnNames.length;
     }
 
-    public Trader getTrader(int row) {
+    public Supplier getTrader(int row) {
         if (listTrader == null) {
             return null;
         } else if (listTrader.isEmpty()) {

@@ -10,17 +10,15 @@ import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.Gl;
 import com.cv.accountswing.entity.view.VGl;
-import com.cv.accountswing.service.CurrencyService;
 import com.cv.accountswing.service.GlService;
 import com.cv.accountswing.service.SeqTableService;
 import com.cv.accountswing.service.VGlService;
-import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.editor.COACellEditor;
 import com.cv.accountswing.ui.editor.CurrencyAutoCompleter;
 import com.cv.accountswing.ui.editor.DepartmentCellEditor;
-import com.cv.accountswing.ui.editor.TraderCellEditor;
+import com.cv.accountswing.ui.editor.SupplierCellEditor;
 import com.cv.accountswing.ui.journal.common.JournalEntryTableModel;
 import com.cv.accountswing.util.Util1;
 import com.google.gson.Gson;
@@ -114,7 +112,7 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
 
         tblJournal.getColumnModel().getColumn(0).setCellEditor(new DepartmentCellEditor());
         tblJournal.getColumnModel().getColumn(1).setCellEditor(new AutoClearEditor());
-        tblJournal.getColumnModel().getColumn(2).setCellEditor(new TraderCellEditor());
+        tblJournal.getColumnModel().getColumn(2).setCellEditor(new SupplierCellEditor());
         tblJournal.getColumnModel().getColumn(3).setCellEditor(new COACellEditor());
         tblJournal.getColumnModel().getColumn(4).setCellEditor(new AutoClearEditor());
         tblJournal.getColumnModel().getColumn(5).setCellEditor(new AutoClearEditor());
@@ -163,7 +161,7 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
             String strJson = gson.toJson(journalTablModel.getListGV());
             List<Gl> listGl = gson.fromJson(strJson, type);
             if (glVouId.equals("-")) {
-                glVouId = getVouNo("GV", strDate, Global.compId.toString());
+                glVouId = getVouNo(Global.machineId, "GV", strDate, Global.compCode);
             }
             if (isGeneralVoucher(listGl, glVouId, vouNo, refrence, strDate)) {
                 assignGlInfo(listGl);
@@ -223,11 +221,11 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
     }
 
     private void assignGlInfo(Gl gl) {
-        String userId = Global.loginUser.getUserId().toString();
-        String compCode = Global.compId.toString();
+        String userId = Global.loginUser.getUserCode();
+        String compCode = Global.compCode;
 
-        if (gl.getGlId() == null) {
-            gl.setCompId(Integer.parseInt(compCode));
+        if (gl.getGlCode() == null) {
+            gl.setCompCode(compCode);
             gl.setCreatedBy(userId);
             gl.setCreatedDate(Util1.getTodayDate());
         } else {
@@ -236,10 +234,10 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
         }
     }
 
-    private String getVouNo(String type, String strDate, String compCode) {
+    private String getVouNo(Integer macId, String type, String strDate, String compCode) {
         String period = Util1.getPeriod(strDate, "dd/MM/yyyy");
         int ttlLength = 9;
-        int seqNo = seqService.getSequence(type, period, compCode);
+        int seqNo = seqService.getSequence(macId, type, period, compCode);
         String tmpVouNo = type.toUpperCase()
                 + String.format("%0" + ttlLength + "d", seqNo) + period;
 

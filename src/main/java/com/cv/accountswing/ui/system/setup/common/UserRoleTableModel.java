@@ -93,16 +93,16 @@ public class UserRoleTableModel extends AbstractTableModel {
     private void save(UserRole user) {
         boolean hasMenu = false;
         try {
-            if (user.getRoleId() != null) {
+            if (user.getRoleCode() != null) {
                 hasMenu = true;
             }
-            user.setCompCode(Global.compId);
+            user.setCompCode(Global.compCode);
             UserRole saveUserRole = userRoleService.save(user);
             if (!hasMenu) {
                 // create menu with role id
-                if (saveUserRole.getRoleId() != null) {
+                if (saveUserRole.getRoleCode() != null) {
                     List<Menu> listMenu = menuService.search("-", "-", "-", "-");
-                    privilegeService.save(saveUserRole.getRoleId().toString(), listMenu);
+                    privilegeService.save(saveUserRole.getRoleCode(), listMenu);
                     addEmptyRow();
                 }
             }
@@ -125,7 +125,7 @@ public class UserRoleTableModel extends AbstractTableModel {
             status = true;
         } else {
             UserRole user = listRole.get(listRole.size() - 1);
-            if (user.getRoleId() == null) {
+            if (user.getRoleCode() == null) {
                 status = false;
             }
         }

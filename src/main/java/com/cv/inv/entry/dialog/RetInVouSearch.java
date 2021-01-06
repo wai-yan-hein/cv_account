@@ -3,15 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.cv.inv.ui.util;
+package com.cv.inv.entry.dialog;
 
 import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
-import com.cv.accountswing.ui.editor.TraderAutoCompleter;
+import com.cv.accountswing.ui.editor.CustomerAutoCompleter;
 import com.cv.accountswing.util.Util1;
-import com.cv.inv.entity.Location;
 import com.cv.inv.entity.RetInHis;
 import com.cv.inv.entity.RetOutHis;
 import com.cv.inv.entry.common.CodeTableModel;
@@ -19,11 +18,9 @@ import com.cv.inv.entry.common.RetInVouSearchTableModel;
 import com.cv.inv.entry.common.RetOutVouSearchTableModel;
 import com.cv.inv.entry.editor.LocationAutoCompleter;
 import com.cv.inv.entry.editor.StockCellEditor;
-import com.cv.inv.service.LocationService;
 import com.cv.inv.service.RetInService;
 import com.cv.inv.service.RetOutService;
 import com.toedter.calendar.JTextFieldDateEditor;
-import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -31,14 +28,10 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,12 +44,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class RetInVouSearch extends javax.swing.JDialog implements KeyListener, SelectionObserver {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RetInVouSearch.class);
+    private static final Logger log = LoggerFactory.getLogger(RetInVouSearch.class);
     private SelectionObserver observer;
     private int selectRow = - 1;
     private LocationAutoCompleter locationAutoCompleter;
-    private TraderAutoCompleter traderAutoCompleter;
-    private final JDialog parent = this;
+    private CustomerAutoCompleter traderAutoCompleter;
     private String panelName;
     private String titleName;
     @Autowired
@@ -66,8 +58,6 @@ public class RetInVouSearch extends javax.swing.JDialog implements KeyListener, 
     @Autowired
     private CodeTableModel codeTableModel;
     @Autowired
-    private LocationService locationService;
-    @Autowired
     private RetInService retInService;
     @Autowired
     private RetOutService retOutService;
@@ -76,21 +66,26 @@ public class RetInVouSearch extends javax.swing.JDialog implements KeyListener, 
      * Creates new form ItemTypeSetupDialog
      */
     public RetInVouSearch() {
-        super(new Frame(), true);
+        super(Global.parentForm, true);
         initComponents();
+        initKeyListener();
     }
 
     public void initMain() {
         initCodeTable();
         initVouTable();
-        initKeyListener();
         initCombo();
         setTodayDate();
-        //assignDefaultValue();
-        initKeyListener();
-        addSelectionListenerTblVou();
         actionMapping();
+        assignDefaultValue();
+        search();
 
+    }
+
+    private void initKeyListener() {
+        txtCus.addKeyListener(this);
+        txtVouNo.addKeyListener(this);
+        txtLocation.addKeyListener(this);
     }
 
     public String getPanelName() {
@@ -111,10 +106,6 @@ public class RetInVouSearch extends javax.swing.JDialog implements KeyListener, 
 
     public void setSelectionObserver(SelectionObserver observer) {
         this.observer = observer;
-    }
-
-    private void initKeyListener() {
-
     }
 
     private void initCodeTable() {
@@ -185,9 +176,8 @@ public class RetInVouSearch extends javax.swing.JDialog implements KeyListener, 
     }
 
     private void assignDefaultValue() {
-        String locId = Global.sysProperties.get("system.default.location");
-        Location location = locationService.findById(locId);
-        locationAutoCompleter.setLocation(location);
+        locationAutoCompleter.setLocation(Global.defaultLocation);
+        traderAutoCompleter.setTrader(Global.defaultCustomer);
 
     }
 
@@ -196,28 +186,47 @@ public class RetInVouSearch extends javax.swing.JDialog implements KeyListener, 
         txtToDate.setDate(Util1.getTodayDate());
     }
 
+    private void select() {
+        if (tblVou.getSelectedRow() >= 0) {
+            switch (panelName) {
+                case "Return In":
+                    int row = tblVou.convertRowIndexToModel(tblVou.getSelectedRow());
+                    RetInHis inVou = retInVouSearchTableModel.getSelectVou(row);
+                    observer.selected("RETIN-SELECTED", inVou);
+                    break;
+                case "Return Out":
+                    int oRow = tblVou.convertRowIndexToModel(tblVou.getSelectedRow());
+                    RetOutHis outVou = retOutVouSearchTableModel.getSelectVou(oRow);
+                    observer.selected("RETOUT-SELECTED", outVou);
+                    break;
+            }
+            this.dispose();
+        } else {
+            JOptionPane.showMessageDialog(Global.parentForm, "Please select.");
+        }
+    }
+
     private void search() {
         String locId;
         String cusId;
         String vouNo;
         String filterCodes = codeTableModel.getFilterCodeStr();
-        String fDate = Util1.toDateStr(txtFromDate.getDate(), "yyyy-MM-dd HH:mm:ss");
-        String tDate = Util1.toDateStr(txtToDate.getDate(), "yyyy-MM-dd HH:mm:ss");
-        if (locationAutoCompleter.getLocation() != null) {
-            locId = locationAutoCompleter.getLocation().getLocationId().toString();
-        } else {
+        String fDate = Util1.toDateStr(txtFromDate.getDate(), "yyyy-MM-dd");
+        String tDate = Util1.toDateStr(txtToDate.getDate(), "yyyy-MM-dd");
+        if (locationAutoCompleter.getLocation() == null || txtLocation.getText().isEmpty()) {
             locId = "-";
-        }
-        if (traderAutoCompleter.getTrader() != null) {
-            cusId = String.valueOf(traderAutoCompleter.getTrader().getId());
-
         } else {
+            locId = locationAutoCompleter.getLocation().getLocationCode();
+        }
+        if (traderAutoCompleter.getTrader() == null || txtCus.getText().isEmpty()) {
             cusId = "-";
-        }
-        if (!txtVouNo.getText().equals("")) {
-            vouNo = txtVouNo.getText();
         } else {
+            cusId = traderAutoCompleter.getTrader().getCode();
+        }
+        if (txtVouNo.getText().isEmpty()) {
             vouNo = "-";
+        } else {
+            vouNo = txtVouNo.getText();
         }
         if (filterCodes == null) {
             filterCodes = "-";
@@ -225,48 +234,34 @@ public class RetInVouSearch extends javax.swing.JDialog implements KeyListener, 
         try {
             switch (panelName) {
                 case "Return In":
+                    log.info("Return In Voucher Searching.");
                     List<RetInHis> listRetIn = retInService.search(fDate, tDate,
                             cusId, locId, vouNo, filterCodes);
                     retInVouSearchTableModel.setListRetInHis(listRetIn);
                     break;
                 case "Return Out":
+                    log.info("Return Out Voucher Searching.");
                     List<RetOutHis> listRetOut = retOutService.search(fDate, tDate,
                             cusId, locId, vouNo, filterCodes);
                     retOutVouSearchTableModel.setListReturnHis(listRetOut);
                     break;
-
                 default:
                     break;
-
             }
 
             lblTtlRecord.setText("Total Record:" + retInVouSearchTableModel.getRowCount());
 
         } catch (Exception ex) {
-            LOGGER.error("Search RetInVouSearch.." + ex.getMessage());
+            log.error("Search RetInVouSearch.." + ex.getMessage());
         }
 
-    }
-
-    private void addSelectionListenerTblVou() {
-        //Define table selection model to single row selection.
-        tblVou.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        //Adding table row selection listener.
-        tblVou.getSelectionModel().addListSelectionListener(
-                new ListSelectionListener() {
-
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                selectRow = tblVou.getSelectedRow();
-            }
-        });
     }
 
     private void actionMapping() {
         tblStock.getInputMap().put(KeyStroke.getKeyStroke("F8"), "F8-Action");
         tblStock.getActionMap().put("F8-Action", actionStockDelete);
     }
-    private Action actionStockDelete = new AbstractAction() {
+    private final Action actionStockDelete = new AbstractAction() {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -301,12 +296,11 @@ public class RetInVouSearch extends javax.swing.JDialog implements KeyListener, 
         txtVouNo = new javax.swing.JTextField();
         jScrollPane4 = new javax.swing.JScrollPane();
         tblStock = new javax.swing.JTable();
-        jPanel2 = new javax.swing.JPanel();
-        btnSelect = new javax.swing.JButton();
-        Search = new javax.swing.JButton();
-        lblTtlRecord = new javax.swing.JLabel();
         jScrollPane5 = new javax.swing.JScrollPane();
         tblVou = new javax.swing.JTable();
+        lblTtlRecord = new javax.swing.JLabel();
+        Search = new javax.swing.JButton();
+        btnSelect = new javax.swing.JButton();
         btnClear = new javax.swing.JButton();
 
         jLabel1.setText("jLabel1");
@@ -329,12 +323,16 @@ public class RetInVouSearch extends javax.swing.JDialog implements KeyListener, 
         setModalityType(java.awt.Dialog.ModalityType.DOCUMENT_MODAL);
         setName(""); // NOI18N
 
-        jLabel2.setText("Date");
+        jLabel2.setFont(Global.lableFont);
+        jLabel2.setText("From");
 
+        jLabel3.setFont(Global.lableFont);
         jLabel3.setText("Location");
 
+        jLabel4.setFont(Global.lableFont);
         jLabel4.setText("Customer");
 
+        jLabel5.setFont(Global.lableFont);
         jLabel5.setText("VouNo");
 
         txtFromDate.setDateFormatString("dd/MM/yyyy");
@@ -345,64 +343,71 @@ public class RetInVouSearch extends javax.swing.JDialog implements KeyListener, 
         txtToDate.setFont(Global.lableFont);
         txtToDate.setName("txtToDate"); // NOI18N
 
+        jLabel6.setFont(Global.lableFont);
         jLabel6.setText("To");
 
+        txtLocation.setFont(Global.textFont);
         txtLocation.setName("txtLocation"); // NOI18N
 
+        txtCus.setFont(Global.textFont);
         txtCus.setName("txtCus"); // NOI18N
 
+        txtVouNo.setFont(Global.textFont);
         txtVouNo.setName("txtVouNo"); // NOI18N
 
+        tblStock.setFont(Global.textFont);
         tblStock.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+
             }
         ));
+        tblStock.setRowHeight(Global.tblRowHeight);
         jScrollPane4.setViewportView(tblStock);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel5)
-                        .addGap(18, 18, 18)
-                        .addComponent(txtVouNo))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel3)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel2)
-                                .addGap(27, 27, 27)))
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(txtFromDate, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabel6)
-                                .addGap(12, 12, 12)
-                                .addComponent(txtToDate, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(txtLocation, javax.swing.GroupLayout.PREFERRED_SIZE, 262, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel4)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtCus, javax.swing.GroupLayout.PREFERRED_SIZE, 262, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(10, 10, 10))
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                .addContainerGap())
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel2)
+                                    .addComponent(jLabel3))
+                                .addGap(18, 18, 18)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addComponent(txtFromDate, javax.swing.GroupLayout.DEFAULT_SIZE, 96, Short.MAX_VALUE)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(jLabel6)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(txtToDate, javax.swing.GroupLayout.DEFAULT_SIZE, 97, Short.MAX_VALUE)
+                                        .addGap(1, 1, 1))
+                                    .addComponent(txtLocation)))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel4)
+                                .addGap(18, 18, 18)
+                                .addComponent(txtCus)))
+                        .addGap(7, 7, 7))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel5)
+                                .addGap(18, 18, 18)
+                                .addComponent(txtVouNo)
+                                .addGap(1, 1, 1)))
+                        .addContainerGap())))
         );
+
+        jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jLabel2, jLabel3, jLabel4, jLabel5});
+
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
@@ -412,33 +417,48 @@ public class RetInVouSearch extends javax.swing.JDialog implements KeyListener, 
                     .addComponent(txtFromDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtToDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel6))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
                     .addComponent(txtLocation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel4)
                     .addComponent(txtCus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
                     .addComponent(txtVouNo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 233, Short.MAX_VALUE)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 262, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
-        btnSelect.setBackground(ColorUtil.mainColor);
-        btnSelect.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/select-button.png"))); // NOI18N
-        btnSelect.setText("Select");
-        btnSelect.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSelectActionPerformed(evt);
+        tblVou.setFont(Global.textFont);
+        tblVou.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {},
+                {},
+                {},
+                {}
+            },
+            new String [] {
+
+            }
+        ));
+        tblVou.setRowHeight(Global.tblRowHeight);
+        tblVou.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblVouMouseClicked(evt);
             }
         });
+        jScrollPane5.setViewportView(tblVou);
+
+        lblTtlRecord.setText("Total Records : 0");
 
         Search.setBackground(ColorUtil.mainColor);
+        Search.setFont(Global.lableFont);
+        Search.setForeground(ColorUtil.foreground);
         Search.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/search-button-white.png"))); // NOI18N
         Search.setText("Search");
         Search.addActionListener(new java.awt.event.ActionListener() {
@@ -447,27 +467,20 @@ public class RetInVouSearch extends javax.swing.JDialog implements KeyListener, 
             }
         });
 
-        lblTtlRecord.setText("Total Records : 0");
-
-        tblVou.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        tblVou.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                tblVouMouseClicked(evt);
+        btnSelect.setBackground(ColorUtil.mainColor);
+        btnSelect.setFont(Global.lableFont);
+        btnSelect.setForeground(ColorUtil.foreground);
+        btnSelect.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/select-button.png"))); // NOI18N
+        btnSelect.setText("Select");
+        btnSelect.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSelectActionPerformed(evt);
             }
         });
-        jScrollPane5.setViewportView(tblVou);
 
         btnClear.setBackground(ColorUtil.btnEdit);
+        btnClear.setFont(Global.lableFont);
+        btnClear.setForeground(ColorUtil.foreground);
         btnClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/clear-button-white.png"))); // NOI18N
         btnClear.setText("Clear");
         btnClear.addActionListener(new java.awt.event.ActionListener() {
@@ -476,37 +489,6 @@ public class RetInVouSearch extends javax.swing.JDialog implements KeyListener, 
             }
         });
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(lblTtlRecord)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(Search)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnSelect)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnClear)
-                        .addContainerGap())
-                    .addComponent(jScrollPane5)))
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 362, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnSelect)
-                    .addComponent(Search)
-                    .addComponent(lblTtlRecord)
-                    .addComponent(btnClear)))
-        );
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -514,8 +496,17 @@ public class RetInVouSearch extends javax.swing.JDialog implements KeyListener, 
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblTtlRecord)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(Search)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnSelect)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnClear))
+                    .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 522, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -523,9 +514,17 @@ public class RetInVouSearch extends javax.swing.JDialog implements KeyListener, 
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(btnSelect)
+                                .addComponent(Search)
+                                .addComponent(btnClear))
+                            .addComponent(lblTtlRecord)))
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         pack();
@@ -543,7 +542,7 @@ public class RetInVouSearch extends javax.swing.JDialog implements KeyListener, 
 
     private void tblVouMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblVouMouseClicked
         // TODO add your handling code here:
-        if (evt.getClickCount() == 2 && selectRow >= 0) {
+        if (evt.getClickCount() == 2) {
             select();
         }
     }//GEN-LAST:event_tblVouMouseClicked
@@ -568,7 +567,6 @@ public class RetInVouSearch extends javax.swing.JDialog implements KeyListener, 
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
@@ -608,12 +606,14 @@ public class RetInVouSearch extends javax.swing.JDialog implements KeyListener, 
                     txtToDate.requestFocus();
                 }
                 if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_DOWN) {
-                    String date = ((JTextFieldDateEditor) sourceObj).getText();
-                    if (date.length() == 8) {
-                        String toFormatDate = Util1.toFormatDate(date);
-                        txtFromDate.setDate(Util1.toDate(toFormatDate, "dd/MM/yyyy"));
+                    if (sourceObj != null) {
+                        String date = ((JTextFieldDateEditor) sourceObj).getText();
+                        if (date.length() == 8) {
+                            String toFormatDate = Util1.toFormatDate(date);
+                            txtFromDate.setDate(Util1.toDate(toFormatDate, "dd/MM/yyyy"));
+                        }
+                        txtCus.requestFocus();
                     }
-                    txtCus.requestFocus();
                 }
                 break;
             case "txtToDate":
@@ -621,17 +621,24 @@ public class RetInVouSearch extends javax.swing.JDialog implements KeyListener, 
                     txtLocation.requestFocus();
                 }
                 if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_DOWN) {
-                    String date = ((JTextFieldDateEditor) sourceObj).getText();
-                    if (date.length() == 8) {
-                        String toFormatDate = Util1.toFormatDate(date);
-                        txtToDate.setDate(Util1.toDate(toFormatDate, "dd/MM/yyyy"));
+                    if (sourceObj != null) {
+                        String date = ((JTextFieldDateEditor) sourceObj).getText();
+                        if (date.length() == 8) {
+                            String toFormatDate = Util1.toFormatDate(date);
+                            txtToDate.setDate(Util1.toDate(toFormatDate, "dd/MM/yyyy"));
+                        }
+                        txtLocation.requestFocus();
                     }
-                    txtLocation.requestFocus();
                 }
                 break;
             case "txtCus":
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     txtVouNo.requestFocus();
+                }
+                if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE || e.getKeyCode() == KeyEvent.VK_DELETE) {
+                    if (txtCus.getText().isEmpty()) {
+                        traderAutoCompleter.closePopup();
+                    }
                 }
                 break;
             case "txtVouNo":
@@ -639,6 +646,12 @@ public class RetInVouSearch extends javax.swing.JDialog implements KeyListener, 
                     tabToTable(e);
                 }
                 break;
+            case "txtLocation":
+                if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE || e.getKeyCode() == KeyEvent.VK_DELETE) {
+                    if (txtLocation.getText().isEmpty()) {
+                        locationAutoCompleter.closePopup();
+                    }
+                }
 
         }
     }
@@ -652,7 +665,7 @@ public class RetInVouSearch extends javax.swing.JDialog implements KeyListener, 
     private void initCombo() {
         locationAutoCompleter = new LocationAutoCompleter(txtLocation, Global.listLocation, null);
         locationAutoCompleter.setSelectionObserver(this);
-        traderAutoCompleter = new TraderAutoCompleter(txtCus, Global.listTrader, null);
+        traderAutoCompleter = new CustomerAutoCompleter(txtCus, Global.listCustomer, null);
         locationAutoCompleter.setSelectionObserver(this);
 
     }
@@ -660,30 +673,4 @@ public class RetInVouSearch extends javax.swing.JDialog implements KeyListener, 
     @Override
     public void selected(Object source, Object selectObj) {
     }
-
-    private void select() {
-        if (selectRow >= 0) {
-            switch (panelName) {
-                case "Return In":
-                    observer.selected("RetInVouList",
-                            retInVouSearchTableModel.getSelectVou(tblVou.convertRowIndexToModel(selectRow)));
-
-                    break;
-                case "Return Out":
-                    observer.selected("RetOutVouList",
-                            retOutVouSearchTableModel.getSelectVou(tblVou.convertRowIndexToModel(selectRow)));
-                    break;
-                default:
-                    break;
-            }
-
-            if (parent instanceof JDialog) {
-                ((JDialog) parent).dispose();
-            }
-        } else {
-            JOptionPane.showMessageDialog(Global.parentForm, "Please select return in voucher.",
-                    "No Selection", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
 }

@@ -228,7 +228,7 @@ public class AllCashTableModel extends AbstractTableModel {
                         trader = getTrader(String.valueOf(value));
                     }
                     if (trader != null) {
-                        vgl.setTraderId(Util1.getLong(trader.getId()));
+                        vgl.setTraderCode(trader.getCode());
                         vgl.setTraderName(trader.getTraderName());
                         if (trader.getAccount() != null) {
                             vgl.setAccountId(trader.getAccount().getCode());
@@ -283,8 +283,8 @@ public class AllCashTableModel extends AbstractTableModel {
     private void save(VGl vgl, int row, int column) {
         if (isValidEntry(vgl, row, column)) {
             vgl.setSourceAcId(sourceAccId);
-            vgl.setCompId(Global.compId);
-            vgl.setCreatedBy(Global.loginUser.getUserId().toString());
+            vgl.setCompCode(Global.compCode);
+            vgl.setCreatedBy(Global.loginUser.getUserCode());
             String strVGL = gson.toJson(vgl);
             Gl gl = gson.fromJson(strVGL, Gl.class);
 
@@ -292,7 +292,7 @@ public class AllCashTableModel extends AbstractTableModel {
                 Gl glSave = glService.save(gl);
                 if (glSave != null) {
                     VGl saveVGl = listVGl.get(row);
-                    saveVGl.setGlId(glSave.getGlId());
+                    saveVGl.setGlCode(glSave.getGlCode());
                     addNewRow();
                     parent.setRowSelectionInterval(row + 1, row + 1);
                     parent.setColumnSelectionInterval(1, 1);
@@ -341,8 +341,8 @@ public class AllCashTableModel extends AbstractTableModel {
         taskExecutor.execute(() -> {
             try {
                 if (Global.useActiveMQ) {
-                    if (gl.getTraderId() != null) {
-                        Trader fTrader = traderService.findById(gl.getTraderId().intValue());
+                    if (gl.getTraderCode() != null) {
+                        Trader fTrader = traderService.findById(gl.getTraderCode());
                         if (fTrader != null) {
 
                             if (fTrader.getAppShortName() != null) {
@@ -406,13 +406,13 @@ public class AllCashTableModel extends AbstractTableModel {
         if (!listVGl.isEmpty()) {
             VGl vgl = listVGl.get(row);
             try {
-                if (vgl.getGlId() != null) {
-                    int delete = glService.delete(vgl.getGlId(), "GL-DELETE");
+                if (vgl.getGlCode() != null) {
+                    int delete = glService.delete(vgl.getGlCode(), "GL-DELETE");
                     if (delete == 1) {
                         listVGl.remove(row);
-                        if (vgl.getTraderId() != null) {
-                            trader = traderService.findById(vgl.getTraderId().intValue());
-                            sendDeletePaymentToInv(trader, vgl.getGlId());
+                        if (vgl.getTraderCode() != null) {
+                            trader = traderService.findById(vgl.getTraderCode());
+                            sendDeletePaymentToInv(trader, vgl.getGlCode());
                         }
                         fireTableRowsDeleted(0, listVGl.size());
                     }
@@ -426,7 +426,7 @@ public class AllCashTableModel extends AbstractTableModel {
 
     }
 
-    private void sendDeletePaymentToInv(Trader trader, long glId) {
+    private void sendDeletePaymentToInv(Trader trader, String glId) {
         if (trader != null) {
             if (trader.getAppShortName() != null) {
                 if (trader.getAppShortName().equals("INVENTORY")) {
@@ -468,7 +468,7 @@ public class AllCashTableModel extends AbstractTableModel {
             status = true;
         } else {
             VGl vgl = listVGl.get(listVGl.size() - 1);
-            if (vgl.getGlId() == null) {
+            if (vgl.getGlCode() == null) {
                 status = false;
             }
         }
@@ -490,9 +490,9 @@ public class AllCashTableModel extends AbstractTableModel {
         if (listVGl != null) {
             VGl newVGl;
             VGl vgl = listVGl.get(selectRow - 1);
-            if (vgl.getGlId() != null) {
+            if (vgl.getGlCode() != null) {
                 newVGl = (VGl) SerializationUtils.clone(vgl);
-                newVGl.setGlId(null);
+                newVGl.setGlCode(null);
                 newVGl.setDrAmt(null);
                 newVGl.setCrAmt(null);
                 listVGl.set(selectRow, newVGl);

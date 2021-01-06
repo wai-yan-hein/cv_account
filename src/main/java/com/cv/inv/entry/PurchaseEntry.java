@@ -10,12 +10,14 @@ import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.SelectionObserver;
+import com.cv.accountswing.entity.Supplier;
+import com.cv.accountswing.entity.Trader;
 import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.editor.CurrencyAutoCompleter;
 import com.cv.accountswing.ui.editor.DepartmentCellEditor;
-import com.cv.accountswing.ui.editor.TraderAutoCompleter;
+import com.cv.accountswing.ui.editor.SupplierAutoCompleter;
 import com.cv.accountswing.util.NumberUtil;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.PurHis;
@@ -40,6 +42,8 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
@@ -81,7 +85,7 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
     private LocationAutoCompleter locCompleter;
     private VouStatusAutoCompleter vouCompleter;
     private CurrencyAutoCompleter currAutoCompleter;
-    private TraderAutoCompleter traderAutoCompleter;
+    private SupplierAutoCompleter traderAutoCompleter;
     private LoadingObserver loadingObserver;
     private PurHis ph = new PurHis();
     //private Gl ph;
@@ -220,7 +224,7 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
         vouCompleter.setSelectionObserver(this);
         currAutoCompleter = new CurrencyAutoCompleter(txtCurrency, Global.listCurrency, null);
         currAutoCompleter.setSelectionObserver(this);
-        traderAutoCompleter = new TraderAutoCompleter(txtSupplier, Global.listTrader, null);
+        traderAutoCompleter = new SupplierAutoCompleter(txtSupplier, Global.listSupplier, null);
         traderAutoCompleter.setSelectionObserver(this);
         locCompleter = new LocationAutoCompleter(txtLocation, Global.listLocation, null);
         locCompleter.setLocation(Global.defaultLocation);
@@ -232,7 +236,7 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
             txtPurDate.setDate(Util1.getTodayDate());
             currAutoCompleter.setCurrency(Global.defalutCurrency);
             vouCompleter.setVouStatus(Global.defaultVouStatus);
-            traderAutoCompleter.setTrader(Global.defaultSupplier);
+            traderAutoCompleter.setTrader((Supplier) Global.defaultSupplier);
             genVouNo();
             txtVouNo.requestFocus();
         } catch (Exception e) {
@@ -319,7 +323,7 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
                 ph.setCreatedBy(Global.loginUser);
                 ph.setSession(Global.sessionId);
             } else {
-                ph.setUpdatedBy(Global.loginUser.getUserId().toString());
+                ph.setUpdatedBy(Global.loginUser.getUserCode());
                 ph.setUpdatedDate(Util1.getTodayDate());
             }
             //cal total
@@ -355,7 +359,7 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
             txtPurDate.setDate(purHis.getPurDate());
             txtDueDate.setDate(purHis.getDueDate());
             locCompleter.setLocation(purHis.getLocation());
-            traderAutoCompleter.setTrader(purHis.getCustomerId());
+            traderAutoCompleter.setTrader((Supplier) purHis.getCustomerId());
             vouCompleter.setVouStatus(purHis.getVouStatus());
             currAutoCompleter.setCurrency(purHis.getCurrency());
             txtVouTotal.setValue(purHis.getVouTotal());
@@ -398,7 +402,11 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
         if (yes_no == 0) {
             String vouNo = txtVouNo.getText();
             if (lblStatus.getText().equals("EDIT")) {
-                phService.delete(vouNo);
+                try {
+                    phService.delete(vouNo);
+                } catch (Exception ex) {
+                    LOGGER.error("Delete Purchase Voucher :" + ex.getMessage());
+                }
                 clear();
             }
         }

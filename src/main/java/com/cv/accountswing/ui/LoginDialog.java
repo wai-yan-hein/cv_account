@@ -36,7 +36,6 @@ public class LoginDialog extends javax.swing.JDialog implements KeyListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginDialog.class);
     private boolean login = false;
     private int loginAttempt = 0;
-    private boolean isRegister = false;
     private final FocusAdapter fa = new FocusAdapter() {
         @Override
         public void focusGained(java.awt.event.FocusEvent evt) {
@@ -82,10 +81,8 @@ public class LoginDialog extends javax.swing.JDialog implements KeyListener {
             Global.machineName = Util1.getComputerName();
             Global.machineId = machineInfoService.getMax(Global.machineName);
             if (Global.machineId == 0) {
-                isRegister = false;
                 JOptionPane.showMessageDialog(Global.parentForm, "Your account is not registed in this machine");
             } else {
-                isRegister = true;
             }
         } catch (Exception ex) {
             LOGGER.error("getMachineInfo Error : {}", ex.getMessage());
@@ -184,6 +181,7 @@ public class LoginDialog extends javax.swing.JDialog implements KeyListener {
     }
 
     private void login() {
+        register();
         if (txtLoginName.getText().isEmpty() || txtPassword.getPassword().length == 0) {
             JOptionPane.showMessageDialog(this, "Invalid user name or password.",
                     "Authentication error.", JOptionPane.ERROR_MESSAGE);
@@ -198,21 +196,10 @@ public class LoginDialog extends javax.swing.JDialog implements KeyListener {
                             "Authentication error.", JOptionPane.ERROR_MESSAGE);
                     loginAttempt++;
                 } else { //Login success
-                    if (user.getUserId() == 1) {
-                        if (!isRegister) {
-                            register();
-                            isRegister = true;
-                        }
-                    }
-                    if (isRegister) {
-                        Global.loginUser = user;
-                        login = true;
-                        this.dispose();
-                    } else {
-                        JOptionPane.showMessageDialog(Global.parentForm, "This machine is not registered yet.");
-                        login = false;
-                        this.dispose();
-                    }
+                    //JOptionPane.showMessageDialog(Global.parentForm, "This machine is not registered yet.");
+                    Global.loginUser = user;
+                    login = true;
+                    this.dispose();
                 }
             } catch (HeadlessException ex) {
                 LOGGER.error("login : " + ex.getMessage());

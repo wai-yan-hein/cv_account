@@ -230,7 +230,7 @@ public class CrDrVoucher extends javax.swing.JPanel implements KeyListener, Sele
 
         taskExecutor.execute(() -> {
             List<VCrDrVoucher> listCD = crdrService.search(stDate, endDate, sourceAcId, fromCurr, depId, vouNo,
-                    Global.compId.toString(), "-", splitId, fromDesp, naration,
+                    Global.compCode, "-", splitId, fromDesp, naration,
                     remark, "-");
             voucherTableModel.setListVCD(listCD);
             loadingObserver.load(this.getName(), "Stop");

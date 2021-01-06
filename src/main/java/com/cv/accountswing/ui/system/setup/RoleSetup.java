@@ -102,7 +102,7 @@ public class RoleSetup extends javax.swing.JPanel implements KeyListener, PanelC
     }
 
     private void initTree() {
-        //createTree(Global.roleId.toString());
+        //createTree(Global.roleCode);
     }
 
     private void createTree(String roleId) {
@@ -116,15 +116,15 @@ public class RoleSetup extends javax.swing.JPanel implements KeyListener, PanelC
     }
 
     private void searchAllUsers() {
-        List<UserRole> listUserRole = userRoleService.search("-", Global.compId.toString());
+        List<UserRole> listUserRole = userRoleService.search("-", Global.compCode);
         userRoleTableModel.setListRole(listUserRole);
         userRoleTableModel.addEmptyRow();
     }
 
     public void setCurrUserRole(UserRole currUserRole) {
         txtRoleName.setText(currUserRole.getRoleName());
-        if (currUserRole.getRoleId() != null) {
-            createTree(currUserRole.getRoleId().toString());
+        if (currUserRole.getRoleCode() != null) {
+            createTree(currUserRole.getRoleCode());
         }
     }
 

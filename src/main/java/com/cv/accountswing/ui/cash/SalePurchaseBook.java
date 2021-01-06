@@ -15,7 +15,7 @@ import com.cv.accountswing.service.VGlService;
 import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.editor.CurrencyEditor;
 import com.cv.accountswing.ui.editor.DepartmentCellEditor;
-import com.cv.accountswing.ui.editor.TraderCellEditor;
+import com.cv.accountswing.ui.editor.SupplierCellEditor;
 import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.SalePurchaseTableModel;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
@@ -175,7 +175,7 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
         tblCash.getColumnModel().getColumn(1).setCellEditor(new DepartmentCellEditor());
         tblCash.getColumnModel().getColumn(2).setCellEditor(new AutoClearEditor());
         tblCash.getColumnModel().getColumn(3).setCellEditor(new AutoClearEditor());
-        tblCash.getColumnModel().getColumn(4).setCellEditor(new TraderCellEditor());
+        tblCash.getColumnModel().getColumn(4).setCellEditor(new SupplierCellEditor());
         tblCash.getColumnModel().getColumn(5).setCellEditor(new COACellEditor());
         tblCash.getColumnModel().getColumn(6).setCellEditor(new CurrencyEditor());
         tblCash.getColumnModel().getColumn(7).setCellEditor(new AutoClearEditor());
@@ -244,7 +244,7 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
             if (tblCash.getSelectedRow() >= 0) {
                 vgl = spTableModel.getVGl(tblCash.convertRowIndexToModel(tblCash.getSelectedRow()));
 
-                if (vgl.getGlId() != null) {
+                if (vgl.getGlCode() != null) {
                     yes_no = JOptionPane.showConfirmDialog(Global.parentForm, "Are you sure to delete?",
                             "Expense item delete", JOptionPane.YES_NO_OPTION);
 
@@ -262,12 +262,12 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
         /*loadingObserver.load(this.getName(), "Start");
         taskExecutor.execute(() -> {
         try {
-        CompanyInfo ci = ciService.findById(Global.compId);
+        CompanyInfo ci = ciService.findById(Global.compCode);
         SystemPropertyKey key = new SystemPropertyKey();
-        key.setCompCode(Global.compId);
+        key.setCompCode(Global.compCode);
         key.setPropKey("system.report.path");
         SystemProperty sp = spService.findById(key);
-        String userId = Global.loginUser.getUserId().toString();
+        String userId = Global.loginUser.getUserCode();
         String fileName = userId + "_Ledger_Report.pdf";
         String reportPath = sp.getPropValue();
         //String reportPath1 = reportPath;
@@ -275,14 +275,14 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
         
         reportPath = reportPath + "/LedgerReport";
         key = new SystemPropertyKey();
-        key.setCompCode(Global.compId);
+        key.setCompCode(Global.compCode);
         key.setPropKey("system.font.path");
         sp = spService.findById(key);
         String fontPath = sp.getPropValue();
         
         Map<String, Object> parameters = new HashMap();
         parameters.put("p_company_name", ci.getName());
-        parameters.put("p_comp_id", Global.compId);
+        parameters.put("p_comp_id", Global.compCode);
         parameters.put("p_trg_acc_id", sourceAccId);
         parameters.put("p_acc_id", Util1.isNull(accId, "-"));
         parameters.put("p_report_info", stDate

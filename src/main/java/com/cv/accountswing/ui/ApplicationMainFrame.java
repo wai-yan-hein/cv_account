@@ -21,10 +21,11 @@ import com.cv.accountswing.entity.view.VRoleMenu;
 import com.cv.accountswing.entity.view.VUsrCompAssign;
 import com.cv.accountswing.service.COAService;
 import com.cv.accountswing.service.CurrencyService;
+import com.cv.accountswing.service.CustomerService;
 import com.cv.accountswing.service.DepartmentService;
 import com.cv.accountswing.service.MenuService;
+import com.cv.accountswing.service.SupplierService;
 import com.cv.accountswing.service.SystemPropertyService;
-import com.cv.accountswing.service.TraderService;
 import com.cv.accountswing.service.UserService;
 import com.cv.accountswing.service.UsrCompRoleService;
 import com.cv.accountswing.ui.cash.AllCash;
@@ -94,6 +95,7 @@ import java.util.HashMap;
 import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -200,7 +202,9 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     @Autowired
     private DepartmentService departmentService;
     @Autowired
-    private TraderService traderService;
+    private SupplierService supplierService;
+    @Autowired
+    private CustomerService customerService;
     @Autowired
     private ProtfitAndLost profitAndLost;
     @Autowired
@@ -660,9 +664,10 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         popupmenu.add(clearData);
         popupmenu.add(closeAll);
     }
+
     public void loadSysProperties() {
         try {
-            List<SystemProperty> listSys = systemPropertyService.search("-", Global.compId.toString(), "-");
+            List<SystemProperty> listSys = systemPropertyService.search("-", Global.compCode, "-");
             HashMap<String, String> hmList = new HashMap<>();
             listSys.forEach(sys -> {
                 hmList.put(sys.getKey().getPropKey(), sys.getPropValue());
@@ -674,21 +679,49 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         }
     }
 
+    private void companyUserRoleAssign() {
+        UsrCompRoleService usrCompRoleService = context.getBean(UsrCompRoleService.class);
+        List<VUsrCompAssign> listVUCA = usrCompRoleService.
+                getAssignCompany(Global.loginUser.getAppUserCode());
+
+        if (listVUCA == null) {
+            JOptionPane.showMessageDialog(new JFrame(),
+                    "No company assign to the user",
+                    "Invalid Compay Access", JOptionPane.ERROR_MESSAGE);
+            System.exit(-1);
+        } else if (listVUCA.isEmpty()) {
+            JOptionPane.showMessageDialog(new JFrame(),
+                    "No company assign to the user",
+                    "Invalid Compay Access", JOptionPane.ERROR_MESSAGE);
+            System.exit(-1);
+        } else if (listVUCA.size() > 1) {
+
+        } else {
+            Global.roleCode = listVUCA.get(0).getKey().getRoleCode();
+            Global.compCode = listVUCA.get(0).getKey().getCompCode();
+            Global.companyName = listVUCA.get(0).getCompName();
+            LOGGER.info("Role Id : " + Global.roleCode);
+            LOGGER.info("Company Id : " + Global.compCode);
+        }
+    }
+
     private void initializeData() {
         this.setTitle(this.getTitle() + "(" + Global.loginUser.getUserName() + ")");
         try {
-            List listCI = usrCompRoleService.getAssignCompany(Global.loginUser.getUserId().toString());
+
+            List listCI = usrCompRoleService.getAssignCompany(Global.loginUser.getAppUserCode());
             if (listCI.size() > 0) {
                 VUsrCompAssign vuca = (VUsrCompAssign) listCI.get(0);
                 Global.finicialPeriodFrom = Util1.toDateStr(vuca.getFinicialPeriodFrom(), "yyyy-MM-dd");
                 Global.finicialPeriodTo = Util1.toDateStr(vuca.getFinicialPeriodTo(), "yyyy-MM-dd");
             }
             Global.listAppUser = userService.search("-", "-", "-", "-");
-            Global.listCOA = cOAService.search("-", "-", Global.compId.toString(), "3", "-", "-", "-");
-            Global.listCurrency = currencyService.search("-", "-", Global.compId.toString());
-            Global.listDepartment = departmentService.search("-", "-", Global.compId.toString(),
+            Global.listCOA = cOAService.search("-", "-", Global.compCode, "3", "-", "-", "-");
+            Global.listCurrency = currencyService.search("-", "-", Global.compCode);
+            Global.listDepartment = departmentService.search("-", "-", Global.compCode,
                     "-", "-");
-            Global.listTrader = traderService.searchTrader("-", "-", "-", "-", "-", Global.compId.toString(), "-");
+            Global.listCustomer = customerService.search("-", "-", "-", "-", Global.compCode);
+            Global.listSupplier = supplierService.search("-", "-", "-", "-", Global.compCode);
             Global.listLocation = locationService.findAll();
             Global.listVou = vouService.findAll();
             Global.listSaleMan = saleManService.findAll();
@@ -709,7 +742,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             //Default Currency
             CurrencyKey key = new CurrencyKey();
             key.setCode(cuId);
-            key.setCompCode(Global.compId);
+            key.setCompCode(Global.compCode);
             Global.defalutCurrency = currencyService.findById(key);
             //Default department
             String depId = Global.sysProperties.get("system.default.department");
@@ -728,10 +761,10 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             }
             //Default Customer
             String cusId = Global.sysProperties.get("system.default.customer");
-            Global.defaultCustomer = traderService.findById(Util1.getInteger(cusId));
+            Global.defaultCustomer = customerService.findById(cusId);
             //Default Supplier
             String supId = Global.sysProperties.get("system.default.supplier");
-            Global.defaultSupplier = traderService.findById(Util1.getInteger(supId));
+            Global.defaultSupplier = supplierService.findById(supId);
         } catch (Exception e) {
             LOGGER.error("Initialize Data :" + e.getMessage());
             JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Initialize Data", JOptionPane.ERROR_MESSAGE);
@@ -744,7 +777,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         LOGGER.info("init menu.");
         menuBar.removeAll();
         taskExecutor.execute(() -> {
-            List<VRoleMenu> listVRM = menuService.getParentChildMenu(Global.roleId.toString(), "Menu");
+            List<VRoleMenu> listVRM = menuService.getParentChildMenu(Global.roleCode, "Menu");
             listVRM.forEach((menu) -> {
                 if (menu.getIsAllow()) {
                     if (menu.getChild() != null) {

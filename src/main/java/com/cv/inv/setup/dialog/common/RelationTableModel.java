@@ -32,13 +32,13 @@ public class RelationTableModel extends AbstractTableModel {
     private final String[] columnNames = {"From Unit", "To Unit", "Factor"};
     private List<UnitRelation> listRelation = new ArrayList<>();
     private JTable parent;
-    private Integer patternId;
+    private String patternId;
 
-    public Integer getPatternId() {
+    public String getPatternId() {
         return patternId;
     }
 
-    public void setPatternId(Integer patternId) {
+    public void setPatternId(String patternId) {
         this.patternId = patternId;
     }
 

@@ -96,7 +96,7 @@ public class CrDrVoucherEntryTableModel extends AbstractTableModel {
                 if (value != null) {
                     if (value instanceof Trader) {
                         Trader trader = (Trader) value;
-                        vgl.setTraderId(Util1.getLong(trader.getId()));
+                        vgl.setTraderCode(trader.getCode());
                         vgl.setTraderName(trader.getTraderName());
                         String coaCode = trader.getAccount().getCode();
                         ChartOfAccount account = cOAService.findById(coaCode);
@@ -215,7 +215,7 @@ public class CrDrVoucherEntryTableModel extends AbstractTableModel {
     }
 
     public void saveGV(VGl cd, String status) {
-        //if (isValidCOA(cd, Global.compId.toString(), Global.loginUser.getUserId().toString(), status)) {
+        //if (isValidCOA(cd, Global.compCode, Global.loginUser.getUserCode(), status)) {
         // coaService.save(cd);
         if (status.equals("NEW")) {
             listVGl.add(new VGl());
@@ -239,7 +239,7 @@ public class CrDrVoucherEntryTableModel extends AbstractTableModel {
             status = true;
         } else {
             VGl vgl = listVGl.get(listVGl.size() - 1);
-            if (vgl.getGlId() == null) {
+            if (vgl.getGlCode() == null) {
                 status = false;
             }
         }

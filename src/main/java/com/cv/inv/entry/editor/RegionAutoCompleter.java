@@ -72,7 +72,7 @@ public class RegionAutoCompleter implements KeyListener, SelectionObserver {
         this.editor = editor;
         this.regionService = regionService;
         if (list.isEmpty()) {
-            Global.listRegion = regionService.search("-", "-", Global.compId.toString(), "-");
+            Global.listRegion = regionService.search("-", "-", Global.compCode, "-");
         }
         textComp.putClientProperty(AUTOCOMPLETER, this);
         textComp.setFont(Global.textFont);
@@ -80,7 +80,7 @@ public class RegionAutoCompleter implements KeyListener, SelectionObserver {
         table.setModel(regionTableModel);
         table.setSize(50, 50);
         table.setTableHeader(null);
-        table.setFont(Global.lableFont); // NOI18N
+        table.setFont(Global.textFont); // NOI18N
         table.setRowHeight(Global.tblRowHeight);
         table.setDefaultRenderer(Object.class, new TableCellRender());
         sorter = new TableRowSorter(table.getModel());

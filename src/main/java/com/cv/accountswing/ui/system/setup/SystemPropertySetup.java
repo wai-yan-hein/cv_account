@@ -92,7 +92,7 @@ public class SystemPropertySetup extends javax.swing.JPanel implements KeyListen
         loadingObserver.load(this.getName(), "Start");
         taskExecutor.execute(() -> {
             try {
-                systemPropertyTableModel.setListSP(spService.search("-", Global.compId.toString(), "-"));
+                systemPropertyTableModel.setListSP(spService.search("-", Global.compCode, "-"));
                 loadingObserver.load(this.getName(), "Stop");
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Search System Propery", JOptionPane.ERROR_MESSAGE);
@@ -158,7 +158,7 @@ public class SystemPropertySetup extends javax.swing.JPanel implements KeyListen
         } else {
             systemProperty = new SystemProperty();
             SystemPropertyKey spKey = new SystemPropertyKey();
-            spKey.setCompCode(Global.compId);
+            spKey.setCompCode(Global.compCode);
             spKey.setPropKey(key);
             systemProperty.setKey(spKey);
             systemProperty.setPropValue(value);

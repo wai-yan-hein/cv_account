@@ -54,7 +54,7 @@ public class RegionFilterTableModel extends AbstractTableModel {
         Region region = listRegion.get(rowIndex);
         switch (columnIndex) {
             case 0:
-                return region.getRegId();
+                return region.getUserCode();
             case 1:
                 return region.getRegionName();
             default:
@@ -71,14 +71,16 @@ public class RegionFilterTableModel extends AbstractTableModel {
                     case 0:
                         if (aValue instanceof Region) {
                             Region s = (Region) aValue;
-                            region.setRegId(s.getRegId());
+                            region.setUserCode(s.getUserCode());
+                            region.setRegCode(s.getRegCode());
                             region.setRegionName(s.getRegionName());
                         }
                         break;
                     case 1:
                         if (aValue instanceof Region) {
                             Region s = (Region) aValue;
-                            region.setRegId(s.getRegId());
+                            region.setUserCode(s.getUserCode());
+                            region.setRegCode(s.getRegCode());
                             region.setRegionName(s.getRegionName());
                         }
                         break;
@@ -125,7 +127,7 @@ public class RegionFilterTableModel extends AbstractTableModel {
         boolean status = false;
         if (!listRegion.isEmpty()) {
             Region s = listRegion.get(listRegion.size() - 1);
-            if (s.getRegId() != null) {
+            if (s.getRegCode() != null) {
                 status = true;
             }
         } else {
@@ -145,7 +147,7 @@ public class RegionFilterTableModel extends AbstractTableModel {
     public void delete(int row) {
         if (listRegion != null) {
             Region region = listRegion.get(row);
-            if (region.getRegId() != null) {
+            if (region.getRegCode() != null) {
                 listRegion.remove(row);
                 fireTableRowsDeleted(row, row);
                 table.setRowSelectionInterval(0, 0);

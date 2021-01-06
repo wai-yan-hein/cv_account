@@ -6,7 +6,7 @@
 package com.cv.inv.entry.common;
 
 import com.cv.accountswing.common.Global;
-import com.cv.accountswing.util.NumberUtil;
+import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.RelationKey;
 import com.cv.inv.entity.RetOutHisDetail;
@@ -14,6 +14,7 @@ import com.cv.inv.entity.Stock;
 import com.cv.inv.entity.StockUnit;
 import com.cv.inv.entity.UnitRelation;
 import com.cv.inv.service.RelationService;
+import java.awt.HeadlessException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
@@ -31,13 +32,22 @@ import org.springframework.stereotype.Component;
 @Component
 public class ReturnOutTableModel extends AbstractTableModel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ReturnOutTableModel.class);
+    private static final Logger log = LoggerFactory.getLogger(ReturnOutTableModel.class);
     private String[] columnNames = {"Code", "Description", "Exp-Date",
         "Qty", "Std-W", "Unit", "Price", "Amount"};
     private JTable parent;
     private List<RetOutHisDetail> listDetail;
     private String deletedList;
-    private List<String> delList = new ArrayList();
+    private final List<String> delList = new ArrayList();
+    private SelectionObserver observer;
+
+    public SelectionObserver getObserver() {
+        return observer;
+    }
+
+    public void setObserver(SelectionObserver observer) {
+        this.observer = observer;
+    }
 
     @Autowired
     private RelationService relationService;
@@ -53,7 +63,7 @@ public class ReturnOutTableModel extends AbstractTableModel {
 
     @Override
     public boolean isCellEditable(int row, int column) {
-        return !(column == 1 || column == 2 || column == 7);
+        return !(column == 4 || column == 5);
     }
 
     @Override
@@ -64,6 +74,7 @@ public class ReturnOutTableModel extends AbstractTableModel {
         return listDetail.size();
     }
 
+    @Override
     public String getColumnName(int column) {
         return columnNames[column];
     }
@@ -71,24 +82,16 @@ public class ReturnOutTableModel extends AbstractTableModel {
     @Override
     public Class getColumnClass(int column) {
         switch (column) {
-            case 0: //Code
-                return String.class;
-            case 1: //Description
-                return String.class;
-            case 2: //Expire-Date
-                return String.class;
             case 3: //Qty
                 return Float.class;
             case 4: //Std-Wt
                 return Float.class;
-            case 5: //Unit
-                return Object.class;
             case 6: //Price
-                return Double.class;
+                return Float.class;
             case 7: //Amt
-                return Double.class;
+                return Float.class;
             default:
-                return Object.class;
+                return String.class;
         }
 
     }
@@ -183,7 +186,6 @@ public class ReturnOutTableModel extends AbstractTableModel {
         if (listDetail.isEmpty()) {
             return;
         }
-        boolean isAmount = false;
         try {
             RetOutHisDetail record = listDetail.get(row);
 
@@ -194,9 +196,9 @@ public class ReturnOutTableModel extends AbstractTableModel {
                             Stock stock = (Stock) value;
                             record.setStock(stock);
                             record.setQty(1.0f);
-                            record.setPrice(Util1.getDouble(stock.getPurPrice()));
-                            record.setStdWt(stock.getPurPriceMeasure());
-                            record.setStockUnit(stock.getPurPriceUnit());
+                            record.setPrice(Util1.getFloat(stock.getPurPrice()));
+                            record.setStdWt(stock.getPurWeight());
+                            record.setStockUnit(stock.getPurUnit());
                             addNewRow();
                             parent.setColumnSelectionInterval(3, 3);
                         }
@@ -216,7 +218,7 @@ public class ReturnOutTableModel extends AbstractTableModel {
                     break;
                 case 3://Qty
                     if (value != null) {
-                        Float qty = NumberUtil.NZeroFloat(value);
+                        float qty = Util1.getFloat(value);
                         if (qty <= 0) {
                             JOptionPane.showMessageDialog(Global.parentForm, "Qty must be positive value.",
                                     "Minus or zero qty.", JOptionPane.ERROR_MESSAGE);
@@ -225,16 +227,11 @@ public class ReturnOutTableModel extends AbstractTableModel {
                             record.setQty(qty);
                         }
                     }
-                    parent.setColumnSelectionInterval(3, 3);
+                    parent.setColumnSelectionInterval(6, 6);
                     break;
                 case 4://Std-w
-                    if (NumberUtil.isNumber(value)) {
+                    if (Util1.isNumber(value.toString())) {
                         record.setStdWt(Util1.getFloat(value));
-                        //calculation with unit
-                        String toUnit = record.getStockUnit().getItemUnitCode();
-                        Float calAmount = calPrice(record, toUnit);
-                        //  record.setPrice(Util1.getDouble(calAmount));
-                        record.setAmount(Util1.getDouble(calAmount));
                         parent.setColumnSelectionInterval(4, 4);
                     }
                     break;
@@ -243,9 +240,6 @@ public class ReturnOutTableModel extends AbstractTableModel {
                         if (value instanceof StockUnit) {
                             StockUnit st = (StockUnit) value;
                             record.setStockUnit(st);
-                            String toUnit = record.getStockUnit().getItemUnitCode();
-                            Float calAmount = calPrice(record, toUnit);
-                            record.setPrice(Util1.getDouble(calAmount));
                             parent.setColumnSelectionInterval(5, 5);
                         }
                     }
@@ -253,7 +247,7 @@ public class ReturnOutTableModel extends AbstractTableModel {
                 case 6://Price
 
                     if (value != null) {
-                        Double price = NumberUtil.NZero(value);
+                        float price = Util1.getFloat(value);
                         if (price <= 0) {
                             JOptionPane.showMessageDialog(Global.parentForm, "Price must be positive value.",
                                     "Minus or zero qty.", JOptionPane.ERROR_MESSAGE);
@@ -269,42 +263,31 @@ public class ReturnOutTableModel extends AbstractTableModel {
                     break;
                 case 7://Amount
                     if (value != null) {
-                        record.setAmount(Util1.getDouble(value));
-                        isAmount = true;
+                        record.setAmount(Util1.getFloat(value));
                     }
                     break;
 
             }
-            if (!isAmount) {
-                calAmt(record);
-                fireTableCellUpdated(row, 8);
-            }
-
-        } catch (Exception ex) {
-            LOGGER.error("setValueAt : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
+            calAmt(record);
+            fireTableRowsUpdated(row, row);
+            observer.selected("CAL-TOTAL", "CAL-TOTAL");
+        } catch (HeadlessException ex) {
+            log.error("setValueAt : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
 
         }
-        fireTableRowsUpdated(row, column);
     }
 
-    private void calAmt(RetOutHisDetail retOutDetailHis) {
-//        Double amt = retOutDetailHis.getQty() * Double.parseDouble(retOutDetailHis.getStdWt().toString());
-//        retOutDetailHis.setAmount(amt);
-        if (retOutDetailHis.getStock() != null) {
-            float saleQty = retOutDetailHis.getQty();
-            double stdSalePrice = retOutDetailHis.getPrice();
-            float calAmount = Util1.getFloat(retOutDetailHis.getAmount());
-            float userWt = retOutDetailHis.getStdWt();
-            //   retOutDetailHis.setSmallestWT(getSmallestUnit(userWt, retOutDetailHis.getItemUnit().getItemUnitCode()));
-            //      retOutDetailHis.set("oz");
-
-            if (calAmount != 0) {
-                double amount = saleQty * calAmount;
-                retOutDetailHis.setAmount(amount);
-            } else {
-                double amount = saleQty * stdSalePrice;
-                retOutDetailHis.setAmount(amount);
-            }
+    private void calAmt(RetOutHisDetail rOut) {
+        float amt;
+        if (rOut.getStock() != null) {
+            float stdWt = Util1.getFloat(rOut.getStdWt());
+            String fromUnit = rOut.getStockUnit().getItemUnitCode();
+            String toUnit = rOut.getStock().getPurUnit().getItemUnitCode();
+            String pattern = rOut.getStock().getPattern().getPatternCode();
+            rOut.setSmallWeight(getSmallestWeight(stdWt, fromUnit, toUnit, pattern));
+            rOut.setSmallUnit(rOut.getStock().getPurUnit());
+            amt = Util1.getFloat(rOut.getQty()) * Util1.getFloat(rOut.getPrice());
+            rOut.setAmount(amt);
         }
     }
 
@@ -322,23 +305,44 @@ public class ReturnOutTableModel extends AbstractTableModel {
         return status;
     }
 
+    private Float getSmallestWeight(Float weight, String fromUnit, String toUnit, String pattern) {
+        float sWt = 0.0f;
+        if (!fromUnit.equals(toUnit)) {
+            RelationKey key = new RelationKey(fromUnit, toUnit, pattern);
+            Float factor = Global.hmRelation.get(key);
+            if (factor != null) {
+                sWt = factor * weight;
+            } else {
+                key = new RelationKey(toUnit, fromUnit, pattern);
+                factor = Global.hmRelation.get(key);
+                if (factor != null) {
+                    sWt = weight / factor;
+                } else {
+                    JOptionPane.showMessageDialog(Global.parentForm, String.format("Need Relation  %s with Smallest Unit", toUnit));
+                    listDetail.remove(parent.getSelectedRow());
+                }
+            }
+        } else {
+            sWt = weight;
+        }
+        return sWt;
+    }
+
     public void addEmptyRow() {
         if (listDetail != null) {
             RetOutHisDetail record = new RetOutHisDetail();
-            record.setUniqueId(listDetail.size() + 1);
+            record.setStock(new Stock());
             listDetail.add(record);
             fireTableRowsInserted(listDetail.size() - 1, listDetail.size() - 1);
-            parent.scrollRectToVisible(parent.getCellRect(parent.getRowCount() - 1, 0, true));
         }
     }
 
     public void addNewRow() {
         if (hasEmptyRow()) {
             RetOutHisDetail detailHis = new RetOutHisDetail();
-            detailHis.setUniqueId(listDetail.size() + 1);
+            detailHis.setStock(new Stock());
             listDetail.add(detailHis);
             fireTableRowsInserted(listDetail.size() - 1, listDetail.size() - 1);
-            parent.scrollRectToVisible(parent.getCellRect(parent.getRowCount() - 1, 0, true));
         }
 
     }
@@ -358,9 +362,9 @@ public class ReturnOutTableModel extends AbstractTableModel {
         float stdPurPrice = stock.getPurPrice();
         float stdPrice = stock.getPurPrice();
         float userWt = pd.getStdWt();
-        float stdWt = stock.getSaleMeasure();
-        String fromUnit = stock.getPurPriceUnit().getItemUnitCode();
-        Integer pattern = stock.getPattern().getPatternId();
+        float stdWt = stock.getSaleWeight();
+        String fromUnit = stock.getPurUnit().getItemUnitCode();
+        String pattern = stock.getPattern().getPatternCode();
 
         if (!fromUnit.equals(toUnit)) {
             RelationKey key = new RelationKey(fromUnit, toUnit, pattern);
@@ -440,16 +444,25 @@ public class ReturnOutTableModel extends AbstractTableModel {
         return delList;
     }
 
-    public List<RetOutHisDetail> getListRetInDetail() {
-        List<RetOutHisDetail> listRetInDetailhis = new ArrayList();
-        for (RetOutHisDetail pdh2 : listDetail) {
-            if (pdh2.getStock() != null) {
-                if (pdh2.getStock().getStockCode() != null) {
-                    listRetInDetailhis.add(pdh2);
+    public boolean isValidEntry() {
+        boolean status = true;
+        for (RetOutHisDetail retOut : listDetail) {
+            if (retOut.getStock().getStockCode() != null) {
+                if (Util1.getFloat(retOut.getAmount()) <= 0) {
+                    status = false;
+                    JOptionPane.showMessageDialog(Global.parentForm, "Could not saved because Return In amount can't not be zero");
                 }
             }
-        }
 
+        }
+        return status;
+    }
+
+    public List<RetOutHisDetail> getListRetInDetail() {
+        List<RetOutHisDetail> listRetInDetailhis = new ArrayList();
+        listDetail.stream().filter(pdh2 -> (pdh2.getStock() != null)).filter(pdh2 -> (pdh2.getStock().getStockCode() != null)).forEachOrdered(pdh2 -> {
+            listRetInDetailhis.add(pdh2);
+        });
         return listRetInDetailhis;
     }
 }

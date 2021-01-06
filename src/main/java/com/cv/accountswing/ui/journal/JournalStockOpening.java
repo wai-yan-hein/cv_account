@@ -11,18 +11,13 @@ import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.ChartOfAccount;
-import com.cv.accountswing.entity.Currency;
 import com.cv.accountswing.entity.CurrencyKey;
 import com.cv.accountswing.entity.Department;
 import com.cv.accountswing.entity.StockOpValue;
-import com.cv.accountswing.entity.SystemProperty;
-import com.cv.accountswing.entity.SystemPropertyKey;
 import com.cv.accountswing.entity.view.VStockOpValue;
 import com.cv.accountswing.service.COAService;
-import com.cv.accountswing.service.CurrencyService;
 import com.cv.accountswing.service.DepartmentService;
 import com.cv.accountswing.service.StockOpValueService;
-import com.cv.accountswing.service.SystemPropertyService;
 import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
@@ -130,7 +125,7 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
         taskExecutor.execute(() -> {
             List<VStockOpValue> listOp = sovService.search(stDate, enDate,
                     Util1.isNull(coaCode, "-"), Util1.isNull(currency, "-"),
-                    Util1.isNull(depId, "-"), Global.compId.toString());
+                    Util1.isNull(depId, "-"), Global.compCode);
             //List<VStockOpValue> listOPValue = (List<VStockOpValue>) (List<?>) listOp;
             journalStockOpeningTableModel.setListStockOpening(listOp);
             loadingObserver.load(this.getName(), "Stop");
@@ -179,19 +174,19 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
 
     private void getNewStockOpValue() {
         if (isValidEntry()) {
-            String userId = Global.loginUser.getUserId().toString();
+            String userId = Global.loginUser.getUserCode();
             String[] coaIds = Global.sysProperties.get("system.stockop.parentid").split(",");
             CurrencyKey curKey = new CurrencyKey();
             curKey.setCode(currency);
-            curKey.setCompCode(Global.compId);
+            curKey.setCompCode(Global.compCode);
             Department oDept = deptService.findById(depId);
             List<VStockOpValue> listVSO = new ArrayList();
             for (String tmpId : coaIds) {
-                List<ChartOfAccount> listCOA = coaService.getAllChild(tmpId, Global.compId.toString());
+                List<ChartOfAccount> listCOA = coaService.getAllChild(tmpId, Global.compCode);
                 listCOA.stream().map(coa -> {
                     VStockOpValue tmpVSOV = new VStockOpValue();
                     tmpVSOV.getKey().setCoaCode(coa.getCode());
-                    tmpVSOV.getKey().setCompId(Global.compId);
+                    tmpVSOV.getKey().setCompCode(Global.compCode);
                     tmpVSOV.getKey().setCurrency(currency);
                     tmpVSOV.getKey().setDeptCode(depId);
                     tmpVSOV.setCoaCodeUsr(coa.getCoaCodeUsr());

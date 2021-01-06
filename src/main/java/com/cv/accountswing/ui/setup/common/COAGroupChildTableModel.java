@@ -31,7 +31,7 @@ public class COAGroupChildTableModel extends AbstractTableModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(COAGroupChildTableModel.class);
     private List<ChartOfAccount> listCOA = new ArrayList();
     String status = "NEW";
-    //String  userId=Global.loginUser.getUserId().toString();
+    //String  userId=Global.loginUser.getUserCode();
     String[] columnNames = {"System Code", "User Code", "Name", "Active"};
     private JTable parent;
     @Autowired
@@ -143,9 +143,9 @@ public class COAGroupChildTableModel extends AbstractTableModel {
 
     private void save(ChartOfAccount coa, int row) {
         coa.setParent(coaGroupCode);
-        coa.setCompCode(Global.compId);
+        coa.setCompCode(Global.compCode);
         coa.setActive(Boolean.TRUE);
-        if (isValidCOA(coa, Global.compId.toString(), Global.loginUser.getUserId().toString())) {
+        if (isValidCOA(coa, Global.compCode, Global.loginUser.getUserCode())) {
             ChartOfAccount save = coaService.save(coa);
             if (save.getCode() != null) {
                 addEmptyRow();
@@ -235,7 +235,7 @@ public class COAGroupChildTableModel extends AbstractTableModel {
                             JOptionPane.showMessageDialog(Global.parentForm, "Duplicate Account Code");
                         }
                     }
-                    coa.setCompCode(Integer.parseInt(compCode));
+                    coa.setCompCode(compCode);
                     coa.setCreatedBy(userId);
                     coa.setCreatedDate(Util1.getTodayDate());
                     coa.setActive(true);

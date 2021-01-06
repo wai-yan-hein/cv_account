@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DespTableModel extends AbstractTableModel {
 
-    private static final Logger log = LoggerFactory.getLogger(TraderTableModel.class);
+    private static final Logger log = LoggerFactory.getLogger(DespTableModel.class);
     private List<VDescription> listAutoText = new ArrayList<>();
     private final String[] columnNames = {"Description"};
 

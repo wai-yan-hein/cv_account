@@ -125,7 +125,7 @@ public class Journal extends javax.swing.JPanel implements KeyListener, Selectio
                 String vouNo = txtVouNo.getText();
                 String refrence = txtRefrence.getText();
                 List<VGeneralVoucher> listGV = vGvService.search(fromDate, toDate, Util1.isNull(vouNo, "-"),
-                        Util1.isNull(refrence, "-"), Global.compId.toString(),
+                        Util1.isNull(refrence, "-"), Global.compCode,
                         "-");
                 journalTableModel.setListGV(listGV);
                 loadingObserver.load(this.getName(), "Stop");

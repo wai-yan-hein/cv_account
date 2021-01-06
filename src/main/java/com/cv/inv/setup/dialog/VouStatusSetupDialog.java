@@ -43,7 +43,7 @@ public class VouStatusSetupDialog extends javax.swing.JDialog implements KeyList
     @Autowired
     private VouStatusService vouService;
     private int selectRow = - 1;
-    private VouStatus vouStatus;
+    private VouStatus vouStatus = new VouStatus();
     private TableRowSorter<TableModel> sorter;
     private StartWithRowFilter swrf;
 
@@ -80,7 +80,9 @@ public class VouStatusSetupDialog extends javax.swing.JDialog implements KeyList
 
     }
 
-    private void setVouStatus(VouStatus vouStatus) {
+    private void setVouStatus(VouStatus vouS) {
+        vouStatus = vouS;
+        txtCode.setText(vouStatus.getUserCode());
         txtName.setText(vouStatus.getStatusDesp());
         lblStatus.setText("EDIT");
     }
@@ -94,8 +96,15 @@ public class VouStatusSetupDialog extends javax.swing.JDialog implements KeyList
                     "Code length", JOptionPane.ERROR_MESSAGE);
             txtName.requestFocusInWindow();
         } else {
-            vouStatus = new VouStatus();
-            vouStatus.setStatusDesp(txtName.getText());
+            if (lblStatus.getText().equals("NEW")) {
+                vouStatus.setUserCode(txtCode.getText());
+                vouStatus.setStatusDesp(txtName.getText());
+                vouStatus.setCreatedBy(Global.loginUser);
+                vouStatus.setCreatedDate(Util1.getTodayDate());
+                vouStatus.setCompCode(Global.compCode);
+            } else {
+                vouStatus.setUpdatedBy(Global.loginUser);
+            }
         }
 
         return status;
@@ -105,7 +114,7 @@ public class VouStatusSetupDialog extends javax.swing.JDialog implements KeyList
         if (isValidEntry()) {
             VouStatus saveVou = vouService.save(vouStatus);
             if (saveVou != null) {
-                LOGGER.info("VOUSTATUS ID :" + saveVou.getVouStatusId());
+                LOGGER.info("VOUSTATUS ID :" + saveVou.getVouStatusCode());
                 JOptionPane.showMessageDialog(Global.parentForm, "Saved");
 
                 if (lblStatus.getText().equals("NEW")) {
@@ -120,7 +129,9 @@ public class VouStatusSetupDialog extends javax.swing.JDialog implements KeyList
     }
 
     private void clear() {
+        txtCode.setText(null);
         txtName.setText(null);
+        vouStatus = new VouStatus();
         vouStatusTableModel.refresh();
         lblStatus.setText("NEW");
     }
@@ -131,7 +142,7 @@ public class VouStatusSetupDialog extends javax.swing.JDialog implements KeyList
 
     private void delete() {
         VouStatus vou = vouStatusTableModel.getVouStatus(selectRow);
-        int delete = vouService.delete(vou.getVouStatusId().toString());
+        int delete = vouService.delete(vou.getVouStatusCode());
         if (delete == 1) {
             JOptionPane.showMessageDialog(Global.parentForm, "Deleted");
             vouStatusTableModel.deleteVouStatus(selectRow);
@@ -185,6 +196,8 @@ public class VouStatusSetupDialog extends javax.swing.JDialog implements KeyList
         btnClear = new javax.swing.JButton();
         btnDelete = new javax.swing.JButton();
         btnSave = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
+        txtCode = new javax.swing.JTextField();
 
         jButton3.setText("jButton3");
 
@@ -259,6 +272,12 @@ public class VouStatusSetupDialog extends javax.swing.JDialog implements KeyList
             }
         });
 
+        jLabel2.setFont(Global.lableFont);
+        jLabel2.setText("Code");
+
+        txtCode.setFont(Global.textFont);
+        txtCode.setName("txtName"); // NOI18N
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -267,7 +286,8 @@ public class VouStatusSetupDialog extends javax.swing.JDialog implements KeyList
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblStatus))
+                    .addComponent(lblStatus)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(txtName)
@@ -277,13 +297,18 @@ public class VouStatusSetupDialog extends javax.swing.JDialog implements KeyList
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnDelete)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnClear)))
+                        .addComponent(btnClear))
+                    .addComponent(txtCode))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(txtCode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -366,10 +391,12 @@ public class VouStatusSetupDialog extends javax.swing.JDialog implements KeyList
     private javax.swing.JButton btnSave;
     private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblStatus;
     private javax.swing.JTable tblVouStatus;
+    private javax.swing.JTextField txtCode;
     private javax.swing.JTextField txtFilter;
     private javax.swing.JTextField txtName;
     // End of variables declaration//GEN-END:variables

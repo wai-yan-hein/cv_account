@@ -8,6 +8,7 @@ package com.cv.inv.setup.dialog;
 import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
+import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.ChargeType;
 import com.cv.inv.service.ChargeTypeService;
 import com.cv.inv.setup.dialog.common.ChargeTypeTableModel;
@@ -38,7 +39,7 @@ public class ChargeTypeSetupDialog extends javax.swing.JDialog implements KeyLis
     @Autowired
     private ChargeTypeService typeService;
     private int selectRow = - 1;
-    private ChargeType chargeType;
+    private ChargeType chargeType = new ChargeType();
 
     public ChargeTypeSetupDialog() {
         super(Global.parentForm, true);
@@ -73,8 +74,10 @@ public class ChargeTypeSetupDialog extends javax.swing.JDialog implements KeyLis
 
     }
 
-    private void setChargeType(ChargeType chargeType) {
+    private void setChargeType(ChargeType ch) {
+        chargeType = ch;
         txtChargeType.setText(chargeType.getChargeTypeDesp());
+        txtCode.setText(chargeType.getUserCode());
         lblStatus.setText("EDIT");
     }
 
@@ -83,8 +86,10 @@ public class ChargeTypeSetupDialog extends javax.swing.JDialog implements KeyLis
     }
 
     private void clear() {
+        txtCode.setText(null);
         txtChargeType.setText(null);
         lblStatus.setText("NEW");
+        chargeType = new ChargeType();
     }
 
     private void save() {
@@ -108,17 +113,24 @@ public class ChargeTypeSetupDialog extends javax.swing.JDialog implements KeyLis
         if (txtChargeType.getText().isEmpty()) {
             status = false;
             JOptionPane.showMessageDialog(Global.parentForm, "Charge Type Description cannot be blank.");
-            txtChargeType.requestFocusInWindow();
+            txtChargeType.requestFocus();
         } else {
-            chargeType = new ChargeType();
-            chargeType.setChargeTypeDesp(txtChargeType.getText());
+            if (lblStatus.getText().equals("NEW")) {
+                chargeType.setUserCode(txtCode.getText());
+                chargeType.setChargeTypeDesp(txtChargeType.getText());
+                chargeType.setCompCode(Global.compCode);
+                chargeType.setCreatedBy(Global.loginUser);
+                chargeType.setCreatedDate(Util1.getTodayDate());
+            } else {
+                chargeType.setUpdatedBy(Global.loginUser);
+            }
         }
         return status;
     }
 
     private void delete() {
         ChargeType charge = typeTableModel.getChargerType(selectRow);
-        int delete = typeService.delete(charge.getChargeTypeId().toString());
+        int delete = typeService.delete(charge.getChargeTypeCode());
         if (delete == 1) {
             JOptionPane.showMessageDialog(Global.parentForm, "Deleted");
             typeTableModel.deleteChargeType(selectRow);
@@ -154,19 +166,22 @@ public class ChargeTypeSetupDialog extends javax.swing.JDialog implements KeyLis
         btnDelete = new javax.swing.JButton();
         btnSave = new javax.swing.JButton();
         lblStatus = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        txtCode = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Charge Type Setup");
 
+        tblChargeType.setFont(Global.textFont);
         tblChargeType.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {},
+                {},
+                {},
+                {}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+
             }
         ));
         jScrollPane1.setViewportView(tblChargeType);
@@ -214,6 +229,11 @@ public class ChargeTypeSetupDialog extends javax.swing.JDialog implements KeyLis
 
         lblStatus.setText("NEW");
 
+        jLabel2.setFont(Global.lableFont);
+        jLabel2.setText("Code");
+
+        txtCode.setName("txtChargeType"); // NOI18N
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -222,23 +242,31 @@ public class ChargeTypeSetupDialog extends javax.swing.JDialog implements KeyLis
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addGap(18, 18, 18)
-                        .addComponent(txtChargeType))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addComponent(lblStatus)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 40, Short.MAX_VALUE)
                         .addComponent(btnSave)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnDelete)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnClear)))
+                        .addComponent(btnClear))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtCode)
+                            .addComponent(txtChargeType))))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(txtCode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(txtChargeType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -248,7 +276,7 @@ public class ChargeTypeSetupDialog extends javax.swing.JDialog implements KeyLis
                     .addComponent(btnDelete)
                     .addComponent(btnSave)
                     .addComponent(lblStatus))
-                .addContainerGap(309, Short.MAX_VALUE))
+                .addContainerGap(275, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -301,12 +329,14 @@ public class ChargeTypeSetupDialog extends javax.swing.JDialog implements KeyLis
     private javax.swing.JButton btnDelete;
     private javax.swing.JButton btnSave;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JLabel lblStatus;
     private javax.swing.JTable tblChargeType;
     private javax.swing.JTextField txtChargeType;
+    private javax.swing.JTextField txtCode;
     // End of variables declaration//GEN-END:variables
 
     @Override

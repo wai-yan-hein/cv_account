@@ -89,13 +89,13 @@ public class BalanceSheet extends javax.swing.JPanel implements SelectionObserve
         currency = currencyAutoCompleter.getCurrency().getKey().getCode();
         taskExecutor.execute(() -> {
             try {
-                String userId = Global.loginUser.getUserId().toString();
-                CompanyInfo ci = ciService.findById(Global.compId);
+                String userId = Global.loginUser.getUserCode();
+                CompanyInfo ci = ciService.findById(Global.compCode);
                 String from = Global.finicialPeriodFrom;
-                rService.genBalanceSheet(from, enDate, depId, userId, Global.compId.toString(), currency);
+                rService.genBalanceSheet(from, enDate, depId, userId, Global.compCode, currency);
 
                 SystemPropertyKey key = new SystemPropertyKey();
-                key.setCompCode(Global.compId);
+                key.setCompCode(Global.compCode);
                 key.setPropKey("system.report.path");
                 SystemProperty sp = spService.findById(key);
                 String fileName = userId + "_Ledger_Report.pdf";
@@ -105,14 +105,14 @@ public class BalanceSheet extends javax.swing.JPanel implements SelectionObserve
 
                 reportPath = reportPath + "LedgerReport";
                 key = new SystemPropertyKey();
-                key.setCompCode(Global.compId);
+                key.setCompCode(Global.compCode);
                 key.setPropKey("system.font.path");
                 sp = spService.findById(key);
                 String fontPath = sp.getPropValue();
 
                 Map<String, Object> parameters = new HashMap();
                 parameters.put("p_company_name", ci.getName());
-                parameters.put("p_comp_id", Global.compId.toString());
+                parameters.put("p_comp_id", Global.compCode);
                 parameters.put("p_report_info", from
                         + " to " + enDate);
                 parameters.put("p_from", from);
@@ -131,11 +131,11 @@ public class BalanceSheet extends javax.swing.JPanel implements SelectionObserve
     private void printBalSheet() {
         loadingObserver.load(this.getName(), "Start");
         taskExecutor.execute(() -> {
-            String userId = Global.loginUser.getUserId().toString();
+            String userId = Global.loginUser.getUserCode();
             try {
-                CompanyInfo ci = ciService.findById(Global.compId);
+                CompanyInfo ci = ciService.findById(Global.compCode);
                 SystemPropertyKey key = new SystemPropertyKey();
-                key.setCompCode(Global.compId);
+                key.setCompCode(Global.compCode);
                 key.setPropKey("system.report.path");
                 SystemProperty sp = spService.findById(key);
                 String fileName = userId + "_profit_lost.pdf";
@@ -145,19 +145,19 @@ public class BalanceSheet extends javax.swing.JPanel implements SelectionObserve
 
                 reportPath = reportPath + "ProfitAndLost";
                 key = new SystemPropertyKey();
-                key.setCompCode(Global.compId);
+                key.setCompCode(Global.compCode);
                 key.setPropKey("system.font.path");
                 sp = spService.findById(key);
                 String fontPath = sp.getPropValue();
 
                 //Need to calculate sub todal
-                ProfitAndLostRetObj obj = rService.getPLCalculateValue(userId, Global.compId.toString());
+                ProfitAndLostRetObj obj = rService.getPLCalculateValue(userId, Global.compCode);
                 LOGGER.info("cost of sale : " + obj.getCostOfSale());
                 //==================================================================
 
                 Map<String, Object> parameters = new HashMap();
                 parameters.put("p_company_name", ci.getName());
-                parameters.put("p_comp_id", Global.compId.toString());
+                parameters.put("p_comp_id", Global.compCode);
                 parameters.put("SUBREPORT_DIR", reportPath1);
                 parameters.put("p_user_id", userId);
                 parameters.put("gross_profit", obj.getGrossProfit());

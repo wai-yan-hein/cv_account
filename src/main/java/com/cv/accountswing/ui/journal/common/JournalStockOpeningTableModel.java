@@ -13,7 +13,6 @@ import com.cv.accountswing.entity.StockOpValue;
 import com.cv.accountswing.entity.view.VStockOpValue;
 import com.cv.accountswing.service.StockOpValueService;
 import com.cv.accountswing.util.Util1;
-import com.cv.inv.entity.Stock;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
@@ -145,7 +144,7 @@ public class JournalStockOpeningTableModel extends AbstractTableModel {
     private void save(VStockOpValue op) {
         try {
             StockOpValue stockOp = gson.fromJson(gson.toJson(op), StockOpValue.class);
-            opValueService.save(stockOp, Global.loginUser.getUserId().toString());
+            opValueService.save(stockOp, Global.loginUser.getUserCode());
         } catch (JsonSyntaxException e) {
             LOGGER.error("Save Stock Opening :" + e.getMessage());
         }
@@ -206,7 +205,7 @@ public class JournalStockOpeningTableModel extends AbstractTableModel {
     }
     
     public void saveGV(VStockOpValue op, String status) {
-        //if (isValidCOA(op, Global.compId.toString(), Global.loginUser.getUserId().toString(), status)) {
+        //if (isValidCOA(op, Global.compCode, Global.loginUser.getUserCode(), status)) {
         // coaService.save(op);
         if (status.equals("NEW")) {
             listStockOpening.add(new VStockOpValue());

@@ -124,11 +124,11 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
     }
 
     private void createTreeNode(String parentMenuID, DefaultMutableTreeNode treeRoot) {
-        List<Region> regions = regionService.search("-", "-", Global.compId.toString(), parentMenuID);
+        List<Region> regions = regionService.search("-", "-", Global.compCode, parentMenuID);
         regions.forEach(region -> {
             DefaultMutableTreeNode regRoot = new DefaultMutableTreeNode(region);
             treeRoot.add(regRoot);
-            createTreeNode(region.getRegId().toString(), regRoot);
+            createTreeNode(region.getRegCode().toString(), regRoot);
 
             /*if (!child.getCode().isEmpty()) {
             }*/
@@ -137,7 +137,7 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
     }
 
     private void setRegion(Region region) {
-        txtRegionCode.setText(Util1.getString(region.getRegId()));
+        txtRegionCode.setText(Util1.getString(region.getRegCode()));
         txtRegionName.setText(region.getRegionName());
         txtRegionName.selectAll();
         labelStatus.setText("EDIT");
@@ -178,8 +178,8 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
         Region reg = (Region) selectedNode.getUserObject();
         int showConfirmDialog = JOptionPane.showConfirmDialog(Global.parentForm, "Are you sure to delete");
         if (showConfirmDialog == JOptionPane.OK_OPTION) {
-            if (reg.getRegId() != null) {
-                int delete = regionService.delete(reg.getRegId().toString(), Global.compId.toString());
+            if (reg.getRegCode() != null) {
+                int delete = regionService.delete(reg.getRegCode().toString(), Global.compCode);
                 if (delete == 1) {
                     clear();
                     status = true;
@@ -205,11 +205,11 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
 
     private void saveRegion() {
         Region reg = new Region();
-        reg.setRegionCode(txtRegionCode.getText());
+        reg.setRegCode(txtRegionCode.getText());
         reg.setRegionName(txtRegionName.getText());
-        reg.setCompId(Global.compId);
+        reg.setCompCode(Global.compCode);
 
-        if (isValidRegion(reg, Global.loginUser.getUserId().toString(), Global.compId, labelStatus.getText())) {
+        if (isValidRegion(reg, Global.compCode)) {
             Region region = regionService.save(reg);
             if (region != null) {
                 JOptionPane.showMessageDialog(Global.parentForm, "Saved");
@@ -224,20 +224,19 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
 
     }
 
-    private boolean isValidRegion(Region region,
-            String userId, Integer compCode, String editStatus) {
+    private boolean isValidRegion(Region region, String compCode) {
         boolean status = true;
 
         if (Util1.isNull(region.getRegionName(), "-").equals("-")) {
             status = false;
             JOptionPane.showMessageDialog(Global.parentForm, "Region can't be blank.");
         } else {
-            if (region.getRegionCode().isEmpty()) {
+            if (region.getRegCode().isEmpty()) {
                 //region.setDeptCode(getDeptCode(compCode));
-                region.setCreatedBy(userId);
-                region.setCreatedDt(Util1.getTodayDate());
+                region.setCreatedBy(Global.loginUser);
+                region.setCreatedDate(Util1.getTodayDate());
             } else {
-                List<Region> listDept = regionService.search(region.getRegionCode(), "-", compCode.toString(), "-");
+                List<Region> listDept = regionService.search(region.getRegCode(), "-", compCode.toString(), "-");
                 if (listDept != null) {
                     if (listDept.size() > 0) {
                         status = false;
@@ -246,15 +245,14 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
                     }
                 }
             }
-            region.setUpdatedBy(userId);
-            region.setUpdatedDt(Util1.getTodayDate());
+            region.setUpdatedBy(Global.loginUser);
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) selectedNode.getParent();
             Object userObject = node.getUserObject();
             if (userObject.toString().equals(parentRootName)) {
-                region.setParentRegion(0);
+                region.setParentRegion("0");
             } else {
                 Region reg = (Region) userObject;
-                region.setParentRegion(reg.getRegId());
+                region.setParentRegion(reg.getRegCode());
             }
 
         }

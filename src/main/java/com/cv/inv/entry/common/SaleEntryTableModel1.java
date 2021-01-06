@@ -240,7 +240,7 @@ public class SaleEntryTableModel1 extends AbstractTableModel {
                         Stock stock = (Stock) value;
                         record.setStock(stock);
                         record.setQuantity(1.0f);
-                        record.setStdWeight(stock.getSaleMeasure());
+                        record.setStdWeight(stock.getSaleWeight());
                         record.setItemUnit(stock.getSaleUnit());
                         record.setUniqueId(row + 1);
                         record.setDepartment(department);
@@ -412,7 +412,7 @@ public class SaleEntryTableModel1 extends AbstractTableModel {
         SaleDetailHis1 record = listDetail.get(row);
         record.setStock(stock);
         record.setQuantity(1.0f);
-        record.setStdWeight(stock.getSaleMeasure());
+        record.setStdWeight(stock.getSaleWeight());
         record.setItemUnit(stock.getSaleUnit());
         record.setUniqueId(row + 1);
         //record.setPrice(stock.getSalePriceN());
@@ -466,7 +466,7 @@ public class SaleEntryTableModel1 extends AbstractTableModel {
             float discount = Util1.getFloat(sale.getDiscount());
             float calAmount = Util1.getFloat(sale.getAmount());
             float userWt = sale.getStdWeight();
-            float stdWt = stock.getSaleMeasure();
+            float stdWt = stock.getSaleWeight();
             sale.setSmallestWT(getSmallestUnit(userWt, sale.getItemUnit().getItemUnitCode()));
             sale.setSmallestUnit("oz");
 
@@ -493,7 +493,7 @@ public class SaleEntryTableModel1 extends AbstractTableModel {
         double stdSalePrice = stockUp.getPrice(stockCode, getCusType());
         double stdPrice = stockUp.getPrice(stockCode, getCusType());
         float userWt = sdh.getStdWeight();
-        float stdWt = stock.getSaleMeasure();
+        float stdWt = stock.getSaleWeight();
         String fromUnit = stock.getSaleUnit().getItemUnitCode();
 
         /* if (!fromUnit.equals(toUnit)) {

@@ -12,14 +12,16 @@ import com.cv.accountswing.common.KeyPropagate;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.SelectionObserver;
+import com.cv.accountswing.entity.Customer;
+import com.cv.accountswing.entity.Region;
 import com.cv.accountswing.entity.Trader;
 import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.editor.CurrencyAutoCompleter;
+import com.cv.accountswing.ui.editor.CustomerAutoCompleter;
 import com.cv.accountswing.ui.editor.DepartmentAutoCompleter;
 import com.cv.accountswing.ui.editor.DepartmentCellEditor;
-import com.cv.accountswing.ui.editor.TraderAutoCompleter;
 import com.cv.accountswing.util.NumberUtil;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.Order;
@@ -99,7 +101,7 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
     private OrderSearchDialog orderSearchDialog;
     private VouStatusAutoCompleter vouCompleter;
     private CurrencyAutoCompleter currAutoCompleter;
-    private TraderAutoCompleter traderAutoCompleter;
+    private CustomerAutoCompleter traderAutoCompleter;
     private SaleManAutoCompleter saleManCompleter;
     private LocationAutoCompleter locationAutoCompleter;
     private DepartmentAutoCompleter departmentAutoCompleter;
@@ -110,7 +112,7 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
     private SaleHis saleHis = new SaleHis();
     private boolean isShown = false;
     private String voucherNo = "-";
-    private Integer regionId;
+    private Region region;
     private String orderCode;
 
     public void setLoadingObserver(LoadingObserver loadingObserver) {
@@ -199,7 +201,7 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
 
     private void initCombo() {
         currAutoCompleter = new CurrencyAutoCompleter(txtCurrency, Global.listCurrency, null);
-        traderAutoCompleter = new TraderAutoCompleter(txtCus, Global.listTrader, null);
+        traderAutoCompleter = new CustomerAutoCompleter(txtCus, Global.listCustomer, null);
         traderAutoCompleter.setSelectionObserver(this);
         vouCompleter = new VouStatusAutoCompleter(txtVouStatus, Global.listVou, null);
         saleManCompleter = new SaleManAutoCompleter(txtSaleman, Global.listSaleMan, null);
@@ -274,12 +276,12 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
 
     private void genVouNo() {
         vouEngine = new GenVouNoImpl(voudIdService, "SaleEntry", Util1.getPeriod(txtSaleDate.getDate()));
-        LOGGER.info("Voucher No :" + vouEngine.genVouNo());
         txtVouNo.setText(vouEngine.genVouNo());
     }
 
     private void clear() {
         saleTableModel.removeListDetail();
+        saleTableModel.clearDelList();
         initTextBoxValue();
         assignDefaultValue();
         genVouNo();
@@ -320,22 +322,27 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
             JOptionPane.showMessageDialog(Global.parentForm, "Customer cannot be blank.",
                     "No customer.", JOptionPane.ERROR_MESSAGE);
             status = false;
-            txtCus.requestFocusInWindow();
+            txtCus.requestFocus();
         } else if (vouCompleter.getVouStatus() == null) {
             JOptionPane.showMessageDialog(Global.parentForm, "Choose vou status.",
                     "No vou status.", JOptionPane.ERROR_MESSAGE);
             status = false;
-            txtVouStatus.requestFocusInWindow();
+            txtVouStatus.requestFocus();
         } else if (currAutoCompleter.getCurrency() == null) {
             JOptionPane.showMessageDialog(Global.parentForm, "Choose Currency.",
                     "No Currency.", JOptionPane.ERROR_MESSAGE);
             status = false;
-            txtCurrency.requestFocusInWindow();
+            txtCurrency.requestFocus();
         } else if (locationAutoCompleter.getLocation() == null) {
             JOptionPane.showMessageDialog(Global.parentForm, "Choose Location.",
                     "No Location.", JOptionPane.ERROR_MESSAGE);
             status = false;
-            txtLocation.requestFocusInWindow();
+            txtLocation.requestFocus();
+        } else if (Util1.getFloat(txtVouTotal.getValue()) <= 0) {
+            JOptionPane.showMessageDialog(Global.parentForm, "Invalid Voucher.",
+                    "No Sale Record.", JOptionPane.ERROR_MESSAGE);
+            status = false;
+            txtLocation.requestFocus();
         } else {
             saleHis.setVouNo(txtVouNo.getText());
             saleHis.setCreditTerm(txtDueDate.getDate());
@@ -354,8 +361,7 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
             saleHis.setTraderId(traderAutoCompleter.getTrader());
             saleHis.setAddress(txtAddress.getText());
             saleHis.setOrderCode(orderCode);
-            saleHis.setRegionId(regionId);
-
+            saleHis.setRegion(region);
             if (lblStatus.getText().equals("NEW")) {
                 saleHis.setSaleDate(txtSaleDate.getDate());
                 saleHis.setCreatedBy(Global.loginUser);
@@ -385,14 +391,17 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
     }
 
     private void deleteSale() {
-        int yes_no = JOptionPane.showConfirmDialog(Global.parentForm,
-                "Are you sure to delete?", "Sale item delete", JOptionPane.YES_NO_OPTION);
-        if (yes_no == 0) {
-            String vouNo = txtVouNo.getText();
-            if (lblStatus.getText().equals("EDIT")) {
-                saleHisService.delete(vouNo);
-
-                clear();
+        if (lblStatus.getText().equals("EDIT")) {
+            int yes_no = JOptionPane.showConfirmDialog(Global.parentForm,
+                    "Are you sure to delete?", "Sale item delete", JOptionPane.YES_NO_OPTION);
+            if (yes_no == 0) {
+                String vouNo = txtVouNo.getText();
+                try {
+                    saleHisService.delete(vouNo);
+                    clear();
+                } catch (Exception ex) {
+                    LOGGER.error("Delete Sale Voucher :" + ex.getMessage());
+                }
             }
         }
 
@@ -466,7 +475,7 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
             }
             txtVouNo.setText(sh.getVouNo());
             vouCompleter.setVouStatus(sh.getVouStatusId());
-            traderAutoCompleter.setTrader(sh.getTraderId());
+            traderAutoCompleter.setTrader((Customer) sh.getTraderId());
             if (sh.getSaleManId() != null) {
                 saleManCompleter.setSaleMan(sh.getSaleManId());
             }
@@ -483,10 +492,10 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
             txtGrandTotal.setValue(Util1.getDouble(sh.getGrandTotal()));
             txtVouPaid.setValue(Util1.getDouble(sh.getPaid()));
             txtVouBalance.setValue(Util1.getDouble(sh.getVouBalance()));
-            saleTableModel.setListDetail(listSaleDetail);
             txtTotalItem.setText(Integer.toString(listSaleDetail.size() - 1));
             saleHis.setCreatedBy(sh.getCreatedBy());
-            calculateTotalAmount();
+            saleHis.setUpdatedBy(sh.getUpdatedBy());
+            saleTableModel.setListDetail(listSaleDetail);
         }
     }
 
@@ -545,11 +554,11 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
     }
 
     private void searchOrder(Order order) {
-        traderAutoCompleter.setTrader(order.getTrader());
+        traderAutoCompleter.setTrader((Customer) order.getTrader());
         txtRemark.setText(order.getDesp());
         txtAddress.setText(order.getOrderAddres());
         orderCode = order.getOrderCode();
-        regionId = order.getTrader().getRegion().getRegId();
+        region = order.getTrader().getRegion();
         lblStatus.setText("NEW");
         List<OrderDetail> listOD = detailService.search(order.getOrderCode());
         if (!listOD.isEmpty()) {
@@ -560,7 +569,7 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
                 sd.setQuantity(od.getQty());
                 sd.setPrice(od.getPrice());
                 sd.setAmount(od.getAmount());
-                sd.setStdWeight(od.getStock().getSaleMeasure());
+                sd.setStdWeight(od.getStock().getSaleWeight());
                 sd.setSaleUnit(od.getStock().getSaleUnit());
                 return sd;
             }).forEachOrdered(sd -> {

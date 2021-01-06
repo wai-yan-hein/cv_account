@@ -138,7 +138,7 @@ public class Company extends javax.swing.JPanel implements KeyListener, PanelCon
         if (isValidEntry()) {
             try {
                 String status = lblStatus.getText();
-                String userId = Global.loginUser.getUserId().toString();
+                String userId = Global.loginUser.getUserCode();
                 CompanyInfo saveCom = compInfoService.save(companyInfo, status, userId, "-");
                 JOptionPane.showMessageDialog(Global.parentForm, "Saved");
                 if (status.equals("NEW")) {
@@ -173,7 +173,7 @@ public class Company extends javax.swing.JPanel implements KeyListener, PanelCon
             companyInfo.setFinicialPeriodTo(Util1.toDate(txtToDate.getText(), "dd-MM-yyyy"));
             companyInfo.setActive(chkActive.isSelected());
             BusinessType businessType = (BusinessType) cboBusiness.getSelectedItem();
-            companyInfo.setBusinessType(businessType.getId());
+            companyInfo.setBusinessType(businessType.getCode());
             status = true;
         }
         return status;

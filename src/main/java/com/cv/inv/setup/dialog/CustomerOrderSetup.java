@@ -10,6 +10,7 @@ import com.cv.accountswing.common.Global;
 import com.cv.accountswing.entity.Customer;
 import com.cv.accountswing.service.CustomerService;
 import com.cv.accountswing.service.RegionService;
+import com.cv.accountswing.util.Util1;
 import com.cv.inv.entry.common.CustomerGridTabelModel;
 import com.cv.inv.entry.editor.RegionAutoCompleter;
 import java.awt.event.KeyEvent;
@@ -99,12 +100,15 @@ public class CustomerOrderSetup extends javax.swing.JDialog implements KeyListen
         }
         if (status) {
             customer = new Customer();
+            customer.setUserCode(txtUserCode.getText());
             customer.setTraderName(txtName.getText());
             customer.setPhone(txtPhone.getText());
             customer.setAddress(txtAddress.getText());
             customer.setEmail(txtAccount.getText());
-            customer.setCompCode(Global.compId);
+            customer.setCompCode(Global.compCode);
             customer.setActive(Boolean.TRUE);
+            customer.setCreatedBy(Global.loginUser);
+            customer.setCreatedDate(Util1.getTodayDate());
         }
         return status;
     }
@@ -131,6 +135,8 @@ public class CustomerOrderSetup extends javax.swing.JDialog implements KeyListen
         txtRegion = new javax.swing.JTextField();
         jPanel1 = new javax.swing.JPanel();
         jLabel6 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        txtUserCode = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -234,6 +240,20 @@ public class CustomerOrderSetup extends javax.swing.JDialog implements KeyListen
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        jLabel7.setFont(Global.lableFont);
+        jLabel7.setText("Code");
+
+        txtUserCode.setFont(Global.textFont);
+        txtUserCode.setName("txtName"); // NOI18N
+        txtUserCode.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtUserCodeFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtUserCodeFocusLost(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -257,7 +277,11 @@ public class CustomerOrderSetup extends javax.swing.JDialog implements KeyListen
                             .addComponent(txtRegion, javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(txtAccount, javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(txtPhone)
-                            .addComponent(txtAddress))))
+                            .addComponent(txtAddress)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(txtUserCode, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
@@ -269,6 +293,10 @@ public class CustomerOrderSetup extends javax.swing.JDialog implements KeyListen
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel7)
+                    .addComponent(txtUserCode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -334,6 +362,14 @@ public class CustomerOrderSetup extends javax.swing.JDialog implements KeyListen
         txtAddress.selectAll();
     }//GEN-LAST:event_txtAddressFocusGained
 
+    private void txtUserCodeFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtUserCodeFocusGained
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtUserCodeFocusGained
+
+    private void txtUserCodeFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtUserCodeFocusLost
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtUserCodeFocusLost
+
     /**
      * @param args the command line arguments
      */
@@ -346,12 +382,14 @@ public class CustomerOrderSetup extends javax.swing.JDialog implements KeyListen
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JTextField txtAccount;
     private javax.swing.JTextField txtAddress;
     private javax.swing.JTextField txtName;
     private javax.swing.JTextField txtPhone;
     private javax.swing.JTextField txtRegion;
+    private javax.swing.JTextField txtUserCode;
     // End of variables declaration//GEN-END:variables
 
     @Override

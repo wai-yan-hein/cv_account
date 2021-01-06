@@ -173,8 +173,8 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                             pur.setPurPrice(Util1.getFloat(0.0));
                         }
                         pur.setAvgPrice(stock.getPurPrice());
-                        pur.setStdWeight(stock.getPurPriceMeasure());
-                        pur.setPurUnit(stock.getPurPriceUnit());
+                        pur.setStdWeight(stock.getPurWeight());
+                        pur.setPurUnit(stock.getPurUnit());
                         pur.setDepartment(Global.defaultDepartment);
                         pur.setLocation(Global.defaultLocation);
                         addNewRow();
@@ -260,8 +260,8 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
             float purPrice = Util1.getFloat(pur.getPurPrice());
             float userWt = pur.getStdWeight();
             String fromUnit = pur.getPurUnit().getItemUnitCode();
-            String toUnit = pur.getStock().getPurPriceUnit().getItemUnitCode();
-            Integer pattern = pur.getStock().getPattern().getPatternId();
+            String toUnit = pur.getStock().getPurUnit().getItemUnitCode();
+            String pattern = pur.getStock().getPattern().getPatternCode();
             pur.setStdSmallWeight(getSmallestWeight(userWt, fromUnit, toUnit, pattern) * purQty);
             if (Util1.getFloat(pur.getAvgWeight()) > 0) {
                 avgWt = pur.getAvgWeight();
@@ -269,7 +269,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                 avgWt = pur.getStdWeight();
             }
             pur.setSmallestWT(getSmallestWeight(avgWt, fromUnit, toUnit, pattern) * purQty);
-            pur.setSmallestUnit(pur.getStock().getPurPriceUnit().getItemUnitCode());
+            pur.setSmallestUnit(pur.getStock().getPurUnit().getItemUnitCode());
             float amount = purQty * purPrice;
             pur.setPurAmt(amount);
             //  calTotalAmount(pur);
@@ -317,9 +317,9 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
         float stdPurPrice = stock.getPurPrice();
         float stdPrice = stock.getPurPrice();
         float userWt = pd.getStdWeight();
-        float stdWt = stock.getPurPriceMeasure();
-        String fromUnit = stock.getPurPriceUnit().getItemUnitCode();
-        Integer pattern = stock.getPattern().getPatternId();
+        float stdWt = stock.getPurWeight();
+        String fromUnit = stock.getPurUnit().getItemUnitCode();
+        String pattern = stock.getPattern().getPatternCode();
 
         if (!fromUnit.equals(toUnit)) {
             RelationKey key = new RelationKey(fromUnit, toUnit, pattern);
@@ -344,7 +344,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
         return purAmt;
     }
 
-    private Float getSmallestWeight(Float weight, String unit, String purUnit, Integer pattern) {
+    private Float getSmallestWeight(Float weight, String unit, String purUnit, String pattern) {
         float sWt = 0.0f;
         if (!unit.equals(purUnit)) {
             RelationKey key = new RelationKey(unit, purUnit, pattern);
@@ -429,7 +429,6 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
 
     public boolean isValidEntry() {
         boolean status = true;
-        int uniqueId = 1;
         for (PurHisDetail sdh2 : listPurDetail) {
             if (sdh2.getStock().getStockCode() != null) {
                 if (sdh2.getLocation() == null) {
@@ -441,17 +440,12 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                     JOptionPane.showMessageDialog(Global.parentForm, "Could not saved because purchase amount can't not be zero");
                 }
             }
-            if (uniqueId != listPurDetail.size()) {
-                if (Util1.NZeroDouble(sdh2.getAvgWeight()) > Util1.NZeroDouble(sdh2.getStdWeight())) {
-                    JOptionPane.showMessageDialog(Global.parentForm, "Avg cannot greater than Std.",
-                            "Invalid.", JOptionPane.ERROR_MESSAGE);
-                    status = false;
-                    parent.requestFocus();
-                    break;
-                } else {
-                    sdh2.setUniqueId(uniqueId);
-                    uniqueId++;
-                }
+            if (Util1.getFloat(sdh2.getAvgWeight()) > Util1.getFloat(sdh2.getStdWeight())) {
+                JOptionPane.showMessageDialog(Global.parentForm, "Avg cannot greater than Std.",
+                        "Invalid.", JOptionPane.ERROR_MESSAGE);
+                status = false;
+                parent.requestFocus();
+                break;
             }
             if (status) {
                 if (sdh2.getAvgWeight() == null) {
@@ -460,11 +454,6 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
             }
 
         }
-
-        if (uniqueId == 1) {
-            status = false;
-        }
-
         return status;
     }
 

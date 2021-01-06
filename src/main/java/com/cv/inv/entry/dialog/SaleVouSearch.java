@@ -9,7 +9,7 @@ import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.ui.editor.AppUserAutoCompleter;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
-import com.cv.accountswing.ui.editor.TraderAutoCompleter;
+import com.cv.accountswing.ui.editor.CustomerAutoCompleter;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.SaleHisDetail;
 import com.cv.inv.entity.SaleHis;
@@ -55,7 +55,7 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
     @Autowired
     private SaleDetailService sdService;
     private VouStatusAutoCompleter vouCompleter;
-    private TraderAutoCompleter traderAutoCompleter;
+    private CustomerAutoCompleter traderAutoCompleter;
     private AppUserAutoCompleter appUserAutoCompleter;
     private MachineInfoAutoCompleter machAutoCompleter;
 
@@ -75,7 +75,7 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
     }
 
     private void initCombo() {
-        traderAutoCompleter = new TraderAutoCompleter(txtCus, Global.listTrader, null);
+        traderAutoCompleter = new CustomerAutoCompleter(txtCus, Global.listCustomer, null);
         vouCompleter = new VouStatusAutoCompleter(txtVouStatus, Global.listVou, null);
         appUserAutoCompleter = new AppUserAutoCompleter(txtUser, Global.listAppUser, null);
         machAutoCompleter = new MachineInfoAutoCompleter(txtMachine, Global.listMachine, null);
@@ -127,19 +127,19 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
         String fromDate = Util1.toDateStr(txtFromDate.getDate(), "yyyy-MM-dd");
         String toDate = Util1.toDateStr(txtToDate.getDate(), "yyyy-MM-dd");
         if (traderAutoCompleter.getTrader() != null) {
-            customerId = traderAutoCompleter.getTrader().getId().toString();
+            customerId = traderAutoCompleter.getTrader().getCode();
         }
         if (txtCus.getText().isEmpty() || traderAutoCompleter.getTrader() == null) {
             customerId = "-";
         }
         if (vouCompleter.getVouStatus() != null) {
-            vouStatusId = vouCompleter.getVouStatus().getVouStatusId().toString();
+            vouStatusId = vouCompleter.getVouStatus().getVouStatusCode();
         }
         if (vouCompleter.getVouStatus() == null || txtVouNo.getText().isEmpty()) {
             vouStatusId = "-";
         }
         if (appUserAutoCompleter.getAppUser() != null) {
-            userId = appUserAutoCompleter.getAppUser().getUserId().toString();
+            userId = appUserAutoCompleter.getAppUser().getUserCode();
         }
         if (appUserAutoCompleter.getAppUser() == null || txtUser.getText().isEmpty()) {
             userId = "-";
@@ -153,7 +153,7 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
         String remark = Util1.isNull(txtRemark.getText(), "-");
         String stockId = codeTableModel.getFilterCodeStr();
         List<SaleHis> listHis = saleHisService.search(fromDate, toDate, customerId,
-                vouStatusId, remark, stockId, userId, machineId);
+                vouStatusId, remark, stockId, userId);
         saleVouTableModel.setListSaleHis(listHis);
         calAmount();
     }
@@ -656,7 +656,7 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
                 if (e.getKeyCode() == KeyEvent.VK_DOWN || e.getKeyCode() == KeyEvent.VK_ENTER) {
                     txtVouStatus.requestFocus();
                 }
-               
+
                 tabToTable(e);
                 break;
             case "txtVouStatus":
@@ -680,7 +680,7 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
                 if (e.getKeyCode() == KeyEvent.VK_DOWN || e.getKeyCode() == KeyEvent.VK_ENTER) {
                     txtMachine.requestFocus();
                 }
-                
+
                 tabToTable(e);
                 break;
             case "txtMachine":

@@ -7,6 +7,7 @@ package com.cv.accountswing.ui.setup;
 
 import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
+import com.cv.accountswing.entity.ChartOfAccount;
 import com.cv.accountswing.entity.Customer;
 import com.cv.accountswing.entity.Font;
 import com.cv.accountswing.service.CustomerService;
@@ -50,6 +51,15 @@ public class CustomerImportDialog extends javax.swing.JDialog {
     private final HashMap<Integer, Integer> hmZG = new HashMap<>();
     private List<Font> listFont;
     private final ImageIcon loadingIcon = new ImageIcon(this.getClass().getResource("/images/process.gif"));
+    private String traderType;
+
+    public String getTraderType() {
+        return traderType;
+    }
+
+    public void setTraderType(String traderType) {
+        this.traderType = traderType;
+    }
 
     /**
      * Creates new form CustomerImportDialog
@@ -98,18 +108,30 @@ public class CustomerImportDialog extends javax.swing.JDialog {
                 {
                     Customer customer = new Customer();
                     String[] data = line.split(splitBy);    // use comma as separator
-                    String id = null;
+                    String code = null;
+                    String userCode = null;
                     String name = null;
+                    String address = null;
+                    String phone = null;
                     lineCount++;
                     try {
-                        id = data[0].replace("\"", "");
-                        name = data[1].replace("\"", "");
+                        code = data[0].replace("\"", "");
+                        userCode = data[1].replace("\"", "");
+                        name = data[2].replace("\"", "");
+                        address = data[3].replace("\"", "");
+                        phone = data[4].replace("\"", "");
                     } catch (IndexOutOfBoundsException e) {
                         JOptionPane.showMessageDialog(Global.parentForm, "FORMAT ERROR IN LINE:" + lineCount);
                     }
 
-                    customer.setAppTraderCode(id);
+                    customer.setMigCode(code);
+                    customer.setUserCode(userCode);
                     customer.setTraderName(name);
+                    customer.setAddress(address);
+                    customer.setPhone(phone);
+                    customer.setCompCode(Global.compCode);
+                    customer.setCreatedBy(Global.loginUser);
+                    customer.setCreatedDate(Util1.getTodayDate());
                     listCustomer.add(customer);
 
                 }
@@ -173,7 +195,7 @@ public class CustomerImportDialog extends javax.swing.JDialog {
         String traderCodeLength = Global.sysProperties.get("system.trader.id.length");
         taskExecutor.execute(() -> {
             importTableModel.getListCustomer().forEach(cus -> {
-                cus.setCompCode(Global.compId);
+                cus.setCompCode(Global.compCode);
                 cus.setActive(true);
                 customerService.save(cus, traderCodeLength);
             });
@@ -182,6 +204,15 @@ public class CustomerImportDialog extends javax.swing.JDialog {
         });
         loading.setVisible(true);
 
+    }
+
+    private void addAccount() {
+        if (!txtAccount.getText().isEmpty()) {
+            importTableModel.getListCustomer().forEach(cus -> {
+                cus.setAccount(new ChartOfAccount(txtAccount.getText(), "-"));
+            });
+            importTableModel.refresh();
+        }
     }
 
     /**
@@ -199,6 +230,9 @@ public class CustomerImportDialog extends javax.swing.JDialog {
         jButton2 = new javax.swing.JButton();
         chkIntegra = new javax.swing.JCheckBox();
         jButton3 = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        txtAccount = new javax.swing.JTextField();
+        jButton4 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         addComponentListener(new java.awt.event.ComponentAdapter() {
@@ -222,6 +256,8 @@ public class CustomerImportDialog extends javax.swing.JDialog {
         jScrollPane1.setViewportView(tblCustomer);
 
         jButton1.setBackground(ColorUtil.mainColor);
+        jButton1.setFont(Global.lableFont);
+        jButton1.setForeground(ColorUtil.foreground);
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save-button-white.png"))); // NOI18N
         jButton1.setText("Save");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -230,6 +266,9 @@ public class CustomerImportDialog extends javax.swing.JDialog {
             }
         });
 
+        jButton2.setBackground(ColorUtil.btnEdit);
+        jButton2.setFont(Global.lableFont);
+        jButton2.setForeground(ColorUtil.foreground);
         jButton2.setText("Choose File");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -240,11 +279,23 @@ public class CustomerImportDialog extends javax.swing.JDialog {
         chkIntegra.setText("Integra Font");
 
         jButton3.setBackground(ColorUtil.btnEdit);
+        jButton3.setFont(Global.lableFont);
+        jButton3.setForeground(ColorUtil.foreground);
         jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/clear-button-white.png"))); // NOI18N
         jButton3.setText("Clear");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton3ActionPerformed(evt);
+            }
+        });
+
+        jLabel1.setText("Account Code");
+
+        jButton4.setFont(Global.lableFont);
+        jButton4.setText("Add");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
             }
         });
 
@@ -260,10 +311,16 @@ public class CustomerImportDialog extends javax.swing.JDialog {
                         .addComponent(chkIntegra)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jButton3)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton1))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
                         .addGap(18, 18, 18)
-                        .addComponent(jButton1)))
+                        .addComponent(txtAccount)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton4)))
                 .addContainerGap())
         );
 
@@ -273,7 +330,12 @@ public class CustomerImportDialog extends javax.swing.JDialog {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 304, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(txtAccount, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton4))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 257, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton1)
@@ -306,6 +368,11 @@ public class CustomerImportDialog extends javax.swing.JDialog {
         saveCustomer();
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        // TODO add your handling code here:
+        addAccount();
+    }//GEN-LAST:event_jButton4ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -315,7 +382,10 @@ public class CustomerImportDialog extends javax.swing.JDialog {
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable tblCustomer;
+    private javax.swing.JTextField txtAccount;
     // End of variables declaration//GEN-END:variables
 }

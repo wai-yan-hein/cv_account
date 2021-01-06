@@ -11,14 +11,14 @@ import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.ChartOfAccount;
 import com.cv.accountswing.entity.Department;
 import com.cv.accountswing.entity.Gl;
-import com.cv.accountswing.entity.Trader;
+import com.cv.accountswing.entity.Supplier;
 import com.cv.accountswing.entity.view.VGl;
 import com.cv.accountswing.service.GlService;
 import com.cv.accountswing.ui.cash.common.AllCashTableModel;
 import com.cv.accountswing.ui.editor.COAAutoCompleter;
 import com.cv.accountswing.ui.editor.CurrencyAutoCompleter;
 import com.cv.accountswing.ui.editor.DepartmentAutoCompleter;
-import com.cv.accountswing.ui.editor.TraderAutoCompleter;
+import com.cv.accountswing.ui.editor.SupplierAutoCompleter;
 import com.cv.accountswing.util.Util1;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -40,7 +40,7 @@ public class EditCashDialog extends javax.swing.JDialog {
     private final Logger LOGGER = LoggerFactory.getLogger(AllCashTableModel.class);
     private final Gson gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
     private DepartmentAutoCompleter departmentAutoCompleter;
-    private TraderAutoCompleter traderAutoCompleter;
+    private SupplierAutoCompleter traderAutoCompleter;
     private COAAutoCompleter cOAAutoCompleter;
     private CurrencyAutoCompleter currencyAutoCompleter;
     private String dType;
@@ -93,14 +93,14 @@ public class EditCashDialog extends javax.swing.JDialog {
         currencyAutoCompleter.setCurrency(Global.defalutCurrency);
         departmentAutoCompleter.setDepartment(new Department(vgl.getDeptId(), vgl.getDeptName()));
         cOAAutoCompleter.setCoa(new ChartOfAccount(vgl.getAccountId(), vgl.getAccName()));
-        if (vgl.getTraderId() != null) {
-            traderAutoCompleter.setTrader(new Trader(vgl.getTraderId().intValue(), vgl.getTraderName()));
+        if (vgl.getTraderCode() != null) {
+            traderAutoCompleter.setTrader(new Supplier(vgl.getTraderCode(), vgl.getTraderName()));
         }
     }
 
     private void initCombo() {
         departmentAutoCompleter = new DepartmentAutoCompleter(txtDep, Global.listDepartment, null);
-        traderAutoCompleter = new TraderAutoCompleter(txtPerson, Global.listTrader, null);
+        traderAutoCompleter = new SupplierAutoCompleter(txtPerson, Global.listSupplier, null);
         cOAAutoCompleter = new COAAutoCompleter(txtAccount, Global.listCOA, null);
         currencyAutoCompleter = new CurrencyAutoCompleter(txtCurrency, Global.listCurrency, null);
     }
@@ -117,7 +117,7 @@ public class EditCashDialog extends javax.swing.JDialog {
                 vGl.setDrAmt(Util1.getDouble(txtCashIn.getValue()));
                 vGl.setCrAmt(Util1.getDouble(txtCashOut.getValue()));
                 if (traderAutoCompleter.getTrader() != null) {
-                    vGl.setTraderId(traderAutoCompleter.getTrader().getId().longValue());
+                    vGl.setTraderCode(traderAutoCompleter.getTrader().getCode());
                 }
                 Gl gl = gson.fromJson(gson.toJson(vGl), Gl.class);
                 glService.save(gl);

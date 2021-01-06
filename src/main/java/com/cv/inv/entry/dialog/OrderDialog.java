@@ -11,7 +11,7 @@ import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.Customer;
 import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
-import com.cv.accountswing.ui.editor.TraderAutoCompleter;
+import com.cv.accountswing.ui.editor.CustomerAutoCompleter;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.Order;
 import com.cv.inv.entity.OrderDetail;
@@ -57,7 +57,7 @@ public class OrderDialog extends javax.swing.JDialog implements SelectionObserve
     private OrderDetailService detailService;
     private GenVouNoImpl vouEngine;
     private Customer customer;
-    private TraderAutoCompleter traderAutoCompleter;
+    private CustomerAutoCompleter traderAutoCompleter;
     private Order order;
 
     public Customer getCustomer() {
@@ -89,7 +89,7 @@ public class OrderDialog extends javax.swing.JDialog implements SelectionObserve
     }
 
     private void initAutoCompleter() {
-        traderAutoCompleter = new TraderAutoCompleter(txtCustomer, Global.listTrader, null);
+        traderAutoCompleter = new CustomerAutoCompleter(txtCustomer, Global.listCustomer, null);
         traderAutoCompleter.setTrader(customer);
         txtAddress.setText(customer.getAddress());
     }
@@ -182,7 +182,7 @@ public class OrderDialog extends javax.swing.JDialog implements SelectionObserve
     }
 
     private void searchByOrderCode(Order order) {
-        traderAutoCompleter.setTrader(order.getTrader());
+        traderAutoCompleter.setTrader((Customer) order.getTrader());
         txtDesp.setText(order.getDesp());
         txtOrderId.setText(order.getOrderCode());
         txtTotalAmt.setValue(Util1.getFloat(order.getOrderTotal()));

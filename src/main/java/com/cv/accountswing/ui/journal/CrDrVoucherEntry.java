@@ -23,7 +23,7 @@ import com.cv.accountswing.ui.editor.COAAutoCompleter;
 import com.cv.accountswing.ui.editor.COACellEditor;
 import com.cv.accountswing.ui.editor.CurrencyAutoCompleter;
 import com.cv.accountswing.ui.editor.DepartmentAutoCompleter;
-import com.cv.accountswing.ui.editor.TraderCellEditor;
+import com.cv.accountswing.ui.editor.SupplierCellEditor;
 import com.cv.accountswing.ui.journal.common.CrDrVoucherEntryTableModel;
 import com.cv.accountswing.util.Util1;
 import com.google.gson.Gson;
@@ -159,7 +159,7 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
         tblCredit.getTableHeader().setForeground(ColorUtil.foreground);
         tblCredit.setCellSelectionEnabled(true);
         tblCredit.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        tblCredit.getColumnModel().getColumn(0).setCellEditor(new TraderCellEditor());
+        tblCredit.getColumnModel().getColumn(0).setCellEditor(new SupplierCellEditor());
         tblCredit.getColumnModel().getColumn(1).setCellEditor(new COACellEditor());
         tblCredit.getColumnModel().getColumn(0).setPreferredWidth(150);
         tblCredit.getColumnModel().getColumn(1).setPreferredWidth(150);
@@ -179,7 +179,7 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
             selectRow = tblCredit.convertRowIndexToModel(tblCredit.getSelectedRow());
             VGl vGl = voucherEntryTableModel.getVGl(selectRow);
             if (vGl != null) {
-                String glID = vGl.getGlId().toString();
+                String glID = vGl.getGlCode().toString();
                 int showConfirmDialog = JOptionPane.showConfirmDialog(Global.parentForm, "Are you sure to delete");
                 if (showConfirmDialog == 1) {
                     if (deleteIds.equals("-")) {
@@ -227,16 +227,16 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
         taskExecutor.execute(() -> {
             try {
                 String vouNo = txtVouNo.getText();
-                String userId = Global.loginUser.getUserId().toString();
+                String userId = Global.loginUser.getUserCode();
                 String type;
                 if (voucherType.equals("CR")) {
                     type = "system.creditvoucher";
                 } else {
                     type = "system.debitvoucher";
                 }
-                CompanyInfo ci = ciService.findById(Global.compId);
+                CompanyInfo ci = ciService.findById(Global.compCode);
                 SystemPropertyKey key = new SystemPropertyKey();
-                key.setCompCode(Global.compId);
+                key.setCompCode(Global.compCode);
                 key.setPropKey("system.report.path");
                 SystemProperty sp = spService.findById(key);
                 String fileName = userId + vouNo + ".pdf";
@@ -244,12 +244,12 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
                 String imagePath = reportPath;
                 String filePath = reportPath + "/temp/" + fileName;
                 key = new SystemPropertyKey();
-                key.setCompCode(Global.compId);
+                key.setCompCode(Global.compCode);
                 key.setPropKey(type);
                 sp = spService.findById(key);
                 reportPath = reportPath + "\\" + sp.getPropValue();
                 key = new SystemPropertyKey();
-                key.setCompCode(Global.compId);
+                key.setCompCode(Global.compCode);
                 key.setPropKey("system.font.path");
                 sp = spService.findById(key);
                 String fontPath = sp.getPropValue();
@@ -257,7 +257,7 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
                 Map<String, Object> parameters = new HashMap();
                 parameters.put("p_vou_no", vouNo);
                 parameters.put("p_company_name", ci.getName());
-                parameters.put("p_comp_id", Global.compId);
+                parameters.put("p_comp_id", Global.compCode);
                 parameters.put("img_path", imagePath);
 
                 rService.genCreditVoucher(reportPath, filePath, fontPath, parameters);
@@ -322,8 +322,8 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
                 List<Gl> listGV = gson.fromJson(strVoucher, listType);
                 String strVouNo = txtVouNo.getText();
                 if (strVouNo.isEmpty()) {
-                    strVouNo = getVouNo(depCode, Util1.toDateStr(txtFromDate.getDate(), "dd/MM/yyyy"),
-                            Global.compId.toString(), depCode, voucherType);
+                    strVouNo = getVouNo(Global.machineId, depCode, Util1.toDateStr(txtFromDate.getDate(), "dd/MM/yyyy"),
+                            Global.compCode, depCode, voucherType);
                 }
 
                 for (Gl gl : listGV) {
@@ -345,8 +345,7 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
                     if (!deleteIds.equals("-")) {
                         String[] ids = deleteIds.split(",");
                         for (String id : ids) {
-                            Long lid = Long.parseLong(id);
-                            glService.delete(lid,"GL-DELETE");
+                            glService.delete(id, "GL-DELETE");
                         }
                     }
                 } catch (Exception ex) {
@@ -363,12 +362,12 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
 
     private void assignGlInfo(Gl gl) {
 
-        if (gl.getGlId() == null) {
-            gl.setCompId(Global.compId);
-            gl.setCreatedBy(Global.loginUser.getUserId().toString());
+        if (gl.getGlCode() == null) {
+            gl.setCompCode(Global.compCode);
+            gl.setCreatedBy(Global.loginUser.getUserCode());
             gl.setCreatedDate(Util1.getTodayDate());
         } else {
-            gl.setModifyBy(Global.loginUser.getUserId().toString());
+            gl.setModifyBy(Global.loginUser.getUserCode());
             gl.setModifyDate(Util1.getTodayDate());
         }
     }
@@ -379,10 +378,10 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
         });
     }
 
-    public String getVouNo(String deptCodeUser, String strDate, String compCode, String deptCode, String type) {
-        Integer period = Util1.getDatePart(Util1.toDate(strDate, "dd/MM/yyyy"), "yyyy");
+    public String getVouNo(Integer macId, String deptCodeUser, String strDate, String compCode, String deptCode, String type) {
+        String period = Util1.toDateStr(Util1.getTodayDate(), "yyyy");
         int ttlLength = 4;
-        int seqNo = seqService.getSequence(type.toUpperCase() + deptCode + period, period.toString(), compCode);
+        int seqNo = seqService.getSequence(macId, "CrDrVoucher", period, compCode);
         String tmpVouNo = deptCodeUser.toUpperCase() + type.toUpperCase() + period
                 + String.format("%0" + ttlLength + "d", seqNo);
         return tmpVouNo;

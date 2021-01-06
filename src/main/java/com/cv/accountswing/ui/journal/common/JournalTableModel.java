@@ -24,7 +24,7 @@ public class JournalTableModel extends AbstractTableModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JournalTableModel.class);
     private List<VGeneralVoucher> listGV = new ArrayList();
-    //String  userId=Global.loginUser.getUserId().toString();
+    //String  userId=Global.loginUser.getUserCode();
     String[] columnNames = {"Date", "Voucher", "Refrence"};
     private JTable parent;
 
@@ -125,7 +125,7 @@ public class JournalTableModel extends AbstractTableModel {
     }
 
     public void saveGV(VGeneralVoucher gv, String status) {
-        //if (isValidCOA(gv, Global.compId.toString(), Global.loginUser.getUserId().toString(), status)) {
+        //if (isValidCOA(gv, Global.compCode, Global.loginUser.getUserCode(), status)) {
         // coaService.save(gv);
         if (status.equals("NEW")) {
             listGV.add(new VGeneralVoucher());

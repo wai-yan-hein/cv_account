@@ -14,6 +14,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -24,11 +25,11 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class DatePickerDialog extends javax.swing.JDialog implements KeyListener {
-
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(DatePickerDialog.class);
-
+    
     private SelectionObserver observer;
-
+    
     public void setObserver(SelectionObserver observer) {
         this.observer = observer;
     }
@@ -43,7 +44,7 @@ public class DatePickerDialog extends javax.swing.JDialog implements KeyListener
         initKeyListener();
         setDate();
     }
-
+    
     private void initKeyListener() {
         txtFromDate.getDateEditor().getUiComponent().setName("txtFromDate");
         txtToDate.getDateEditor().getUiComponent().setName("txtToDate");
@@ -62,9 +63,9 @@ public class DatePickerDialog extends javax.swing.JDialog implements KeyListener
             }
         });
         btnOK.addKeyListener(this);
-
+        
     }
-
+    
     private void addFoucsMoveKey() {
         /* Set backwardKeys = getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS);
         Set newBackwardKeys = new HashSet(backwardKeys);
@@ -95,11 +96,15 @@ public class DatePickerDialog extends javax.swing.JDialog implements KeyListener
         txtFromDate.setDate(Util1.getTodayDate());
         txtToDate.setDate(Util1.getTodayDate());
     }
-
+    
     private void sendDate() {
-        String dateStr = Util1.toDateStr(txtFromDate.getDate(), "dd/MM/yyyy") + "to" + Util1.toDateStr(txtToDate.getDate(), "dd/MM/yyyy");
-        if (observer != null) {
-            observer.selected("DatePickerDialog", dateStr);
+        if (txtFromDate.getDate() != null && txtToDate.getDate() != null) {
+            String dateStr = Util1.toDateStr(txtFromDate.getDate(), "dd/MM/yyyy") + "to" + Util1.toDateStr(txtToDate.getDate(), "dd/MM/yyyy");
+            if (observer != null) {
+                observer.selected("DatePickerDialog", dateStr);
+            }
+        }else{
+            JOptionPane.showMessageDialog(Global.parentForm, "Invalid Date Format.");
         }
     }
 
@@ -253,16 +258,16 @@ public class DatePickerDialog extends javax.swing.JDialog implements KeyListener
     @Override
     public void keyTyped(KeyEvent e) {
     }
-
+    
     @Override
     public void keyPressed(KeyEvent e) {
     }
-
+    
     @Override
     public void keyReleased(KeyEvent e) {
         Object sourceObj = e.getSource();
         String ctrlName = "-";
-
+        
         if (sourceObj instanceof JTextFieldDateEditor) {
             ctrlName = ((JTextFieldDateEditor) sourceObj).getName();
         } else if (sourceObj instanceof JButton) {
@@ -287,9 +292,9 @@ public class DatePickerDialog extends javax.swing.JDialog implements KeyListener
                     case KeyEvent.VK_UP:
                         btnOK.requestFocus();
                         break;
-
+                    
                 }
-
+                
                 break;
             case "txtToDate":
                 switch (e.getKeyCode()) {
@@ -308,7 +313,7 @@ public class DatePickerDialog extends javax.swing.JDialog implements KeyListener
                         break;
                 }
                 break;
-
+            
             case "btnOK":
                 switch (e.getKeyCode()) {
                     case KeyEvent.VK_ENTER:
@@ -318,10 +323,10 @@ public class DatePickerDialog extends javax.swing.JDialog implements KeyListener
                         txtFromDate.getDateEditor().getUiComponent().requestFocusInWindow();
                         break;
                 }
-
+                
                 break;
-
+            
         }
-
+        
     }
 }

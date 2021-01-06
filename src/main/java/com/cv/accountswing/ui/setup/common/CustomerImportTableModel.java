@@ -21,7 +21,7 @@ public class CustomerImportTableModel extends AbstractTableModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CustomerImportTableModel.class);
     private List<Customer> listCustomer = new ArrayList();
-    private String[] columnNames = {"Id", "Name"};
+    private String[] columnNames = {"Code", "Usr-Code", "Name", "Address", "Phone", "Account Code"};
 
     @Override
     public String getColumnName(int column) {
@@ -36,14 +36,8 @@ public class CustomerImportTableModel extends AbstractTableModel {
     @Override
     public Class getColumnClass(int column) {
         switch (column) {
-            case 0:
-                return String.class;
-            case 1:
-                return String.class;
-            case 2:
-                return String.class;
             default:
-                return Object.class;
+                return String.class;
         }
     }
 
@@ -55,9 +49,21 @@ public class CustomerImportTableModel extends AbstractTableModel {
 
             switch (column) {
                 case 0: //Id
-                    return customer.getAppTraderCode();
+                    return customer.getMigCode();
                 case 1: //Name
+                    return customer.getUserCode();
+                case 2:
                     return customer.getTraderName();
+                case 3:
+                    return customer.getAddress();
+                case 4:
+                    return customer.getPhone();
+                case 5:
+                    if (customer.getAccount() != null) {
+                        return customer.getAccount().getCode();
+                    } else {
+                        return null;
+                    }
                 default:
                     return null;
             }
@@ -132,6 +138,10 @@ public class CustomerImportTableModel extends AbstractTableModel {
             listCustomer.clear();
             fireTableDataChanged();
         }
+    }
+
+    public void refresh() {
+        fireTableDataChanged();
     }
 
 }

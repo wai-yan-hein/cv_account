@@ -121,7 +121,7 @@ public class MyDataModel extends MyAbstractTreeTableModel {
     private void savePrivilege(VRoleMenu roleMenu, boolean allow) {
         try {
             if (roleMenu.getKey() != null) {
-                PrivilegeKey key = new PrivilegeKey(roleMenu.getKey().getRoleId(), roleMenu.getKey().getMenuId());
+                PrivilegeKey key = new PrivilegeKey(roleMenu.getKey().getRoleCode(), roleMenu.getKey().getMenuCode());
                 Privilege privilege = new Privilege();
                 privilege.setKey(key);
                 privilege.setIsAllow(allow);

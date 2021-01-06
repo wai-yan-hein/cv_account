@@ -14,7 +14,6 @@ import com.cv.inv.entity.StockUnit;
 import com.cv.inv.setup.dialog.common.StockUnitTableModel;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.Date;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
@@ -40,7 +39,7 @@ public class StockUnitSetupDailog extends javax.swing.JDialog implements KeyList
     private static final Logger LOGGER = LoggerFactory.getLogger(StockUnitSetupDailog.class);
 
     private int selectRow = - 1;
-    private StockUnit itemUnit;
+    private StockUnit itemUnit = new StockUnit();
     @Autowired
     private StockUnitService itemUnitService;
     @Autowired
@@ -100,9 +99,9 @@ public class StockUnitSetupDailog extends javax.swing.JDialog implements KeyList
     }
 
     private void setItemUnit(StockUnit unit) {
-
-        txtUnitShort.setText(unit.getItemUnitCode());
-        txtUnitDesp.setText(unit.getItemUnitName());
+        itemUnit = unit;
+        txtUnitShort.setText(itemUnit.getItemUnitCode());
+        txtUnitDesp.setText(itemUnit.getItemUnitName());
         lblStatus.setText("EDIT");
         txtUnitShort.setEditable(false);
         txtUnitDesp.requestFocus();
@@ -130,6 +129,7 @@ public class StockUnitSetupDailog extends javax.swing.JDialog implements KeyList
         txtUnitShort.setText(null);
         txtUnitDesp.setText(null);
         lblStatus.setText("NEW");
+        itemUnit =new StockUnit();
         txtUnitShort.setEditable(true);
         itemUnitTableModel.refresh();
         txtUnitShort.requestFocus();
@@ -155,10 +155,14 @@ public class StockUnitSetupDailog extends javax.swing.JDialog implements KeyList
                     "Code length", JOptionPane.ERROR_MESSAGE);
             txtUnitShort.requestFocusInWindow();
         } else {
-            itemUnit = new StockUnit();
-            itemUnit.setItemUnitCode(txtUnitShort.getText());
-            itemUnit.setItemUnitName(txtUnitDesp.getText());
-            itemUnit.setUpdateDate(new Date());
+            if (lblStatus.getText().equals("NEW")) {
+                itemUnit.setItemUnitCode(txtUnitShort.getText());
+                itemUnit.setItemUnitName(txtUnitDesp.getText());
+                itemUnit.setCreatedBy(Global.loginUser);
+                itemUnit.setCreatedDate(Util1.getTodayDate());
+            }else{
+                itemUnit.setUpdatedBy(Global.loginUser);
+            }
         }
 
         return status;

@@ -103,7 +103,7 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
         curId = Global.sysProperties.get("system.default.currency");
         CurrencyKey key = new CurrencyKey();
         key.setCode(curId);
-        key.setCompCode(Global.compId);
+        key.setCompCode(Global.compCode);
         Currency currency = currencyService.findById(key);
         currencyAutoCompleter.setCurrency(currency);
     }
@@ -142,10 +142,10 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
         taskExecutor.execute(() -> {
             openingTableModel.clear();
             /*List<VGl> listVGl = vGlService.search(stDate, endDate, "-", "-", "-", curId, "-", "-", depCode,
-            "-", "-", "-", Global.compId.toString(), "OPENING", "-", "-", "-", "-", "-", "-", "-");
+            "-", "-", "-", Global.compCode, "OPENING", "-", "-", "-", "-", "-", "-", "-");
             btnGen.setEnabled(listVGl.isEmpty());
             openingTableModel.setListVGl(listVGl);*/
-            List<VCOAOpening> listOpening = openingService.search(stDate, "-", "-", Global.compId.toString(), depCode, curId);
+            List<VCOAOpening> listOpening = openingService.search(stDate, "-", "-", Global.compCode, depCode, curId);
             openingTableModel.setListOpening(listOpening);
             btnGen.setEnabled(listOpening.isEmpty());
             calTotalAmt(listOpening);
@@ -203,11 +203,11 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
             taskExecutor.execute(() -> {
                 btnGen.setEnabled(false);
                 try {
-                    String userId = Global.loginUser.getUserId().toString();
+                    String userId = Global.loginUser.getUserCode();
                     String coaGroup = Global.sysProperties.get("system.opening.coa.group");
                     if (coaGroup != null) {
                         cOAOpeningService.generateZeroOpening(Util1.toDateStr(txtDate.getDate(), "dd/MM/yyyy"),
-                                userId, Global.compId.toString(), curId, depCode, coaGroup);
+                                userId, Global.compCode, curId, depCode, coaGroup);
                         searchOpening();
                         btnGen.setEnabled(true);
                     } else {

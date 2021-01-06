@@ -128,8 +128,8 @@ public class OpeningTableModel extends AbstractTableModel {
 
     private void save(VCOAOpening vgl, int row) {
 
-        vgl.setCompId(Global.compId);
-        vgl.setUserId(Global.loginUser.getUserId());
+        vgl.setCompCode(Global.compCode);
+        vgl.setUserId(Global.loginUser.getUserCode());
         String strVGL = gson.toJson(vgl);
         COAOpening op = gson.fromJson(strVGL, COAOpening.class);
         try {

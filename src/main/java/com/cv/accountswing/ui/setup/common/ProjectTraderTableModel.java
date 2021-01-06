@@ -29,15 +29,15 @@ public class ProjectTraderTableModel extends AbstractTableModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectTraderTableModel.class);
     private List<VProjectTraderMapping> listProject = new ArrayList();
     private String[] columnNames = {"Code", "Name"};
-    private long projectId;
+    private String projectId;
     @Autowired
     private ProjectTraderMappingService projectTraderMappingService;
 
-    public long getProjectId() {
+    public String getProjectId() {
         return projectId;
     }
 
-    public void setProjectId(long projectId) {
+    public void setProjectId(String projectId) {
         this.projectId = projectId;
     }
 
@@ -95,7 +95,7 @@ public class ProjectTraderTableModel extends AbstractTableModel {
                     if (value != null) {
                         if (value instanceof Trader) {
                             trader = (Trader) value;
-                            vPTM.setTraderCode(trader.getTraderId());
+                            vPTM.setTraderCode(trader.getUserCode());
                             vPTM.setTraderName(trader.getTraderName());
 
                         }
@@ -110,11 +110,11 @@ public class ProjectTraderTableModel extends AbstractTableModel {
     }
 
     private void saveTrader(Trader trader) {
-        long traderId = trader.getId();
-        if (isValidTrader(Util1.getString(projectId), trader.getTraderId())) {
+        String traderId = trader.getCode();
+        if (isValidTrader(projectId, trader.getUserCode())) {
             ProjectTraderMapping ptm = new ProjectTraderMapping();
-            ptm.setProjectId(projectId);
-            ptm.setTraderId(traderId);
+            ptm.setProjectCode(projectId);
+            ptm.setProjectCode(traderId);
             ProjectTraderMapping save = projectTraderMappingService.save(ptm);
             if (save != null) {
                 JOptionPane.showMessageDialog(Global.parentForm, "Person Added.");

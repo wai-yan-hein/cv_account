@@ -10,13 +10,14 @@ import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.SelectionObserver;
+import com.cv.accountswing.entity.Supplier;
 import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.editor.CurrencyAutoCompleter;
 import com.cv.accountswing.ui.editor.DepartmentAutoCompleter;
 import com.cv.accountswing.ui.editor.DepartmentCellEditor;
-import com.cv.accountswing.ui.editor.TraderAutoCompleter;
+import com.cv.accountswing.ui.editor.SupplierAutoCompleter;
 import com.cv.accountswing.util.NumberUtil;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.PurHis;
@@ -81,7 +82,7 @@ public class PurchaseEntryUnit extends javax.swing.JPanel implements SelectionOb
     private LocationAutoCompleter locCompleter;
     private VouStatusAutoCompleter vouCompleter;
     private CurrencyAutoCompleter currAutoCompleter;
-    private TraderAutoCompleter traderAutoCompleter;
+    private SupplierAutoCompleter traderAutoCompleter;
     private DepartmentAutoCompleter departmentAutoCompleter;
     private LoadingObserver loadingObserver;
     private final PurHis ph = new PurHis();
@@ -208,7 +209,7 @@ public class PurchaseEntryUnit extends javax.swing.JPanel implements SelectionOb
         vouCompleter.setSelectionObserver(this);
         currAutoCompleter = new CurrencyAutoCompleter(txtCurrency, Global.listCurrency, null);
         currAutoCompleter.setSelectionObserver(this);
-        traderAutoCompleter = new TraderAutoCompleter(txtSupplier, Global.listTrader, null);
+        traderAutoCompleter = new SupplierAutoCompleter(txtSupplier, Global.listSupplier, null);
         traderAutoCompleter.setSelectionObserver(this);
         locCompleter = new LocationAutoCompleter(txtLocation, Global.listLocation, null);
         locCompleter.setLocation(Global.defaultLocation);
@@ -220,7 +221,7 @@ public class PurchaseEntryUnit extends javax.swing.JPanel implements SelectionOb
             txtPurDate.setDate(Util1.getTodayDate());
             currAutoCompleter.setCurrency(Global.defalutCurrency);
             vouCompleter.setVouStatus(Global.defaultVouStatus);
-            traderAutoCompleter.setTrader(Global.defaultSupplier);
+            traderAutoCompleter.setTrader((Supplier) Global.defaultSupplier);
             genVouNo();
         } catch (Exception e) {
             LOGGER.info("Assign Default Value :" + e.getMessage());
@@ -302,7 +303,7 @@ public class PurchaseEntryUnit extends javax.swing.JPanel implements SelectionOb
                 ph.setCreatedBy(Global.loginUser);
                 ph.setSession(Global.sessionId);
             } else {
-                ph.setUpdatedBy(Global.loginUser.getUserId().toString());
+                ph.setUpdatedBy(Global.loginUser.getUserCode());
                 ph.setUpdatedDate(Util1.getTodayDate());
             }
 
@@ -334,13 +335,13 @@ public class PurchaseEntryUnit extends javax.swing.JPanel implements SelectionOb
             txtPurDate.setDate(purHis.getPurDate());
             txtDueDate.setDate(purHis.getDueDate());
             locCompleter.setLocation(purHis.getLocation());
-            traderAutoCompleter.setTrader(purHis.getCustomerId());
+            traderAutoCompleter.setTrader((Supplier) purHis.getCustomerId());
             vouCompleter.setVouStatus(purHis.getVouStatus());
             if (purHis.getDeptCode() != null) {
                 departmentAutoCompleter.setDepartment(purHis.getDeptCode());
             }
             currAutoCompleter.setCurrency(purHis.getCurrency());
-            txtVouTotal.setValue(purHis.getVouTotal()); 
+            txtVouTotal.setValue(purHis.getVouTotal());
             txtVouPaid.setText(purHis.getPaid().toString());
             if (purHis.getDiscount() == null) {
                 txtVouDiscount.setText("0.0");
@@ -395,7 +396,7 @@ public class PurchaseEntryUnit extends javax.swing.JPanel implements SelectionOb
         if (yes_no == 0) {
             String vouNo = txtVouNo.getText();
             if (lblStatus.getText().equals("EDIT")) {
-                phService.delete(vouNo);
+                //phService.delete(vouNo);
                 clear();
             }
         }

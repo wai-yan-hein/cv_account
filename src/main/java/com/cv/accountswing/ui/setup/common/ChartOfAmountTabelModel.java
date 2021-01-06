@@ -29,15 +29,15 @@ public class ChartOfAmountTabelModel extends AbstractTableModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChartOfAmountTabelModel.class);
     private List<VProjectCOAMapping> listProject = new ArrayList();
     private String[] columnNames = {"Code", "Name", "Active"};
-    private long projectId;
+    private String projectId;
     @Autowired
     private ProjectCOAMappingService pcoamService;
 
-    public long getProjectId() {
+    public String getProjectId() {
         return projectId;
     }
 
-    public void setProjectId(long projectId) {
+    public void setProjectId(String projectId) {
         this.projectId = projectId;
     }
 

@@ -8,18 +8,15 @@ package com.cv.accountswing.ui.cash.common;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.entity.ChartOfAccount;
 import com.cv.accountswing.entity.Currency;
+import com.cv.accountswing.entity.Customer;
 import com.cv.accountswing.entity.Department;
 import com.cv.accountswing.entity.Gl;
 import com.cv.accountswing.entity.Trader;
 import com.cv.accountswing.service.COAService;
-import com.cv.accountswing.service.CurrencyService;
-import com.cv.accountswing.service.DepartmentService;
 import com.cv.accountswing.service.GlService;
-import com.cv.accountswing.service.TraderService;
 import com.cv.accountswing.util.BindingUtil;
 import com.cv.accountswing.util.Util1;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.List;
 import javax.swing.JOptionPane;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,8 +49,8 @@ public class DailyCashEntry extends javax.swing.JDialog {
         txtGlDate.setText(Util1.toDateStr(Util1.getTodayDate(), "dd-MM-yyyy"));
         BindingUtil.BindComboFilter(cboDepartment, Global.listDepartment, null, true, false);
         BindingUtil.BindComboFilter(cboCurrency, Global.listCurrency, null, true, false);
-        BindingUtil.BindComboFilter(cboPerson, Global.listTrader, null, true, false);
-        BindingUtil.BindComboFilter(cboAccount, coaService.getCompanyCOA(Global.compId.toString()), null, true, false);
+        BindingUtil.BindComboFilter(cboPerson, (List<Trader>) (Customer) Global.listCustomer, null, true, false);
+        BindingUtil.BindComboFilter(cboAccount, coaService.getCompanyCOA(Global.compCode), null, true, false);
 
     }
 
@@ -73,7 +70,7 @@ public class DailyCashEntry extends javax.swing.JDialog {
         gl.setDeptId(department.getDeptCode());
         gl.setDrAmt(Util1.getDouble(txtDrAmt.getText()));
         gl.setCrAmt(Util1.getDouble(txtCrdAmt.getText()));
-        gl.setTraderId(Long.valueOf(trader.getId()));
+        gl.setTraderCode(trader.getCode());
         try {
             Gl save = glService.save(gl);
             if (save != null) {

@@ -19,13 +19,11 @@ import com.cv.accountswing.service.ProjectCOAMappingService;
 import com.cv.accountswing.service.ProjectService;
 import com.cv.accountswing.service.ProjectTraderMappingService;
 import com.cv.accountswing.service.ProjectUserMappingService;
-import com.cv.accountswing.service.TraderService;
-import com.cv.accountswing.service.UserService;
 import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.editor.AppUserCellEditor;
 import com.cv.accountswing.ui.editor.COACellEditor;
-import com.cv.accountswing.ui.editor.TraderCellEditor;
+import com.cv.accountswing.ui.editor.SupplierCellEditor;
 import com.cv.accountswing.ui.setup.common.ChartOfAmountTabelModel;
 import com.cv.accountswing.ui.setup.common.ProjectTableModel;
 import com.cv.accountswing.ui.setup.common.ProjectTraderTableModel;
@@ -62,7 +60,7 @@ public class ManageProjectSetup extends javax.swing.JPanel implements KeyListene
     private static final Logger LOGGER = LoggerFactory.getLogger(ManageProjectSetup.class);
 
     private int selectRow = -1;
-    Long projectId;
+    String projectId;
     @Autowired
     private ProjectService projectService;
     @Autowired
@@ -154,7 +152,7 @@ public class ManageProjectSetup extends javax.swing.JPanel implements KeyListene
         tblTrader.getTableHeader().setForeground(ColorUtil.foreground);
         tblTrader.getColumnModel().getColumn(0).setPreferredWidth(15);// Code
         tblTrader.getColumnModel().getColumn(1).setPreferredWidth(450);// Name
-        tblTrader.getColumnModel().getColumn(0).setCellEditor(new TraderCellEditor());
+        tblTrader.getColumnModel().getColumn(0).setCellEditor(new SupplierCellEditor());
         tblTrader.setDefaultRenderer(Object.class, new TableCellRender());
 
     }
@@ -252,11 +250,10 @@ public class ManageProjectSetup extends javax.swing.JPanel implements KeyListene
         project.setProjectStatus(chkActive.isSelected());
         if (isValidProject(project)) {
             if (project.getProjectId() == null) {
-                long userId = Global.loginUser.getUserId();
-                project.setCreatedBy(userId);
+                project.setCreatedBy(Global.loginUser);
                 project.setCreatedDate(new Date());
             }
-            project.setCompCode(Global.compId);
+            project.setCompCode(Global.compCode);
             Project save = projectService.save(project);
             if (save != null) {
                 JOptionPane.showMessageDialog(Global.parentForm, "Saved");

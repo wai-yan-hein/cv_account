@@ -127,15 +127,15 @@ public class COAOpeningTableModel extends AbstractTableModel {
 
     private void save(VGl vgl, int row) {
 
-        vgl.setCompId(Global.compId);
-        vgl.setCreatedBy(Global.loginUser.getUserId().toString());
+        vgl.setCompCode(Global.compCode);
+        vgl.setCreatedBy(Global.loginUser.getUserCode());
         String strVGL = gson.toJson(vgl);
         Gl gl = gson.fromJson(strVGL, Gl.class);
         try {
             Gl save = glService.save(gl);
             if (save != null) {
                 VGl saveVGl = listVGl.get(row);
-                saveVGl.setGlId(save.getGlId());
+                saveVGl.setGlCode(save.getGlCode());
                 addNewRow();
                 parent.setRowSelectionInterval(row + 1, row + 1);
                 parent.setColumnSelectionInterval(6, 6);
@@ -163,7 +163,7 @@ public class COAOpeningTableModel extends AbstractTableModel {
             status = true;
         } else {
             VGl vgl = listVGl.get(listVGl.size() - 1);
-            if (vgl.getGlId() == null) {
+            if (vgl.getGlCode() == null) {
                 status = false;
             }
         }

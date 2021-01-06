@@ -93,7 +93,7 @@ public class ProtfitAndLost extends javax.swing.JPanel implements SelectionObser
                     JOptionPane.showMessageDialog(Global.parentForm, "Invalid profit & lost process");
                 } else {
                     try {
-                        rService.getProfitLost(process, stDate, enDate, depId, currency, Global.compId.toString(), Global.loginUser.getUserId().toString());
+                        rService.getProfitLost(process, stDate, enDate, depId, currency, Global.compCode, Global.loginUser.getUserCode());
                         //ro.setObj();
                         btnCalculate.setEnabled(true);
                         loadingObserver.load(this.getName(), "Stop");
@@ -117,10 +117,10 @@ public class ProtfitAndLost extends javax.swing.JPanel implements SelectionObser
         taskExecutor.execute(() -> {
             try {
                 loadingObserver.load(this.getName(), "Start");
-                String userId = Global.loginUser.getUserId().toString();
-                CompanyInfo ci = ciService.findById(Global.compId);
+                String userId = Global.loginUser.getUserCode();
+                CompanyInfo ci = ciService.findById(Global.compCode);
                 SystemPropertyKey key = new SystemPropertyKey();
-                key.setCompCode(Global.compId);
+                key.setCompCode(Global.compCode);
                 key.setPropKey("system.report.path");
                 SystemProperty sp = spService.findById(key);
                 String fileName = userId + "_profit_lost.pdf";
@@ -130,19 +130,19 @@ public class ProtfitAndLost extends javax.swing.JPanel implements SelectionObser
 
                 reportPath = reportPath + "/ProfitAndLost";
                 key = new SystemPropertyKey();
-                key.setCompCode(Global.compId);
+                key.setCompCode(Global.compCode);
                 key.setPropKey("system.font.path");
                 sp = spService.findById(key);
                 String fontPath = sp.getPropValue();
 
                 //Need to calculate sub todal
-                ProfitAndLostRetObj obj = rService.getPLCalculateValue(userId, Global.compId.toString());
+                ProfitAndLostRetObj obj = rService.getPLCalculateValue(userId, Global.compCode);
                 LOGGER.info("cost of sale : " + obj.getCostOfSale());
                 //==================================================================
 
                 Map<String, Object> parameters = new HashMap();
                 parameters.put("p_company_name", ci.getName());
-                parameters.put("p_comp_id", Global.compId.toString());
+                parameters.put("p_comp_id", Global.compCode);
                 parameters.put("SUBREPORT_DIR", reportPath1);
                 parameters.put("p_user_id", userId);
                 parameters.put("gross_profit", obj.getGrossProfit());

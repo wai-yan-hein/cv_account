@@ -167,7 +167,7 @@ public class SalePurchaseTableModel extends AbstractTableModel {
                 if (value != null) {
                     if (value instanceof Trader) {
                         Trader trader = (Trader) value;
-                        vgl.setTraderId(Util1.getLong(trader.getId()));
+                        vgl.setTraderCode(trader.getCode());
                         vgl.setTraderName(trader.getTraderName());
                         ChartOfAccount account = trader.getAccount();
                         if (account != null) {
@@ -220,7 +220,7 @@ public class SalePurchaseTableModel extends AbstractTableModel {
 
     private void save(VGl vgl, int row) {
         boolean save = false;
-        if (vgl.getGlId() != null) {
+        if (vgl.getGlCode() != null) {
             int yes_no = JOptionPane.showConfirmDialog(Global.parentForm, "Are you sure to edit ?",
                     "Edit ", JOptionPane.YES_NO_OPTION);
             if (yes_no == 0) {
@@ -234,8 +234,8 @@ public class SalePurchaseTableModel extends AbstractTableModel {
         }
         if (save) {
             vgl.setSourceAcId(sourceAccId);
-            vgl.setCompId(Global.compId);
-            vgl.setCreatedBy(Global.loginUser.getUserId().toString());
+            vgl.setCompCode(Global.compCode);
+            vgl.setCreatedBy(Global.loginUser.getUserCode());
             String strVGL = gson.toJson(vgl);
             Gl gl = gson.fromJson(strVGL, Gl.class);
 
@@ -243,7 +243,7 @@ public class SalePurchaseTableModel extends AbstractTableModel {
                 Gl glSave = glService.save(gl);
                 if (glSave != null) {
                     VGl saveVGl = listVGl.get(row);
-                    saveVGl.setGlId(glSave.getGlId());
+                    saveVGl.setGlCode(glSave.getGlCode());
                     addNewRow();
                     parent.setRowSelectionInterval(row + 1, row + 1);
                     parent.setColumnSelectionInterval(1, 1);
@@ -295,7 +295,7 @@ public class SalePurchaseTableModel extends AbstractTableModel {
 
             VGl vgl = listVGl.get(row);
             try {
-                int delete = glService.delete(vgl.getGlId(),"GL-DELETE");
+                int delete = glService.delete(vgl.getGlCode(), "GL-DELETE");
                 if (delete == 1) {
                     listVGl.remove(row);
                     fireTableRowsDeleted(0, listVGl.size());
@@ -344,7 +344,7 @@ public class SalePurchaseTableModel extends AbstractTableModel {
             status = true;
         } else {
             VGl vgl = listVGl.get(listVGl.size() - 1);
-            if (vgl.getGlId() == null) {
+            if (vgl.getGlCode() == null) {
                 status = false;
             }
         }

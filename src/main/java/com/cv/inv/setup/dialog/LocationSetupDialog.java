@@ -7,6 +7,7 @@ package com.cv.inv.setup.dialog;
 
 import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
+import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.Location;
 import com.cv.inv.service.LocationService;
 import java.awt.event.ActionListener;
@@ -54,7 +55,7 @@ public class LocationSetupDialog extends javax.swing.JDialog implements KeyListe
     private TaskExecutor taskExecutor;
     @Autowired
     private LocationService locationService;
-    private Location location;
+    private Location location = new Location();
 
     JPopupMenu popupmenu;
     private final ActionListener menuListener = (java.awt.event.ActionEvent evt) -> {
@@ -96,7 +97,7 @@ public class LocationSetupDialog extends javax.swing.JDialog implements KeyListe
         locs.forEach(loc -> {
             DefaultMutableTreeNode root = new DefaultMutableTreeNode(loc);
             treeRoot.add(root);
-            createTreeNode(loc.getLocationId().toString(), root);
+            createTreeNode(loc.getLocationCode(), root);
             /*if (!child.getCode().isEmpty()) {
                 }*/
         });
@@ -134,21 +135,24 @@ public class LocationSetupDialog extends javax.swing.JDialog implements KeyListe
     private void newLocation() {
         Location loc = new Location();
         loc.setLocationName("New Location");
+        loc.setCreatedBy(Global.loginUser);
+        loc.setCreatedDate(Util1.getTodayDate());
         child = new DefaultMutableTreeNode(loc);
         selectedNode.add(child);
         treeModel.insertNodeInto(child, selectedNode, selectedNode.getChildCount() - 1);
     }
 
     private void saveLocaiton() {
+        location.setLocationCode(txtCode.getText());
         location.setLocationName(txtName.getText());
         location.setCalcStock(chkActive.isSelected());
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) selectedNode.getParent();
         Object userObject = node.getUserObject();
         if (userObject.toString().equals(parentRootName)) {
-            location.setParent(0);
+            location.setParentCode("0");
         } else {
             Location loc = (Location) userObject;
-            location.setParent(loc.getLocationId());
+            location.setParentCode(loc.getLocationCode());
         }
         try {
             Location saveLoc = locationService.save(location);
@@ -159,10 +163,10 @@ public class LocationSetupDialog extends javax.swing.JDialog implements KeyListe
                     Global.listLocation.add(saveLoc);
                     clear();
                     treeModel.reload(selectedNode);
-                }else{
-                    
+                } else {
+
                 }
-                
+
             }
         } catch (DataIntegrityViolationException e) {
             JOptionPane.showMessageDialog(Global.parentForm, "Duplicate Name.");
@@ -172,8 +176,8 @@ public class LocationSetupDialog extends javax.swing.JDialog implements KeyListe
 
     private void delLoc() {
         Location loc = (Location) selectedNode.getUserObject();
-        if (loc.getLocationId() != null) {
-            int delete = locationService.delete(loc.getLocationId().toString());
+        if (loc.getLocationCode() != null) {
+            int delete = locationService.delete(loc.getLocationCode());
             if (delete == 1) {
                 JOptionPane.showMessageDialog(Global.parentForm, "Deleted.");
             }
@@ -185,11 +189,11 @@ public class LocationSetupDialog extends javax.swing.JDialog implements KeyListe
     private void clear() {
         txtName.setText(null);
         chkActive.setSelected(false);
-        lblStatus.setText("NEW");
         txtName.requestFocus();
         btnClear.setEnabled(false);
         btnDelete.setEnabled(false);
         btnSave.setEnabled(false);
+        lblStatus.setText("NEW");
     }
 
     /**
@@ -211,6 +215,8 @@ public class LocationSetupDialog extends javax.swing.JDialog implements KeyListe
         btnDelete = new javax.swing.JButton();
         btnClear = new javax.swing.JButton();
         lblStatus = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        txtCode = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Location Setup");
@@ -275,6 +281,15 @@ public class LocationSetupDialog extends javax.swing.JDialog implements KeyListe
 
         lblStatus.setText("NEW");
 
+        jLabel2.setText("Code");
+
+        txtCode.setName("txtName"); // NOI18N
+        txtCode.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtCodeFocusGained(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -283,7 +298,8 @@ public class LocationSetupDialog extends javax.swing.JDialog implements KeyListe
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lblStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
@@ -293,13 +309,18 @@ public class LocationSetupDialog extends javax.swing.JDialog implements KeyListe
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnClear))
                     .addComponent(chkActive, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtName))
+                    .addComponent(txtName)
+                    .addComponent(txtCode))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(txtCode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -377,6 +398,10 @@ public class LocationSetupDialog extends javax.swing.JDialog implements KeyListe
         txtName.selectAll();
     }//GEN-LAST:event_txtNameFocusGained
 
+    private void txtCodeFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtCodeFocusGained
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtCodeFocusGained
+
     /**
      * @param args the command line arguments
      */
@@ -387,10 +412,12 @@ public class LocationSetupDialog extends javax.swing.JDialog implements KeyListe
     private javax.swing.JButton btnSave;
     private javax.swing.JCheckBox chkActive;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblStatus;
     private javax.swing.JTree treeLoc;
+    private javax.swing.JTextField txtCode;
     private javax.swing.JTextField txtName;
     // End of variables declaration//GEN-END:variables
 

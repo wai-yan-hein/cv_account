@@ -14,6 +14,7 @@ import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.Currency;
 import com.cv.accountswing.entity.CurrencyKey;
+import com.cv.accountswing.entity.Customer;
 import com.cv.accountswing.entity.Department;
 import com.cv.accountswing.entity.Trader;
 import com.cv.accountswing.service.CurrencyService;
@@ -23,8 +24,8 @@ import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.editor.CurrencyAutoCompleter;
+import com.cv.accountswing.ui.editor.CustomerAutoCompleter;
 import com.cv.accountswing.ui.editor.DepartmentAutoCompleter;
-import com.cv.accountswing.ui.editor.TraderAutoCompleter;
 import com.cv.accountswing.util.BindingUtil;
 import com.cv.accountswing.util.NumberUtil;
 import com.cv.accountswing.util.StockUP;
@@ -106,7 +107,7 @@ public class SaleEntry1 extends javax.swing.JPanel implements SelectionObserver,
     private LocationAutoCompleter locCompleter;
     private VouStatusAutoCompleter vouCompleter;
     private CurrencyAutoCompleter currAutoCompleter;
-    private TraderAutoCompleter traderAutoCompleter;
+    private CustomerAutoCompleter traderAutoCompleter;
     private DepartmentAutoCompleter departmentAutoCompleter;
     private SaleManAutoCompleter saleManCompleter;
     private TaskExecutor taskExecutor;
@@ -228,7 +229,7 @@ public class SaleEntry1 extends javax.swing.JPanel implements SelectionObserver,
         currAutoCompleter.setSelectionObserver(this);
         locCompleter = new LocationAutoCompleter(txtLocation, Global.listLocation, null);
         locCompleter.setSelectionObserver(this);
-        traderAutoCompleter = new TraderAutoCompleter(txtCus, Global.listTrader, null);
+        traderAutoCompleter = new CustomerAutoCompleter(txtCus, Global.listCustomer, null);
         traderAutoCompleter.setSelectionObserver(this);
         vouCompleter = new VouStatusAutoCompleter(txtVouStatus, Global.listVou, null);
         vouCompleter.setSelectionObserver(this);
@@ -314,8 +315,8 @@ public class SaleEntry1 extends javax.swing.JPanel implements SelectionObserver,
             String traderId;
             traderId = Global.sysProperties.get("system.default.customer");
             if (traderId != null) {
-                Trader trader = traderService.findById(Util1.getInteger(traderId));
-                traderAutoCompleter.setTrader(trader);
+                Trader trader = traderService.findById(traderId);
+                traderAutoCompleter.setTrader((Customer) trader);
                 selected("CustomerList", trader);
             }
             String depId = Global.sysProperties.get("system.default.department");
@@ -324,7 +325,7 @@ public class SaleEntry1 extends javax.swing.JPanel implements SelectionObserver,
             String cuId = Global.sysProperties.get("system.default.currency");
             CurrencyKey key = new CurrencyKey();
             key.setCode(cuId);
-            key.setCompCode(Global.compId);
+            key.setCompCode(Global.compCode);
             Currency currency = currencyService.findById(key);
             currAutoCompleter.setCurrency(currency);
             String locId = Global.sysProperties.get("system.default.location");

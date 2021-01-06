@@ -286,8 +286,8 @@ public class StockInOutTableModel extends AbstractTableModel {
         }
         if (status) {
             sio.setBatchCode(batchCode);
-            StockUnit toUnit = sio.getStock().getPurPriceUnit();
-            Integer pattern = sio.getStock().getPattern().getPatternId();
+            StockUnit toUnit = sio.getStock().getPurUnit();
+            String pattern = sio.getStock().getPattern().getPatternCode();
             float inWt = Util1.getFloat(sio.getInWeight());
             float outWt = Util1.getFloat(sio.getOutWeight());
 
@@ -299,14 +299,14 @@ public class StockInOutTableModel extends AbstractTableModel {
             if (sio.getOutUnit() != null) {
                 String outUnit = sio.getOutUnit().getItemUnitCode();
                 sio.setSamllOutWeight(getSmallestWeight(outWt, outUnit, toUnit.getItemUnitCode(), pattern));
-                sio.setSmallOutUnit(sio.getStock().getPurPriceUnit());
+                sio.setSmallOutUnit(sio.getStock().getPurUnit());
             }
         }
         return status;
 
     }
 
-    private Float getSmallestWeight(Float weight, String unit, String purUnit, Integer pattern) {
+    private Float getSmallestWeight(Float weight, String unit, String purUnit, String pattern) {
         float sWt = 0.0f;
         if (!unit.equals(purUnit)) {
             RelationKey key = new RelationKey(unit, purUnit, pattern);

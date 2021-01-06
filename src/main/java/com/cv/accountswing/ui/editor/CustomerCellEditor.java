@@ -6,6 +6,7 @@
 package com.cv.accountswing.ui.editor;
 
 import com.cv.accountswing.common.Global;
+import com.cv.accountswing.entity.Customer;
 import com.cv.accountswing.entity.Trader;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -13,6 +14,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.util.EventObject;
+import java.util.List;
 import javax.swing.AbstractCellEditor;
 import javax.swing.JComponent;
 import javax.swing.JTable;
@@ -25,11 +27,11 @@ import org.slf4j.LoggerFactory;
  *
  * @author Lenovo
  */
-public class TraderCellEditor extends AbstractCellEditor implements TableCellEditor {
+public class CustomerCellEditor extends AbstractCellEditor implements TableCellEditor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TraderCellEditor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CustomerCellEditor.class);
     private JComponent component = null;
-    private TraderAutoCompleter completer;
+    private SupplierAutoCompleter completer;
     private final FocusAdapter fa = new FocusAdapter() {
         @Override
         public void focusLost(FocusEvent e) {
@@ -44,7 +46,7 @@ public class TraderCellEditor extends AbstractCellEditor implements TableCellEdi
     };
 
     //private List<Medicine> listTrader = new ArrayList();
-    public TraderCellEditor() {
+    public CustomerCellEditor() {
 
     }
 
@@ -85,7 +87,7 @@ public class TraderCellEditor extends AbstractCellEditor implements TableCellEdi
         if (value != null) {
             jtf.setText(value.toString());
         }
-        completer = new TraderAutoCompleter(jtf, Global.listTrader, this);
+        completer = new SupplierAutoCompleter(jtf, Global.listSupplier, this);
         return component;
     }
 

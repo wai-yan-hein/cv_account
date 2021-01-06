@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DepartmentTableModel extends AbstractTableModel {
 
-    private static final Logger log = LoggerFactory.getLogger(TraderTableModel.class);
+    private static final Logger log = LoggerFactory.getLogger(Department.class);
     private List<Department> listDep = new ArrayList<>();
     private final String[] columnNames = {"Code", "Name"};
 

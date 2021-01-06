@@ -98,7 +98,7 @@ public class CustomerGrid extends javax.swing.JPanel {
     }
 
     private void searchCustomerList() {
-        List<Customer> listCustomer = customerService.search("-", "-", "-", "-", Global.compId.toString());
+        List<Customer> listCustomer = customerService.search("-", "-", "-", "-", Global.compCode);
         gridTabelModel.setListCustomer(listCustomer);
     }
 

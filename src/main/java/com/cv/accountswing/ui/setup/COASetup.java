@@ -99,7 +99,7 @@ public class COASetup extends javax.swing.JPanel implements KeyListener, PanelCo
     }
 
     private void searchHead() {
-        List<ChartOfAccount> listCOA = coaService.getParent(Global.compId.toString());
+        List<ChartOfAccount> listCOA = coaService.getParent(Global.compCode);
         coaHeadTableModel.setlistCoaHead(listCOA);
 
     }
@@ -156,7 +156,7 @@ public class COASetup extends javax.swing.JPanel implements KeyListener, PanelCo
     private void getCOAGroup(int row) {
         ChartOfAccount c = coaHeadTableModel.getChartOfAccount(row);
         if (c.getCode() != null) {
-            List<ChartOfAccount> listCoaGroup = coaService.search("-", "-", Global.compId.toString(), "-", c.getCode(), "-", "-");
+            List<ChartOfAccount> listCoaGroup = coaService.search("-", "-", Global.compCode, "-", c.getCode(), "-", "-");
             coaGroupTableModel.setCoaHeadCode(c.getCode());
             coaGroupTableModel.setListCOA(listCoaGroup);
             coaGroupTableModel.addEmptyRow();
@@ -170,7 +170,7 @@ public class COASetup extends javax.swing.JPanel implements KeyListener, PanelCo
     private void getCOAGroupChild(int row) {
         ChartOfAccount coa = coaGroupTableModel.getChartOfAccount(row);
         if (coa.getCode() != null) {
-            List<ChartOfAccount> listCoaChild = coaService.search("-", "-", Global.compId.toString(), "-", coa.getCode(), "-", "-");
+            List<ChartOfAccount> listCoaChild = coaService.search("-", "-", Global.compCode, "-", coa.getCode(), "-", "-");
             cOAGroupChildTableModel.setListCOA(listCoaChild);
             cOAGroupChildTableModel.setCoaGroupCode(coa.getCode());
             cOAGroupChildTableModel.addEmptyRow();

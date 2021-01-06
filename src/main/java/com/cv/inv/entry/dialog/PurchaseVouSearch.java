@@ -7,8 +7,9 @@ package com.cv.inv.entry.dialog;
 
 import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
+import com.cv.accountswing.entity.Supplier;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
-import com.cv.accountswing.ui.editor.TraderAutoCompleter;
+import com.cv.accountswing.ui.editor.SupplierAutoCompleter;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.PurHis;
 import com.cv.inv.entity.PurHisDetail;
@@ -52,7 +53,7 @@ public class PurchaseVouSearch extends javax.swing.JDialog implements KeyListene
     @Autowired
     private PurchaseDetailService pdService;
     private VouStatusAutoCompleter vouCompleter;
-    private TraderAutoCompleter traderAutoCompleter;
+    private SupplierAutoCompleter traderAutoCompleter;
 
     public PurchaseVouSearch() {
         super(Global.parentForm, true);
@@ -70,7 +71,7 @@ public class PurchaseVouSearch extends javax.swing.JDialog implements KeyListene
     }
 
     private void initCombo() {
-        traderAutoCompleter = new TraderAutoCompleter(txtCus, Global.listTrader, null);
+        traderAutoCompleter = new SupplierAutoCompleter(txtCus, Global.listSupplier, null);
         vouCompleter = new VouStatusAutoCompleter(txtVouStatus, Global.listVou, null);
     }
 
@@ -99,7 +100,7 @@ public class PurchaseVouSearch extends javax.swing.JDialog implements KeyListene
     }
 
     private void assignDefaultValue() {
-        traderAutoCompleter.setTrader(Global.defaultSupplier);
+        traderAutoCompleter.setTrader((Supplier) Global.defaultSupplier);
         vouCompleter.setVouStatus(Global.defaultVouStatus);
 
     }
@@ -116,7 +117,7 @@ public class PurchaseVouSearch extends javax.swing.JDialog implements KeyListene
         String fromDate = Util1.toDateStr(txtFromDate.getDate(), "yyyy-MM-dd");
         String toDate = Util1.toDateStr(txtToDate.getDate(), "yyyy-MM-dd");
         if (traderAutoCompleter.getTrader() != null) {
-            customerId = traderAutoCompleter.getTrader().getId().toString();
+            customerId = traderAutoCompleter.getTrader().getCode();
         } else {
             customerId = "-";
         }
@@ -124,7 +125,7 @@ public class PurchaseVouSearch extends javax.swing.JDialog implements KeyListene
             customerId = "-";
         }
         if (vouCompleter.getVouStatus() != null) {
-            vouStatusId = vouCompleter.getVouStatus().getVouStatusId().toString();
+            vouStatusId = vouCompleter.getVouStatus().getVouStatusCode();
             if (txtVouStatus.getText().isEmpty()) {
                 vouStatusId = "-";
             }
@@ -132,7 +133,7 @@ public class PurchaseVouSearch extends javax.swing.JDialog implements KeyListene
             vouStatusId = "-";
         }
         if (vouCompleter.getVouStatus() != null) {
-            vouStatusId = vouCompleter.getVouStatus().getVouStatusId().toString();
+            vouStatusId = vouCompleter.getVouStatus().getVouStatusCode();
         }
         if (txtVouStatus.getText().isEmpty()) {
             vouStatusId = "-";

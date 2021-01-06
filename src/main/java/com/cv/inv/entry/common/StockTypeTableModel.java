@@ -5,7 +5,6 @@
  */
 package com.cv.inv.entry.common;
 
-import com.cv.accountswing.ui.cash.common.*;
 import com.cv.inv.entity.StockType;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +18,7 @@ import org.slf4j.LoggerFactory;
  */
 public class StockTypeTableModel extends AbstractTableModel {
 
-    private static final Logger log = LoggerFactory.getLogger(TraderTableModel.class);
+    private static final Logger log = LoggerFactory.getLogger(StockTypeTableModel.class);
     private List<StockType> listType = new ArrayList<>();
     private final String[] columnNames = {"Stock Type"};
 

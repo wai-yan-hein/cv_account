@@ -39,7 +39,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class RelationSetupDialog extends javax.swing.JDialog implements KeyListener {
-    
+
     private static final Logger LOGGER = LoggerFactory.getLogger(RelationSetupDialog.class);
     @Autowired
     private RelationTableModel relationTableModel;
@@ -60,20 +60,20 @@ public class RelationSetupDialog extends javax.swing.JDialog implements KeyListe
         super(Global.parentForm, true);
         initComponents();
     }
-    
+
     public void initMain() {
         initTable();
         searchRelation();
         initCombo();
     }
-    
+
     private void initCombo() {
     }
-    
+
     private void searchRelation() {
         //relationTableModel.setListRelation();
     }
-    
+
     private void initTable() {
         initTablePattern();
         tblRelation.setModel(relationTableModel);
@@ -98,9 +98,9 @@ public class RelationSetupDialog extends javax.swing.JDialog implements KeyListe
         swrf = new StartWithRowFilter(txtFilter);
         sorter = new TableRowSorter(tblRelation.getModel());
         tblRelation.setRowSorter(sorter);
-        
+
     }
-    
+
     private void initTablePattern() {
         tblPattern.setModel(patternTableModel);
         tblPattern.getTableHeader().setFont(Global.tblHeaderFont);
@@ -114,27 +114,27 @@ public class RelationSetupDialog extends javax.swing.JDialog implements KeyListe
                 if (tblPattern.getSelectedRow() >= 0) {
                     selectRow = tblPattern.convertRowIndexToModel(tblPattern.getSelectedRow());
                     UnitPattern pattern = patternTableModel.getPattern(selectRow);
-                    relationTableModel.setPatternId(pattern.getPatternId());
-                    searchUnitRelation(pattern.getPatternId());
+                    relationTableModel.setPatternId(pattern.getPatternCode());
+                    searchUnitRelation(pattern.getPatternCode());
                 }
             }
         });
-        
+
     }
-    
+
     private void foucsRelationTable() {
         int row = relationTableModel.getListRelation().size();
         tblRelation.setColumnSelectionInterval(0, 0);
         tblRelation.setRowSelectionInterval(row - 1, row - 1);
     }
-    
-    private void searchUnitRelation(Integer patternId) {
+
+    private void searchUnitRelation(String patternId) {
         if (patternId != null) {
-            List<UnitRelation> listRelation = relationService.search(patternId.toString());
+            List<UnitRelation> listRelation = relationService.search(patternId);
             relationTableModel.setListRelation(listRelation);
             relationTableModel.addNewRow();
             foucsRelationTable();
-        }else{
+        } else {
             relationTableModel.clear();
         }
     }
@@ -248,18 +248,18 @@ public class RelationSetupDialog extends javax.swing.JDialog implements KeyListe
 
     @Override
     public void keyTyped(KeyEvent e) {
-        
+
     }
-    
+
     @Override
     public void keyPressed(KeyEvent e) {
     }
-    
+
     @Override
     public void keyReleased(KeyEvent e) {
         Object sourceObj = e.getSource();
         String ctrlName = "-";
-        
+
         if (sourceObj instanceof JTable) {
             ctrlName = ((JTable) sourceObj).getName();
         } else if (sourceObj instanceof JTextField) {
@@ -268,23 +268,23 @@ public class RelationSetupDialog extends javax.swing.JDialog implements KeyListe
             ctrlName = ((JButton) sourceObj).getName();
         }
         switch (ctrlName) {
-            
+
             case "txtName":
                 if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_DOWN) {
                 }
                 if (e.getKeyCode() == KeyEvent.VK_UP) {
                 }
                 tabToTable(e);
-                
+
                 break;
-            
+
             case "btnSave":
                 if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_DOWN) {
                 }
                 if (e.getKeyCode() == KeyEvent.VK_UP) {
                 }
                 tabToTable(e);
-                
+
                 break;
             case "btnDelete":
                 if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_DOWN) {
@@ -292,7 +292,7 @@ public class RelationSetupDialog extends javax.swing.JDialog implements KeyListe
                 if (e.getKeyCode() == KeyEvent.VK_UP) {
                 }
                 tabToTable(e);
-                
+
                 break;
             case "btnClear":
                 if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_DOWN) {
@@ -300,11 +300,11 @@ public class RelationSetupDialog extends javax.swing.JDialog implements KeyListe
                 if (e.getKeyCode() == KeyEvent.VK_UP) {
                 }
                 tabToTable(e);
-                
+
                 break;
         }
     }
-    
+
     private void tabToTable(KeyEvent e) {
         if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_RIGHT) {
             tblRelation.requestFocus();

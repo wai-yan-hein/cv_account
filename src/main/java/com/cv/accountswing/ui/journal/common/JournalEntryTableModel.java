@@ -7,7 +7,6 @@ package com.cv.accountswing.ui.journal.common;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.entity.ChartOfAccount;
-import com.cv.accountswing.entity.Currency;
 import com.cv.accountswing.entity.Department;
 import com.cv.accountswing.entity.Trader;
 import com.cv.accountswing.entity.view.VGl;
@@ -33,7 +32,7 @@ public class JournalEntryTableModel extends AbstractTableModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JournalEntryTableModel.class);
     private List<VGl> listGV = new ArrayList();
-    //String  userId=Global.loginUser.getUserId().toString();
+    //String  userId=Global.loginUser.getUserCode();
     String[] columnNames = {"Dept:", "Descripiton", "Cus / Sup", "Account", "Dr-Amt", "Crd-Amt"};
     private JTable parent;
     JFormattedTextField ttlCrdAmt;
@@ -129,7 +128,7 @@ public class JournalEntryTableModel extends AbstractTableModel {
                 if (value != null) {
                     if (value instanceof Trader) {
                         Trader trader = (Trader) value;
-                        gv.setTraderId(Util1.getLong(trader.getId()));
+                        gv.setTraderCode(trader.getCode());
                         gv.setTraderName(trader.getTraderName());
                         if (trader.getAccount() != null) {
                             gv.setSourceAcId(trader.getAccount().getCode());
@@ -239,7 +238,7 @@ public class JournalEntryTableModel extends AbstractTableModel {
     }
 
     public void saveGV(VGl gv, String status) {
-        //if (isValidCOA(gv, Global.compId.toString(), Global.loginUser.getUserId().toString(), status)) {
+        //if (isValidCOA(gv, Global.compCode, Global.loginUser.getUserCode(), status)) {
         // coaService.save(gv);
         if (status.equals("NEW")) {
             listGV.add(new VGl());

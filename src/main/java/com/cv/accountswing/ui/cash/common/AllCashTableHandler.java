@@ -70,11 +70,11 @@ public class AllCashTableHandler extends TransferHandler {
         try {
             data = (String) support.getTransferable().getTransferData(DataFlavor.stringFlavor);
             VGl vgl = gson.fromJson(data, VGl.class);
-            vgl.setGlId(null);
+            vgl.setGlCode(null);
             vgl.setDrAmt(null);
             vgl.setCrAmt(null);
             VGl getVGl = allCashTableModel.getVGl(row);
-            if (getVGl.getGlId() == null) {
+            if (getVGl.getGlCode() == null) {
                 allCashTableModel.setVGl(row, vgl);
                 table.setRowSelectionInterval(row, row);
                 table.setColumnSelectionInterval(7, 7);

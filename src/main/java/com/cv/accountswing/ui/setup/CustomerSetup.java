@@ -99,10 +99,10 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener, Pa
 
     private void initCombo() {
         String strList = Global.sysProperties.get("system.customer.setup.account");
-        List<ChartOfAccount> listCOA = coaService.searchWhereIn(strList, Global.compId.toString());
+        List<ChartOfAccount> listCOA = coaService.searchWhereIn(strList, Global.compCode);
         BindingUtil.BindComboFilter(cboAccount, listCOA, null, true, false);
         BindingUtil.BindComboFilter(cboPriceType, traderTypeService.findAll(), null, true, false);
-        BindingUtil.BindComboFilter(cboRegion, regionService.search("-", "-", Global.compId.toString(), "-"), null, true, false);
+        BindingUtil.BindComboFilter(cboRegion, regionService.search("-", "-", Global.compCode, "-"), null, true, false);
     }
 
     private void initTable() {
@@ -134,8 +134,10 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener, Pa
         loadingObserver.load(this.getName(), "Start");
         taskExecutor.execute(() -> {
             try {
-                List<Customer> listcustomer = customerService.search("-", "-", "-", "-", "-");
-                customerTabelModel.setListCustomer(listcustomer);
+                if (Global.listCustomer == null) {
+                    Global.listCustomer = customerService.search("-", "-", "-", "-", Global.compCode);
+                }
+                customerTabelModel.setListCustomer(Global.listCustomer);
                 loadingObserver.load(this.getName(), "Stop");
             } catch (Exception e) {
                 LOGGER.error("Search Customer :" + e.getMessage());
@@ -147,7 +149,7 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener, Pa
     }
 
     private void setCustomer(Customer cus) {
-        txtCusCode.setText(cus.getTraderId());
+        txtCusCode.setText(cus.getUserCode());
         txtConPerson.setText(cus.getContactPerson());
         txtCusName.setText(cus.getTraderName());
         txtCusEmail.setText(cus.getEmail());
@@ -172,9 +174,9 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener, Pa
             customer = new Customer();
             if (lblStatus.getText().equals("EDIT")) {
                 Customer cus = customerTabelModel.getCustomer(selectRow);
-                customer.setId(cus.getId());
+                customer.setCode(cus.getCode());
             }
-            customer.setTraderId(txtCusCode.getText());
+            customer.setUserCode(txtCusCode.getText());
             customer.setTraderName(txtCusName.getText());
             customer.setContactPerson(txtConPerson.getText());
             customer.setPhone(txtCusPhone.getText());
@@ -191,7 +193,7 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener, Pa
                 customer.setAccount((ChartOfAccount) cboAccount.getSelectedItem());
             }
             customer.setActive(chkActive.isSelected());
-            customer.setCompCode(Global.compId);
+            customer.setCompCode(Global.compCode);
             customer.setUpdatedDate(Util1.getTodayDate());
             customer.setCreditLimit(Util1.getInteger(txtCreditLimit.getText()));
             customer.setCreditDays(Util1.getInteger(txtCreditTerm.getText()));
@@ -207,11 +209,11 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener, Pa
         if (isValidEntry()) {
             String traderCodeLength = Global.sysProperties.get("system.trader.id.length");
             Customer save = customerService.save(customer, traderCodeLength);
-            if (save.getTraderId() != null) {
+            if (save.getUserCode() != null) {
                 JOptionPane.showMessageDialog(Global.parentForm, "Saved");
                 if (lblStatus.getText().equals("NEW")) {
                     customerTabelModel.addCustomer(customer);
-                    Global.listTrader.add(customer);
+                    Global.listCustomer.add(customer);
                 } else {
                     customerTabelModel.setCustomer(selectRow, customer);
                 }

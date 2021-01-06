@@ -95,7 +95,7 @@ public class RoleAssignSetup extends javax.swing.JPanel implements KeyListener, 
 
     private void initCombo() {
         List<CompanyInfo> listComInfo = compInfoService.search("-", "-", "-", "-", "-", "-");
-        List<UserRole> listUserRole = userRoleService.search("-", Global.compId.toString());
+        List<UserRole> listUserRole = userRoleService.search("-", Global.compCode);
         BindingUtil.BindComboFilter(cboComInfo, listComInfo, null, true, false);
         BindingUtil.BindComboFilter(cboRole, listUserRole, null, true, false);
 
@@ -120,7 +120,7 @@ public class RoleAssignSetup extends javax.swing.JPanel implements KeyListener, 
                 if (tblUser.getSelectedRow() >= 0) {
                     selectRow = tblUser.convertRowIndexToModel(tblUser.getSelectedRow());
                     AppUser user = userTableModel.getUser(selectRow);
-                    getAssignRole(user.getUserId());
+                    getAssignRole(user.getAppUserCode());
 
                 }
 
@@ -173,8 +173,8 @@ public class RoleAssignSetup extends javax.swing.JPanel implements KeyListener, 
         });
     }
 
-    private void getAssignRole(int userId) {
-        List assignCompany = usrCompRoleService.getAssignRole(String.valueOf(userId));
+    private void getAssignRole(String userId) {
+        List assignCompany = usrCompRoleService.getAssignRole(userId);
         List<VUsrCompRole> listUCR = (List<VUsrCompRole>) (List<?>) assignCompany;
         compRoleTableModel.setListUCR(listUCR);
         btnAdd.setEnabled(true);
@@ -185,9 +185,9 @@ public class RoleAssignSetup extends javax.swing.JPanel implements KeyListener, 
         CompanyInfo cInfo = (CompanyInfo) cboComInfo.getSelectedItem();
         UserRole uRole = (UserRole) cboRole.getSelectedItem();
         UsrCompRoleKey key = new UsrCompRoleKey();
-        key.setCompCode(cInfo.getCompId());
-        key.setRoleId(uRole.getRoleId());
-        key.setUserId(user.getUserId());
+        key.setCompCode(cInfo.getCompCode());
+        key.setRoleCode(uRole.getRoleCode());
+        key.setUserCode(user.getUserCode());
         UsrCompRole ucr = new UsrCompRole();
         ucr.setKey(key);
 
@@ -411,7 +411,7 @@ public class RoleAssignSetup extends javax.swing.JPanel implements KeyListener, 
                 if (e.getKeyCode() == KeyEvent.VK_DOWN || e.getKeyCode() == KeyEvent.VK_UP) {
                     selectRow = tblUser.convertRowIndexToModel(tblUser.getSelectedRow());
                     AppUser user = userTableModel.getUser(selectRow);
-                    getAssignRole(user.getUserId());
+                    getAssignRole(user.getUserCode());
                 }
                 if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_RIGHT) {
                     cboComInfo.requestFocus();

@@ -42,7 +42,7 @@ public class StockBrandSetupDialog extends javax.swing.JDialog implements KeyLis
     private static final Logger LOGGER = LoggerFactory.getLogger(StockBrandSetupDialog.class);
 
     private int selectRow = - 1;
-    private StockBrand brand;
+    private StockBrand brand = new StockBrand();
     @Autowired
     private StockBrandService itemBrandService;
     @Autowired
@@ -104,9 +104,10 @@ public class StockBrandSetupDialog extends javax.swing.JDialog implements KeyLis
 
     }
 
-    private void setCategory(StockBrand cat) {
-
-        txtName.setText(cat.getBrandName());
+    private void setCategory(StockBrand b) {
+        brand = b;
+        txtCode.setText(brand.getUserCode());
+        txtName.setText(brand.getBrandName());
         lblStatus.setText("EDIT");
         txtName.requestFocus();
 
@@ -116,9 +117,8 @@ public class StockBrandSetupDialog extends javax.swing.JDialog implements KeyLis
         if (isValidEntry()) {
             StockBrand saveCat = itemBrandService.save(brand);
             if (saveCat != null) {
-                LOGGER.info("CATEGORY ID :" + saveCat.getBrandId());
+                LOGGER.info("CATEGORY ID :" + saveCat.getBrandCode());
                 JOptionPane.showMessageDialog(Global.parentForm, "Saved");
-
                 if (lblStatus.getText().equals("NEW")) {
                     Global.listStockBrand.add(saveCat);
                 } else {
@@ -131,10 +131,11 @@ public class StockBrandSetupDialog extends javax.swing.JDialog implements KeyLis
     }
 
     private void clear() {
-
+        txtCode.setText(null);
         txtFilter.setText(null);
         txtName.setText(null);
         lblStatus.setText("NEW");
+        brand = new StockBrand();
         txtName.requestFocus();
         itemBrandTableModel.refresh();
 
@@ -142,11 +143,11 @@ public class StockBrandSetupDialog extends javax.swing.JDialog implements KeyLis
 
     private void delete() {
         StockBrand cat = itemBrandTableModel.getItemBrand(selectRow);
-        List<Stock> stockList = stockService.searchC(cat.getBrandId().toString());
+        List<Stock> stockList = stockService.searchC(cat.getBrandCode());
         if (stockList.size() >= 0) {
             JOptionPane.showMessageDialog(Global.parentForm, "Cannot Delete!");
         } else {
-            int delete = itemBrandService.delete(cat.getBrandId().toString());
+            int delete = itemBrandService.delete(cat.getBrandCode());
             if (delete == 1) {
                 JOptionPane.showMessageDialog(Global.parentForm, "Deleted");
             } else {
@@ -164,8 +165,15 @@ public class StockBrandSetupDialog extends javax.swing.JDialog implements KeyLis
                     "Code length", JOptionPane.ERROR_MESSAGE);
             txtName.requestFocusInWindow();
         } else {
-            brand = new StockBrand();
-            brand.setBrandName(txtName.getText());
+            if (lblStatus.getText().equals("NEW")) {
+                brand.setUserCode(txtCode.getText());
+                brand.setBrandName(txtName.getText());
+                brand.setCreatedBy(Global.loginUser);
+                brand.setCreatedDate(Util1.getTodayDate());
+                brand.setCompCode(Global.compCode);
+            }else{
+                brand.setUpdatedBy(Global.loginUser);
+            }
         }
 
         return status;
@@ -205,6 +213,8 @@ public class StockBrandSetupDialog extends javax.swing.JDialog implements KeyLis
         btnDelete = new javax.swing.JButton();
         btnClear = new javax.swing.JButton();
         lblStatus = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        txtCode = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Stock Brand Setup");
@@ -286,6 +296,22 @@ public class StockBrandSetupDialog extends javax.swing.JDialog implements KeyLis
         lblStatus.setFont(Global.lableFont);
         lblStatus.setText("NEW");
 
+        jLabel3.setFont(Global.lableFont);
+        jLabel3.setText("Code");
+
+        txtCode.setFont(Global.textFont);
+        txtCode.setName("txtName"); // NOI18N
+        txtCode.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtCodeFocusGained(evt);
+            }
+        });
+        txtCode.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtCodeActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -294,7 +320,8 @@ public class StockBrandSetupDialog extends javax.swing.JDialog implements KeyLis
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 57, Short.MAX_VALUE)
-                    .addComponent(lblStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(lblStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, 57, Short.MAX_VALUE))
                 .addGap(12, 12, 12)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(txtName, javax.swing.GroupLayout.Alignment.LEADING)
@@ -303,13 +330,18 @@ public class StockBrandSetupDialog extends javax.swing.JDialog implements KeyLis
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnDelete)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnClear)))
+                        .addComponent(btnClear))
+                    .addComponent(txtCode, javax.swing.GroupLayout.Alignment.LEADING))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(txtCode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -320,7 +352,7 @@ public class StockBrandSetupDialog extends javax.swing.JDialog implements KeyLis
                         .addComponent(lblStatus))
                     .addComponent(btnDelete)
                     .addComponent(btnClear))
-                .addContainerGap(299, Short.MAX_VALUE))
+                .addContainerGap(265, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -395,6 +427,14 @@ public class StockBrandSetupDialog extends javax.swing.JDialog implements KeyLis
         txtName.selectAll();
     }//GEN-LAST:event_txtNameFocusGained
 
+    private void txtCodeFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtCodeFocusGained
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtCodeFocusGained
+
+    private void txtCodeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCodeActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtCodeActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -404,10 +444,12 @@ public class StockBrandSetupDialog extends javax.swing.JDialog implements KeyLis
     private javax.swing.JButton btnDelete;
     private javax.swing.JButton btnSave;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblStatus;
     private javax.swing.JTable tblCategory;
+    private javax.swing.JTextField txtCode;
     private javax.swing.JTextField txtFilter;
     private javax.swing.JTextField txtName;
     // End of variables declaration//GEN-END:variables

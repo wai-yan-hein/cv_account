@@ -109,7 +109,7 @@ public class CurrencySetup extends javax.swing.JPanel implements KeyListener, Pa
         loadingObserver.load(this.getName(), "Start");
         taskExecutor.execute(() -> {
             try {
-                List<Currency> listCurr = curService.search("-", "-", Global.compId.toString());
+                List<Currency> listCurr = curService.search("-", "-", Global.compCode);
                 currencyTabelModel.setlistCurrency(listCurr);
                 loadingObserver.load(this.getName(), "Stop");
             } catch (Exception e) {
@@ -124,7 +124,7 @@ public class CurrencySetup extends javax.swing.JPanel implements KeyListener, Pa
     private void saveCurrency() {
         currency = new Currency();
         CurrencyKey key = new CurrencyKey();
-        key.setCompCode(Global.compId);
+        key.setCompCode(Global.compCode);
         key.setCode(txtCurrCode.getText());
         currency.setKey(key);
         currency.setActive(chkActive.isSelected());
@@ -183,7 +183,7 @@ public class CurrencySetup extends javax.swing.JPanel implements KeyListener, Pa
             status = false;
             JOptionPane.showMessageDialog(Global.parentForm, "Invalid currency name.");
         } else if (editStatus.equals("NEW")) {
-            List<Currency> listCurr = curService.search(cur.getKey().getCode(), "-", Global.compId.toString());
+            List<Currency> listCurr = curService.search(cur.getKey().getCode(), "-", Global.compCode);
 
             if (listCurr != null) {
                 if (listCurr.size() > 0) {
@@ -195,10 +195,10 @@ public class CurrencySetup extends javax.swing.JPanel implements KeyListener, Pa
 
         if (status) {
             if (editStatus.equals("NEW")) {
-                cur.setCreatedBy(Global.loginUser.getUserId().toString());
+                cur.setCreatedBy(Global.loginUser.getUserCode());
                 cur.setCreatedDt(Util1.getTodayDate());
             } else {
-                cur.setUpdatedBy(Global.loginUser.getUserId().toString());
+                cur.setUpdatedBy(Global.loginUser.getUserCode());
                 cur.setUpdatedDt(Util1.getTodayDate());
             }
         }

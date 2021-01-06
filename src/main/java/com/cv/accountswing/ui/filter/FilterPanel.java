@@ -5,7 +5,6 @@
  */
 package com.cv.accountswing.ui.filter;
 
-import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.service.VDescriptionService;
@@ -14,7 +13,7 @@ import com.cv.accountswing.ui.editor.COAAutoCompleter;
 import com.cv.accountswing.ui.editor.CurrencyAutoCompleter;
 import com.cv.accountswing.ui.editor.DateAutoCompleter;
 import com.cv.accountswing.ui.editor.DepartmentAutoCompleter;
-import com.cv.accountswing.ui.editor.TraderAutoCompleter;
+import com.cv.accountswing.ui.editor.SupplierAutoCompleter;
 import com.cv.accountswing.ui.cash.AllCash;
 import com.cv.accountswing.ui.editor.DespAutoCompleter;
 import com.cv.accountswing.ui.editor.RefAutoCompleter;
@@ -36,7 +35,7 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FilterPanel.class);
     private DateAutoCompleter dateAutoCompleter;
-    private TraderAutoCompleter traderAutoCompleter;
+    private SupplierAutoCompleter traderAutoCompleter;
     private DepartmentAutoCompleter departmentAutoCompleter;
     private COAAutoCompleter coaAutoCompleter;
     private CurrencyAutoCompleter currencyAutoCompleter;
@@ -75,7 +74,7 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
     }
 
     private void initializeData() {
-        traderAutoCompleter = new TraderAutoCompleter(txtPerson, Global.listTrader, null);
+        traderAutoCompleter = new SupplierAutoCompleter(txtPerson, Global.listSupplier, null);
         traderAutoCompleter.setSelectionObserver(selectionObserver);
         departmentAutoCompleter = new DepartmentAutoCompleter(txtDepartment, Global.listDepartment, null);
         departmentAutoCompleter.setSelectionObserver(selectionObserver);

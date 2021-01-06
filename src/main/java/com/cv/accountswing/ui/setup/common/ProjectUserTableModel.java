@@ -29,13 +29,13 @@ public class ProjectUserTableModel extends AbstractTableModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectUserTableModel.class);
     private List<VProjectUserMapping> listProject = new ArrayList();
     private String[] columnNames = {"Short Name", "Name"};
-    private Long projectId;
+    private String projectId;
 
-    public Long getProjectId() {
+    public String getProjectId() {
         return projectId;
     }
 
-    public void setProjectId(Long projectId) {
+    public void setProjectId(String projectId) {
         this.projectId = projectId;
     }
 
@@ -112,11 +112,11 @@ public class ProjectUserTableModel extends AbstractTableModel {
     }
 
     private void saveUser(AppUser appUser) {
-        long userId = appUser.getUserId();
-        if (isValidUser(Util1.getString(projectId), appUser.getUserId().toString())) {
+        String userId = appUser.getUserCode();
+        if (isValidUser(Util1.getString(projectId), appUser.getUserCode())) {
             ProjectUserMapping userMapping = new ProjectUserMapping();
-            userMapping.setProjectId(projectId);
-            userMapping.setUserId(userId);
+            userMapping.setProjecCode(projectId);
+            userMapping.setUserCode(userId);
             ProjectUserMapping save = projectUserMappingService.save(userMapping);
             if (save != null) {
                 JOptionPane.showMessageDialog(Global.parentForm, "User  Added.");

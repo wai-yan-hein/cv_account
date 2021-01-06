@@ -8,9 +8,9 @@ package com.cv.accountswing.ui.editor;
 import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.SelectionObserver;
-import com.cv.accountswing.entity.Trader;
+import com.cv.accountswing.entity.Customer;
+import com.cv.accountswing.ui.cash.common.CustomerTableModel;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
-import com.cv.accountswing.ui.cash.common.TraderTableModel;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -42,15 +42,15 @@ import org.slf4j.LoggerFactory;
  *
  * @author Lenovo
  */
-public class TraderAutoCompleter implements KeyListener {
+public class CustomerAutoCompleter implements KeyListener {
 
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(TraderAutoCompleter.class);
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(CustomerAutoCompleter.class);
     private JTable table = new JTable();
     private JPopupMenu popup = new JPopupMenu();
     private JTextComponent textComp;
     private static final String AUTOCOMPLETER = "AUTOCOMPLETER"; //NOI18N
-    private TraderTableModel traderTableModel;
-    private Trader trader;
+    private CustomerTableModel traderTableModel;
+    private Customer trader;
     public AbstractCellEditor editor;
     private TableRowSorter<TableModel> sorter;
     private int x = 0;
@@ -62,16 +62,16 @@ public class TraderAutoCompleter implements KeyListener {
         this.selectionObserver = selectionObserver;
     }
 
-    public TraderAutoCompleter() {
+    public CustomerAutoCompleter() {
     }
 
-    public TraderAutoCompleter(JTextComponent comp, List<Trader> list,
+    public CustomerAutoCompleter(JTextComponent comp, List<Customer> list,
             AbstractCellEditor editor) {
         this.textComp = comp;
         this.editor = editor;
         textComp.putClientProperty(AUTOCOMPLETER, this);
         textComp.setFont(Global.textFont);
-        traderTableModel = new TraderTableModel(list);
+        traderTableModel = new CustomerTableModel(list);
         table.setModel(traderTableModel);
         table.getTableHeader().setFont(Global.textFont);
         table.setFont(Global.textFont); // NOI18N
@@ -244,7 +244,7 @@ public class TraderAutoCompleter implements KeyListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             JComponent tf = (JComponent) e.getSource();
-            TraderAutoCompleter completer = (TraderAutoCompleter) tf.getClientProperty(AUTOCOMPLETER);
+            CustomerAutoCompleter completer = (CustomerAutoCompleter) tf.getClientProperty(AUTOCOMPLETER);
             if (tf.isEnabled()) {
                 if (completer.popup.isVisible()) {
                     completer.selectNextPossibleValue();
@@ -262,7 +262,7 @@ public class TraderAutoCompleter implements KeyListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             JComponent tf = (JComponent) e.getSource();
-            TraderAutoCompleter completer = (TraderAutoCompleter) tf.getClientProperty(AUTOCOMPLETER);
+            CustomerAutoCompleter completer = (CustomerAutoCompleter) tf.getClientProperty(AUTOCOMPLETER);
             if (tf.isEnabled()) {
                 if (completer.popup.isVisible()) {
                     completer.selectPreviousPossibleValue();
@@ -274,7 +274,7 @@ public class TraderAutoCompleter implements KeyListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             JComponent tf = (JComponent) e.getSource();
-            TraderAutoCompleter completer = (TraderAutoCompleter) tf.getClientProperty(AUTOCOMPLETER);
+            CustomerAutoCompleter completer = (CustomerAutoCompleter) tf.getClientProperty(AUTOCOMPLETER);
             if (tf.isEnabled()) {
                 completer.popup.setVisible(false);
                 popupOpen = false;
@@ -316,11 +316,11 @@ public class TraderAutoCompleter implements KeyListener {
         table.scrollRectToVisible(rect);
     }
 
-    public Trader getTrader() {
+    public Customer getTrader() {
         return trader;
     }
 
-    public void setTrader(Trader trader) {
+    public void setTrader(Customer trader) {
         this.trader = trader;
         if (trader != null) {
             this.textComp.setText(trader.getTraderName());

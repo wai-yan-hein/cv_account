@@ -31,7 +31,7 @@ import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.editor.CurrencyAutoCompleter;
 import com.cv.accountswing.ui.editor.DateAutoCompleter;
 import com.cv.accountswing.ui.editor.DepartmentAutoCompleter;
-import com.cv.accountswing.ui.editor.TraderAutoCompleter;
+import com.cv.accountswing.ui.editor.SupplierAutoCompleter;
 import com.cv.accountswing.ui.report.common.APARTableModel;
 import com.cv.accountswing.ui.report.common.GLListingTableModel;
 import com.cv.accountswing.util.Util1;
@@ -230,13 +230,13 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         initializeParameter();
         taskExecutor.execute(() -> {
             try {
-                coaOpDService.genArAp1(Global.compId.toString(),
+                coaOpDService.genArAp1(Global.compCode,
                         Util1.toDateStrMYSQL(stDate, "dd/MM/yyyy"), Global.finicialPeriodFrom,
                         Util1.toDateStrMYSQL(enDate, "dd/MM/yyyy"), "-",
                         currency, dept, cvId,
                         userId);
                 List<VApar> listApar = aParService.getApAr(userId,
-                        Global.compId.toString());
+                        Global.compCode);
                 if (!listApar.isEmpty()) {
                     aPARTableModel.setListAPAR(listApar);
                     calAPARTotalAmount(listApar);
@@ -268,11 +268,11 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         taskExecutor.execute(() -> {
             try {
                 LOGGER.info("START DATE :" + stDate + "---" + "END DATE :" + enDate);
-                coaOpDService.genTriBalance1(Global.compId.toString(),
+                coaOpDService.genTriBalance1(Global.compCode,
                         Util1.toDateStrMYSQL(stDate, "dd/MM/yyyy"),
                         Global.finicialPeriodFrom, Util1.toDateStrMYSQL(enDate, "dd/MM/yyyy"),
                         "-", currency, dept, cvId, userId, Global.machineId.toString());
-                List<VTriBalance> listVTB = vTriBalanceService.getTriBalance(userId, Global.compId.toString());
+                List<VTriBalance> listVTB = vTriBalanceService.getTriBalance(userId, Global.compCode);
                 glListingTableModel.setListTBAL(listVTB);
                 calGLTotlaAmount(listVTB);
                 loadingObserver.load(this.getName(), "Stop");
@@ -288,7 +288,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         try {
             List<VGl> listVGL = vGlService.searchGlDrCr(Util1.isNull(stDate, "-"),
                     Util1.isNull(enDate, "-"), coaId, currency, dept,
-                    cvId, Global.compId.toString(),
+                    cvId, Global.compCode,
                     "DR");
             swapDrCrAmt(listVGL, getTarget());
             calculateOpening(cvId);
@@ -307,13 +307,13 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                 opBalanceGL = coaOpDService.getOpBalanceByTrader(getTarget(),
                         Global.finicialPeriodFrom,
                         stDate, 3, "MMK",
-                        Global.loginUser.getUserId().toString(),
+                        Global.loginUser.getUserCode(),
                         Util1.isNull(dept, "-"), cvId, Global.machineId.toString());
             } else {
                 opBalanceGL = coaOpDService.getOpBalanceGL1(getTarget(),
                         Global.finicialPeriodFrom,
                         stDate, 3, "MMK",
-                        Global.loginUser.getUserId().toString(),
+                        Global.loginUser.getUserCode(),
                         Util1.isNull(dept, "-"), Global.machineId.toString());
             }
             if (!opBalanceGL.isEmpty()) {
@@ -411,7 +411,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         currency = Global.defalutCurrency.getKey().getCode();
         stDate = Util1.isNull(stDate, Util1.toDateStr(Util1.getTodayDate(), "dd/MM/yyyy"));
         enDate = Util1.isNull(enDate, Util1.toDateStr(Util1.getTodayDate(), "dd/MM/yyyy"));
-        userId = Global.loginUser.getUserId().toString();
+        userId = Global.loginUser.getUserCode();
     }
 
     private void initCombo() {
@@ -419,8 +419,8 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                 Global.listDateModel, null);
         dateAutoCompleter.setSelectionObserver(this);
 
-        TraderAutoCompleter traderAutoCompleter = new TraderAutoCompleter(txtPerson,
-                Global.listTrader, null);
+        SupplierAutoCompleter traderAutoCompleter = new SupplierAutoCompleter(txtPerson,
+                Global.listSupplier, null);
         traderAutoCompleter.setSelectionObserver(this);
 
         departmentAutoCompleter = new DepartmentAutoCompleter(txtDep,
@@ -436,9 +436,9 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         loadingObserver.load(this.getName(), "Start");
         taskExecutor.execute(() -> {
             try {
-                CompanyInfo ci = ciService.findById(Global.compId);
+                CompanyInfo ci = ciService.findById(Global.compCode);
                 SystemPropertyKey key = new SystemPropertyKey();
-                key.setCompCode(Global.compId);
+                key.setCompCode(Global.compCode);
                 key.setPropKey("system.report.path");
                 SystemProperty sp = spService.findById(key);
                 String fileName = userId + "_apar.pdf";
@@ -448,14 +448,14 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
 
                 reportPath = reportPath + "APAR";
                 key = new SystemPropertyKey();
-                key.setCompCode(Global.compId);
+                key.setCompCode(Global.compCode);
                 key.setPropKey("system.font.path");
                 sp = spService.findById(key);
                 String fontPath = sp.getPropValue();
 
                 Map<String, Object> parameters = new HashMap();
                 parameters.put("p_company_name", ci.getName());
-                parameters.put("p_comp_id", Global.compId.toString());
+                parameters.put("p_comp_id", Global.compCode);
                 parameters.put("img_path", imgPath);
 
                 rService.genCreditVoucher(reportPath, filePath, fontPath, parameters);
