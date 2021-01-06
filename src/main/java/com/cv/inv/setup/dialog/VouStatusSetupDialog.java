@@ -96,12 +96,13 @@ public class VouStatusSetupDialog extends javax.swing.JDialog implements KeyList
                     "Code length", JOptionPane.ERROR_MESSAGE);
             txtName.requestFocusInWindow();
         } else {
+            vouStatus.setStatusDesp(txtName.getText());
             if (lblStatus.getText().equals("NEW")) {
-                vouStatus.setUserCode(txtCode.getText());
-                vouStatus.setStatusDesp(txtName.getText());
+                vouStatus.setUserCode(txtCode.getText());               
                 vouStatus.setCreatedBy(Global.loginUser);
                 vouStatus.setCreatedDate(Util1.getTodayDate());
                 vouStatus.setCompCode(Global.compCode);
+                vouStatus.setMacId(Global.machineId);
             } else {
                 vouStatus.setUpdatedBy(Global.loginUser);
             }

@@ -42,7 +42,7 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
     private static final Logger LOGGER = LoggerFactory.getLogger(CategorySetupDialog.class);
 
     private int selectRow = - 1;
-    private Category category;
+    private Category category =new Category();
     @Autowired
     private CategoryService categoryService;
     @Autowired
@@ -164,12 +164,13 @@ public class CategorySetupDialog extends javax.swing.JDialog implements KeyListe
                     "Code length", JOptionPane.ERROR_MESSAGE);
             txtName.requestFocusInWindow();
         } else {
+            category.setCatName(txtName.getText());
             if (lblStatus.getText().equals("NEW")) {
-                category.setCatName(txtName.getText());
                 category.setCompCode(Global.compCode);
                 category.setCreatedBy(Global.loginUser);
                 category.setCreatedDate(Util1.getTodayDate());
                 category.setUserCode(txtUserCode.getText());
+                category.setMacId(Global.machineId);
             } else {
                 category.setUpdatedBy(Global.loginUser);
             }

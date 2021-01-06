@@ -728,7 +728,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             Global.listLocation = locationService.findAll();
             Global.listVou = vouService.findAll();
             Global.listSaleMan = saleManService.findAll();
-            Global.listStock = stockService.findActiveStock();
+            Global.listStock = stockService.findAll();
             Global.listStockUnit = stockUnitService.findAll();
             Global.listRelation = relationService.findAll();
             Global.listMachine = machineInfoService.findAll();

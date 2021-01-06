@@ -165,12 +165,13 @@ public class StockBrandSetupDialog extends javax.swing.JDialog implements KeyLis
                     "Code length", JOptionPane.ERROR_MESSAGE);
             txtName.requestFocusInWindow();
         } else {
+            brand.setBrandName(txtName.getText());
             if (lblStatus.getText().equals("NEW")) {
-                brand.setUserCode(txtCode.getText());
-                brand.setBrandName(txtName.getText());
+                brand.setUserCode(txtCode.getText());                
                 brand.setCreatedBy(Global.loginUser);
                 brand.setCreatedDate(Util1.getTodayDate());
                 brand.setCompCode(Global.compCode);
+                brand.setMacId(Global.machineId);
             }else{
                 brand.setUpdatedBy(Global.loginUser);
             }

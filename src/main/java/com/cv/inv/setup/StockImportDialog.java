@@ -203,7 +203,7 @@ public class StockImportDialog extends javax.swing.JDialog {
         JDialog loading = Util1.getLoading(this, loadingIcon);
         taskExecutor.execute(() -> {
             importTableModel.getListStock().forEach(stock -> {
-                stockService.save(stock, "NEW");
+                stockService.save(stock);
             });
             importTableModel.clear();
             loading.setVisible(false);

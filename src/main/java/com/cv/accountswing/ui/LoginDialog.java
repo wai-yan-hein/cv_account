@@ -181,7 +181,7 @@ public class LoginDialog extends javax.swing.JDialog implements KeyListener {
     }
 
     private void login() {
-        register();
+       // register();
         if (txtLoginName.getText().isEmpty() || txtPassword.getPassword().length == 0) {
             JOptionPane.showMessageDialog(this, "Invalid user name or password.",
                     "Authentication error.", JOptionPane.ERROR_MESSAGE);

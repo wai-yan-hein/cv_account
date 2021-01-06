@@ -109,6 +109,7 @@ public class StockTypeSetupDialog extends javax.swing.JDialog implements KeyList
     private void setItemType(StockType item) {
         itemType = item;
         txtAccId.setText(itemType.getAccountId());
+        txtCode.setText(itemType.getItemTypeCode());
         txtName.setText(itemType.getItemTypeName());
         lblStatus.setText("EDIT");
         txtCode.setEnabled(false);
@@ -178,13 +179,14 @@ public class StockTypeSetupDialog extends javax.swing.JDialog implements KeyList
                     "Code length", JOptionPane.ERROR_MESSAGE);
             txtCode.requestFocusInWindow();
         } else {
+            itemType.setItemTypeName(txtName.getText().trim());
             if (lblStatus.getText().equals("NEW")) {
-                itemType.setItemTypeCode(txtCode.getText().trim());
-                itemType.setItemTypeName(txtName.getText().trim());
+                itemType.setItemTypeCode(txtCode.getText().trim());                
                 itemType.setAccountId(txtAccId.getText().trim());
                 itemType.setCompCode(Global.compCode);
                 itemType.setCreatedBy(Global.loginUser);
                 itemType.setCreatedDate(Util1.getTodayDate());
+                itemType.setMacId(Global.machineId);
             }else{
                 itemType.setUpdatedBy(Global.loginUser);
             }
