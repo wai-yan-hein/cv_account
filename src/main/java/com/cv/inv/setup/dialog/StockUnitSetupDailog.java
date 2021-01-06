@@ -155,11 +155,12 @@ public class StockUnitSetupDailog extends javax.swing.JDialog implements KeyList
                     "Code length", JOptionPane.ERROR_MESSAGE);
             txtUnitShort.requestFocusInWindow();
         } else {
+             itemUnit.setItemUnitName(txtUnitDesp.getText());
             if (lblStatus.getText().equals("NEW")) {
-                itemUnit.setItemUnitCode(txtUnitShort.getText());
-                itemUnit.setItemUnitName(txtUnitDesp.getText());
+                itemUnit.setItemUnitCode(txtUnitShort.getText());              
                 itemUnit.setCreatedBy(Global.loginUser);
                 itemUnit.setCreatedDate(Util1.getTodayDate());
+                itemUnit.setMacId(Global.machineId);
             }else{
                 itemUnit.setUpdatedBy(Global.loginUser);
             }

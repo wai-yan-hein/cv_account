@@ -79,7 +79,7 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
     private StockImportDialog importDialog;
     @Autowired
     private UnitPatternService unitPatternService;
-    private Stock stock;
+    private Stock stock = new Stock();
     private LoadingObserver loadingObserver;
     private TableRowSorter<TableModel> sorter;
     private StartWithRowFilter swrf;
@@ -145,7 +145,7 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
         txtPurPrice.setText(Util1.getString(stock.getPurPrice()));
         txtRemark.setText(stock.getRemark());
         txtShortName.setText(stock.getShortName());
-        txtStockCode.setText(stock.getStockCode());
+        txtStockCode.setText(stock.getUserCode());
         txtStockName.setText(stock.getStockName());
         chkActive.setSelected(Util1.getBoolean(stock.getIsActive()));
         cboBrand.setSelectedItem(stock.getBrand());
@@ -229,8 +229,7 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
             if (txtExpDate.getDate() != null) {
                 stock.setExpireDate(txtExpDate.getDate());
             }
-            stock = new Stock();
-            stock.setStockCode(txtStockCode.getText().trim());
+            stock.setUserCode(txtStockCode.getText().trim());
             stock.setStockType((StockType) cboStockType.getSelectedItem());
             stock.setStockName(txtStockName.getText().trim());
             stock.setCategory((Category) cboCategory.getSelectedItem());
@@ -250,7 +249,11 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
             stock.setSalePriceC(Util1.getFloat(txtSalePriceC.getText()));
             stock.setSalePriceD(Util1.getFloat(txtSalePriceD.getText()));
             stock.setSttCostPrice(Util1.getFloat(txtSalePriceStd.getText()));
+
             if (lblStatus.getText().equals("NEW")) {
+                stock.setMacId(Global.machineId);
+                stock.setCompCode(Global.compCode);
+                stock.setCreatedDate(Util1.getTodayDate());
                 stock.setCreatedBy(Global.loginUser);
             } else {
                 stock.setUpdatedBy(Global.loginUser);
@@ -262,7 +265,7 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
 
     private void saveStock() {
         if (isValidEntry()) {
-            Stock saveStock = stockService.save(stock, lblStatus.getText());
+            Stock saveStock = stockService.save(stock);
             if (saveStock != null) {
                 JOptionPane.showMessageDialog(Global.parentForm, "Saved");
                 if (lblStatus.getText().equals("NEW")) {
@@ -279,7 +282,7 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
 
     private boolean isDuplicate() {
         boolean status = false;
-        String stockCode = txtStockCode.getText();
+        /* String stockCode = txtStockCode.getText();
         if (!stockCode.isEmpty()) {
             if (lblStatus.getText().equals("NEW")) {
                 Stock s = stockService.findById(stockCode);
@@ -287,7 +290,7 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
                     status = true;
                 }
             }
-        }
+        }*/
         return status;
     }
 
@@ -319,6 +322,7 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
         txtStockCode.setEnabled(true);
         txtStockCode.requestFocus();
         stockTableModel.refresh();
+        stock = new Stock();
 
     }
 

@@ -115,12 +115,13 @@ public class ChargeTypeSetupDialog extends javax.swing.JDialog implements KeyLis
             JOptionPane.showMessageDialog(Global.parentForm, "Charge Type Description cannot be blank.");
             txtChargeType.requestFocus();
         } else {
+            chargeType.setChargeTypeDesp(txtChargeType.getText());
             if (lblStatus.getText().equals("NEW")) {
                 chargeType.setUserCode(txtCode.getText());
-                chargeType.setChargeTypeDesp(txtChargeType.getText());
                 chargeType.setCompCode(Global.compCode);
                 chargeType.setCreatedBy(Global.loginUser);
                 chargeType.setCreatedDate(Util1.getTodayDate());
+                chargeType.setMacId(Global.machineId);
             } else {
                 chargeType.setUpdatedBy(Global.loginUser);
             }
