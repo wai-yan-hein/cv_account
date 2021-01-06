@@ -125,7 +125,7 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
         });
     }
 
-    private void initTree() {
+     private void initTree() {
         treeModel = (DefaultTreeModel) treeCOA.getModel();
         treeModel.setRoot(null);
         treeRoot = new DefaultMutableTreeNode(parentRootName);
