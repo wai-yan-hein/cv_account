@@ -187,7 +187,7 @@ public class RoleAssignSetup extends javax.swing.JPanel implements KeyListener, 
         UsrCompRoleKey key = new UsrCompRoleKey();
         key.setCompCode(cInfo.getCompCode());
         key.setRoleCode(uRole.getRoleCode());
-        key.setUserCode(user.getUserCode());
+        key.setUserCode(user.getAppUserCode());
         UsrCompRole ucr = new UsrCompRole();
         ucr.setKey(key);
 

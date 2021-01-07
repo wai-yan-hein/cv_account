@@ -8,8 +8,10 @@ package com.cv.accountswing.ui;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.entity.view.VUsrCompAssign;
 import com.cv.accountswing.ui.cash.common.CompanyNameTableModel;
-import com.cv.accountswing.ui.system.setup.common.CompanyTableModel;
+import com.cv.accountswing.util.Util1;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -17,6 +19,7 @@ import java.util.List;
  */
 public class CompanyDialog extends javax.swing.JDialog {
 
+    private static final Logger log = LoggerFactory.getLogger(ApplicationMainFrame.class);
     private List<VUsrCompAssign> listCompany;
     private CompanyNameTableModel companyTableModel;
 
@@ -34,11 +37,26 @@ public class CompanyDialog extends javax.swing.JDialog {
     public CompanyDialog() {
         super(Global.parentForm, true);
         initComponents();
-        initTable();
     }
 
-    private void initTable() {
+    public void initTable() {
         companyTableModel = new CompanyNameTableModel(listCompany);
+        tblCompany.setModel(companyTableModel);
+    }
+
+    private void select() {
+        if (tblCompany.getSelectedRow() >= 0) {
+            int row = tblCompany.convertRowIndexToModel(tblCompany.getSelectedRow());
+            VUsrCompAssign company = companyTableModel.getCompany(row);
+            Global.roleCode = company.getKey().getRoleCode();
+            Global.compCode = company.getKey().getCompCode();
+            Global.companyName = company.getCompName();
+            Global.finicialPeriodFrom = Util1.toDateStr(company.getFinicialPeriodFrom(), "yyyy-MM-dd");
+            Global.finicialPeriodTo = Util1.toDateStr(company.getFinicialPeriodTo(), "yyyy-MM-dd");
+            log.info("Role Id : " + Global.roleCode);
+            log.info("Company Id : " + Global.compCode);
+            this.dispose();
+        }
     }
 
     /**
@@ -50,23 +68,54 @@ public class CompanyDialog extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tblCompany = new javax.swing.JTable();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+
+        tblCompany.setFont(Global.textFont);
+        tblCompany.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {},
+                {},
+                {},
+                {}
+            },
+            new String [] {
+
+            }
+        ));
+        tblCompany.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblCompanyMouseClicked(evt);
+            }
+        });
+        jScrollPane1.setViewportView(tblCompany);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void tblCompanyMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblCompanyMouseClicked
+        // TODO add your handling code here:
+        if (evt.getClickCount() == 2) {
+            select();
+        }
+    }//GEN-LAST:event_tblCompanyMouseClicked
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable tblCompany;
     // End of variables declaration//GEN-END:variables
 }

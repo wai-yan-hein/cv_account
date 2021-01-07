@@ -118,17 +118,17 @@ public class Company extends javax.swing.JPanel implements KeyListener, PanelCon
 
     private void setCompanyInfo(CompanyInfo cInfo) {
         companyInfo = cInfo;
-        txtCode.setText(cInfo.getCompCode());
-        txtShortCode.setText(cInfo.getShortCode());
-        txtName.setText(cInfo.getName());
-        txtPhone.setText(cInfo.getPhone());
-        txtEmail.setText(cInfo.getEmail());
-        txtSecurityCode.setText(cInfo.getSecurityCode());
-        txtAddress.setText(cInfo.getAddress());
-        txtFromDate.setText(Util1.toDateStr(cInfo.getFinicialPeriodFrom(), "dd-MM-yyyy"));
-        txtToDate.setText(Util1.toDateStr(cInfo.getFinicialPeriodTo(), "dd-MM-yyyy"));
+        txtCode.setText(companyInfo.getCompCode());
+        txtShortCode.setText(companyInfo.getShortCode());
+        txtName.setText(companyInfo.getName());
+        txtPhone.setText(companyInfo.getPhone());
+        txtEmail.setText(companyInfo.getEmail());
+        txtSecurityCode.setText(companyInfo.getSecurityCode());
+        txtAddress.setText(companyInfo.getAddress());
+        txtFromDate.setText(Util1.toDateStr(companyInfo.getFinicialPeriodFrom(), "dd-MM-yyyy"));
+        txtToDate.setText(Util1.toDateStr(companyInfo.getFinicialPeriodTo(), "dd-MM-yyyy"));
         if (cInfo.getActive() != null) {
-            chkActive.setSelected(cInfo.getActive());
+            chkActive.setSelected(companyInfo.getActive());
         }
         lblStatus.setText("EDIT");
 
@@ -173,6 +173,7 @@ public class Company extends javax.swing.JPanel implements KeyListener, PanelCon
             companyInfo.setFinicialPeriodTo(Util1.toDate(txtToDate.getText(), "dd-MM-yyyy"));
             companyInfo.setActive(chkActive.isSelected());
             companyInfo.setBusinessType((BusinessType) cboBusiness.getSelectedItem());
+            companyInfo.setMacId(Global.machineId);
             status = true;
         }
         return status;
@@ -280,19 +281,19 @@ public class Company extends javax.swing.JPanel implements KeyListener, PanelCon
         tblCompany.setRowHeight(Global.tblRowHeight);
         jScrollPane1.setViewportView(tblCompany);
 
-        jLabel1.setFont(Global.textFont);
+        jLabel1.setFont(Global.lableFont);
         jLabel1.setText("Code");
 
         txtCode.setFont(Global.textFont);
         txtCode.setName("txtCode"); // NOI18N
 
-        jLabel2.setFont(Global.textFont);
+        jLabel2.setFont(Global.lableFont);
         jLabel2.setText("Short Code");
 
         txtShortCode.setFont(Global.textFont);
         txtShortCode.setName("txtShortCode"); // NOI18N
 
-        jLabel3.setFont(Global.textFont);
+        jLabel3.setFont(Global.lableFont);
         jLabel3.setText("Name");
 
         txtName.setFont(Global.textFont);
@@ -301,16 +302,16 @@ public class Company extends javax.swing.JPanel implements KeyListener, PanelCon
         txtPhone.setFont(Global.textFont);
         txtPhone.setName("txtPhone"); // NOI18N
 
-        jLabel4.setFont(Global.textFont);
+        jLabel4.setFont(Global.lableFont);
         jLabel4.setText("Phone");
 
         txtEmail.setFont(Global.textFont);
         txtEmail.setName("txtEmail"); // NOI18N
 
-        jLabel5.setFont(Global.textFont);
+        jLabel5.setFont(Global.lableFont);
         jLabel5.setText("Email");
 
-        jLabel6.setFont(Global.textFont);
+        jLabel6.setFont(Global.lableFont);
         jLabel6.setText("Security Code");
 
         txtSecurityCode.setFont(Global.textFont);
@@ -319,22 +320,22 @@ public class Company extends javax.swing.JPanel implements KeyListener, PanelCon
         txtAddress.setFont(Global.textFont);
         txtAddress.setName("txtAddress"); // NOI18N
 
-        jLabel7.setFont(Global.textFont);
+        jLabel7.setFont(Global.lableFont);
         jLabel7.setText("Address");
 
         txtFromDate.setFont(Global.textFont);
         txtFromDate.setName("txtFromDate"); // NOI18N
 
-        jLabel8.setFont(Global.textFont);
+        jLabel8.setFont(Global.lableFont);
         jLabel8.setText("From Date");
 
-        jLabel9.setFont(Global.textFont);
+        jLabel9.setFont(Global.lableFont);
         jLabel9.setText("To Date");
 
         txtToDate.setFont(Global.textFont);
         txtToDate.setName("txtToDate"); // NOI18N
 
-        jLabel10.setFont(Global.textFont);
+        jLabel10.setFont(Global.lableFont);
         jLabel10.setText("Business");
 
         chkActive.setFont(Global.textFont);

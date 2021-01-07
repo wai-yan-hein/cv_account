@@ -148,6 +148,7 @@ public class DepartmentSetup extends javax.swing.JPanel implements TreeSelection
         txtName.setText(null);
         chkActive.setSelected(Boolean.FALSE);
         labelStatus.setText("NEW");
+        Global.listDepartment = deptService.search("-", "-", Global.compCode, "-", "-");
         //txtUserCode.requestFocus();
     }
 
@@ -227,7 +228,7 @@ public class DepartmentSetup extends javax.swing.JPanel implements TreeSelection
         department.setUsrCode(txtUserCode.getText());
         department.setActive(chkActive.isSelected());
         department.setCompCode(Global.compCode);
-
+        department.setMacId(Global.machineId);
         if (isValidDepartment(department, Global.loginUser.getUserCode(), Global.compCode)) {
             Department dep = deptService.save(department);
             if (dep != null) {

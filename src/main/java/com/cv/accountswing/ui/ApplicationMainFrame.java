@@ -697,12 +697,16 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         } else if (listVUCA.size() > 1) {
             CompanyDialog companyDialog = new CompanyDialog();
             companyDialog.setListCompany(listVUCA);
+            companyDialog.initTable();
             companyDialog.setLocationRelativeTo(null);
             companyDialog.setVisible(true);
         } else {
-            Global.roleCode = listVUCA.get(0).getKey().getRoleCode();
-            Global.compCode = listVUCA.get(0).getKey().getCompCode();
-            Global.companyName = listVUCA.get(0).getCompName();
+            VUsrCompAssign vuca = listVUCA.get(0);
+            Global.roleCode = vuca.getKey().getRoleCode();
+            Global.compCode = vuca.getKey().getCompCode();
+            Global.companyName = vuca.getCompName();
+            Global.finicialPeriodFrom = Util1.toDateStr(vuca.getFinicialPeriodFrom(), "yyyy-MM-dd");
+            Global.finicialPeriodTo = Util1.toDateStr(vuca.getFinicialPeriodTo(), "yyyy-MM-dd");
             LOGGER.info("Role Id : " + Global.roleCode);
             LOGGER.info("Company Id : " + Global.compCode);
         }
@@ -712,12 +716,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         this.setTitle(this.getTitle() + "(" + Global.loginUser.getUserName() + ")");
         try {
 
-            List listCI = usrCompRoleService.getAssignCompany(Global.loginUser.getAppUserCode());
-            if (listCI.size() > 0) {
-                VUsrCompAssign vuca = (VUsrCompAssign) listCI.get(0);
-                Global.finicialPeriodFrom = Util1.toDateStr(vuca.getFinicialPeriodFrom(), "yyyy-MM-dd");
-                Global.finicialPeriodTo = Util1.toDateStr(vuca.getFinicialPeriodTo(), "yyyy-MM-dd");
-            }
+            Global.listStock = stockService.findAll();
             Global.listAppUser = userService.search("-", "-", "-", "-");
             Global.listCOA = cOAService.search("-", "-", Global.compCode, "3", "-", "-", "-");
             Global.listCurrency = currencyService.search("-", "-", Global.compCode);
@@ -728,7 +727,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             Global.listLocation = locationService.findAll();
             Global.listVou = vouService.findAll();
             Global.listSaleMan = saleManService.findAll();
-            Global.listStock = stockService.findAll();
             Global.listStockUnit = stockUnitService.findAll();
             Global.listRelation = relationService.findAll();
             Global.listMachine = machineInfoService.findAll();
@@ -893,7 +891,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
 
     private void startPhoneService() {
         String open = Global.sysProperties.get("system.phone.service");
-        if (open.trim().equals("1")) {
+        if (open == null || open.trim().equals("1")) {
             Thread socketThread = new Thread(() -> {
                 LOGGER.info("Socket Thread Start.");
                 try {

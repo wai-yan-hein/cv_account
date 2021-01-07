@@ -133,14 +133,15 @@ public class StockImportDialog extends javax.swing.JDialog {
                     stock.setStockName(name);
                     stock.setStockType(new StockType(stockTypeId, "-"));
                     stock.setSaleWeight(Util1.getFloat(stockWt));
-                    stock.setSaleUnit(new StockUnit("p"));
+                    stock.setSaleUnit(new StockUnit("lb"));
                     stock.setPurWeight(Util1.getFloat(stockWt));
-                    stock.setPurUnit(new StockUnit("p"));
+                    stock.setPurUnit(new StockUnit("lb"));
                     stock.setPattern(new UnitPattern(patternId));
                     stock.setCompCode(Global.compCode);
                     stock.setCreatedBy(Global.loginUser);
                     stock.setCreatedDate(Util1.getTodayDate());
                     stock.setIsActive(Boolean.TRUE);
+                    stock.setMacId(Global.machineId);
                     listStock.add(stock);
 
                 }
