@@ -172,7 +172,8 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener, Pa
             customer = new Supplier();
             if (lblStatus.getText().equals("EDIT")) {
                 Supplier cus = supplierTabelModel.getCustomer(selectRow);
-                customer.setCode(cus.getCode());
+                customer.setUserCode(cus.getUserCode());
+               customer.setUpdatedBy(Global.loginUser);
             }
             customer.setUserCode(txtCusCode.getText());
             customer.setTraderName(txtCusName.getText());
@@ -191,6 +192,9 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener, Pa
             customer.setActive(chkActive.isSelected());
             customer.setCompCode(Global.compCode);
             customer.setUpdatedDate(Util1.getTodayDate());
+            customer.setMacId(Global.machineId);
+            customer.setCreatedBy(Global.loginUser);
+            customer.setCreatedDate(Util1.getTodayDate());
             //customer.setCreditLimit(Util1.getInteger(txtCreditLimit.getText()));
             //customer.setAppShortName(TOOL_TIP_TEXT_KEY);
             //customer.setAppTraderCode(TOOL_TIP_TEXT_KEY);
@@ -207,10 +211,11 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener, Pa
             if (save.getUserCode() != null) {
                 JOptionPane.showMessageDialog(Global.parentForm, "Saved");
                 if (lblStatus.getText().equals("NEW")) {
-                    supplierTabelModel.addCustomer(customer);
+                  //  supplierTabelModel.addCustomer(customer);
                     Global.listSupplier.add(customer);
                 } else {
-                    supplierTabelModel.setCustomer(selectRow, customer);
+                   // supplierTabelModel.setCustomer(selectRow, customer);
+                    Global.listSupplier.set(selectRow,customer);
                 }
                 clear();
             }
@@ -306,9 +311,8 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener, Pa
         });
 
         jLabel1.setFont(Global.lableFont);
-        jLabel1.setText("Code");
+        jLabel1.setText("User Code");
 
-        txtCusCode.setEditable(false);
         txtCusCode.setFont(Global.textFont);
         txtCusCode.setName("txtCusCode"); // NOI18N
 

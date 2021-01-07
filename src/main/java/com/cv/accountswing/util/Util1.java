@@ -541,7 +541,7 @@ public class Util1 {
 
     public static String getString(String str) {
         String value = "";
-        if (!str.isEmpty()) {
+        if (str != null) {
             value = str;
         }
         return value;

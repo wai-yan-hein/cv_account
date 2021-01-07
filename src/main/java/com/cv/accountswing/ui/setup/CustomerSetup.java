@@ -54,7 +54,7 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener, Pa
     private static final Logger LOGGER = LoggerFactory.getLogger(CustomerSetup.class);
     private int selectRow = -1;
     private TableRowSorter<TableModel> sorter;
-    private Customer customer;
+    private Customer customer =new Customer();
     @Autowired
     private CustomerTabelModel customerTabelModel;
     @Autowired
@@ -149,16 +149,17 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener, Pa
     }
 
     private void setCustomer(Customer cus) {
-        txtCusCode.setText(cus.getUserCode());
-        txtConPerson.setText(cus.getContactPerson());
-        txtCusName.setText(cus.getTraderName());
-        txtCusEmail.setText(cus.getEmail());
-        txtCusPhone.setText(cus.getPhone());
-        cboRegion.setSelectedItem(cus.getRegion());
-        cboPriceType.setSelectedItem(cus.getTraderType());
-        cboAccount.setSelectedItem(cus.getAccount());
-        txtCusAddress.setText(cus.getAddress());
-        chkActive.setSelected(cus.getActive());
+        customer=cus;
+        txtCusCode.setText(customer.getUserCode());
+        txtConPerson.setText(customer.getContactPerson());
+        txtCusName.setText(customer.getTraderName());
+        txtCusEmail.setText(customer.getEmail());
+        txtCusPhone.setText(customer.getPhone());
+        cboRegion.setSelectedItem(customer.getRegion());
+        cboPriceType.setSelectedItem(customer.getTraderType());
+        cboAccount.setSelectedItem(customer.getAccount());
+        txtCusAddress.setText(customer.getAddress());
+        chkActive.setSelected(customer.getActive());
         txtCreditLimit.setText(Util1.getString(cus.getCreditLimit()));
         txtCreditTerm.setText(Util1.getString(cus.getCreditDays()));
         lblStatus.setText("EDIT");
@@ -171,10 +172,11 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener, Pa
             JOptionPane.showMessageDialog(Global.parentForm, "Customer Name can't be empty");
             status = false;
         } else {
-            customer = new Customer();
+          
             if (lblStatus.getText().equals("EDIT")) {
                 Customer cus = customerTabelModel.getCustomer(selectRow);
-                customer.setCode(cus.getCode());
+                customer.setUserCode(cus.getUserCode());
+                customer.setUpdatedBy(Global.loginUser);
             }
             customer.setUserCode(txtCusCode.getText());
             customer.setTraderName(txtCusName.getText());
@@ -197,6 +199,9 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener, Pa
             customer.setUpdatedDate(Util1.getTodayDate());
             customer.setCreditLimit(Util1.getInteger(txtCreditLimit.getText()));
             customer.setCreditDays(Util1.getInteger(txtCreditTerm.getText()));
+            customer.setMacId(Global.machineId);
+            customer.setCreatedBy(Global.loginUser);
+            customer.setCreatedDate(Util1.getTodayDate());
             //customer.setAppShortName(TOOL_TIP_TEXT_KEY);
             //customer.setAppTraderCode(TOOL_TIP_TEXT_KEY);
 
@@ -212,10 +217,11 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener, Pa
             if (save.getUserCode() != null) {
                 JOptionPane.showMessageDialog(Global.parentForm, "Saved");
                 if (lblStatus.getText().equals("NEW")) {
-                    customerTabelModel.addCustomer(customer);
+                    //customerTabelModel.addCustomer(customer);
                     Global.listCustomer.add(customer);
                 } else {
-                    customerTabelModel.setCustomer(selectRow, customer);
+                  // customerTabelModel.setCustomer(selectRow, customer);
+                    Global.listCustomer.set(selectRow, customer);
                 }
                 clear();
             }
@@ -223,6 +229,7 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener, Pa
     }
 
     public void clear() {
+        customer=new Customer();
         txtCusCode.setText(null);
         txtCusName.setText(null);
         txtCusEmail.setText(null);
@@ -290,9 +297,8 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener, Pa
         });
 
         jLabel1.setFont(Global.lableFont);
-        jLabel1.setText("Code/ID");
+        jLabel1.setText("User Code");
 
-        txtCusCode.setEditable(false);
         txtCusCode.setFont(Global.textFont);
         txtCusCode.setName("txtCusCode"); // NOI18N
         txtCusCode.addKeyListener(new java.awt.event.KeyAdapter() {

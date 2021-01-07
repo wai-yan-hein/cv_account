@@ -128,7 +128,7 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
         regions.forEach(region -> {
             DefaultMutableTreeNode regRoot = new DefaultMutableTreeNode(region);
             treeRoot.add(regRoot);
-            createTreeNode(region.getRegCode().toString(), regRoot);
+            createTreeNode(region.getRegCode(), regRoot);
 
             /*if (!child.getCode().isEmpty()) {
             }*/
@@ -208,6 +208,7 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
         reg.setRegCode(txtRegionCode.getText());
         reg.setRegionName(txtRegionName.getText());
         reg.setCompCode(Global.compCode);
+        reg.setMacId(Global.machineId);
 
         if (isValidRegion(reg, Global.compCode)) {
             Region region = regionService.save(reg);

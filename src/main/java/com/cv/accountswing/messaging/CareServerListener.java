@@ -5,25 +5,17 @@
  */
 package com.cv.accountswing.messaging;
 
-import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.ReloadData;
 import com.cv.accountswing.gson.DateDeSerializer;
 import com.cv.accountswing.gson.DateSerializer;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonParser;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.util.Date;
-import java.util.UUID;
 import javax.jms.BytesMessage;
 import javax.jms.MapMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
-import org.springframework.stereotype.Component;
 
 /**
  *
