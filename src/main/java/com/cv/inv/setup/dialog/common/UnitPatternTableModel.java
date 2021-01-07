@@ -62,7 +62,7 @@ public class UnitPatternTableModel extends AbstractTableModel {
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
         UnitPattern up = listPattern.get(rowIndex);
         switch (columnIndex) {
-            case 0 -> {
+            case 0:
                 if (aValue != null) {
                     if (up.getPatternCode() != null) {
                         status = "EDIT";
@@ -85,7 +85,7 @@ public class UnitPatternTableModel extends AbstractTableModel {
                     }
                     addNewRow();
                 }
-            }
+                break;
 
         }
     }

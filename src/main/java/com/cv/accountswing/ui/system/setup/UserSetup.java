@@ -167,6 +167,8 @@ public class UserSetup extends javax.swing.JPanel implements KeyListener, PanelC
             appUser.setPassword(Arrays.toString(txtPassword.getPassword()));
             appUser.setPhone(txtPhone.getText());
             appUser.setActive(chkActive.isSelected());
+            appUser.setCompCode(Global.compCode);
+            appUser.setMacId(Global.machineId);
             status = true;
         }
         return status;
