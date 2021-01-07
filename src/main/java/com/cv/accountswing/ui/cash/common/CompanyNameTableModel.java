@@ -24,6 +24,7 @@ public class CompanyNameTableModel extends AbstractTableModel {
 
     public CompanyNameTableModel(List<VUsrCompAssign> listCompany) {
         this.listCompany = listCompany;
+        fireTableDataChanged();
     }
 
     @Override
@@ -85,7 +86,7 @@ public class CompanyNameTableModel extends AbstractTableModel {
         return columnNames.length;
     }
 
-    public VUsrCompAssign getRemark(int row) {
+    public VUsrCompAssign getCompany(int row) {
         if (listCompany == null) {
             return null;
         } else if (listCompany.isEmpty()) {

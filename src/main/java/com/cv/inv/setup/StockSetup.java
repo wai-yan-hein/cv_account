@@ -113,11 +113,13 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
     }
 
     private void initTable() {
+        stockTableModel.setListStock(Global.listStock);
         tblStock.getTableHeader().setFont(Global.tblHeaderFont);
         tblStock.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
         tblStock.getTableHeader().setForeground(ColorUtil.foreground);
         tblStock.setModel(stockTableModel);
         sorter = new TableRowSorter<>(tblStock.getModel());
+        swrf = new StartWithRowFilter(txtFilter);
         tblStock.setRowSorter(sorter);
 
         tblStock.setDefaultRenderer(Boolean.class, new TableCellRender());
@@ -167,7 +169,7 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
     }
 
     private void searchStock() {
-        stockTableModel.setListStock(Global.listStock);
+        Global.listStock = stockService.findAll();
     }
 
     private void setStockSize() {

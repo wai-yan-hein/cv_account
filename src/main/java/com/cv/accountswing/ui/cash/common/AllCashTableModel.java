@@ -283,11 +283,17 @@ public class AllCashTableModel extends AbstractTableModel {
     private void save(VGl vgl, int row, int column) {
         if (isValidEntry(vgl, row, column)) {
             vgl.setSourceAcId(sourceAccId);
-            vgl.setCompCode(Global.compCode);
             vgl.setCreatedBy(Global.loginUser.getUserCode());
             String strVGL = gson.toJson(vgl);
             Gl gl = gson.fromJson(strVGL, Gl.class);
-
+            if (gl.getGlCode() == null) {
+                gl.setCreatedBy(Global.loginUser.getAppUserCode());
+                gl.setCreatedDate(Util1.getTodayDate());
+                gl.setMacId(Global.machineId);
+                gl.setCompCode(Global.compCode);
+            } else {
+                gl.setModifyBy(Global.loginUser.getAppUserCode());
+            }
             try {
                 Gl glSave = glService.save(gl);
                 if (glSave != null) {
