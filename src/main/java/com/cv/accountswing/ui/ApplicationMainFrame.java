@@ -130,6 +130,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private final ImageIcon lowIcon = new ImageIcon(this.getClass().getResource("/images/low-signal.png"));
     private final ImageIcon offlineIcon = new ImageIcon(this.getClass().getResource("/images/offline-signal.png"));
     private final ImageIcon loadingIcon = new ImageIcon(this.getClass().getResource("/images/dual-loading.gif"));
+    private final ImageIcon companyIcon = new ImageIcon(this.getClass().getResource("/images/museum_50px.png"));
     private final ActionListener menuListener = (java.awt.event.ActionEvent evt) -> {
         JMenuItem actionMenu = (JMenuItem) evt.getSource();
         String className = actionMenu.getName();
@@ -137,7 +138,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         JPanel panel = getPanel(className, menuName);
         addTabMain(panel, menuName);
     };
-
     /*@Autowired
     private CareServerSender sender;
     @Autowired
@@ -696,6 +696,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             System.exit(-1);
         } else if (listVUCA.size() > 1) {
             CompanyDialog companyDialog = new CompanyDialog();
+            companyDialog.setIconImage(companyIcon.getImage());
             companyDialog.setListCompany(listVUCA);
             companyDialog.initTable();
             companyDialog.setLocationRelativeTo(null);

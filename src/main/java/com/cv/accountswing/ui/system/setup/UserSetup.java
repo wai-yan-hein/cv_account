@@ -41,7 +41,7 @@ public class UserSetup extends javax.swing.JPanel implements KeyListener, PanelC
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserSetup.class);
     private int selectRow = -1;
-    private AppUser appUser;
+    private AppUser appUser = new AppUser();
     @Autowired
     private UserService userService;
     @Autowired
@@ -120,12 +120,13 @@ public class UserSetup extends javax.swing.JPanel implements KeyListener, PanelC
     }
 
     private void setUser(AppUser user) {
-        txtUserName.setText(user.getUserName());
-        txtUserShortName.setText(user.getUserShort());
-        txtEmailAddress.setText(user.getEmail());
-        txtPassword.setText(user.getPassword());
-        txtPhone.setText(user.getPhone());
-        chkActive.setSelected(Util1.getBoolean(user.getActive()));
+        appUser = user;
+        txtUserName.setText(appUser.getUserName());
+        txtUserShortName.setText(appUser.getUserShort());
+        txtEmailAddress.setText(appUser.getEmail());
+        txtPassword.setText(appUser.getPassword());
+        txtPhone.setText(appUser.getPhone());
+        chkActive.setSelected(Util1.getBoolean(appUser.getActive()));
         lblStatus.setText("EDIT");
     }
 
@@ -154,7 +155,6 @@ public class UserSetup extends javax.swing.JPanel implements KeyListener, PanelC
             JOptionPane.showMessageDialog(Global.parentForm, "User Name can't empty");
             txtUserShortName.requestFocus();
             status = false;
-
         } else if (txtPassword.getPassword().length < 1) {
             JOptionPane.showMessageDialog(Global.parentForm, "Password can't empty");
             txtPassword.requestFocus();

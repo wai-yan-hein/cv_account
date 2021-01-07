@@ -54,7 +54,7 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener, Pa
     private static final Logger LOGGER = LoggerFactory.getLogger(CustomerSetup.class);
     private int selectRow = -1;
     private TableRowSorter<TableModel> sorter;
-    private Customer customer =new Customer();
+    private Customer customer = new Customer();
     @Autowired
     private CustomerTabelModel customerTabelModel;
     @Autowired
@@ -149,7 +149,7 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener, Pa
     }
 
     private void setCustomer(Customer cus) {
-        customer=cus;
+        customer = cus;
         txtCusCode.setText(customer.getUserCode());
         txtConPerson.setText(customer.getContactPerson());
         txtCusName.setText(customer.getTraderName());
@@ -171,40 +171,40 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener, Pa
         if (txtCusName.getText().isEmpty()) {
             JOptionPane.showMessageDialog(Global.parentForm, "Customer Name can't be empty");
             status = false;
+        } else if (!(cboRegion.getSelectedItem() instanceof Region)) {
+            JOptionPane.showConfirmDialog(Global.parentForm, "Invalid Region.");
+            cboRegion.requestFocus();
+            status = false;
+        } else if (!(cboPriceType.getSelectedItem() instanceof TraderType)) {
+            JOptionPane.showConfirmDialog(Global.parentForm, "Invalid Price Type.");
+            cboPriceType.requestFocus();
+            status = false;
+        } else if (!(cboAccount.getSelectedItem() instanceof ChartOfAccount)) {
+            JOptionPane.showConfirmDialog(Global.parentForm, "Invalid Acoount.");
+            cboAccount.requestFocus();
+            status = false;
         } else {
-          
-            if (lblStatus.getText().equals("EDIT")) {
-                Customer cus = customerTabelModel.getCustomer(selectRow);
-                customer.setUserCode(cus.getUserCode());
-                customer.setUpdatedBy(Global.loginUser);
-            }
             customer.setUserCode(txtCusCode.getText());
             customer.setTraderName(txtCusName.getText());
             customer.setContactPerson(txtConPerson.getText());
             customer.setPhone(txtCusPhone.getText());
             customer.setEmail(txtCusEmail.getText());
             customer.setAddress(txtCusAddress.getText());
-
-            if (cboRegion.getSelectedItem() instanceof Region) {
-                customer.setRegion((Region) cboRegion.getSelectedItem());
-            }
-            if (cboPriceType.getSelectedItem() instanceof TraderType) {
-                customer.setTraderType((TraderType) cboPriceType.getSelectedItem());
-            }
-            if (cboAccount.getSelectedItem() instanceof ChartOfAccount) {
-                customer.setAccount((ChartOfAccount) cboAccount.getSelectedItem());
-            }
             customer.setActive(chkActive.isSelected());
             customer.setCompCode(Global.compCode);
             customer.setUpdatedDate(Util1.getTodayDate());
             customer.setCreditLimit(Util1.getInteger(txtCreditLimit.getText()));
             customer.setCreditDays(Util1.getInteger(txtCreditTerm.getText()));
-            customer.setMacId(Global.machineId);
-            customer.setCreatedBy(Global.loginUser);
-            customer.setCreatedDate(Util1.getTodayDate());
-            //customer.setAppShortName(TOOL_TIP_TEXT_KEY);
-            //customer.setAppTraderCode(TOOL_TIP_TEXT_KEY);
-
+            customer.setAccount((ChartOfAccount) cboAccount.getSelectedItem());
+            customer.setTraderType((TraderType) cboPriceType.getSelectedItem());
+            customer.setRegion((Region) cboRegion.getSelectedItem());
+            if (lblStatus.getText().equals("NEW")) {
+                customer.setMacId(Global.machineId);
+                customer.setCreatedBy(Global.loginUser);
+                customer.setCreatedDate(Util1.getTodayDate());
+            } else {
+                customer.setUpdatedBy(Global.loginUser);
+            }
             status = true;
         }
         return status;
@@ -220,7 +220,7 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener, Pa
                     //customerTabelModel.addCustomer(customer);
                     Global.listCustomer.add(customer);
                 } else {
-                  // customerTabelModel.setCustomer(selectRow, customer);
+                    //customerTabelModel.setCustomer(selectRow, customer);
                     Global.listCustomer.set(selectRow, customer);
                 }
                 clear();
@@ -229,7 +229,7 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener, Pa
     }
 
     public void clear() {
-        customer=new Customer();
+        customer = new Customer();
         txtCusCode.setText(null);
         txtCusName.setText(null);
         txtCusEmail.setText(null);
@@ -241,9 +241,10 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener, Pa
         chkActive.setSelected(Boolean.TRUE);
         txtCreditLimit.setText(null);
         lblStatus.setText("NEW");
-        txtCusName.requestFocus();
+        txtCusCode.requestFocus();
         txtConPerson.setText(null);
         txtCreditTerm.setText(null);
+        customerTabelModel.refresh();
     }
 
     private void setTableFilter(String filter) {

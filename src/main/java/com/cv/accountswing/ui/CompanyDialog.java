@@ -5,9 +5,11 @@
  */
 package com.cv.accountswing.ui;
 
+import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.entity.view.VUsrCompAssign;
 import com.cv.accountswing.ui.cash.common.CompanyNameTableModel;
+import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.util.Util1;
 import java.util.List;
 import org.slf4j.Logger;
@@ -41,7 +43,11 @@ public class CompanyDialog extends javax.swing.JDialog {
 
     public void initTable() {
         companyTableModel = new CompanyNameTableModel(listCompany);
+        tblCompany.getTableHeader().setFont(Global.lableFont);
+        tblCompany.getTableHeader().setForeground(ColorUtil.foreground);
+        tblCompany.getTableHeader().setBackground(ColorUtil.btnEdit);
         tblCompany.setModel(companyTableModel);
+        tblCompany.setDefaultRenderer(Object.class, new TableCellRender());
     }
 
     private void select() {
@@ -72,8 +78,9 @@ public class CompanyDialog extends javax.swing.JDialog {
         tblCompany = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+        setTitle("Select Company");
 
-        tblCompany.setFont(Global.textFont);
+        tblCompany.setFont(Global.companyFont);
         tblCompany.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {},
@@ -85,6 +92,7 @@ public class CompanyDialog extends javax.swing.JDialog {
 
             }
         ));
+        tblCompany.setRowHeight(40);
         tblCompany.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tblCompanyMouseClicked(evt);

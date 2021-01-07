@@ -129,4 +129,8 @@ public class SupplierTabelModel extends AbstractTableModel {
         }
     }
 
+    public void refresh() {
+        fireTableDataChanged();
+    }
+
 }
