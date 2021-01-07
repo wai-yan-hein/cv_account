@@ -8,6 +8,7 @@ package com.cv.inv.setup.dialog;
 import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
+import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.SaleMan;
 import com.cv.inv.service.SaleManService;
 import com.cv.inv.setup.dialog.common.SaleManTableModel;
@@ -39,7 +40,7 @@ public class SaleManSetupDialog extends javax.swing.JDialog implements KeyListen
     @Autowired
     private SaleManService saleManService;
     private int selectRow = - 1;
-    private SaleMan saleMan;
+    private SaleMan saleMan = new SaleMan();
 
     public SaleManSetupDialog() {
         super(Global.parentForm, true);
@@ -75,8 +76,9 @@ public class SaleManSetupDialog extends javax.swing.JDialog implements KeyListen
 
     }
 
-    private void setSaleMan(SaleMan saleMan) {
-        txtId.setText(saleMan.getSaleManId());
+    private void setSaleMan(SaleMan sm) {
+        saleMan = sm;
+        txtId.setText(saleMan.getUserCode());
         txtName.setText(saleMan.getSaleManName());
         txtPhone.setText(saleMan.getPhone());
         txtAddress.setText(saleMan.getAddress());
@@ -85,6 +87,7 @@ public class SaleManSetupDialog extends javax.swing.JDialog implements KeyListen
     }
 
     private void clear() {
+
         txtName.setText(null);
         txtId.setText(null);
         txtAddress.setText(null);
@@ -92,6 +95,7 @@ public class SaleManSetupDialog extends javax.swing.JDialog implements KeyListen
         lblStatus.setText("NEW");
         chkActive.setSelected(false);
         saleManTableModel.refresh();
+        saleMan = new SaleMan();
     }
 
     private boolean isValidEntry() {
@@ -102,12 +106,20 @@ public class SaleManSetupDialog extends javax.swing.JDialog implements KeyListen
                     "Code length", JOptionPane.ERROR_MESSAGE);
             txtId.requestFocusInWindow();
         } else {
-            saleMan = new SaleMan();
-            saleMan.setSaleManId(txtId.getText());
             saleMan.setSaleManName(txtName.getText());
-            saleMan.setPhone(txtPhone.getText());
-            saleMan.setAddress(txtAddress.getText());
-            saleMan.setActive(chkActive.isSelected());
+            if (lblStatus.getText().equals("NEW")) {
+                saleMan.setUserCode(txtId.getText());
+                saleMan.setPhone(txtPhone.getText());
+                saleMan.setAddress(txtAddress.getText());
+                saleMan.setActive(chkActive.isSelected());
+                saleMan.setMacId(Global.machineId);
+                saleMan.setCompCode(Global.compCode);
+                saleMan.setCreatedDate(Util1.getTodayDate());
+                saleMan.setCreatedBy(Global.loginUser);
+            } else {
+                saleMan.setUpdatedBy(Global.loginUser);
+
+            }
         }
         return status;
     }
@@ -116,7 +128,7 @@ public class SaleManSetupDialog extends javax.swing.JDialog implements KeyListen
         if (isValidEntry()) {
             SaleMan saveSaleMan = saleManService.save(saleMan);
             if (saveSaleMan != null) {
-                LOGGER.info("SALEMAN ID :" + saveSaleMan.getSaleManId());
+                LOGGER.info("SALEMAN ID :" + saveSaleMan.getSaleManCode());
                 JOptionPane.showMessageDialog(Global.parentForm, "Saved");
                 if ("NEW".equals(lblStatus.getText())) {
                     Global.listSaleMan.add(saveSaleMan);
@@ -134,7 +146,7 @@ public class SaleManSetupDialog extends javax.swing.JDialog implements KeyListen
 
     private void delete() {
         SaleMan sale = saleManTableModel.getSaleMan(selectRow);
-        int delete = saleManService.delete(sale.getSaleManId());
+        int delete = saleManService.delete(sale.getUserCode());
         if (delete == 1) {
             JOptionPane.showMessageDialog(Global.parentForm, "Deleted");
             saleManTableModel.deleteSaleMan(selectRow);

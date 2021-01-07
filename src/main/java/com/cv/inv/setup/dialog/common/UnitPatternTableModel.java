@@ -5,6 +5,8 @@
  */
 package com.cv.inv.setup.dialog.common;
 
+import com.cv.accountswing.common.Global;
+import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.UnitPattern;
 import com.cv.inv.service.UnitPatternService;
 import java.util.ArrayList;
@@ -60,23 +62,30 @@ public class UnitPatternTableModel extends AbstractTableModel {
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
         UnitPattern up = listPattern.get(rowIndex);
         switch (columnIndex) {
-            case 0:
+            case 0 -> {
                 if (aValue != null) {
                     if (up.getPatternCode() != null) {
                         status = "EDIT";
                     }
                     up.setPatternName(aValue.toString());
+                    up.setMacId(Global.machineId);
+                    up.setCompCode(Global.compCode);
+                    up.setCreatedDate(Util1.getTodayDate());
+                    up.setCreatedBy(Global.loginUser);
                     UnitPattern save = patternService.save(up);
+
                     if (status.equals("EDIT")) {
+                        up.setUpdatedBy(Global.loginUser);
                         listPattern.set(rowIndex, save);
                         fireTableCellUpdated(rowIndex, columnIndex);
                     } else {
+
                         listPattern.add(save);
                         fireTableDataChanged();
                     }
                     addNewRow();
                 }
-                break;
+            }
 
         }
     }

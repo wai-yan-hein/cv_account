@@ -40,7 +40,7 @@ public class SaleManTableModel extends AbstractTableModel {
             SaleMan saleMan = listSaleMan.get(row);
             switch (column) {
                 case 0:
-                    return saleMan.getSaleManId();
+                    return saleMan.getUserCode();
                 case 1:
                     return saleMan.getSaleManName();
             }

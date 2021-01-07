@@ -54,7 +54,7 @@ public class SaleManCompleterTableModel extends AbstractTableModel {
             SaleMan saleMan = listSaleMan.get(row);
             switch (column) {
                 case 0:
-                    return saleMan.getSaleManId();
+                    return saleMan.getSaleManCode();
                 case 1:
                     return saleMan.getSaleManName();
                 default:
