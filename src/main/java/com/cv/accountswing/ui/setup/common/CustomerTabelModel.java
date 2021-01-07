@@ -129,4 +129,8 @@ public class CustomerTabelModel extends AbstractTableModel {
         }
     }
 
+    public void refresh() {
+        fireTableDataChanged();
+    }
+
 }

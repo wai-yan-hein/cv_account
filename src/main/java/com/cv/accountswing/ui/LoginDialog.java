@@ -17,6 +17,7 @@ import java.awt.HeadlessException;
 import java.awt.event.FocusAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.Arrays;
 import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JOptionPane;
@@ -181,7 +182,7 @@ public class LoginDialog extends javax.swing.JDialog implements KeyListener {
     }
 
     private void login() {
-       // register();
+        // register();
         if (txtLoginName.getText().isEmpty() || txtPassword.getPassword().length == 0) {
             JOptionPane.showMessageDialog(this, "Invalid user name or password.",
                     "Authentication error.", JOptionPane.ERROR_MESSAGE);
@@ -189,14 +190,13 @@ public class LoginDialog extends javax.swing.JDialog implements KeyListener {
         } else {
             try {
                 AppUser user = usrService.login(
-                        txtLoginName.getText(), String.copyValueOf(txtPassword.getPassword())
+                        txtLoginName.getText(), Arrays.toString(txtPassword.getPassword())
                 );
                 if (user == null) {
                     JOptionPane.showMessageDialog(this, "Invalid user name or password.",
                             "Authentication error.", JOptionPane.ERROR_MESSAGE);
                     loginAttempt++;
-                } else { //Login success
-                    //JOptionPane.showMessageDialog(Global.parentForm, "This machine is not registered yet.");
+                } else {
                     Global.loginUser = user;
                     login = true;
                     this.dispose();

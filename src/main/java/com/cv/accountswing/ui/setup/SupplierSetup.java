@@ -55,7 +55,7 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener, Pa
     private static final Logger LOGGER = LoggerFactory.getLogger(Supplier.class);
     private int selectRow = -1;
     private TableRowSorter<TableModel> sorter;
-    private Supplier customer;
+    private Supplier supplier = new Supplier();
     @Autowired
     private SupplierTabelModel supplierTabelModel;
     @Autowired
@@ -136,8 +136,8 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener, Pa
         loadingObserver.load(this.getName(), "Start");
         taskExecutor.execute(() -> {
             try {
-                List<Supplier> listSupplier = supplierService.search("-", "-", "-", "-", "-");
-                supplierTabelModel.setListCustomer(listSupplier);
+                Global.listSupplier = supplierService.search("-", "-", "-", "-", "-");
+                supplierTabelModel.setListCustomer(Global.listSupplier);
                 loadingObserver.load(this.getName(), "Stop");
             } catch (Exception e) {
                 LOGGER.error("Search Supplier " + e.getMessage());
@@ -148,17 +148,17 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener, Pa
 
     }
 
-    private void setCustomer(Supplier cus) {
-        txtCusCode.setText(cus.getUserCode());
-        txtCusName.setText(cus.getTraderName());
-        txtCusEmail.setText(cus.getEmail());
-        txtCusPhone.setText(cus.getPhone());
-        cboRegion.setSelectedItem(cus.getRegion());
-        cboPriceType.setSelectedItem(cus.getTraderType());
-        txtCusAddress.setText(cus.getAddress());
-        chkActive.setSelected(cus.getActive());
-        cboAccount.setSelectedItem(cus.getAccount());
-        //txtCreditLimit.setText(Util1.getString(cus.getCreditLimit()));
+    private void setCustomer(Supplier sup) {
+        supplier = sup;
+        txtCusCode.setText(supplier.getUserCode());
+        txtCusName.setText(supplier.getTraderName());
+        txtCusEmail.setText(supplier.getEmail());
+        txtCusPhone.setText(supplier.getPhone());
+        cboRegion.setSelectedItem(supplier.getRegion());
+        cboPriceType.setSelectedItem(supplier.getTraderType());
+        txtCusAddress.setText(supplier.getAddress());
+        chkActive.setSelected(supplier.getActive());
+        cboAccount.setSelectedItem(supplier.getAccount());
         lblStatus.setText("EDIT");
 
     }
@@ -166,39 +166,39 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener, Pa
     private boolean isValidEntry() {
         boolean status;
         if (txtCusName.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(Global.parentForm, "Supplier Name can't be empty");
+            JOptionPane.showMessageDialog(Global.parentForm, "Customer Name can't be empty");
+            status = false;
+        } else if (!(cboRegion.getSelectedItem() instanceof Region)) {
+            JOptionPane.showConfirmDialog(Global.parentForm, "Invalid Region.");
+            cboRegion.requestFocus();
+            status = false;
+        } else if (!(cboPriceType.getSelectedItem() instanceof TraderType)) {
+            JOptionPane.showConfirmDialog(Global.parentForm, "Invalid Price Type.");
+            cboPriceType.requestFocus();
+            status = false;
+        } else if (!(cboAccount.getSelectedItem() instanceof ChartOfAccount)) {
+            JOptionPane.showConfirmDialog(Global.parentForm, "Invalid Acoount.");
+            cboAccount.requestFocus();
             status = false;
         } else {
-            customer = new Supplier();
-            if (lblStatus.getText().equals("EDIT")) {
-                Supplier cus = supplierTabelModel.getCustomer(selectRow);
-                customer.setUserCode(cus.getUserCode());
-               customer.setUpdatedBy(Global.loginUser);
+            supplier.setUserCode(txtCusCode.getText());
+            supplier.setTraderName(txtCusName.getText());
+            supplier.setPhone(txtCusPhone.getText());
+            supplier.setEmail(txtCusEmail.getText());
+            supplier.setAddress(txtCusAddress.getText());
+            supplier.setActive(chkActive.isSelected());
+            supplier.setCompCode(Global.compCode);
+            supplier.setUpdatedDate(Util1.getTodayDate());
+            supplier.setAccount((ChartOfAccount) cboAccount.getSelectedItem());
+            supplier.setTraderType((TraderType) cboPriceType.getSelectedItem());
+            supplier.setRegion((Region) cboRegion.getSelectedItem());
+            if (lblStatus.getText().equals("NEW")) {
+                supplier.setMacId(Global.machineId);
+                supplier.setCreatedBy(Global.loginUser);
+                supplier.setCreatedDate(Util1.getTodayDate());
+            } else {
+                supplier.setUpdatedBy(Global.loginUser);
             }
-            customer.setUserCode(txtCusCode.getText());
-            customer.setTraderName(txtCusName.getText());
-            customer.setPhone(txtCusPhone.getText());
-            customer.setEmail(txtCusEmail.getText());
-            customer.setAddress(txtCusAddress.getText());
-            if (cboRegion.getSelectedItem() instanceof Region) {
-                customer.setRegion((Region) cboRegion.getSelectedItem());
-            }
-            if (cboPriceType.getSelectedItem() instanceof TraderType) {
-                customer.setTraderType((TraderType) cboPriceType.getSelectedItem());
-            }
-            if (cboAccount.getSelectedItem() instanceof ChartOfAccount) {
-                customer.setAccount((ChartOfAccount) cboAccount.getSelectedItem());
-            }
-            customer.setActive(chkActive.isSelected());
-            customer.setCompCode(Global.compCode);
-            customer.setUpdatedDate(Util1.getTodayDate());
-            customer.setMacId(Global.machineId);
-            customer.setCreatedBy(Global.loginUser);
-            customer.setCreatedDate(Util1.getTodayDate());
-            //customer.setCreditLimit(Util1.getInteger(txtCreditLimit.getText()));
-            //customer.setAppShortName(TOOL_TIP_TEXT_KEY);
-            //customer.setAppTraderCode(TOOL_TIP_TEXT_KEY);
-
             status = true;
         }
         return status;
@@ -207,15 +207,15 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener, Pa
     private void saveCustomer() {
         if (isValidEntry()) {
             String traderCodeLength = Global.sysProperties.get("system.trader.id.length");
-            Supplier save = supplierService.save(customer, traderCodeLength);
+            Supplier save = supplierService.save(supplier, traderCodeLength);
             if (save.getUserCode() != null) {
                 JOptionPane.showMessageDialog(Global.parentForm, "Saved");
                 if (lblStatus.getText().equals("NEW")) {
-                  //  supplierTabelModel.addCustomer(customer);
-                    Global.listSupplier.add(customer);
+                    //  supplierTabelModel.addCustomer(supplier);
+                    Global.listSupplier.add(supplier);
                 } else {
-                   // supplierTabelModel.setCustomer(selectRow, customer);
-                    Global.listSupplier.set(selectRow,customer);
+                    // supplierTabelModel.setCustomer(selectRow, supplier);
+                    Global.listSupplier.set(selectRow, supplier);
                 }
                 clear();
             }
@@ -233,8 +233,10 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener, Pa
         chkActive.setSelected(Boolean.TRUE);
         //txtCreditLimit.setText(null);
         lblStatus.setText("NEW");
-        txtCusName.requestFocus();
+        txtCusCode.requestFocus();
         cboAccount.setSelectedItem(null);
+        supplier = new Supplier();
+        supplierTabelModel.refresh();
     }
 
     private void initKeyListener() {

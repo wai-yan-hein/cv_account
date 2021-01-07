@@ -135,17 +135,19 @@ public class LocationSetupDialog extends javax.swing.JDialog implements KeyListe
     private void newLocation() {
         Location loc = new Location();
         loc.setLocationName("New Location");
-        loc.setCreatedBy(Global.loginUser);
-        loc.setCreatedDate(Util1.getTodayDate());
         child = new DefaultMutableTreeNode(loc);
         selectedNode.add(child);
         treeModel.insertNodeInto(child, selectedNode, selectedNode.getChildCount() - 1);
     }
 
     private void saveLocaiton() {
-        location.setLocationCode(txtCode.getText());
+        location.setUserCode(txtCode.getText());
         location.setLocationName(txtName.getText());
         location.setCalcStock(chkActive.isSelected());
+        location.setCompCode(Global.compCode);
+        location.setCreatedBy(Global.loginUser);
+        location.setCreatedDate(Util1.getTodayDate());
+        location.setMacId(Global.machineId);
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) selectedNode.getParent();
         Object userObject = node.getUserObject();
         if (userObject.toString().equals(parentRootName)) {
@@ -163,10 +165,7 @@ public class LocationSetupDialog extends javax.swing.JDialog implements KeyListe
                     Global.listLocation.add(saveLoc);
                     clear();
                     treeModel.reload(selectedNode);
-                } else {
-
                 }
-
             }
         } catch (DataIntegrityViolationException e) {
             JOptionPane.showMessageDialog(Global.parentForm, "Duplicate Name.");
@@ -187,6 +186,7 @@ public class LocationSetupDialog extends javax.swing.JDialog implements KeyListe
     }
 
     private void clear() {
+        txtCode.setText(null);
         txtName.setText(null);
         chkActive.setSelected(false);
         txtName.requestFocus();
@@ -538,6 +538,7 @@ public class LocationSetupDialog extends javax.swing.JDialog implements KeyListe
         if (selectedNode != null) {
             if (!selectedNode.getUserObject().toString().equals(parentRootName)) {
                 location = (Location) selectedNode.getUserObject();
+                txtCode.setText(location.getUserCode());
                 txtName.setText(location.getLocationName());
                 lblStatus.setText("EDIT");
                 txtName.requestFocus();
