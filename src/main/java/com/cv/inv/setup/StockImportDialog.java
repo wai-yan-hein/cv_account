@@ -129,7 +129,7 @@ public class StockImportDialog extends javax.swing.JDialog {
                     }
 
                     stock.setMigCode(code);
-                    stock.setBarcode(stockCode);
+                    stock.setUserCode(stockCode);
                     stock.setStockName(name);
                     stock.setStockType(new StockType(stockTypeId, "-"));
                     stock.setSaleWeight(Util1.getFloat(stockWt));

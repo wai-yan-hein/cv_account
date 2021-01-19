@@ -57,7 +57,7 @@ public class ChartOfAccountImportTableModel extends AbstractTableModel {
                 case 2: //Name
                     return coa.getCoaNameEng();
                 case 3:
-                    return coa.getParent();
+                    return coa.getCoaParent();
                 case 4:
                     return coa.getOption();
                 case 5:

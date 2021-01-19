@@ -369,6 +369,8 @@ public class Util1 {
         }
     }
 
+    
+
     public static String isNullObj(Object obj, String value) {
         if (obj == null) {
             return value;

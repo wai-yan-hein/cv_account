@@ -7,8 +7,6 @@ package com.cv.accountswing.ui.setup.common;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.entity.ChartOfAccount;
-import com.cv.accountswing.entity.SystemProperty;
-import com.cv.accountswing.entity.SystemPropertyKey;
 import com.cv.accountswing.service.COAService;
 import com.cv.accountswing.service.SeqTableService;
 import com.cv.accountswing.service.SystemPropertyService;
@@ -33,7 +31,7 @@ public class COAGroupTableModel extends AbstractTableModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(COAGroupTableModel.class);
     private List<ChartOfAccount> listCOA = new ArrayList();
     String status = "NEW";
-    //String  userId=Global.loginUser.getUserCode();
+    //String  userCode=Global.loginUser.getAppUserCode();
     String[] columnNames = {"System Code", "User Code", "Name", "Active"};
     private JTable parent;
     @Autowired
@@ -143,10 +141,11 @@ public class COAGroupTableModel extends AbstractTableModel {
     }
 
     private void save(ChartOfAccount coa, int row) {
-        coa.setParent(coaHeadCode);
+        coa.setCoaParent(coaHeadCode);
         coa.setCompCode(Global.compCode);
         coa.setActive(Boolean.TRUE);
-        if (isValidCOA(coa, Global.compCode, Global.loginUser.getUserCode())) {
+        coa.setMacId(Global.machineId);
+        if (isValidCOA(coa, Global.compCode, Global.loginUser.getAppUserCode())) {
             ChartOfAccount save = coaService.save(coa);
             if (save.getCode() != null) {
                 addEmptyRow();
@@ -213,14 +212,14 @@ public class COAGroupTableModel extends AbstractTableModel {
     }
 
     public boolean isValidCOA(ChartOfAccount coa, String compCode,
-            String userId) {
+            String userCode) {
         boolean isTrue = true;
 
         if (Util1.isNull(coa.getCoaNameEng(), "-").equals("-")) {
             isTrue = false;
             //JOptionPane.showMessageDialog(Global.parentForm, "Invalid COA Name");
 
-        } else if (coa.getParent() == null) {
+        } else if (coa.getCoaParent()== null) {
             isTrue = false;
             //JOptionPane.showMessageDialog(Global.parentForm, "Please Select Parent.");
 
@@ -237,7 +236,7 @@ public class COAGroupTableModel extends AbstractTableModel {
                         }
                     }
                     coa.setCompCode(compCode);
-                    coa.setCreatedBy(userId);
+                    coa.setCreatedBy(userCode);
                     coa.setCreatedDate(Util1.getTodayDate());
                     coa.setActive(true);
                     if (Util1.isNull(coa.getOption(), "-").equals("-")) {
@@ -245,18 +244,18 @@ public class COAGroupTableModel extends AbstractTableModel {
                     }
                 }
             } else {
-                coa.setModifiedBy(userId);
+                coa.setModifiedBy(userCode);
                 coa.setModifiedDate(Util1.getTodayDate());
             }
 
-            if (coa.getParent() != null) {
-                if (!coa.getParent().isEmpty()) {
-                    ChartOfAccount coa1 = coaService.findById(coa.getParent());
-                    coa.setLevel(coa1.getLevel() + 1);
+            if (coa.getCoaParent()!= null) {
+                if (!coa.getCoaParent().isEmpty()) {
+                    ChartOfAccount coa1 = coaService.findById(coa.getCoaParent());
+                    coa.setCoaLevel(coa1.getCoaLevel()+ 1);
                     coa.setParentUsrDesp(coa1.getCoaNameEng());
                 }
             } else {
-                coa.setLevel(1);
+                coa.setCoaLevel(1);
             }
         }
 

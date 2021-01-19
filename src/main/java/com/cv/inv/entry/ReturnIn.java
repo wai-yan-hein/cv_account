@@ -141,7 +141,8 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
         tblReturnIn.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                 .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
         tblReturnIn.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
+        tblReturnIn.changeSelection(0, 0, false, false);
+        tblReturnIn.requestFocus();
     }
 
     private void initKeyListener() {
@@ -568,18 +569,18 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
                 } else {
                     lblStatus.setText("EDIT");
                 }
-                txtVouNo.setText(retIn.getRetInId());
-                txtVouTotal.setValue(retIn.getVouTotal());
-                txtVouPaid.setValue(retIn.getPaid());
-                txtVouBalance.setValue(retIn.getBalance());
+                txtVouNo.setText(retIn.getVouNo());
+                txtVouTotal.setValue(Util1.getFloat(retIn.getVouTotal()));
+                txtVouPaid.setValue(Util1.getFloat(retIn.getPaid()));
+                txtVouBalance.setValue(Util1.getFloat(retIn.getBalance()));
                 txtRemark.setText(retIn.getRemark());
                 txtRetInDate.setDate(retIn.getRetInDate());
                 traderAutoCompleter.setTrader((Customer) retIn.getCustomer());
                 locationAutoCompleter.setLocation(retIn.getLocation());
                 currencyAutoCompleter.setCurrency(retIn.getCurrency());
-                List<RetInHisDetail> listRetinDetail = retInDetailService.search(retIn.getRetInId());
+                List<RetInHisDetail> listRetinDetail = retInDetailService.search(retIn.getVouNo());
                 returnInTableModel.setRetInDetailList(listRetinDetail);
-                calculateTotalAmount();
+                returnInTableModel.addNewRow();
                 break;
             case "TOTAL-AMT":
                 calculateTotalAmount();
@@ -742,7 +743,6 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
         assignDefaultValue();
         returnInTableModel.clearRetInTable();
         genVouNo();
-        // deleteRetInDetail();
     }
 
     @Override
@@ -821,12 +821,12 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
                         "Select Trader", JOptionPane.ERROR_MESSAGE);
                 status = false;
                 txtCurrency.requestFocusInWindow();
-            } else if (returnInTableModel.getListRetInDetail().size() == 1) {
-                JOptionPane.showMessageDialog(Global.parentForm, "No Sale record.",
+            } else if (returnInTableModel.getListRetInDetail().size() == 0) {
+                JOptionPane.showMessageDialog(Global.parentForm, "No Return In record.",
                         "No data.", JOptionPane.ERROR_MESSAGE);
                 status = false;
             } else {
-                retIn.setRetInId(txtVouNo.getText());
+                retIn.setVouNo(txtVouNo.getText());
                 retIn.setCustomer(traderAutoCompleter.getTrader());
                 retIn.setRemark(txtRemark.getText());
                 retIn.setRetInDate(txtRetInDate.getDate());
@@ -841,6 +841,7 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
                 if (lblStatus.getText().equals("NEW")) {
                     retIn.setCreatedBy(Global.loginUser);
                     retIn.setSession(Global.sessionId);
+                    retIn.setMacId(Global.machineId);
                 } else {
                     retIn.setUpdatedBy(Global.loginUser);
                     retIn.setUpdatedDate(Util1.getTodayDate());

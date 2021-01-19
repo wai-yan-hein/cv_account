@@ -122,7 +122,7 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
         LOGGER.info("Search Sale History.");
         String customerId = "-";
         String vouStatusId = "-";
-        String userId = "-";
+        String userCode = "-";
         String machineId = "-";
         String fromDate = Util1.toDateStr(txtFromDate.getDate(), "yyyy-MM-dd");
         String toDate = Util1.toDateStr(txtToDate.getDate(), "yyyy-MM-dd");
@@ -139,10 +139,10 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
             vouStatusId = "-";
         }
         if (appUserAutoCompleter.getAppUser() != null) {
-            userId = appUserAutoCompleter.getAppUser().getUserCode();
+            userCode = appUserAutoCompleter.getAppUser().getAppUserCode();
         }
         if (appUserAutoCompleter.getAppUser() == null || txtUser.getText().isEmpty()) {
-            userId = "-";
+            userCode = "-";
         }
         if (machAutoCompleter.getManchineInfo() != null) {
             machineId = machAutoCompleter.getManchineInfo().getMachineId().toString();
@@ -152,33 +152,41 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
         }
         String remark = Util1.isNull(txtRemark.getText(), "-");
         String stockId = codeTableModel.getFilterCodeStr();
+        stockId = Util1.isNull(stockId, "-");
         List<SaleHis> listHis = saleHisService.search(fromDate, toDate, customerId,
-                vouStatusId, remark, stockId, userId);
+                vouStatusId, remark, stockId, userCode);
         saleVouTableModel.setListSaleHis(listHis);
         calAmount();
     }
 
     private void calAmount() {
-        double totalAmt = 0.0;
-        if (saleVouTableModel.getListSaleHis() != null) {
-            totalAmt = saleVouTableModel.getListSaleHis().stream().map(saleHis -> saleHis.getVouTotal()).reduce(totalAmt, (accumulator, _item) -> accumulator + _item);
-            txtTotalAmt.setValue(totalAmt);
-            txtTotalRecord.setValue(saleVouTableModel.getListSaleHis().size());
+        float ttlAmt = 0.0f;
+        List<SaleHis> listSale = saleVouTableModel.getListSaleHis();
+        if (!listSale.isEmpty()) {
+            for (SaleHis sh : listSale) {
+                ttlAmt = Util1.getFloat(sh.getVouTotal());
+            }
+            txtTotalAmt.setValue(ttlAmt);
+            txtTotalRecord.setValue(listSale.size());
+            tblVoucher.setRowSelectionInterval(0, 0);
+            tblVoucher.requestFocus();
         }
     }
 
     private void select() {
         int row = tblVoucher.convertRowIndexToModel(tblVoucher.getSelectedRow());
-        SaleHis his = saleVouTableModel.getSelectVou(row);
-        if (his != null) {
-            String vouNo = his.getVouNo();
-            SaleHis saleHis = saleHisService.findById(vouNo);
-            List<SaleHisDetail> detailHis = sdService.search(vouNo);
-            this.dispose();
-            saleEntry.setSaleVoucher(saleHis, detailHis);
-        } else {
-            JOptionPane.showMessageDialog(this, "Please select the voucher.",
-                    "No Voucher Selected", JOptionPane.ERROR_MESSAGE);
+        if (row >= 0) {
+            SaleHis his = saleVouTableModel.getSelectVou(row);
+            if (his != null) {
+                String vouNo = his.getVouNo();
+                SaleHis saleHis = saleHisService.findById(vouNo);
+                List<SaleHisDetail> detailHis = sdService.search(vouNo);
+                this.dispose();
+                saleEntry.setSaleVoucher(saleHis, detailHis);
+            } else {
+                JOptionPane.showMessageDialog(this, "Please select the voucher.",
+                        "No Voucher Selected", JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 
@@ -478,7 +486,7 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblTtlRecord)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(txtTotalRecord, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtTotalRecord)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(lblTtlAmount)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -487,7 +495,7 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
                         .addComponent(btnSearch)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnSelect))
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 677, Short.MAX_VALUE))
+                    .addComponent(jScrollPane2))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -512,10 +520,7 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
 
     private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
         search();
-        if (saleVouTableModel.getListSaleHis() != null) {
-            tblVoucher.setRowSelectionInterval(0, 0);
-            tblVoucher.requestFocus();
-        }
+
     }//GEN-LAST:event_btnSearchActionPerformed
 
     private void btnSelectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectActionPerformed

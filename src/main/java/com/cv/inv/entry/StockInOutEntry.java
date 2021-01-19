@@ -7,92 +7,83 @@ package com.cv.inv.entry;
 
 import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
+import com.cv.accountswing.common.PanelControl;
+import com.cv.accountswing.common.SelectionObserver;
+import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.util.Util1;
+import com.cv.inv.entity.StockInOut;
 import com.cv.inv.entity.StockInOutDetail;
 import com.cv.inv.entry.common.StockInOutTableModel;
+import com.cv.inv.entry.dialog.StockInOutVouSearch;
 import com.cv.inv.entry.editor.LocationCellEditor;
 import com.cv.inv.entry.editor.StockCellEditor;
 import com.cv.inv.entry.editor.StockUnitEditor;
 import com.cv.inv.service.VouIdService;
 import com.cv.inv.util.GenVouNoImpl;
 import java.awt.event.KeyEvent;
-import java.util.List;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import com.cv.inv.service.StockInOutDetailService;
+import com.cv.inv.service.StockInOutService;
 import com.cv.inv.ui.commom.VouFormatFactory;
 import java.text.ParseException;
+import java.util.List;
+import javax.swing.JOptionPane;
 
 /**
  *
  * @author Lenovo
  */
 @Component
-public class StockInOutEntry extends javax.swing.JPanel {
-    
+public class StockInOutEntry extends javax.swing.JPanel implements PanelControl, SelectionObserver {
+
     private static final Logger log = LoggerFactory.getLogger(StockInOutEntry.class);
     @Autowired
     private StockInOutTableModel outTableModel;
     @Autowired
-    private StockInOutDetailService stockInOutService;
+    private StockInOutService stockInOutService;
     @Autowired
     private VouIdService voudIdService;
+    @Autowired
+    private ApplicationMainFrame mainFrame;
     private GenVouNoImpl vouEngine = null;
+    private StockInOut inOut;
+    @Autowired
+    private StockInOutVouSearch stockInOutVouSearch;
 
     /**
      * Creates new form StockInOutEntry
      */
     public StockInOutEntry() {
         initComponents();
-        setTodayDate();
+        initVoucherFormat();
     }
-    
-    private void setTodayDate() {
-        txtFromDate.setDate(Util1.getTodayDate());
-        txtToDate.setDate(Util1.getTodayDate());
+
+    private void initVoucherFormat() {
         try {
             txtBatchNo.setFormatterFactory(new VouFormatFactory());
+            txtDate.setDate(Util1.getTodayDate());
         } catch (ParseException ex) {
             log.error(ex.getMessage());
         }
-        
+
     }
-    
-    private void search() {
-        log.info("Search Stock In Out");
-        String fromDate = Util1.toDateStr(txtFromDate.getDate(), "yyyy-MM-dd");
-        String toDate = Util1.toDateStr(txtToDate.getDate(), "yyyy-MM-dd");
-        String option = Util1.isNull(txtDesp.getText(), "-");
-        String remak = Util1.isNull(txtRemark.getText(), "-");
-        List<StockInOutDetail> listStock = stockInOutService.search(fromDate, toDate, "-", remak, option, remak);
-        outTableModel.setListStock(listStock);
-        outTableModel.addEmptyRow();
-        requestFocusTable();
-        
-    }
-    
-    private void requestFocusTable() {
-        int row = tblStock.getSelectedRowCount();
-        tblStock.setRowSelectionInterval(row, row);
-        tblStock.setColumnSelectionInterval(0, 0);
-    }
-    
-    private void initMain() {
+
+    public void initMain() {
         genVouNo();
         initTable();
-        search();
     }
-    
+
     private void initTable() {
-        outTableModel.addEmptyRow();
+        outTableModel.addNewRow();
         outTableModel.setParent(tblStock);
-        outTableModel.setBatchCode(txtBatchNo.getText());
+        outTableModel.setInTotal(txtInTotalWt);
+        outTableModel.setOutTotal(txtOutTotalWt);
         tblStock.setModel(outTableModel);
         tblStock.getTableHeader().setFont(Global.tblHeaderFont);
         tblStock.getTableHeader().setForeground(ColorUtil.foreground);
@@ -110,7 +101,6 @@ public class StockInOutEntry extends javax.swing.JPanel {
         tblStock.getColumnModel().getColumn(8).setPreferredWidth(20);
         tblStock.getColumnModel().getColumn(9).setPreferredWidth(20);
         tblStock.getColumnModel().getColumn(10).setPreferredWidth(20);
-        tblStock.getColumnModel().getColumn(11).setPreferredWidth(150);
         tblStock.getColumnModel().getColumn(0).setCellEditor(new AutoClearEditor());
         tblStock.getColumnModel().getColumn(1).setCellEditor(new AutoClearEditor());
         tblStock.getColumnModel().getColumn(2).setCellEditor(new StockCellEditor());
@@ -121,14 +111,87 @@ public class StockInOutEntry extends javax.swing.JPanel {
         tblStock.getColumnModel().getColumn(8).setCellEditor(new AutoClearEditor());
         tblStock.getColumnModel().getColumn(9).setCellEditor(new AutoClearEditor());
         tblStock.getColumnModel().getColumn(10).setCellEditor(new StockUnitEditor());
-        tblStock.getColumnModel().getColumn(11).setCellEditor(new AutoClearEditor());
         tblStock.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                 .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
+        tblStock.setCellSelectionEnabled(true);
+        tblStock.changeSelection(0, 0, false, false);
+        tblStock.requestFocus();
     }
-    
+
     private void genVouNo() {
         vouEngine = new GenVouNoImpl(voudIdService, "StockInOut", Util1.getPeriod(Util1.getTodayDate()));
         txtBatchNo.setText(vouEngine.genVouNo());
+    }
+
+    private void actionKeyEnter() {
+        int row = tblStock.convertRowIndexToModel(tblStock.getSelectedRow());
+        int column = tblStock.getSelectedColumn();
+        if (row >= 0) {
+            if (column == 6) {
+                StockInOutDetail stockInout = outTableModel.getStockInout(row);
+                if (Util1.getFloat(stockInout.getInQty()) == 0) {
+                    tblStock.setColumnSelectionInterval(8, 8);
+                    tblStock.setRowSelectionInterval(row, row);
+                }
+            }
+            tblStock.requestFocus();
+        }
+
+    }
+
+    private void saveStockInout() {
+        if (isValidEntry()) {
+            try {
+                List<StockInOutDetail> listStock = outTableModel.getListStock();
+                StockInOut save = stockInOutService.save(inOut, listStock);
+                if (save != null) {
+                    if (lblStatus.getText().equals("NEW")) {
+                        vouEngine.updateVouNo();
+                    }
+                }
+                clear();
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(Global.parentForm, e.getMessage());
+                log.error("Save In Out :" + e.getMessage());
+            }
+        }
+
+    }
+
+    private void clear() {
+        txtDesp.setText(null);
+        txtRemark.setText(null);
+        txtInTotalWt.setValue(0.0);
+        txtOutTotalWt.setValue(0.0);
+        outTableModel.clear();
+        outTableModel.addNewRow();
+        txtDate.setDate(Util1.getTodayDate());
+        genVouNo();
+    }
+
+    private boolean isValidEntry() {
+        boolean status = true;
+        if (txtBatchNo.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(Global.parentForm, "Invalid Batch No.");
+            status = false;
+        } else {
+            inOut = new StockInOut();
+            inOut.setBatchCode(txtBatchNo.getText());
+            inOut.setDescription(txtDesp.getText());
+            inOut.setRemark(txtRemark.getText());
+            inOut.setInTotal(Util1.getFloat(txtInTotalWt.getValue()));
+            inOut.setOutTotal(Util1.getFloat(txtOutTotalWt.getValue()));
+            inOut.setTranDate(txtDate.getDate());
+            if (lblStatus.getText().equals("NEW")) {
+                inOut.setCreatedBy(Global.loginUser);
+                inOut.setCreatedDate(Util1.getTodayDate());
+                inOut.setCompCode(Global.compCode);
+                inOut.setMacId(Global.machineId);
+            } else {
+                inOut.setUpdatedBy(Global.loginUser);
+            }
+        }
+        return status;
     }
 
     /**
@@ -143,20 +206,20 @@ public class StockInOutEntry extends javax.swing.JPanel {
         jScrollPane1 = new javax.swing.JScrollPane();
         tblStock = new javax.swing.JTable();
         jPanel1 = new javax.swing.JPanel();
-        txtFromDate = new com.toedter.calendar.JDateChooser();
-        jLabel2 = new javax.swing.JLabel();
-        txtToDate = new com.toedter.calendar.JDateChooser();
-        jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         txtDesp = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
         txtRemark = new javax.swing.JTextField();
-        btnSearch = new javax.swing.JButton();
         jLabel6 = new javax.swing.JLabel();
-        btnSearch1 = new javax.swing.JButton();
         txtBatchNo = new javax.swing.JFormattedTextField();
+        lblStatus = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        txtDate = new com.toedter.calendar.JDateChooser();
+        txtOutTotalWt = new javax.swing.JFormattedTextField();
+        txtInTotalWt = new javax.swing.JFormattedTextField();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
 
-        setBackground(new java.awt.Color(255, 255, 255));
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentShown(java.awt.event.ComponentEvent evt) {
                 formComponentShown(evt);
@@ -176,47 +239,33 @@ public class StockInOutEntry extends javax.swing.JPanel {
             }
         ));
         tblStock.setRowHeight(Global.tblRowHeight);
+        tblStock.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                tblStockKeyReleased(evt);
+            }
+        });
         jScrollPane1.setViewportView(tblStock);
 
-        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
-
-        txtFromDate.setDateFormatString("dd/MM/yyyy");
-        txtFromDate.setFont(Global.shortCutFont);
-
-        jLabel2.setText("From Date");
-
-        txtToDate.setDateFormatString("dd/MM/yyyy");
-        txtToDate.setFont(Global.shortCutFont);
-
-        jLabel3.setText("ToDate");
-
+        jLabel4.setFont(Global.lableFont);
         jLabel4.setText("Description");
 
+        jLabel5.setFont(Global.lableFont);
         jLabel5.setText("Remark");
 
-        btnSearch.setBackground(ColorUtil.btnEdit);
-        btnSearch.setFont(Global.lableFont);
-        btnSearch.setForeground(ColorUtil.foreground);
-        btnSearch.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/search-button-white.png"))); // NOI18N
-        btnSearch.setText("Search");
-        btnSearch.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSearchActionPerformed(evt);
-            }
-        });
+        jLabel6.setFont(Global.lableFont);
+        jLabel6.setText("Batch Code");
 
-        jLabel6.setText("BatchId");
+        txtBatchNo.setEditable(false);
 
-        btnSearch1.setBackground(ColorUtil.btnEdit);
-        btnSearch1.setFont(Global.lableFont);
-        btnSearch1.setForeground(ColorUtil.foreground);
-        btnSearch1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/search-button-white.png"))); // NOI18N
-        btnSearch1.setText("New");
-        btnSearch1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSearch1ActionPerformed(evt);
-            }
-        });
+        lblStatus.setFont(Global.lableFont);
+        lblStatus.setText("NEW");
+
+        jLabel3.setFont(Global.lableFont);
+        jLabel3.setText("Date");
+
+        txtDate.setDateFormatString("dd/MM/yyyy");
+        txtDate.setFont(Global.lableFont);
+        txtDate.setMaxSelectableDate(new java.util.Date(253370745114000L));
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -226,50 +275,55 @@ public class StockInOutEntry extends javax.swing.JPanel {
                 .addContainerGap()
                 .addComponent(jLabel6)
                 .addGap(18, 18, 18)
-                .addComponent(txtBatchNo, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel2)
+                .addComponent(txtBatchNo, javax.swing.GroupLayout.DEFAULT_SIZE, 103, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
-                .addComponent(txtFromDate, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel3)
                 .addGap(18, 18, 18)
-                .addComponent(txtToDate, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(txtDate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(txtDesp, javax.swing.GroupLayout.DEFAULT_SIZE, 107, Short.MAX_VALUE)
+                .addComponent(txtDesp, javax.swing.GroupLayout.DEFAULT_SIZE, 103, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(txtRemark, javax.swing.GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
+                .addComponent(txtRemark, javax.swing.GroupLayout.DEFAULT_SIZE, 103, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
-                .addComponent(btnSearch1)
-                .addGap(11, 11, 11)
-                .addComponent(btnSearch)
-                .addGap(12, 12, 12))
+                .addComponent(lblStatus)
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtFromDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2)
-                    .addComponent(txtToDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3)
+                    .addComponent(txtDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jLabel4)
                         .addComponent(txtDesp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jLabel5)
                         .addComponent(txtRemark, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(btnSearch)
-                        .addComponent(btnSearch1))
+                        .addComponent(lblStatus)
+                        .addComponent(jLabel3))
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jLabel6)
                         .addComponent(txtBatchNo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(7, Short.MAX_VALUE))
         );
+
+        txtOutTotalWt.setEditable(false);
+        txtOutTotalWt.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
+        txtOutTotalWt.setFont(Global.amtFont);
+
+        txtInTotalWt.setEditable(false);
+        txtInTotalWt.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
+        txtInTotalWt.setFont(Global.amtFont);
+
+        jLabel1.setFont(Global.lableFont);
+        jLabel1.setText("Stock Out Total");
+
+        jLabel2.setFont(Global.lableFont);
+        jLabel2.setText("Stock In Total");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -278,40 +332,51 @@ public class StockInOutEntry extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jLabel2)
+                        .addGap(18, 18, 18)
+                        .addComponent(txtInTotalWt, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(txtOutTotalWt, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 357, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 427, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtOutTotalWt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtInTotalWt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1)
+                    .addComponent(jLabel2))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
-        initMain();
+        mainFrame.setControl(this);
     }//GEN-LAST:event_formComponentShown
 
-    private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
+    private void tblStockKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tblStockKeyReleased
         // TODO add your handling code here:
-        search();
-    }//GEN-LAST:event_btnSearchActionPerformed
-
-    private void btnSearch1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearch1ActionPerformed
-        // TODO add your handling code here:
-        genVouNo();
-    }//GEN-LAST:event_btnSearch1ActionPerformed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            actionKeyEnter();
+        }
+    }//GEN-LAST:event_tblStockKeyReleased
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnSearch;
-    private javax.swing.JButton btnSearch1;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -319,11 +384,48 @@ public class StockInOutEntry extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lblStatus;
     private javax.swing.JTable tblStock;
     private javax.swing.JFormattedTextField txtBatchNo;
+    private com.toedter.calendar.JDateChooser txtDate;
     private javax.swing.JTextField txtDesp;
-    private com.toedter.calendar.JDateChooser txtFromDate;
+    private javax.swing.JFormattedTextField txtInTotalWt;
+    private javax.swing.JFormattedTextField txtOutTotalWt;
     private javax.swing.JTextField txtRemark;
-    private com.toedter.calendar.JDateChooser txtToDate;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void save() {
+        saveStockInout();
+    }
+
+    @Override
+    public void delete() {
+    }
+
+    @Override
+    public void newForm() {
+    }
+
+    @Override
+    public void history() {
+        stockInOutVouSearch.initMain();
+        stockInOutVouSearch.setSize(Global.width - 300, Global.height - 300);
+        stockInOutVouSearch.setObserver(this);
+        stockInOutVouSearch.setLocationRelativeTo(null);
+        stockInOutVouSearch.setVisible(true);
+    }
+
+    @Override
+    public void print() {
+    }
+
+    @Override
+    public void refresh() {
+    }
+
+    @Override
+    public void selected(Object source, Object selectObj) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

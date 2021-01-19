@@ -229,7 +229,7 @@ public class DepartmentSetup extends javax.swing.JPanel implements TreeSelection
         department.setActive(chkActive.isSelected());
         department.setCompCode(Global.compCode);
         department.setMacId(Global.machineId);
-        if (isValidDepartment(department, Global.loginUser.getUserCode(), Global.compCode)) {
+        if (isValidDepartment(department, Global.loginUser.getAppUserCode(), Global.compCode)) {
             Department dep = deptService.save(department);
             if (dep != null) {
                 JOptionPane.showMessageDialog(Global.parentForm, "Saved");
@@ -244,7 +244,7 @@ public class DepartmentSetup extends javax.swing.JPanel implements TreeSelection
     }
 
     private boolean isValidDepartment(Department dept,
-            String userId, String compCode) {
+            String userCode, String compCode) {
         boolean status = true;
 
         if (Util1.isNull(dept.getDeptName(), "-").equals("-")) {
@@ -254,7 +254,7 @@ public class DepartmentSetup extends javax.swing.JPanel implements TreeSelection
 
             if (dept.getDeptCode().isEmpty()) {
                 //dept.setDeptCode(getDeptCode(compCode));
-                dept.setCreatedBy(userId);
+                dept.setCreatedBy(userCode);
                 dept.setCreatedDt(Util1.getTodayDate());
             } else {
                 if (labelStatus.getText().equals("NEW")) {
@@ -268,7 +268,7 @@ public class DepartmentSetup extends javax.swing.JPanel implements TreeSelection
                     }
                 }
             }
-            dept.setUpdatedBy(userId);
+            dept.setUpdatedBy(userCode);
             dept.setUpdatedDt(Util1.getTodayDate());
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) selectedNode.getParent();
             Object userObject = node.getUserObject();

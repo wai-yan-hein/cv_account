@@ -166,7 +166,15 @@
             <artifactId>cv-account-dal</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.mariadb.jdbc/mariadb-java-client -->
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>2.7.1</version>
+        </dependency>
     </dependencies>
+    
+
 
     <build>
         <plugins>
@@ -180,9 +188,6 @@
                 <version>3.8.0</version>
                 <configuration>
                     <release>15</release>
-                    <compilerArgs>
-                        <arg>--enable-preview</arg>
-                    </compilerArgs>
                 </configuration>
             </plugin>
         </plugins>

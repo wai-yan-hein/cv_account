@@ -112,7 +112,11 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
         switch (columnIndex) {
             case 0:
                 if (pur.getStock() != null) {
-                    return pur.getStock().getStockCode();
+                    if (Util1.isNull(Global.sysProperties.get("system.use.usercode"), "0").equals("1")) {
+                        return pur.getStock().getUserCode();
+                    } else {
+                        return pur.getStock().getStockCode();
+                    }
                 }
             case 1:
                 if (pur.getStock() != null) {
@@ -176,7 +180,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
                         pur.setStdWeight(stock.getPurWeight());
                         pur.setPurUnit(stock.getPurUnit());
                         pur.setDepartment(Global.defaultDepartment);
-                        pur.setLocation(Global.defaultLocation);
+                        pur.setLocation(locationAutoCompleter.getLocation());
                         addNewRow();
                         parent.setColumnSelectionInterval(4, 4);
                     }
@@ -258,15 +262,15 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
             float avgWt;
             float purQty = Util1.getFloat(pur.getQty());
             float purPrice = Util1.getFloat(pur.getPurPrice());
-            float userWt = pur.getStdWeight();
+            float userWt = Util1.getFloat(pur.getStdWeight());
             String fromUnit = pur.getPurUnit().getItemUnitCode();
             String toUnit = pur.getStock().getPurUnit().getItemUnitCode();
             String pattern = pur.getStock().getPattern().getPatternCode();
             pur.setStdSmallWeight(getSmallestWeight(userWt, fromUnit, toUnit, pattern) * purQty);
             if (Util1.getFloat(pur.getAvgWeight()) > 0) {
-                avgWt = pur.getAvgWeight();
+                avgWt = Util1.getFloat(pur.getAvgWeight());
             } else {
-                avgWt = pur.getStdWeight();
+                avgWt = Util1.getFloat(pur.getStdWeight());
             }
             pur.setSmallestWT(getSmallestWeight(avgWt, fromUnit, toUnit, pattern) * purQty);
             pur.setSmallestUnit(pur.getStock().getPurUnit().getItemUnitCode());
@@ -275,7 +279,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
             //  calTotalAmount(pur);
             //cal avg wt
             if (pur.getAvgWeight() != null) {
-                Float stdWt = pur.getStdWeight();
+                Float stdWt = Util1.getFloat(pur.getStdWeight());
                 float avgPrice = (pur.getAvgWeight() / stdWt) * pur.getPurPrice();
                 pur.setAvgWeight(avgWt);
                 pur.setAvgPrice(avgPrice);
@@ -401,7 +405,7 @@ public class PurchaseEntryTableModel extends AbstractTableModel {
         boolean status = true;
         if (listPurDetail.size() > 1) {
             PurHisDetail get = listPurDetail.get(listPurDetail.size() - 1);
-            if (get.getStock() == null) {
+            if (get.getStock().getStockCode() == null) {
                 status = false;
             }
         }

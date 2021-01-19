@@ -195,10 +195,10 @@ public class CurrencySetup extends javax.swing.JPanel implements KeyListener, Pa
 
         if (status) {
             if (editStatus.equals("NEW")) {
-                cur.setCreatedBy(Global.loginUser.getUserCode());
+                cur.setCreatedBy(Global.loginUser.getAppUserCode());
                 cur.setCreatedDt(Util1.getTodayDate());
             } else {
-                cur.setUpdatedBy(Global.loginUser.getUserCode());
+                cur.setUpdatedBy(Global.loginUser.getAppUserCode());
                 cur.setUpdatedDt(Util1.getTodayDate());
             }
         }

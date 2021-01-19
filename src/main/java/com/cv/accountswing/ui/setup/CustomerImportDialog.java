@@ -132,6 +132,7 @@ public class CustomerImportDialog extends javax.swing.JDialog {
                     customer.setCompCode(Global.compCode);
                     customer.setCreatedBy(Global.loginUser);
                     customer.setCreatedDate(Util1.getTodayDate());
+                    customer.setMacId(Global.machineId);
                     listCustomer.add(customer);
 
                 }

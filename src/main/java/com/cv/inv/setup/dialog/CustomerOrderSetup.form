@@ -114,6 +114,9 @@
           <Connection code="Global.textFont" type="code"/>
         </Property>
         <Property name="name" type="java.lang.String" value="txtName" noResource="true"/>
+        <Property name="nextFocusableComponent" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+          <ComponentRef name="txtPhone"/>
+        </Property>
       </Properties>
       <Events>
         <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtNameFocusGained"/>
@@ -134,6 +137,9 @@
           <Connection code="Global.textFont" type="code"/>
         </Property>
         <Property name="name" type="java.lang.String" value="txtPhone" noResource="true"/>
+        <Property name="nextFocusableComponent" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+          <ComponentRef name="txtAccount"/>
+        </Property>
       </Properties>
       <Events>
         <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtPhoneFocusGained"/>
@@ -154,6 +160,9 @@
           <Connection code="Global.textFont" type="code"/>
         </Property>
         <Property name="name" type="java.lang.String" value="txtAccount" noResource="true"/>
+        <Property name="nextFocusableComponent" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+          <ComponentRef name="txtRegion"/>
+        </Property>
       </Properties>
       <Events>
         <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtAccountFocusGained"/>
@@ -173,6 +182,9 @@
           <Connection code="Global.textFont" type="code"/>
         </Property>
         <Property name="name" type="java.lang.String" value="txtAddress" noResource="true"/>
+        <Property name="nextFocusableComponent" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+          <ComponentRef name="btnSave"/>
+        </Property>
       </Properties>
       <Events>
         <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtAddressFocusGained"/>
@@ -213,6 +225,9 @@
           <Connection code="Global.textFont" type="code"/>
         </Property>
         <Property name="name" type="java.lang.String" value="txtRegion" noResource="true"/>
+        <Property name="nextFocusableComponent" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+          <ComponentRef name="txtAddress"/>
+        </Property>
       </Properties>
       <Events>
         <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtRegionFocusGained"/>
@@ -277,6 +292,9 @@
           <Connection code="Global.textFont" type="code"/>
         </Property>
         <Property name="name" type="java.lang.String" value="txtName" noResource="true"/>
+        <Property name="nextFocusableComponent" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+          <ComponentRef name="txtName"/>
+        </Property>
       </Properties>
       <Events>
         <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtUserCodeFocusGained"/>

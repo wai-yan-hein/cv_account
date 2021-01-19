@@ -19,6 +19,7 @@ import com.cv.accountswing.entity.Currency;
 import com.cv.accountswing.entity.Customer;
 import com.cv.accountswing.entity.Region;
 import com.cv.accountswing.entity.Supplier;
+import com.cv.accountswing.entity.Trader;
 import com.cv.accountswing.entity.view.VDescription;
 import com.cv.accountswing.entity.view.VRef;
 import com.cv.inv.entity.Category;
@@ -74,6 +75,7 @@ public class Global {
     public static List<Department> listDepartment;
     public static List<Customer> listCustomer;
     public static List<Supplier> listSupplier;
+    public static List<Trader> listTrader = new ArrayList<>();
     public static List<ChartOfAccount> listCOA;
     public static List<DateModel> listDateModel;
     public static List<AppUser> listAppUser;

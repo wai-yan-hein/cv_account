@@ -61,7 +61,7 @@ public class StockTableModel extends AbstractTableModel {
 
             switch (column) {
                 case 0: //Code
-                    return med.getStockCode();
+                    return med.getUserCode();
                 case 1: //Name
                     return med.getStockName();
                 case 2: //Active

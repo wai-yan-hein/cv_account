@@ -116,27 +116,16 @@ public class PurchaseVouSearch extends javax.swing.JDialog implements KeyListene
         String vouStatusId;
         String fromDate = Util1.toDateStr(txtFromDate.getDate(), "yyyy-MM-dd");
         String toDate = Util1.toDateStr(txtToDate.getDate(), "yyyy-MM-dd");
-        if (traderAutoCompleter.getTrader() != null) {
+
+        if (txtCus.getText().isEmpty() || traderAutoCompleter.getTrader() == null) {
+            customerId = "-";
+        } else {
             customerId = traderAutoCompleter.getTrader().getCode();
-        } else {
-            customerId = "-";
         }
-        if (txtCus.getText().isEmpty()) {
-            customerId = "-";
-        }
-        if (vouCompleter.getVouStatus() != null) {
-            vouStatusId = vouCompleter.getVouStatus().getVouStatusCode();
-            if (txtVouStatus.getText().isEmpty()) {
-                vouStatusId = "-";
-            }
-        } else {
+        if (vouCompleter.getVouStatus() == null || txtVouStatus.getText().isEmpty()) {
             vouStatusId = "-";
-        }
-        if (vouCompleter.getVouStatus() != null) {
+        } else {
             vouStatusId = vouCompleter.getVouStatus().getVouStatusCode();
-        }
-        if (txtVouStatus.getText().isEmpty()) {
-            vouStatusId = "-";
         }
 
         String remark = Util1.isNull(txtRemark.getText(), "-");
@@ -147,7 +136,7 @@ public class PurchaseVouSearch extends javax.swing.JDialog implements KeyListene
     }
 
     private void calAmount() {
-        double ttlAmt = 0.0;
+        float ttlAmt = 0.0f;
         if (!purVouTableModel.getListPurHis().isEmpty()) {
             ttlAmt = purVouTableModel.getListPurHis().stream().map(p -> p.getVouTotal()).reduce(ttlAmt, (accumulator, _item) -> accumulator + _item);
             txtTotalAmt.setValue(ttlAmt);
@@ -176,7 +165,7 @@ public class PurchaseVouSearch extends javax.swing.JDialog implements KeyListene
         int row = tblVoucher.convertRowIndexToModel(tblVoucher.getSelectedRow());
         PurHis vs = purVouTableModel.getSelectVou(row);
         if (vs != null) {
-            String vouNo = vs.getPurInvId();
+            String vouNo = vs.getVouNo();
             PurHis dmgHis = purHisService.findById(vouNo);
             List<PurHisDetail> listDetail = pdService.search(vouNo);
             this.dispose();

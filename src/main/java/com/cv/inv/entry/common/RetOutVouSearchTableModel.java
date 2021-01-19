@@ -72,7 +72,7 @@ public class RetOutVouSearchTableModel extends AbstractTableModel {
                     return Util1.toDateStr(vRetOut.getRetOutDate(), "dd/MM/yyyy");
                 case 1: //Vou No
 
-                    return vRetOut.getRetOutId();
+                    return vRetOut.getVouNo();
 
                 case 2: //Customer
                     return vRetOut.getCustomer();

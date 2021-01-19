@@ -26,6 +26,7 @@ import com.cv.accountswing.service.DepartmentService;
 import com.cv.accountswing.service.MenuService;
 import com.cv.accountswing.service.SupplierService;
 import com.cv.accountswing.service.SystemPropertyService;
+import com.cv.accountswing.service.TraderService;
 import com.cv.accountswing.service.UserService;
 import com.cv.accountswing.service.UsrCompRoleService;
 import com.cv.accountswing.ui.cash.AllCash;
@@ -64,9 +65,11 @@ import com.cv.inv.service.LocationService;
 import com.cv.inv.service.SaleManService;
 import com.cv.inv.service.VouStatusService;
 import com.cv.accountswing.util.Util1;
+import com.cv.inv.entity.AccSetting;
 import com.cv.inv.entry.CustomerGrid;
 import com.cv.inv.entry.SaleEntry;
 import com.cv.inv.entry.StockInOutEntry;
+import com.cv.inv.service.AccSettingService;
 import com.cv.inv.service.CategoryService;
 import com.cv.inv.service.ChargeTypeService;
 import com.cv.inv.service.MachineInfoService;
@@ -145,6 +148,8 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     @Autowired
     private MenuService menuService;
     @Autowired
+    private AccSettingService accSettingService;
+    @Autowired
     private CustomerSetup customerSetup;
     @Autowired
     private CurrencySetup currencySetup;
@@ -192,8 +197,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     @Autowired
     private AparGlReport glListingReport;
     @Autowired
-    private UsrCompRoleService usrCompRoleService;
-    @Autowired
     private UserService userService;
     @Autowired
     private COAService cOAService;
@@ -205,6 +208,8 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private SupplierService supplierService;
     @Autowired
     private CustomerService customerService;
+    @Autowired
+    private TraderService traderService;
     @Autowired
     private ProtfitAndLost profitAndLost;
     @Autowired
@@ -269,6 +274,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private VouStatusService vouStatusService;
     @Autowired
     private CustomerGrid customerGrid;
+
     private PanelControl control;
     private FilterObserver filterObserver;
 
@@ -315,6 +321,8 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     }
 
     private JPanel getPanel(String className, String panelName) {
+        LOGGER.info("Class Name :" + className);
+        LOGGER.info("Panel Name :" + panelName);
         String[] split = className.split(",");
         String cName = split[0]; // group name
         String sourceId = split[1];
@@ -400,15 +408,25 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             case "DayBook":
                 switch (panelName) {
                     case "Purchase":
-                        purchaseBook.setName(panelName);
-                        purchaseBook.setLoadingObserver(this);
-                        purchaseBook.setSourceAccId(sourceId);
-                        return purchaseBook;
+                        String sourcePur = getSourceAccount("Purchase");
+                        if (!sourcePur.equals("-")) {
+                            purchaseBook.setName(panelName);
+                            purchaseBook.setLoadingObserver(this);
+                            purchaseBook.setSourceAccId(sourcePur);
+                            return purchaseBook;
+                        } else {
+                            return null;
+                        }
                     case "Sale":
-                        saleBook.setName(panelName);
-                        saleBook.setLoadingObserver(this);
-                        saleBook.setSourceAccId(sourceId);
-                        return saleBook;
+                        String sourceAcc = getSourceAccount("Sale");
+                        if (!sourceAcc.equals("-")) {
+                            saleBook.setName(panelName);
+                            saleBook.setLoadingObserver(this);
+                            saleBook.setSourceAccId(sourceAcc);
+                            return saleBook;
+                        } else {
+                            return null;
+                        }
                     default:
                         return null;
                 }
@@ -484,6 +502,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                         return manageProjectSetup;
                     case "Stock In/Out":
                         stockInOut.setName(panelName);
+                        stockInOut.initMain();
                         return stockInOut;
                     case "Customer List":
                         customerGrid.setName(panelName);
@@ -581,11 +600,11 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     }
 
     private void addTabMain(JPanel panel, String menuName) {
-        Integer tabIndex = tabMain.getTabCount() - 1;
-        //tabMain.setSelectedIndex(tabIndex);
-        tabMain.add(panel);
-        tabMain.setTabComponentAt(tabMain.indexOfComponent(panel), setTitlePanel(tabMain, panel, menuName));
-        tabMain.setSelectedComponent(panel);
+        if (panel != null) {
+            tabMain.add(panel);
+            tabMain.setTabComponentAt(tabMain.indexOfComponent(panel), setTitlePanel(tabMain, panel, menuName));
+            tabMain.setSelectedComponent(panel);
+        }
     }
 
     private void showCloseAllPopup() {
@@ -725,6 +744,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                     "-", "-");
             Global.listCustomer = customerService.search("-", "-", "-", "-", Global.compCode);
             Global.listSupplier = supplierService.search("-", "-", "-", "-", Global.compCode);
+            Global.listTrader = traderService.searchTrader("-", "-", "-", "-", "-", Global.compCode, "-");
             Global.listLocation = locationService.findAll();
             Global.listVou = vouService.findAll();
             Global.listSaleMan = saleManService.findAll();
@@ -887,14 +907,13 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         detector.setNetworkObserver(this);
         scheduler.scheduleAtFixedRate(detector, Duration.ofSeconds(10));
         startPhoneService();
-
     }
 
     private void startPhoneService() {
-        String open = Global.sysProperties.get("system.phone.service");
-        if (open == null || open.trim().equals("1")) {
+        String open = Util1.isNull(Global.sysProperties.get("system.phone.service"), "-");
+        if (open.equals("1")) {
             Thread socketThread = new Thread(() -> {
-                LOGGER.info("Socket Thread Start.");
+                LOGGER.info("Phone Serivce Thread Started.");
                 try {
                     while (true) {
                         try (Socket s = Global.sock.accept()) {
@@ -926,6 +945,17 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         }
         revalidate();
         repaint();
+    }
+
+    private String getSourceAccount(String option) {
+        String sourceAcc = "-";
+        AccSetting setting = accSettingService.findByCode(option);
+        if (setting != null) {
+            if (setting.getSoureAccount() != null) {
+                sourceAcc = setting.getSoureAccount().getCode();
+            }
+        }
+        return sourceAcc;
     }
 
     @SuppressWarnings("unchecked")

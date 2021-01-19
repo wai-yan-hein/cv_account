@@ -27,13 +27,13 @@ import com.cv.accountswing.service.VRefService;
 import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.editor.CurrencyEditor;
 import com.cv.accountswing.ui.editor.DepartmentCellEditor;
-import com.cv.accountswing.ui.editor.SupplierCellEditor;
 import com.cv.accountswing.ui.cash.common.AllCashTableModel;
 import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.editor.COACellEditor;
 import com.cv.accountswing.ui.editor.DespEditor;
 import com.cv.accountswing.ui.editor.RefCellEditor;
+import com.cv.accountswing.ui.editor.TraderCellEditor;
 import com.cv.accountswing.ui.filter.FilterPanel;
 import com.cv.accountswing.util.Util1;
 import java.awt.BorderLayout;
@@ -213,7 +213,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
         tblCash.getColumnModel().getColumn(1).setCellEditor(new DepartmentCellEditor());
         tblCash.getColumnModel().getColumn(2).setCellEditor(new DespEditor(descriptionService));
         tblCash.getColumnModel().getColumn(3).setCellEditor(new RefCellEditor(refService));
-        tblCash.getColumnModel().getColumn(4).setCellEditor(new SupplierCellEditor());
+        tblCash.getColumnModel().getColumn(4).setCellEditor(new TraderCellEditor());
         tblCash.getColumnModel().getColumn(5).setCellEditor(new COACellEditor());
         tblCash.getColumnModel().getColumn(6).setCellEditor(new CurrencyEditor());
         tblCash.getColumnModel().getColumn(7).setCellEditor(new AutoClearEditor());
@@ -364,8 +364,8 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
                 key.setCompCode(Global.compCode);
                 key.setPropKey("system.report.path");
                 SystemProperty sp = spService.findById(key);
-                String userId = Global.loginUser.getUserCode();
-                String fileName = userId + "_Ledger_Report.pdf";
+                String userCode = Global.loginUser.getAppUserCode();
+                String fileName = userCode + "_Ledger_Report.pdf";
                 String reportPath = sp.getPropValue();
                 //String reportPath1 = reportPath;
                 String filePath = reportPath + "/temp/" + fileName;
@@ -446,7 +446,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
         accId = Util1.isNull(accId, "-");
         currency = Util1.isNull(currency, "-");
         ref = Util1.isNull(ref, "-");
-        depId = Util1.isNull(depId, Util1.isNull(Global.sysProperties.get("system.default.department"), "-"));
+        depId = Util1.isNull(depId, "-");
         traderName = Util1.isNull(traderName, "-");
         debAmt = Util1.isNull(debAmt, "-");
         crdAmt = Util1.isNull(crdAmt, "-");
@@ -489,7 +489,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
                 vgl.setDrAmt(tmpAmt);
                 }*/
                 } else if (accId.equals(targetId)) {
-                    double tmpDrAmt = 0;
+                    float tmpDrAmt = 0;
                     if (vgl.getDrAmt() != null) {
                         tmpDrAmt = vgl.getDrAmt();
                     }
@@ -500,8 +500,8 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
                     vgl.setAccName(vgl.getSrcAccName());
                     vgl.setSrcAccName(tmpStr);
                 } else {
-                    vgl.setDrAmt(0.0);
-                    vgl.setCrAmt(0.0);
+                    vgl.setDrAmt(0.0f);
+                    vgl.setCrAmt(0.0f);
                 }
             });
         }
@@ -712,7 +712,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
                 stDate = opDate;
             }
             List<TmpOpeningClosing> opBalanceGL = coaOpDService.getOpBalanceGL1(sourceAccId, opDate, stDate, 3, "MMK",
-                    Global.loginUser.getUserCode(),
+                    Global.loginUser.getAppUserCode(),
                     Util1.isNull(depId, "-"), Global.machineId.toString());
             LOGGER.info("End calculate opening.");
             if (!opBalanceGL.isEmpty()) {

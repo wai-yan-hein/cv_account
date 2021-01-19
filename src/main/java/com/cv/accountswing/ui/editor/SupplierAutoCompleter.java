@@ -324,6 +324,8 @@ public class SupplierAutoCompleter implements KeyListener {
         this.trader = trader;
         if (trader != null) {
             this.textComp.setText(trader.getTraderName());
+        }else{
+            this.textComp.setText(null);
         }
     }
 

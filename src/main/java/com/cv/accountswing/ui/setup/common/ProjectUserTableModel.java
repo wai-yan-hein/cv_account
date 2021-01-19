@@ -112,11 +112,11 @@ public class ProjectUserTableModel extends AbstractTableModel {
     }
 
     private void saveUser(AppUser appUser) {
-        String userId = appUser.getUserCode();
+        String userCode = appUser.getUserCode();
         if (isValidUser(Util1.getString(projectId), appUser.getUserCode())) {
             ProjectUserMapping userMapping = new ProjectUserMapping();
             userMapping.setProjecCode(projectId);
-            userMapping.setUserCode(userId);
+            userMapping.setUserCode(userCode);
             ProjectUserMapping save = projectUserMappingService.save(userMapping);
             if (save != null) {
                 JOptionPane.showMessageDialog(Global.parentForm, "User  Added.");
@@ -127,9 +127,9 @@ public class ProjectUserTableModel extends AbstractTableModel {
 
     }
 
-    private boolean isValidUser(String projectId, String userId) {
+    private boolean isValidUser(String projectId, String userCode) {
         boolean status = true;
-        List listPTM = projectUserMappingService.search(projectId, userId);
+        List listPTM = projectUserMappingService.search(projectId, userCode);
         if (listPTM != null) {
             if (!listPTM.isEmpty()) {
                 status = false;

@@ -70,9 +70,7 @@ public class RetInVouSearchTableModel extends AbstractTableModel {
                 case 0: //Date
                     return Util1.toDateStr(vRetIn.getRetInDate(), "dd/MM/yyyy");
                 case 1: //Vou No
-
-                    return vRetIn.getRetInId();
-
+                    return vRetIn.getVouNo();
                 case 2: //Customer
                     return vRetIn.getCustomer();
                 case 3: //User
@@ -91,7 +89,7 @@ public class RetInVouSearchTableModel extends AbstractTableModel {
 
     @Override
     public void setValueAt(Object value, int row, int column) {
-     
+
     }
 
     @Override
@@ -111,7 +109,7 @@ public class RetInVouSearchTableModel extends AbstractTableModel {
         return listVRetIns;
     }
 
-   public void setListRetInHis(List<RetInHis> listVRetIns) {
+    public void setListRetInHis(List<RetInHis> listVRetIns) {
         this.listVRetIns = listVRetIns;
         fireTableDataChanged();
     }

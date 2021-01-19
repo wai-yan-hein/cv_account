@@ -110,13 +110,13 @@ public class COAOpeningTableModel extends AbstractTableModel {
         switch (column) {
             case 6:
                 if (value != null) {
-                    vgl.setDrAmt(Util1.getDouble(value));
+                    vgl.setDrAmt(Util1.getFloat(value));
                     save(vgl, row);
                 }
                 break;
             case 7:
                 if (value != null) {
-                    vgl.setCrAmt(Util1.getDouble(value));
+                    vgl.setCrAmt(Util1.getFloat(value));
                     save(vgl, row);
                 }
                 break;
@@ -128,7 +128,7 @@ public class COAOpeningTableModel extends AbstractTableModel {
     private void save(VGl vgl, int row) {
 
         vgl.setCompCode(Global.compCode);
-        vgl.setCreatedBy(Global.loginUser.getUserCode());
+        vgl.setCreatedBy(Global.loginUser.getAppUserCode());
         String strVGL = gson.toJson(vgl);
         Gl gl = gson.fromJson(strVGL, Gl.class);
         try {

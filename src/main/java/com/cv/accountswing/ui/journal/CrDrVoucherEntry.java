@@ -227,7 +227,7 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
         taskExecutor.execute(() -> {
             try {
                 String vouNo = txtVouNo.getText();
-                String userId = Global.loginUser.getUserCode();
+                String userCode = Global.loginUser.getAppUserCode();
                 String type;
                 if (voucherType.equals("CR")) {
                     type = "system.creditvoucher";
@@ -239,7 +239,7 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
                 key.setCompCode(Global.compCode);
                 key.setPropKey("system.report.path");
                 SystemProperty sp = spService.findById(key);
-                String fileName = userId + vouNo + ".pdf";
+                String fileName = userCode + vouNo + ".pdf";
                 String reportPath = sp.getPropValue();
                 String imagePath = reportPath;
                 String filePath = reportPath + "/temp/" + fileName;
@@ -364,10 +364,10 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
 
         if (gl.getGlCode() == null) {
             gl.setCompCode(Global.compCode);
-            gl.setCreatedBy(Global.loginUser.getUserCode());
+            gl.setCreatedBy(Global.loginUser.getAppUserCode());
             gl.setCreatedDate(Util1.getTodayDate());
         } else {
-            gl.setModifyBy(Global.loginUser.getUserCode());
+            gl.setModifyBy(Global.loginUser.getAppUserCode());
             gl.setModifyDate(Util1.getTodayDate());
         }
     }

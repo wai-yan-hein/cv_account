@@ -173,8 +173,8 @@ public class RoleAssignSetup extends javax.swing.JPanel implements KeyListener, 
         });
     }
 
-    private void getAssignRole(String userId) {
-        List assignCompany = usrCompRoleService.getAssignRole(userId);
+    private void getAssignRole(String userCode) {
+        List assignCompany = usrCompRoleService.getAssignRole(userCode);
         List<VUsrCompRole> listUCR = (List<VUsrCompRole>) (List<?>) assignCompany;
         compRoleTableModel.setListUCR(listUCR);
         btnAdd.setEnabled(true);

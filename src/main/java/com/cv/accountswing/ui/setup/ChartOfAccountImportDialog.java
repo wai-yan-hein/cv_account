@@ -113,14 +113,15 @@ public class ChartOfAccountImportDialog extends javax.swing.JDialog {
                     } catch (IndexOutOfBoundsException e) {
                         JOptionPane.showMessageDialog(Global.parentForm, "FORMAT ERROR IN LINE:" + lineCount);
                     }
-                    coa.setParent(parentCode);
+                    coa.setCoaParent(parentCode);
                     coa.setCoaCodeUsr(userCode);
                     coa.setMigCode(code);
                     coa.setCoaNameEng(name);
                     coa.setCompCode(Global.compCode);
                     coa.setActive(Boolean.TRUE);
                     coa.setCreatedDate(Util1.getTodayDate());
-                    coa.setCreatedBy(Global.loginUser.getUserCode());
+                    coa.setCreatedBy(Global.loginUser.getAppUserCode());
+                    coa.setMacId(Global.machineId);
                     listCOA.add(coa);
 
                 }
@@ -203,7 +204,7 @@ public class ChartOfAccountImportDialog extends javax.swing.JDialog {
         taskExecutor.execute(() -> {
             importTableModel.getListCOA().forEach(coa -> {
                 coa.setOption("SYS");
-                coa.setLevel(1);
+                coa.setCoaLevel(1);
                 cOAService.save(coa);
             });
             importTableModel.clear();
@@ -214,7 +215,7 @@ public class ChartOfAccountImportDialog extends javax.swing.JDialog {
     }
 
     private void saveLevel(String level) {
-        log.info("Save ChartOfAccount Level Two.");
+        log.info("Save ChartOfAccount Level :" + level);
         JDialog loading = Util1.getLoading(this, loadingIcon);
         List<ChartOfAccount> listLevelOne = cOAService.search("-", "-", Global.compCode, level, "-", "-", "-");
         listLevelOne.forEach(one -> {
@@ -222,14 +223,14 @@ public class ChartOfAccountImportDialog extends javax.swing.JDialog {
         });
         taskExecutor.execute(() -> {
             importTableModel.getListCOA().stream().map(levelTwo -> {
-                String pCode = hmCOA.get(levelTwo.getParent());
-                levelTwo.setParent(pCode);
+                String pCode = hmCOA.get(levelTwo.getCoaParent());
+                levelTwo.setCoaParent(pCode);
                 return levelTwo;
             }).map(levelTwo -> {
                 levelTwo.setOption("USR");
                 return levelTwo;
             }).map(levelTwo -> {
-                levelTwo.setLevel(2);
+                levelTwo.setCoaLevel(Integer.parseInt(txtLevel.getText()));
                 return levelTwo;
             }).forEachOrdered(levelTwo -> {
                 cOAService.save(levelTwo);

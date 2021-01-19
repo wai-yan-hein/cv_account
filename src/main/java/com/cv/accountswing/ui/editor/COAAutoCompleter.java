@@ -100,7 +100,7 @@ public class COAAutoCompleter implements KeyListener {
         scroll.getHorizontalScrollBar().setFocusable(false);
 
         popup.setBorder(BorderFactory.createLineBorder(ColorUtil.mainColor));
-        popup.setPopupSize(600, 300);
+        popup.setPopupSize(400, 200);
         popup.add(scroll);
 
         if (textComp instanceof JTextField) {
@@ -221,11 +221,13 @@ public class COAAutoCompleter implements KeyListener {
                     textComp.registerKeyboardAction(acceptAction, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
                             JComponent.WHEN_FOCUSED);
                     if (x == 0) {
-                        x = textComp.getWidth();
+                        x = textComp.getWidth() - textComp.getWidth();
                         y = textComp.getHeight();
                     }
                     popup.show(textComp, x, y);
+                    log.info("COA Popup Show.");
                     popupOpen = false;
+
                 } else {
                     popup.setVisible(false);
                     popupOpen = false;
@@ -315,7 +317,11 @@ public class COAAutoCompleter implements KeyListener {
 
     public void setCoa(ChartOfAccount coa) {
         this.coa = coa;
-        textComp.setText(coa.getCoaNameEng());
+        if (this.coa != null) {
+            textComp.setText(coa.getCoaNameEng());
+        } else {
+            textComp.setText(null);
+        }
     }
 
     /*

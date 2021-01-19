@@ -277,15 +277,15 @@ public class PurchaseEntryUnit extends javax.swing.JPanel implements SelectionOb
             status = false;
             txtLocation.requestFocus();
         } else {
-            ph.setPurInvId(txtVouNo.getText());
+            ph.setVouNo(txtVouNo.getText());
             ph.setDueDate(txtDueDate.getDate());
             ph.setLocation(locCompleter.getLocation());
             ph.setVouStatus(vouCompleter.getVouStatus());
             ph.setRemark(txtRemark.getText());
-            ph.setVouTotal(NumberUtil.getDouble(txtVouTotal.getText()));
-            ph.setPaid(NumberUtil.getDouble(txtVouPaid.getText()));
-            ph.setBalance(NumberUtil.getDouble(txtVouBalance.getText()));
-            ph.setTaxAmt(NumberUtil.getDouble(txtTax.getText()));
+            ph.setVouTotal(Util1.getFloat(txtVouTotal.getText()));
+            ph.setPaid(Util1.getFloat(txtVouPaid.getText()));
+            ph.setBalance(Util1.getFloat(txtVouBalance.getText()));
+            ph.setTaxAmt(Util1.getFloat(txtTax.getText()));
             ph.setRefNo(txtRefNo.getText());
             ph.setIntgUpdStatus(null);
             ph.setDeleted(Util1.getNullTo(ph.getDeleted()));
@@ -298,12 +298,12 @@ public class PurchaseEntryUnit extends javax.swing.JPanel implements SelectionOb
                 }
             }
             ph.setCurrency((currAutoCompleter.getCurrency())); //Need to change
-            ph.setCustomerId(traderAutoCompleter.getTrader());
+            ph.setTrader(traderAutoCompleter.getTrader());
             if (lblStatus.getText().equals("NEW")) {
                 ph.setCreatedBy(Global.loginUser);
                 ph.setSession(Global.sessionId);
             } else {
-                ph.setUpdatedBy(Global.loginUser.getUserCode());
+                ph.setUpdatedBy(Global.loginUser.getAppUserCode());
                 ph.setUpdatedDate(Util1.getTodayDate());
             }
 
@@ -330,12 +330,12 @@ public class PurchaseEntryUnit extends javax.swing.JPanel implements SelectionOb
             } else {
                 lblStatus.setText("EDIT");
             }
-            txtVouNo.setText(purHis.getPurInvId());
+            txtVouNo.setText(purHis.getVouNo());
             txtRemark.setText(purHis.getRemark());
             txtPurDate.setDate(purHis.getPurDate());
             txtDueDate.setDate(purHis.getDueDate());
             locCompleter.setLocation(purHis.getLocation());
-            traderAutoCompleter.setTrader((Supplier) purHis.getCustomerId());
+            traderAutoCompleter.setTrader((Supplier) purHis.getTrader());
             vouCompleter.setVouStatus(purHis.getVouStatus());
             if (purHis.getDeptCode() != null) {
                 departmentAutoCompleter.setDepartment(purHis.getDeptCode());

@@ -68,8 +68,8 @@ public class DailyCashEntry extends javax.swing.JDialog {
         gl.setSourceAcId(chartOfAccount.getCode());
         gl.setFromCurId(currency.getKey().getCode());
         gl.setDeptId(department.getDeptCode());
-        gl.setDrAmt(Util1.getDouble(txtDrAmt.getText()));
-        gl.setCrAmt(Util1.getDouble(txtCrdAmt.getText()));
+        gl.setDrAmt(Util1.getFloat(txtDrAmt.getText()));
+        gl.setCrAmt(Util1.getFloat(txtCrdAmt.getText()));
         gl.setTraderCode(trader.getCode());
         try {
             Gl save = glService.save(gl);

@@ -203,13 +203,8 @@ public class SalePurchaseTableModel extends AbstractTableModel {
                 break;
             case 7:
                 if (value != null) {
-                    vgl.setDrAmt(Util1.getDouble(value));
+                    vgl.setCrAmt(Util1.getFloat(value));
 
-                }
-                break;
-            case 8:
-                if (value != null) {
-                    vgl.setCrAmt(Util1.getDouble(value));
                 }
                 break;
         }
@@ -219,25 +214,14 @@ public class SalePurchaseTableModel extends AbstractTableModel {
     }
 
     private void save(VGl vgl, int row) {
-        boolean save = false;
-        if (vgl.getGlCode() != null) {
-            int yes_no = JOptionPane.showConfirmDialog(Global.parentForm, "Are you sure to edit ?",
-                    "Edit ", JOptionPane.YES_NO_OPTION);
-            if (yes_no == 0) {
-                save = true;
-            } else {
-                save = false;
-            }
-
-        } else {
-            save = true;
-        }
-        if (save) {
+        if (isValidEntry(vgl, row, row)) {
             vgl.setSourceAcId(sourceAccId);
             vgl.setCompCode(Global.compCode);
-            vgl.setCreatedBy(Global.loginUser.getUserCode());
+            vgl.setCreatedBy(Global.loginUser.getAppUserCode());
             String strVGL = gson.toJson(vgl);
             Gl gl = gson.fromJson(strVGL, Gl.class);
+            gl.setMacId(Global.machineId);
+            gl.setCreatedDate(Util1.getTodayDate());
 
             try {
                 Gl glSave = glService.save(gl);
@@ -254,6 +238,35 @@ public class SalePurchaseTableModel extends AbstractTableModel {
             }
         }
 
+    }
+
+    private boolean isValidEntry(VGl vgl, int row, int column) {
+        boolean status = true;
+        if (vgl.getAccountId() == null) {
+            status = false;
+            if (column > 5) {
+                JOptionPane.showMessageDialog(Global.parentForm, "Account missing.");
+                parent.setColumnSelectionInterval(5, 5);
+                parent.setRowSelectionInterval(row, row);
+            }
+        }
+        if (Util1.getDouble(vgl.getDrAmt()) + Util1.getDouble(vgl.getCrAmt()) <= 0) {
+            status = false;
+            /*JOptionPane.showMessageDialog(Global.parentForm, "Dr / Cr missing.");
+            parent.setColumnSelectionInterval(7, 7);
+            parent.setRowSelectionInterval(row, row);*/
+        }
+        if (vgl.getDeptId() == null) {
+            status = false;
+            if (column > 1) {
+                JOptionPane.showMessageDialog(Global.parentForm, "Missing Department.");
+                parent.setColumnSelectionInterval(1, 1);
+                parent.setRowSelectionInterval(row, row);
+
+            }
+        }
+
+        return status;
     }
 
     @Override

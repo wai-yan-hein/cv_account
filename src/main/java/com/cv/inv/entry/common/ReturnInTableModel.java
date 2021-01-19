@@ -101,7 +101,11 @@ public class ReturnInTableModel extends AbstractTableModel {
                 if (record.getStock() == null) {
                     return null;
                 } else {
-                    return record.getStock().getStockCode();
+                    if (Util1.isNull(Global.sysProperties.get("system.use.usercode"), "0").equals("1")) {
+                        return record.getStock().getUserCode();
+                    } else {
+                        return record.getStock().getStockCode();
+                    }
                 }
             case 1: //Description
                 if (record.getStock() == null) {
@@ -149,17 +153,6 @@ public class ReturnInTableModel extends AbstractTableModel {
                 return new Object();
 
         }
-    }
-
-    public void addNewRow() {
-        if (hasEmptyRow()) {
-            RetInHisDetail detailHis = new RetInHisDetail();
-            detailHis.setStock(new Stock());
-            listRetInDtail.add(detailHis);
-            fireTableRowsInserted(listRetInDtail.size() - 1, listRetInDtail.size() - 1);
-            parent.scrollRectToVisible(parent.getCellRect(parent.getRowCount() - 1, 0, true));
-        }
-
     }
 
     @Override
@@ -292,12 +285,13 @@ public class ReturnInTableModel extends AbstractTableModel {
         if (rd.getStock() != null) {
             float amt;
             float stdWt = Util1.getFloat(rd.getStdWt());
+            float qty = Util1.getFloat(rd.getQty());
             String fromUnit = rd.getStockUnit().getItemUnitCode();
             String toUnit = rd.getStock().getPurUnit().getItemUnitCode();
             String pattern = rd.getStock().getPattern().getPatternCode();
-            rd.setSmallWeight(getSmallestWeight(stdWt, fromUnit, toUnit, pattern));
+            rd.setSmallWeight(getSmallestWeight(stdWt, fromUnit, toUnit, pattern) * qty);
             rd.setSmallUnit(rd.getStock().getPurUnit());
-            amt = Util1.getFloat(rd.getQty()) * Util1.getFloat(rd.getPrice());
+            amt = qty * Util1.getFloat(rd.getPrice());
             rd.setAmount(amt);
         }
     }
@@ -329,32 +323,31 @@ public class ReturnInTableModel extends AbstractTableModel {
         return sWt;
     }
 
-    public void addEmptyRow() {
+    public void addNewRow() {
         if (listRetInDtail != null) {
-            RetInHisDetail record = new RetInHisDetail();
-            record.setStock(new Stock());
-            listRetInDtail.add(record);
-            fireTableRowsInserted(listRetInDtail.size() - 1, listRetInDtail.size() - 1);
+            if (hasEmptyRow()) {
+                RetInHisDetail pd = new RetInHisDetail();
+                pd.setStock(new Stock());
+                listRetInDtail.add(pd);
+                fireTableRowsInserted(listRetInDtail.size() - 1, listRetInDtail.size() - 1);
+            }
         }
     }
 
-    public boolean hasEmptyRow() {
+    private boolean hasEmptyRow() {
         boolean status = true;
-        if (listRetInDtail.isEmpty() || listRetInDtail == null) {
-            status = true;
-        } else {
-            RetInHisDetail detailHis = listRetInDtail.get(listRetInDtail.size() - 1);
-            if (detailHis.getStock() == null) {
+        if (listRetInDtail.size() > 1) {
+            RetInHisDetail get = listRetInDtail.get(listRetInDtail.size() - 1);
+            if (get.getStock().getStockCode() == null) {
                 status = false;
             }
         }
-
         return status;
     }
 
     public void clearRetInTable() {
         this.listRetInDtail.clear();
-        addEmptyRow();
+        addNewRow();
     }
 
     private Float calPrice(RetInHisDetail pd, String toUnit) {
@@ -393,10 +386,7 @@ public class ReturnInTableModel extends AbstractTableModel {
 
     public void setRetInDetailList(List<RetInHisDetail> listDetail) {
         this.listRetInDtail = listDetail;
-
-        if (hasEmptyRow()) {
-            addEmptyRow();
-        }
+        addNewRow();
         fireTableCellUpdated(listDetail.size() - 1, listDetail.size() - 1);
 
         fireTableDataChanged();
@@ -425,10 +415,7 @@ public class ReturnInTableModel extends AbstractTableModel {
 
         listRetInDtail.remove(row);
 
-        if (hasEmptyRow()) {
-            addEmptyRow();
-        }
-
+        addNewRow();
         fireTableRowsDeleted(row, row);
     }
 

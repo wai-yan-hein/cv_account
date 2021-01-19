@@ -478,7 +478,7 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Sel
     }
     
     private VGl swapDrCr(VGl vgl) {
-        double tmp;
+        float tmp;
         tmp = vgl.getDrAmt();
         vgl.setDrAmt(vgl.getCrAmt());
         vgl.setCrAmt(tmp);

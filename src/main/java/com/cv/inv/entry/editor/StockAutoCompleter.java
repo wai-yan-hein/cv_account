@@ -105,7 +105,7 @@ public class StockAutoCompleter implements KeyListener {
         scroll.getHorizontalScrollBar().setFocusable(false);
 
         popup.setBorder(BorderFactory.createLineBorder(Color.black));
-        popup.setPopupSize(600, 300);
+        popup.setPopupSize(400, 200);
 
         popup.add(scroll);
 

@@ -102,7 +102,7 @@ public class DepartmentAutoCompleter implements KeyListener {
         scroll.getHorizontalScrollBar().setFocusable(false);
 
         popup.setBorder(BorderFactory.createLineBorder(ColorUtil.mainColor));
-        popup.setPopupSize(600, 300);
+        popup.setPopupSize(400, 200);
 
         popup.add(scroll);
 
@@ -326,6 +326,8 @@ public class DepartmentAutoCompleter implements KeyListener {
         this.department = department;
         if (department != null) {
             this.textComp.setText(this.department.getDeptName());
+        } else {
+            this.textComp.setText(null);
         }
     }
 

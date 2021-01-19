@@ -9,6 +9,7 @@ import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.inv.setup.dialog.ChargeTypeSetupDialog;
+import com.cv.inv.setup.dialog.InvToAccSettingDialog;
 import com.cv.inv.setup.dialog.LocationSetupDialog;
 import com.cv.inv.setup.dialog.RelationSetupDialog;
 import com.cv.inv.setup.dialog.SaleManSetupDialog;
@@ -41,6 +42,8 @@ public class OtherSetup extends javax.swing.JPanel {
     private RelationSetupDialog relationSetupDialog;
     @Autowired
     private ChargeTypeSetupDialog chargeTypeSetupDialog;
+    @Autowired
+    private InvToAccSettingDialog accSettingDialog;
 
     private LoadingObserver loadingObserver;
 
@@ -51,7 +54,6 @@ public class OtherSetup extends javax.swing.JPanel {
     public void setLoadingObserver(LoadingObserver loadingObserver) {
         this.loadingObserver = loadingObserver;
     }
-    
 
     /**
      * Creates new form OtherSetup
@@ -74,6 +76,7 @@ public class OtherSetup extends javax.swing.JPanel {
         btnSaleMan = new javax.swing.JButton();
         btnRelation = new javax.swing.JButton();
         btnChargeType = new javax.swing.JButton();
+        btnSetting = new javax.swing.JButton();
 
         jButton1.setBackground(ColorUtil.btnEdit);
         jButton1.setFont(Global.lableFont);
@@ -129,13 +132,23 @@ public class OtherSetup extends javax.swing.JPanel {
             }
         });
 
+        btnSetting.setBackground(ColorUtil.btnEdit);
+        btnSetting.setFont(Global.lableFont);
+        btnSetting.setForeground(ColorUtil.foreground);
+        btnSetting.setText("Account Setting");
+        btnSetting.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSettingActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -144,11 +157,14 @@ public class OtherSetup extends javax.swing.JPanel {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(btnVouStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(btnRelation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                    .addComponent(btnChargeType))
-                .addContainerGap(522, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(btnChargeType)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnSetting, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addContainerGap(510, Short.MAX_VALUE))
         );
 
-        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnChargeType, btnRelation, btnSaleMan, btnVouStatus, jButton1});
+        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnChargeType, btnRelation, btnSaleMan, btnSetting, btnVouStatus, jButton1});
 
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -162,7 +178,9 @@ public class OtherSetup extends javax.swing.JPanel {
                     .addComponent(btnSaleMan)
                     .addComponent(btnRelation))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnChargeType)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnChargeType)
+                    .addComponent(btnSetting))
                 .addContainerGap(333, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -210,11 +228,22 @@ public class OtherSetup extends javax.swing.JPanel {
         chargeTypeSetupDialog.setVisible(true);
     }//GEN-LAST:event_btnChargeTypeActionPerformed
 
+    private void btnSettingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSettingActionPerformed
+        // TODO add your handling code here:
+        accSettingDialog.initMain();
+        accSettingDialog.setIconImage(chIcon);
+        accSettingDialog.setSize(Global.width / 2, Global.height / 2);
+        accSettingDialog.setLocationRelativeTo(null);
+        accSettingDialog.setVisible(true);
+
+    }//GEN-LAST:event_btnSettingActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnChargeType;
     private javax.swing.JButton btnRelation;
     private javax.swing.JButton btnSaleMan;
+    private javax.swing.JButton btnSetting;
     private javax.swing.JButton btnVouStatus;
     private javax.swing.JButton jButton1;
     // End of variables declaration//GEN-END:variables

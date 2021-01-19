@@ -62,7 +62,7 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
     String desp;
     String accId;
     String ref;
-    String depId;
+    String depCode;
     String traderName;
     String currency;
     String debAmt;
@@ -153,7 +153,7 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
         tblCash.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
         tblCash.getTableHeader().setForeground(ColorUtil.foreground);
         tblCash.getTableHeader().setPreferredSize(new Dimension(25, 25));
-        
+
         tblCash.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
         tblCash.getTableHeader().setForeground(ColorUtil.foreground);
         sorter = new TableRowSorter<>(tblCash.getModel());
@@ -267,8 +267,8 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
         key.setCompCode(Global.compCode);
         key.setPropKey("system.report.path");
         SystemProperty sp = spService.findById(key);
-        String userId = Global.loginUser.getUserCode();
-        String fileName = userId + "_Ledger_Report.pdf";
+        String userCode = Global.loginUser.getAppUserCode();
+        String fileName = userCode + "_Ledger_Report.pdf";
         String reportPath = sp.getPropValue();
         //String reportPath1 = reportPath;
         String filePath = reportPath + "/temp/" + fileName;
@@ -293,7 +293,7 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
         parameters.put("p_from_curr", Util1.isNull(currency, "-"));
         parameters.put("p_to_curr", "-");
         parameters.put("p_ref", Util1.isNull(ref, "-"));
-        parameters.put("p_dept", Util1.isNull(depId, "-"));
+        parameters.put("p_dept", Util1.isNull(depCode, "-"));
         parameters.put("p_vou_no", "-");
         parameters.put("p_cv_id", Util1.isNull(accId, "-"));
         parameters.put("p_report_name", this.getName());
@@ -317,7 +317,7 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
                 List<VGl> listVGl = vGlService.search(stDate, enDate,
                         desp, sourceAccId,
                         accId, currency, "-",
-                        ref, depId, "-", "-",
+                        ref, depCode, "-", "-",
                         "-", "-", "-", "-", "-",
                         traderName, "-", "-",
                         debAmt,
@@ -343,7 +343,7 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
         accId = Util1.isNull(accId, "-");
         currency = Util1.isNull(currency, "-");
         ref = Util1.isNull(ref, "-");
-        depId = Util1.isNull(depId, Util1.isNull(Global.sysProperties.get("system.default.department"), "-"));
+        depCode = Util1.isNull(depCode, "-");
         traderName = Util1.isNull(traderName, "-");
         debAmt = Util1.isNull(debAmt, "-");
         crdAmt = Util1.isNull(crdAmt, "-");
@@ -357,7 +357,7 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
         accId = null;
         currency = null;
         ref = null;
-        depId = null;
+        depCode = null;
         traderName = null;
         debAmt = null;
         crdAmt = null;
@@ -382,7 +382,7 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
                 vgl.setDrAmt(tmpAmt);
                 }*/
             } else if (accId.equals(targetId)) {
-                double tmpDrAmt = 0;
+                float tmpDrAmt = 0;
                 if (vgl.getDrAmt() != null) {
                     tmpDrAmt = vgl.getDrAmt();
                 }
@@ -393,8 +393,8 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
                 vgl.setAccName(vgl.getSrcAccName());
                 vgl.setSrcAccName(tmpStr);
             } else {
-                vgl.setDrAmt(0.0);
-                vgl.setCrAmt(0.0);
+                vgl.setDrAmt(0.0f);
+                vgl.setCrAmt(0.0f);
             }
         });
     }
@@ -461,6 +461,7 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
         jButton1.setFont(Global.lableFont);
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/new-button.png"))); // NOI18N
         jButton1.setText("Sale Entry");
+        jButton1.setEnabled(false);
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -518,11 +519,13 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
         mainFrame.setControl(this);
+
         if (!isShown) {
             initMain();
         } else {
             requestFoucsTable();
         }
+        searchCash();
 
     }//GEN-LAST:event_formComponentShown
 
@@ -557,19 +560,18 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
 
     private void calTotalAmt() {
         List<VGl> listVGl = spTableModel.getListVGl();
-        double ttlAmt = 0.0;
+        float ttlAmt = 0.0f;
         if (panelName.equals("Sale")) {
             for (VGl vgl : listVGl) {
-                ttlAmt += Util1.getDouble(vgl.getCrAmt());
+                ttlAmt += Util1.getFloat(vgl.getCrAmt());
                 //cdAmt += Util1.getDouble(vgl.getCrAmt());
             }
         } else {
             for (VGl vgl : listVGl) {
-                ttlAmt += Util1.getDouble(vgl.getDrAmt());
+                ttlAmt += Util1.getFloat(vgl.getDrAmt());
                 //cdAmt += Util1.getDouble(vgl.getCrAmt());
             }
         }
-
         txtFTotalAmt.setValue(ttlAmt);
         loadingObserver.load(this.getName(), "Stop");
     }
@@ -592,8 +594,8 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
                     searchValidation(stDate);
                     break;
                 case "Department":
-                    depId = selectObj.toString();
-                    searchValidation(depId);
+                    depCode = selectObj.toString();
+                    searchValidation(depCode);
                     break;
                 case "COA":
                     accId = selectObj.toString();

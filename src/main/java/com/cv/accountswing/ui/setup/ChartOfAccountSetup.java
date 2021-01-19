@@ -162,7 +162,7 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
                 option = "USR";
             }
             if (isNew) {
-                chartOfAccount.setCreatedBy(Global.loginUser.getUserCode());
+                chartOfAccount.setCreatedBy(Global.loginUser.getAppUserCode());
                 chartOfAccount.setCreatedDate(Util1.getTodayDate());
             }
             int level = selectedNode.getLevel();
@@ -170,12 +170,13 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
             chartOfAccount.setCoaNameEng(txtName.getText());
             chartOfAccount.setCoaCodeUsr(txtUsrCode.getText());
             chartOfAccount.setCompCode(Global.compCode);
-            chartOfAccount.setParent(parentCode);
-            chartOfAccount.setLevel(level);
-            chartOfAccount.setModifiedBy(Global.loginUser.getUserCode());
+            chartOfAccount.setCoaParent(parentCode);
+            chartOfAccount.setCoaLevel(level);
+            chartOfAccount.setModifiedBy(Global.loginUser.getAppUserCode());
             chartOfAccount.setModifiedDate(Util1.getTodayDate());
             chartOfAccount.setOption(option);
             chartOfAccount.setActive(chkActive.isSelected());
+            chartOfAccount.setMacId(Global.machineId);
             ChartOfAccount coaSave = coaServcie.save(chartOfAccount);
             if (coaSave != null) {
                 JOptionPane.showMessageDialog(Global.parentForm, "Saved");
@@ -252,8 +253,8 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
         txtUsrCode.setText(chartOfAccount.getCoaCodeUsr());
         chkActive.setSelected(Util1.getBoolean(chartOfAccount.isActive()));
         lblStatus.setText("EDIT");
-        if (chartOfAccount.getLevel() != null) {
-            if (chartOfAccount.getLevel() == 3) {
+        if (chartOfAccount.getCoaLevel()!= null) {
+            if (chartOfAccount.getCoaLevel()== 3) {
                 btnCreate.setEnabled(true);
                 Menu menu = hmMenu.get(chartOfAccount.getCode());
                 cboMenu.setSelectedItem(menu == null ? null : menu);
@@ -307,6 +308,8 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
                 menu.setParent(selectMenu.getCode());
                 menu.setSoureAccCode(coa.getCode());
                 menu.setMenuType("Menu");
+                menu.setCompCode(Global.compCode);
+                menu.setMacId(Global.machineId);
                 try {
                     Menu saveMenu = menuService.saveMenu(menu);
                     if (saveMenu != null) {
@@ -400,8 +403,8 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
         jLabel1.setFont(Global.lableFont);
         jLabel1.setText("System Code");
 
+        txtSysCode.setEditable(false);
         txtSysCode.setFont(Global.textFont);
-        txtSysCode.setEnabled(false);
 
         jLabel2.setFont(Global.lableFont);
         jLabel2.setText("User Code");

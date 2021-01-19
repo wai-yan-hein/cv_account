@@ -266,12 +266,12 @@ public class AllCashTableModel extends AbstractTableModel {
                 break;
             case 7:
                 if (value != null) {
-                    vgl.setDrAmt(Util1.getDouble(value));
+                    vgl.setDrAmt(Util1.getFloat(value));
                 }
                 break;
             case 8:
                 if (value != null) {
-                    vgl.setCrAmt(Util1.getDouble(value));
+                    vgl.setCrAmt(Util1.getFloat(value));
                 }
                 break;
         }
@@ -283,7 +283,7 @@ public class AllCashTableModel extends AbstractTableModel {
     private void save(VGl vgl, int row, int column) {
         if (isValidEntry(vgl, row, column)) {
             vgl.setSourceAcId(sourceAccId);
-            vgl.setCreatedBy(Global.loginUser.getUserCode());
+            vgl.setCreatedBy(Global.loginUser.getAppUserCode());
             String strVGL = gson.toJson(vgl);
             Gl gl = gson.fromJson(strVGL, Gl.class);
             if (gl.getGlCode() == null) {

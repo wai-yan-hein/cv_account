@@ -32,7 +32,7 @@ public class JournalEntryTableModel extends AbstractTableModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JournalEntryTableModel.class);
     private List<VGl> listGV = new ArrayList();
-    //String  userId=Global.loginUser.getUserCode();
+    //String  userCode=Global.loginUser.getAppUserCode();
     String[] columnNames = {"Dept:", "Descripiton", "Cus / Sup", "Account", "Dr-Amt", "Crd-Amt"};
     private JTable parent;
     JFormattedTextField ttlCrdAmt;
@@ -155,9 +155,9 @@ public class JournalEntryTableModel extends AbstractTableModel {
 
             case 4:
                 if (value != null) {
-                    gv.setDrAmt(Util1.getDouble(value));
+                    gv.setDrAmt(Util1.getFloat(value));
                     if (gv.getCrAmt() != null) {
-                        gv.setCrAmt(0.0);
+                        gv.setCrAmt(0.0f);
                         parent.setColumnSelectionInterval(5, 5);
                         parent.setRowSelectionInterval(row + 1, row + 1);
                     }
@@ -165,9 +165,9 @@ public class JournalEntryTableModel extends AbstractTableModel {
                 break;
             case 5:
                 if (value != null) {
-                    gv.setCrAmt(Util1.getDouble(value));
+                    gv.setCrAmt(Util1.getFloat(value));
                     if (gv.getDrAmt() != null) {
-                        gv.setDrAmt(0.0);
+                        gv.setDrAmt(0.0f);
                         parent.setColumnSelectionInterval(4, 4);
                         parent.setRowSelectionInterval(row + 1, row + 1);
                     }
@@ -238,7 +238,7 @@ public class JournalEntryTableModel extends AbstractTableModel {
     }
 
     public void saveGV(VGl gv, String status) {
-        //if (isValidCOA(gv, Global.compCode, Global.loginUser.getUserCode(), status)) {
+        //if (isValidCOA(gv, Global.compCode, Global.loginUser.getAppUserCode(), status)) {
         // coaService.save(gv);
         if (status.equals("NEW")) {
             listGV.add(new VGl());

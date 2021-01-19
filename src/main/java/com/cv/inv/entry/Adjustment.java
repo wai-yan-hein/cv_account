@@ -75,6 +75,8 @@ public class Adjustment extends javax.swing.JPanel implements SelectionObserver,
         tblAdjust.getColumnModel().getColumn(9).setPreferredWidth(50);
         tblAdjust.setDefaultRenderer(Boolean.class, new TableCellRender());
         tblAdjust.setDefaultRenderer(Object.class, new TableCellRender());
+        
+
     }
 
     private void initKeyListener() {

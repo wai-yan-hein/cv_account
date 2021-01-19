@@ -138,8 +138,8 @@ public class Company extends javax.swing.JPanel implements KeyListener, PanelCon
         if (isValidEntry()) {
             try {
                 String status = lblStatus.getText();
-                String userId = Global.loginUser.getUserCode();
-                CompanyInfo saveCom = compInfoService.save(companyInfo, status, userId, "-");
+                String userCode = Global.loginUser.getAppUserCode();
+                CompanyInfo saveCom = compInfoService.save(companyInfo, status, userCode, "-");
                 JOptionPane.showMessageDialog(Global.parentForm, "Saved");
                 if (status.equals("NEW")) {
                     companyTableModel.addCompany(saveCom);

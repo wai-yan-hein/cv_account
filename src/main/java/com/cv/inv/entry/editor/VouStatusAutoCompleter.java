@@ -87,7 +87,7 @@ public class VouStatusAutoCompleter implements KeyListener, SelectionObserver {
         table.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                if (evt.getClickCount() == 2) {
+                if (evt.getClickCount() == 1) {
                     mouseSelect();
                 }
             }
@@ -326,9 +326,12 @@ public class VouStatusAutoCompleter implements KeyListener, SelectionObserver {
 
     public void setVouStatus(VouStatus vouStatus) {
         this.vouStatus = vouStatus;
-        this.textComp.setText(vouStatus.getStatusDesp());
+        if (this.vouStatus != null) {
+            this.textComp.setText(vouStatus.getStatusDesp());
+        } else {
+            this.textComp.setText(null);
+        }
     }
-    
 
     @Override
     public void keyTyped(KeyEvent e) {

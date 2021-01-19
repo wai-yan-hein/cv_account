@@ -13,7 +13,6 @@ import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.MachineInfo;
 import com.cv.inv.service.MachineInfoService;
 import java.awt.HeadlessException;
-//import com.cv.accounts.service.UserService;
 import java.awt.event.FocusAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -82,8 +81,14 @@ public class LoginDialog extends javax.swing.JDialog implements KeyListener {
             Global.machineName = Util1.getComputerName();
             Global.machineId = machineInfoService.getMax(Global.machineName);
             if (Global.machineId == 0) {
-                JOptionPane.showMessageDialog(Global.parentForm, "Your account is not registed in this machine");
-            } else {
+                String inputKey = JOptionPane.showInputDialog(Global.parentForm, "Enter Security Key");
+                String toDayKey = Util1.toDateStr(Util1.getTodayDate(), "yyyy-MM-dd".replaceAll("-", ""));
+                if (inputKey.equals(toDayKey)) {
+                    register();
+                } else {
+                    JOptionPane.showMessageDialog(Global.parentForm, "Invalid Security Key.");
+                    System.exit(1);
+                }
             }
         } catch (Exception ex) {
             LOGGER.error("getMachineInfo Error : {}", ex.getMessage());
@@ -279,7 +284,7 @@ public class LoginDialog extends javax.swing.JDialog implements KeyListener {
         butLogin.setBackground(ColorUtil.mainColor);
         butLogin.setFont(Global.lableFont);
         butLogin.setForeground(ColorUtil.foreground);
-        butLogin.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save-button-white.png"))); // NOI18N
+        butLogin.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/login-button.png"))); // NOI18N
         butLogin.setText("Login");
         butLogin.setHorizontalAlignment(javax.swing.SwingConstants.LEADING);
         butLogin.setName("butLogin"); // NOI18N
@@ -345,8 +350,6 @@ public class LoginDialog extends javax.swing.JDialog implements KeyListener {
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
-        this.requestFocusInWindow();
-        txtLoginName.requestFocus();
     }//GEN-LAST:event_formComponentShown
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

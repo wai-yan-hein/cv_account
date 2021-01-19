@@ -93,7 +93,7 @@ public class ProtfitAndLost extends javax.swing.JPanel implements SelectionObser
                     JOptionPane.showMessageDialog(Global.parentForm, "Invalid profit & lost process");
                 } else {
                     try {
-                        rService.getProfitLost(process, stDate, enDate, depId, currency, Global.compCode, Global.loginUser.getUserCode());
+                        rService.getProfitLost(process, stDate, enDate, depId, currency, Global.compCode, Global.loginUser.getAppUserCode());
                         //ro.setObj();
                         btnCalculate.setEnabled(true);
                         loadingObserver.load(this.getName(), "Stop");
@@ -117,13 +117,13 @@ public class ProtfitAndLost extends javax.swing.JPanel implements SelectionObser
         taskExecutor.execute(() -> {
             try {
                 loadingObserver.load(this.getName(), "Start");
-                String userId = Global.loginUser.getUserCode();
+                String userCode = Global.loginUser.getAppUserCode();
                 CompanyInfo ci = ciService.findById(Global.compCode);
                 SystemPropertyKey key = new SystemPropertyKey();
                 key.setCompCode(Global.compCode);
                 key.setPropKey("system.report.path");
                 SystemProperty sp = spService.findById(key);
-                String fileName = userId + "_profit_lost.pdf";
+                String fileName = userCode + "_profit_lost.pdf";
                 String reportPath = sp.getPropValue();
                 String reportPath1 = reportPath;
                 String filePath = reportPath + "/temp/" + fileName;
@@ -136,7 +136,7 @@ public class ProtfitAndLost extends javax.swing.JPanel implements SelectionObser
                 String fontPath = sp.getPropValue();
 
                 //Need to calculate sub todal
-                ProfitAndLostRetObj obj = rService.getPLCalculateValue(userId, Global.compCode);
+                ProfitAndLostRetObj obj = rService.getPLCalculateValue(userCode, Global.compCode);
                 LOGGER.info("cost of sale : " + obj.getCostOfSale());
                 //==================================================================
 
@@ -144,7 +144,7 @@ public class ProtfitAndLost extends javax.swing.JPanel implements SelectionObser
                 parameters.put("p_company_name", ci.getName());
                 parameters.put("p_comp_id", Global.compCode);
                 parameters.put("SUBREPORT_DIR", reportPath1);
-                parameters.put("p_user_id", userId);
+                parameters.put("p_user_id", userCode);
                 parameters.put("gross_profit", obj.getGrossProfit());
                 parameters.put("net_profit", obj.getNetProfit());
                 parameters.put("p_report_info", Util1.isNull(stDate, "-")

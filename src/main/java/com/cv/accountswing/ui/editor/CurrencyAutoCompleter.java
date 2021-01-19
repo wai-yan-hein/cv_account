@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
  * @author Lenovo
  */
 public class CurrencyAutoCompleter implements KeyListener, SelectionObserver {
-
+    
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(CurrencyAutoCompleter.class);
     private JTable table = new JTable();
     private JPopupMenu popup = new JPopupMenu();
@@ -58,7 +58,7 @@ public class CurrencyAutoCompleter implements KeyListener, SelectionObserver {
     private int y = 0;
     private boolean popupOpen = false;
     private SelectionObserver selectionObserver;
-
+    
     public void setSelectionObserver(SelectionObserver selectionObserver) {
         this.selectionObserver = selectionObserver;
     }
@@ -66,7 +66,7 @@ public class CurrencyAutoCompleter implements KeyListener, SelectionObserver {
     //private CashFilter cashFilter = Global.allCash;
     public CurrencyAutoCompleter() {
     }
-
+    
     public CurrencyAutoCompleter(JTextComponent comp, List<Currency> list,
             AbstractCellEditor editor) {
         this.textComp = comp;
@@ -83,7 +83,7 @@ public class CurrencyAutoCompleter implements KeyListener, SelectionObserver {
         sorter = new TableRowSorter(table.getModel());
         table.setRowSorter(sorter);
         JScrollPane scroll = new JScrollPane(table);
-
+        
         scroll.setBorder(null);
         table.setFocusable(false);
         table.getColumnModel().getColumn(0).setPreferredWidth(40);//Code
@@ -96,15 +96,15 @@ public class CurrencyAutoCompleter implements KeyListener, SelectionObserver {
                 }
             }
         });
-
+        
         scroll.getVerticalScrollBar().setFocusable(false);
         scroll.getHorizontalScrollBar().setFocusable(false);
-
+        
         popup.setBorder(BorderFactory.createLineBorder(ColorUtil.mainColor));
         popup.setPopupSize(170, 300);
-
+        
         popup.add(scroll);
-
+        
         if (textComp instanceof JTextField) {
             textComp.registerKeyboardAction(showAction, KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0),
                     JComponent.WHEN_FOCUSED);
@@ -114,31 +114,31 @@ public class CurrencyAutoCompleter implements KeyListener, SelectionObserver {
                     popupOpen = true;
                     showPopup();
                 }
-
+                
             });
             textComp.getDocument().addDocumentListener(documentListener);
         } else {
             textComp.registerKeyboardAction(showAction, KeyStroke.getKeyStroke(KeyEvent.VK_SPACE,
                     KeyEvent.CTRL_MASK), JComponent.WHEN_FOCUSED);
         }
-
+        
         textComp.registerKeyboardAction(upAction, KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0),
                 JComponent.WHEN_FOCUSED);
         textComp.registerKeyboardAction(hidePopupAction, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_FOCUSED);
-
+        
         popup.addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
             }
-
+            
             @Override
             public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
                 textComp.unregisterKeyboardAction(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
                 popupOpen = false;
-
+                
             }
-
+            
             @Override
             public void popupMenuCanceled(PopupMenuEvent e) {
                 if (!popupOpen) {
@@ -148,14 +148,14 @@ public class CurrencyAutoCompleter implements KeyListener, SelectionObserver {
                 }
             }
         });
-
+        
         table.setRequestFocusEnabled(false);
-
+        
         if (list.size() > 0) {
             table.setRowSelectionInterval(0, 0);
         }
     }
-
+    
     public void mouseSelect() {
         if (table.getSelectedRow() != -1) {
             currency = currencyTabelModel.getCurrency(table.convertRowIndexToModel(
@@ -171,11 +171,11 @@ public class CurrencyAutoCompleter implements KeyListener, SelectionObserver {
         popup.setVisible(false);
         if (editor != null) {
             editor.stopCellEditing();
-
+            
         }
-
+        
     }
-
+    
     private Action acceptAction = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -190,7 +190,7 @@ public class CurrencyAutoCompleter implements KeyListener, SelectionObserver {
                 showPopup();
             }
         }
-
+        
         @Override
         public void removeUpdate(DocumentEvent e) {
             if (editor != null) {
@@ -198,17 +198,17 @@ public class CurrencyAutoCompleter implements KeyListener, SelectionObserver {
                 showPopup();
             }
         }
-
+        
         @Override
         public void changedUpdate(DocumentEvent e) {
         }
     };
-
+    
     public void closePopup() {
         popup.setVisible(false);
         popupOpen = false;
     }
-
+    
     public void showPopup() {
         if (popupOpen) {
             if (!popup.isVisible()) {
@@ -218,17 +218,17 @@ public class CurrencyAutoCompleter implements KeyListener, SelectionObserver {
                     if (textComp instanceof JTextField) {
                         textComp.getDocument().addDocumentListener(documentListener);
                     }
-
+                    
                     textComp.registerKeyboardAction(acceptAction, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
                             JComponent.WHEN_FOCUSED);
                     if (x == 0) {
                         x = textComp.getWidth();
                         y = textComp.getHeight();
                     }
-
+                    
                     popup.show(textComp, x, y);
                     popupOpen = false;
-
+                    
                 } else {
                     popup.setVisible(false);
                     popupOpen = false;
@@ -250,7 +250,7 @@ public class CurrencyAutoCompleter implements KeyListener, SelectionObserver {
                         popupOpen = true;
                         completer.showPopup();
                     }
-
+                    
                 }
             }
         }
@@ -278,18 +278,18 @@ public class CurrencyAutoCompleter implements KeyListener, SelectionObserver {
             }
         }
     };
-
+    
     protected void selectNextPossibleValue() {
         int si = table.getSelectedRow();
-
+        
         if (si < table.getRowCount() - 1) {
             try {
                 table.setRowSelectionInterval(si + 1, si + 1);
             } catch (Exception ex) {
-
+                
             }
         }
-
+        
         Rectangle rect = table.getCellRect(table.getSelectedRow(), 0, true);
         table.scrollRectToVisible(rect);
     }
@@ -300,27 +300,29 @@ public class CurrencyAutoCompleter implements KeyListener, SelectionObserver {
      */
     protected void selectPreviousPossibleValue() {
         int si = table.getSelectedRow();
-
+        
         if (si > 0) {
             try {
                 table.setRowSelectionInterval(si - 1, si - 1);
             } catch (Exception ex) {
-
+                
             }
         }
-
+        
         Rectangle rect = table.getCellRect(table.getSelectedRow(), 0, true);
         table.scrollRectToVisible(rect);
     }
-
+    
     public Currency getCurrency() {
-
+        
         return currency;
     }
-
+    
     public void setCurrency(Currency currency) {
         this.currency = currency;
-        textComp.setText(this.currency.getCurrencyName());
+        if (this.currency != null) {
+            textComp.setText(this.currency.getCurrencyName());
+        }
     }
 
     /*
@@ -346,7 +348,7 @@ public class CurrencyAutoCompleter implements KeyListener, SelectionObserver {
     @Override
     public void keyReleased(KeyEvent e) {
         String filter = textComp.getText();
-
+        
         if (filter.length() == 0) {
             sorter.setRowFilter(null);
         } else {
@@ -380,13 +382,13 @@ public class CurrencyAutoCompleter implements KeyListener, SelectionObserver {
              * textComp.getText().toUpperCase())) { return true; }
              }
              */
-
+            
             String tmp1 = entry.getStringValue(0).toUpperCase();
             String tmp2 = entry.getStringValue(1).toUpperCase();
             String tmp3 = entry.getStringValue(3).toUpperCase();
             String tmp4 = entry.getStringValue(4).toUpperCase();
             String text = textComp.getText().toUpperCase();
-
+            
             if (tmp1.startsWith(text) || tmp2.startsWith(text) || tmp3.startsWith(text) || tmp4.startsWith(text)) {
                 return true;
             } else {
@@ -394,7 +396,7 @@ public class CurrencyAutoCompleter implements KeyListener, SelectionObserver {
             }
         }
     };
-
+    
     @Override
     public void selected(Object source, Object selectObj) {
         if (source != null) {
@@ -404,11 +406,11 @@ public class CurrencyAutoCompleter implements KeyListener, SelectionObserver {
                 popupOpen = false;
                 if (editor != null) {
                     editor.stopCellEditing();
-
+                    
                 }
             } else {
             }
         }
     }
-
+    
 }

@@ -86,7 +86,7 @@ public class OrderSearchDialog extends javax.swing.JDialog implements KeyListene
         tblVoucher.getColumnModel().getColumn(2).setPreferredWidth(40);
         tblVoucher.getColumnModel().getColumn(3).setPreferredWidth(130);
         tblVoucher.getColumnModel().getColumn(4).setPreferredWidth(50);
-        tblVoucher.setDefaultRenderer(Double.class, new TableCellRender());
+        tblVoucher.setDefaultRenderer(Float.class, new TableCellRender());
         tblVoucher.setDefaultRenderer(Object.class, new TableCellRender());
     }
 
@@ -100,7 +100,7 @@ public class OrderSearchDialog extends javax.swing.JDialog implements KeyListene
     }
 
     private void search() {
-        LOGGER.info("Search History.");
+        LOGGER.info("Search Order History.");
         String customerId;
         String orderCode;
         String fromDate = Util1.toDateStr(txtFromDate.getDate(), "yyyy-MM-dd");
@@ -118,10 +118,15 @@ public class OrderSearchDialog extends javax.swing.JDialog implements KeyListene
     }
 
     private void calAmount() {
-        double ttlAmt = 0.0;
+        float ttlAmt = 0.0f;
         if (!orderSearchTableModel.getListOrder().isEmpty()) {
-
+            for (Order oh : orderSearchTableModel.getListOrder()) {
+                ttlAmt += Util1.getFloat(oh.getOrderTotal());
+            }
+            txtTotalAmt.setValue(ttlAmt);
+            txtTotalRecord.setValue(orderSearchTableModel.getListOrder().size());
         }
+
     }
 
     private void initKeyListener() {
@@ -214,11 +219,11 @@ public class OrderSearchDialog extends javax.swing.JDialog implements KeyListene
                 .addGap(22, 22, 22)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(txtFromDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtFromDate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGap(18, 18, 18)
                         .addComponent(jLabel3)
                         .addGap(18, 18, 18)
-                        .addComponent(txtToDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(txtToDate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(txtCus)
                     .addComponent(txtOrderno)))
         );
@@ -240,7 +245,7 @@ public class OrderSearchDialog extends javax.swing.JDialog implements KeyListene
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
                     .addComponent(txtOrderno, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(387, Short.MAX_VALUE))
+                .addContainerGap(273, Short.MAX_VALUE))
         );
 
         jPanel1Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jLabel11, jLabel3, txtFromDate, txtToDate});
@@ -306,13 +311,13 @@ public class OrderSearchDialog extends javax.swing.JDialog implements KeyListene
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblTtlRecord)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(txtTotalRecord, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtTotalRecord)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(lblTtlAmount)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -321,7 +326,7 @@ public class OrderSearchDialog extends javax.swing.JDialog implements KeyListene
                         .addComponent(btnSearch)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnSelect))
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 677, Short.MAX_VALUE))
+                    .addComponent(jScrollPane2))
                 .addContainerGap())
         );
         layout.setVerticalGroup(

@@ -134,9 +134,7 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener, Pa
         loadingObserver.load(this.getName(), "Start");
         taskExecutor.execute(() -> {
             try {
-                if (Global.listCustomer == null) {
-                    Global.listCustomer = customerService.search("-", "-", "-", "-", Global.compCode);
-                }
+                Global.listCustomer = customerService.search("-", "-", "-", "-", Global.compCode);
                 customerTabelModel.setListCustomer(Global.listCustomer);
                 loadingObserver.load(this.getName(), "Stop");
             } catch (Exception e) {

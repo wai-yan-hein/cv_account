@@ -72,7 +72,6 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
     private LocationAutoCompleter locationAutoCompleter;
     private CurrencyAutoCompleter currencyAutoCompleter;
     private GenVouNoImpl vouEngine = null;
-    private Long glId;
     private RetOutHis retOut = new RetOutHis();
     private boolean isShown = false;
     @Autowired
@@ -119,6 +118,7 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
     private void initTable() {
         retOutTableModel.setParent(tblRetOut);
         retOutTableModel.setObserver(this);
+        retOutTableModel.addNewRow();
         tblRetOut.setModel(retOutTableModel);
         tblRetOut.getTableHeader().setFont(Global.lableFont);
         tblRetOut.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
@@ -144,8 +144,8 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
         tblRetOut.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                 .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
         tblRetOut.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        retOutTableModel.addNewRow();
-
+        tblRetOut.changeSelection(0, 0, false, false);
+        tblRetOut.requestFocus();
     }
 
     private void initKeyListener() {
@@ -323,7 +323,9 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
         jLabel6.setFont(Global.lableFont);
         jLabel6.setText("Currency");
 
+        txtCurrency.setEditable(false);
         txtCurrency.setFont(Global.textFont);
+        txtCurrency.setEnabled(false);
         txtCurrency.setName("txtCurrency"); // NOI18N
 
         butGetPurItems.setFont(Global.lableFont);
@@ -349,14 +351,14 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
                     .addComponent(jLabel4))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(txtSup, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtSup, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 347, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(txtVouNo)
                         .addGap(18, 18, 18)
                         .addComponent(jLabel2)
                         .addGap(18, 18, 18)
                         .addComponent(txtRetOutDate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(txtRemark))
+                    .addComponent(txtRemark, javax.swing.GroupLayout.DEFAULT_SIZE, 347, Short.MAX_VALUE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
@@ -365,8 +367,8 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
                             .addComponent(jLabel6))
                         .addGap(18, 18, 18)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtLocation)
-                            .addComponent(txtCurrency)))
+                            .addComponent(txtLocation, javax.swing.GroupLayout.DEFAULT_SIZE, 347, Short.MAX_VALUE)
+                            .addComponent(txtCurrency, javax.swing.GroupLayout.DEFAULT_SIZE, 347, Short.MAX_VALUE)))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(butGetPurItems)))
@@ -496,7 +498,7 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 701, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -573,17 +575,18 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
                 } else {
                     lblStatus.setText("EDIT");
                 }
-                txtVouNo.setText(retOut.getRetOutId());
-                txtVouTotal.setText(retOut.getVouTotal().toString());
-                txtVouPaid.setText(retOut.getPaid().toString());
-                txtVouBalance.setText(retOut.getBalance().toString());
+                txtVouNo.setText(retOut.getVouNo());
+                txtVouTotal.setValue(Util1.getFloat(retOut.getVouTotal()));
+                txtVouPaid.setValue(Util1.getFloat(retOut.getPaid()));
+                txtVouBalance.setValue(Util1.getFloat(retOut.getBalance()));
                 txtRemark.setText(retOut.getRemark());
                 txtRetOutDate.setDate(retOut.getRetOutDate());
                 supplierAutoCompleter.setTrader((Supplier) retOut.getCustomer());
                 locationAutoCompleter.setLocation(retOut.getLocation());
                 currencyAutoCompleter.setCurrency(retOut.getCurrency());
-                List<RetOutHisDetail> listRetOut = retOutDetailService.search(retOut.getRetOutId());
+                List<RetOutHisDetail> listRetOut = retOutDetailService.search(retOut.getVouNo());
                 retOutTableModel.setRetOutDetailList(listRetOut);
+                retOutTableModel.addNewRow();
                 break;
             case "CAL-TOTAL":
                 calculateTotalAmount();
@@ -757,19 +760,19 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
                         "Select Supplier", JOptionPane.ERROR_MESSAGE);
                 status = false;
                 txtSup.requestFocus();
-            } else if (retOutTableModel.getListRetInDetail().size() == 1) {
-                JOptionPane.showMessageDialog(Global.parentForm, "No Purchase record.",
+            } else if (retOutTableModel.getListRetInDetail().size() == 0) {
+                JOptionPane.showMessageDialog(Global.parentForm, "No Return Out  record.",
                         "No data.", JOptionPane.ERROR_MESSAGE);
                 status = false;
             } else {
-                retOut.setRetOutId(txtVouNo.getText());
+                retOut.setVouNo(txtVouNo.getText());
                 retOut.setCustomer(supplierAutoCompleter.getTrader());
                 retOut.setRemark(txtRemark.getText());
                 retOut.setRetOutDate(txtRetOutDate.getDate());
                 retOut.setCreatedDate(Util1.getTodayDate());
                 retOut.setCurrency((currencyAutoCompleter.getCurrency()));
                 retOut.setLocation(locationAutoCompleter.getLocation());
-                retOut.setCreatedBy(Global.loginUser.getUserCode());
+                retOut.setCreatedBy(Global.loginUser.getAppUserCode());
                 retOut.setVouTotal(NumberUtil.getDouble(txtVouTotal.getText()));
                 retOut.setPaid(NumberUtil.getDouble(txtVouPaid.getText()));
                 retOut.setBalance(NumberUtil.getDouble(txtVouBalance.getText()));
@@ -777,10 +780,11 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
                 retOut.setRetOutDate(txtRetOutDate.getDate());
                 if (lblStatus.getText().equals("NEW")) {
                     retOut.setSession(Global.sessionId);
-                    retOut.setCreatedBy(Global.loginUser.getUserCode());
+                    retOut.setCreatedBy(Global.loginUser.getAppUserCode());
                     retOut.setCreatedDate(Util1.getTodayDate());
+                    retOut.setMacId(Global.machineId);
                 } else {
-                    retOut.setUpdatedBy(Global.loginUser.getUserCode());
+                    retOut.setUpdatedBy(Global.loginUser.getAppUserCode());
                 }
             }
         } catch (HeadlessException ex) {

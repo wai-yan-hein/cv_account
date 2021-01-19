@@ -109,6 +109,8 @@ public class CustomerOrderSetup extends javax.swing.JDialog implements KeyListen
             customer.setActive(Boolean.TRUE);
             customer.setCreatedBy(Global.loginUser);
             customer.setCreatedDate(Util1.getTodayDate());
+            customer.setMacId(Global.machineId);
+            customer.setCompCode(Global.compCode);
         }
         return status;
     }
@@ -145,6 +147,7 @@ public class CustomerOrderSetup extends javax.swing.JDialog implements KeyListen
 
         txtName.setFont(Global.textFont);
         txtName.setName("txtName"); // NOI18N
+        txtName.setNextFocusableComponent(txtPhone);
         txtName.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 txtNameFocusGained(evt);
@@ -159,6 +162,7 @@ public class CustomerOrderSetup extends javax.swing.JDialog implements KeyListen
 
         txtPhone.setFont(Global.textFont);
         txtPhone.setName("txtPhone"); // NOI18N
+        txtPhone.setNextFocusableComponent(txtAccount);
         txtPhone.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 txtPhoneFocusGained(evt);
@@ -175,6 +179,7 @@ public class CustomerOrderSetup extends javax.swing.JDialog implements KeyListen
 
         txtAccount.setFont(Global.textFont);
         txtAccount.setName("txtAccount"); // NOI18N
+        txtAccount.setNextFocusableComponent(txtRegion);
         txtAccount.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 txtAccountFocusGained(evt);
@@ -186,6 +191,7 @@ public class CustomerOrderSetup extends javax.swing.JDialog implements KeyListen
 
         txtAddress.setFont(Global.textFont);
         txtAddress.setName("txtAddress"); // NOI18N
+        txtAddress.setNextFocusableComponent(btnSave);
         txtAddress.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 txtAddressFocusGained(evt);
@@ -209,6 +215,7 @@ public class CustomerOrderSetup extends javax.swing.JDialog implements KeyListen
 
         txtRegion.setFont(Global.textFont);
         txtRegion.setName("txtRegion"); // NOI18N
+        txtRegion.setNextFocusableComponent(txtAddress);
         txtRegion.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 txtRegionFocusGained(evt);
@@ -245,6 +252,7 @@ public class CustomerOrderSetup extends javax.swing.JDialog implements KeyListen
 
         txtUserCode.setFont(Global.textFont);
         txtUserCode.setName("txtName"); // NOI18N
+        txtUserCode.setNextFocusableComponent(txtName);
         txtUserCode.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 txtUserCodeFocusGained(evt);
@@ -354,7 +362,7 @@ public class CustomerOrderSetup extends javax.swing.JDialog implements KeyListen
 
     private void txtRegionFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtRegionFocusGained
         // TODO add your handling code here:
-        txtRegion.selectAll();
+        regionAutoCompleter.showPopup();
     }//GEN-LAST:event_txtRegionFocusGained
 
     private void txtAddressFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtAddressFocusGained

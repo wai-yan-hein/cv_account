@@ -132,6 +132,7 @@ public class SupplierImportDialog extends javax.swing.JDialog {
                     supplier.setCompCode(Global.compCode);
                     supplier.setCreatedBy(Global.loginUser);
                     supplier.setCreatedDate(Util1.getTodayDate());
+                    supplier.setMacId(Global.machineId);
                     listSupplier.add(supplier);
 
                 }

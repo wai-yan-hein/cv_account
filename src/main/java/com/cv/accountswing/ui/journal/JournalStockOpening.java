@@ -174,7 +174,7 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
 
     private void getNewStockOpValue() {
         if (isValidEntry()) {
-            String userId = Global.loginUser.getUserCode();
+            String userCode = Global.loginUser.getAppUserCode();
             String[] coaIds = Global.sysProperties.get("system.stockop.parentid").split(",");
             CurrencyKey curKey = new CurrencyKey();
             curKey.setCode(currency);
@@ -202,7 +202,7 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
                     tmpVSOV.setDeptName(oDept.getDeptName());
                     return tmpVSOV;
                 }).map(tmpVSOV -> {
-                    tmpVSOV.setCreatedBy(userId);
+                    tmpVSOV.setCreatedBy(userCode);
                     return tmpVSOV;
                 }).map(tmpVSOV -> {
                     tmpVSOV.setAmount(0.0);
@@ -214,7 +214,7 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
                     sov.setCreatedDate(new Date());
                     sov.getKey().setCurrency(Global.defalutCurrency.getKey().getCode());
                     try {
-                        sovService.save(sov, userId);
+                        sovService.save(sov, userCode);
                     } catch (Exception e) {
                         LOGGER.error("Save StockOpening :" + e.getMessage());
                         JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Save StockOpening", JOptionPane.ERROR_MESSAGE);

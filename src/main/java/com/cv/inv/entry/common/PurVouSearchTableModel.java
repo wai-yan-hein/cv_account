@@ -83,11 +83,11 @@ public class PurVouSearchTableModel extends AbstractTableModel {
                 case 0://date
                     return Util1.toDateStr(his.getPurDate(), "dd/MM/yyyy");
                 case 1://vou-no
-                    return his.getPurInvId();
+                    return his.getVouNo();
                 case 2://remark
                     return his.getRemark();
                 case 3://customer
-                    return his.getCustomerId();
+                    return his.getTrader();
                 case 4://user
                     return his.getCreatedBy().getUserName();
                 case 5://v-total

@@ -127,7 +127,11 @@ public class ReturnOutTableModel extends AbstractTableModel {
                 if (record.getStock() == null) {
                     return null;
                 } else {
-                    return record.getStock().getStockCode();
+                    if (Util1.isNull(Global.sysProperties.get("system.use.usercode"), "0").equals("1")) {
+                        return record.getStock().getUserCode();
+                    } else {
+                        return record.getStock().getStockCode();
+                    }
                 }
             case 1: //Description
                 if (record.getStock() == null) {
@@ -281,28 +285,15 @@ public class ReturnOutTableModel extends AbstractTableModel {
         float amt;
         if (rOut.getStock() != null) {
             float stdWt = Util1.getFloat(rOut.getStdWt());
+            float qty = Util1.getFloat(rOut.getQty());
             String fromUnit = rOut.getStockUnit().getItemUnitCode();
             String toUnit = rOut.getStock().getPurUnit().getItemUnitCode();
             String pattern = rOut.getStock().getPattern().getPatternCode();
-            rOut.setSmallWeight(getSmallestWeight(stdWt, fromUnit, toUnit, pattern));
+            rOut.setSmallWeight(getSmallestWeight(stdWt, fromUnit, toUnit, pattern) * qty);
             rOut.setSmallUnit(rOut.getStock().getPurUnit());
-            amt = Util1.getFloat(rOut.getQty()) * Util1.getFloat(rOut.getPrice());
+            amt = qty * Util1.getFloat(rOut.getPrice());
             rOut.setAmount(amt);
         }
-    }
-
-    public boolean hasEmptyRow() {
-        boolean status = true;
-        if (listDetail.isEmpty() || listDetail == null) {
-            status = true;
-        } else {
-            RetOutHisDetail detailHis = listDetail.get(listDetail.size() - 1);
-            if (detailHis.getStock() == null) {
-                status = false;
-            }
-        }
-
-        return status;
     }
 
     private Float getSmallestWeight(Float weight, String fromUnit, String toUnit, String pattern) {
@@ -338,13 +329,25 @@ public class ReturnOutTableModel extends AbstractTableModel {
     }
 
     public void addNewRow() {
-        if (hasEmptyRow()) {
-            RetOutHisDetail detailHis = new RetOutHisDetail();
-            detailHis.setStock(new Stock());
-            listDetail.add(detailHis);
-            fireTableRowsInserted(listDetail.size() - 1, listDetail.size() - 1);
+        if (listDetail != null) {
+            if (hasEmptyRow()) {
+                RetOutHisDetail pd = new RetOutHisDetail();
+                pd.setStock(new Stock());
+                listDetail.add(pd);
+                fireTableRowsInserted(listDetail.size() - 1, listDetail.size() - 1);
+            }
         }
+    }
 
+    private boolean hasEmptyRow() {
+        boolean status = true;
+        if (listDetail.size() > 1) {
+            RetOutHisDetail get = listDetail.get(listDetail.size() - 1);
+            if (get.getStock().getStockCode() == null) {
+                status = false;
+            }
+        }
+        return status;
     }
 
     public void clearRetOutTable() {

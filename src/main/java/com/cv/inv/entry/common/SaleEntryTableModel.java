@@ -15,12 +15,19 @@ import com.cv.inv.entity.Location;
 import com.cv.inv.entity.RelationKey;
 import com.cv.inv.entity.SaleHisDetail;
 import com.cv.inv.entity.Stock;
+import com.cv.inv.entity.StockBalanceTmp;
 import com.cv.inv.entity.StockUnit;
 import com.cv.inv.entity.UnitRelation;
 import com.cv.inv.entry.editor.LocationAutoCompleter;
 import com.cv.inv.service.RelationService;
+import com.cv.inv.service.SReportService;
+import com.cv.inv.service.StockBalanceTmpService;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -28,6 +35,7 @@ import javax.swing.table.AbstractTableModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
 
 /**
@@ -40,7 +48,8 @@ public class SaleEntryTableModel extends AbstractTableModel {
     private static final Logger log = LoggerFactory.getLogger(SaleEntryTableModel.class);
     private String[] columnNames = {"Code", "Description", "Department", "Location",
         "Qty", "Std-Wt", "Unit", "Sale Price", "Amount"};
-
+    private final ImageIcon progressIcon = new ImageIcon(this.getClass().getResource("/images/progress_indicator_16px.png"));
+    private final ImageIcon refreshIcon = new ImageIcon(this.getClass().getResource("/images/synchronize_16px.png"));
     private JTable parent;
     private List<SaleHisDetail> listDetail = new ArrayList();
     @Autowired
@@ -52,6 +61,33 @@ public class SaleEntryTableModel extends AbstractTableModel {
     private JTextField txtTotalItem;
     private final List<String> deleteList = new ArrayList();
     private LocationAutoCompleter locationAutoCompleter;
+    private HashMap<String, List<StockBalanceTmp>> hmBalance = new HashMap<>();
+    @Autowired
+    private SReportService reportService;
+    @Autowired
+    private StockBalanceTmpService tmpService;
+    @Autowired
+    private StockBalanceTableModel balanceTableModel;
+    @Autowired
+    private TaskExecutor taskExecutor;
+    private JLabel lblStockName;
+    private JButton btnProgress;
+
+    public JLabel getLblStockName() {
+        return lblStockName;
+    }
+
+    public void setLblStockName(JLabel lblStockName) {
+        this.lblStockName = lblStockName;
+    }
+
+    public JButton getBtnProgress() {
+        return btnProgress;
+    }
+
+    public void setBtnProgress(JButton btnProgress) {
+        this.btnProgress = btnProgress;
+    }
 
     public JTable getParent() {
         return parent;
@@ -167,7 +203,11 @@ public class SaleEntryTableModel extends AbstractTableModel {
                     if (record.getStock() == null) {
                         return null;
                     } else {
-                        return record.getStock().getStockCode();
+                        if (Util1.isNull(Global.sysProperties.get("system.use.usercode"), "0").equals("1")) {
+                            return record.getStock().getUserCode();
+                        } else {
+                            return record.getStock().getStockCode();
+                        }
                     }
                 case 1://Name
                     if (record.getStock() == null) {
@@ -214,20 +254,23 @@ public class SaleEntryTableModel extends AbstractTableModel {
             switch (column) {
                 case 0://Code
                     if (value != null) {
-                        Stock stock = (Stock) value;
-                        record.setStock(stock);
-                        record.setQuantity(1.0f);
-                        record.setStdWeight(stock.getSaleWeight());
-                        record.setSaleUnit(stock.getSaleUnit());
-                        record.setDepartment(department);
-                        stockUp.add(stock);
-                        if (stock.getStockCode() != null) {
-                            String stockCode = stock.getStockCode();
-                            Float salePrice = stockUp.getPrice(stockCode, getCusType());
-                            record.setPrice(Util1.getFloat(salePrice));
+                        if (value instanceof Stock) {
+                            Stock stock = (Stock) value;
+                            calStockBalance(stock, true);
+                            record.setStock(stock);
+                            record.setQuantity(1.0f);
+                            record.setStdWeight(stock.getSaleWeight());
+                            record.setSaleUnit(stock.getSaleUnit());
+                            record.setDepartment(department);
+                            stockUp.add(stock);
+                            if (stock.getStockCode() != null) {
+                                String stockCode = stock.getStockCode();
+                                Float salePrice = stockUp.getPrice(stockCode, getCusType());
+                                record.setPrice(Util1.getFloat(salePrice));
+                            }
+                            txtTotalItem.setText(Integer.toString(listDetail.size()));
+                            addNewRow();
                         }
-                        txtTotalItem.setText(Integer.toString(listDetail.size()));
-                        addEmptyRow();
                     }
                     parent.setColumnSelectionInterval(4, 4);
                     break;
@@ -316,33 +359,27 @@ public class SaleEntryTableModel extends AbstractTableModel {
         }
     }
 
-    public boolean hasEmptyRow() {
-        if (listDetail == null) {
-            return false;
-        }
-        if (listDetail.isEmpty()) {
-            return false;
-        }
-
-        SaleHisDetail detailHis = listDetail.get(listDetail.size() - 1);
-        if (detailHis.getStock() != null) {
-            return detailHis.getStock().getStockCode() == null;
-        } else {
-            return true;
+    public void addNewRow() {
+        if (listDetail != null) {
+            if (hasEmptyRow()) {
+                SaleHisDetail pd = new SaleHisDetail();
+                pd.setStock(new Stock());
+                pd.setLocation(locationAutoCompleter.getLocation());
+                listDetail.add(pd);
+                fireTableRowsInserted(listDetail.size() - 1, listDetail.size() - 1);
+            }
         }
     }
 
-    public void addEmptyRow() {
-        if (listDetail != null) {
-            if (!hasEmptyRow()) {
-                SaleHisDetail detailHis = new SaleHisDetail();
-                detailHis.setStock(new Stock());
-                detailHis.setLocation(locationAutoCompleter.getLocation());
-                listDetail.add(detailHis);
-                fireTableRowsInserted(listDetail.size() - 1, listDetail.size() - 1);
-                parent.scrollRectToVisible(parent.getCellRect(parent.getRowCount() - 1, 0, true));
+    private boolean hasEmptyRow() {
+        boolean status = true;
+        if (listDetail.size() > 1) {
+            SaleHisDetail get = listDetail.get(listDetail.size() - 1);
+            if (get.getStock().getStockCode() == null) {
+                status = false;
             }
         }
+        return status;
     }
 
     public Department getDepartment() {
@@ -355,11 +392,7 @@ public class SaleEntryTableModel extends AbstractTableModel {
 
     public void setListDetail(List<SaleHisDetail> listDetail) {
         this.listDetail = listDetail;
-
-        if (!hasEmptyRow()) {
-            addEmptyRow();
-        }
-
+        addNewRow();
         fireTableDataChanged();
     }
 
@@ -377,7 +410,7 @@ public class SaleEntryTableModel extends AbstractTableModel {
 
     public void removeListDetail() {
         this.listDetail.clear();
-        addEmptyRow();
+        addNewRow();
     }
 
     private void calculateAmount(SaleHisDetail sale) {
@@ -513,11 +546,7 @@ public class SaleEntryTableModel extends AbstractTableModel {
         }
 
         listDetail.remove(row);
-
-        if (!hasEmptyRow()) {
-            addEmptyRow();
-        }
-
+        addNewRow();
         fireTableRowsDeleted(row, row);
         if (row - 1 >= 0) {
             parent.setRowSelectionInterval(row - 1, row - 1);
@@ -536,6 +565,45 @@ public class SaleEntryTableModel extends AbstractTableModel {
     public void clear() {
         if (listDetail != null) {
             listDetail.clear();
+        }
+    }
+
+    public void calStockBalance(int row, boolean refresh) {
+        if (listDetail != null) {
+            SaleHisDetail sd = listDetail.get(row);
+            if (sd.getStock() != null) {
+                if (sd.getStock().getStockCode() != null) {
+                    calStockBalance(sd.getStock(), refresh);
+                }
+            }
+        }
+    }
+
+    private void calStockBalance(Stock stock, boolean refresh) {
+        String isStock = Global.sysProperties.get("system.sale.stock.balance");
+        if (Util1.isNull(isStock, "0").equals("1")) {
+            taskExecutor.execute(() -> {
+                String stockCode = stock.getStockCode();
+                if (refresh) {
+                    hmBalance.remove(stockCode);
+                }
+                lblStockName.setText(stock.getStockName());
+                btnProgress.setIcon(progressIcon);
+                if (!hmBalance.containsKey(stockCode)) {
+                    log.info("Calculating Stock Balance : " + stockCode);
+                    reportService.generateStockBalance("'" + stockCode + "'", "-", Global.compCode, Global.machineId.toString());
+                    List<StockBalanceTmp> listStockBalance = tmpService.search(Global.machineId.toString());
+                    if (listStockBalance.isEmpty()) {
+                        StockBalanceTmp tmp = new StockBalanceTmp();
+                        listStockBalance.add(tmp);
+                    }
+                    balanceTableModel.setListStockBalance(listStockBalance);
+                    hmBalance.put(stockCode, listStockBalance);
+                } else {
+                    balanceTableModel.setListStockBalance(hmBalance.get(stockCode));
+                }
+                btnProgress.setIcon(refreshIcon);
+            });
         }
     }
 

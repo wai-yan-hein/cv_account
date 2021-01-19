@@ -144,7 +144,7 @@ public class JournalStockOpeningTableModel extends AbstractTableModel {
     private void save(VStockOpValue op) {
         try {
             StockOpValue stockOp = gson.fromJson(gson.toJson(op), StockOpValue.class);
-            opValueService.save(stockOp, Global.loginUser.getUserCode());
+            opValueService.save(stockOp, Global.loginUser.getAppUserCode());
         } catch (JsonSyntaxException e) {
             LOGGER.error("Save Stock Opening :" + e.getMessage());
         }
@@ -205,7 +205,7 @@ public class JournalStockOpeningTableModel extends AbstractTableModel {
     }
     
     public void saveGV(VStockOpValue op, String status) {
-        //if (isValidCOA(op, Global.compCode, Global.loginUser.getUserCode(), status)) {
+        //if (isValidCOA(op, Global.compCode, Global.loginUser.getAppUserCode(), status)) {
         // coaService.save(op);
         if (status.equals("NEW")) {
             listStockOpening.add(new VStockOpValue());

@@ -203,11 +203,11 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
             taskExecutor.execute(() -> {
                 btnGen.setEnabled(false);
                 try {
-                    String userId = Global.loginUser.getUserCode();
+                    String userCode = Global.loginUser.getAppUserCode();
                     String coaGroup = Global.sysProperties.get("system.opening.coa.group");
                     if (coaGroup != null) {
                         cOAOpeningService.generateZeroOpening(Util1.toDateStr(txtDate.getDate(), "dd/MM/yyyy"),
-                                userId, Global.compCode, curId, depCode, coaGroup);
+                                userCode, Global.compCode, curId, depCode, coaGroup);
                         searchOpening();
                         btnGen.setEnabled(true);
                     } else {

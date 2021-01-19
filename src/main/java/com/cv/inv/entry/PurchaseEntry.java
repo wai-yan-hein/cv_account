@@ -11,7 +11,6 @@ import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.Supplier;
-import com.cv.accountswing.entity.Trader;
 import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
@@ -30,6 +29,7 @@ import com.cv.inv.entry.editor.StockCellEditor;
 import com.cv.inv.entry.editor.VouStatusAutoCompleter;
 import com.cv.inv.service.PurchaseDetailService;
 import com.cv.inv.service.PurchaseHisService;
+import com.cv.inv.service.SReportService;
 import com.cv.inv.service.VouIdService;
 import com.cv.inv.ui.commom.VouFormatFactory;
 import com.cv.inv.util.GenVouNoImpl;
@@ -40,10 +40,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Map;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
@@ -91,6 +90,9 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
     //private Gl ph;
     private GenVouNoImpl vouEngine;
     private List<PurHisDetail> listDetail = new ArrayList();
+    private String voucherNo = "-";
+    @Autowired
+    private SReportService reportService;
 
     public void setIsShown(boolean isShown) {
         this.isShown = isShown;
@@ -165,12 +167,8 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
     }
 
     private void focusTable() {
-        int rowCount = tblPurchase.getRowCount();
-        if (rowCount > 0) {
-            tblPurchase.setColumnSelectionInterval(0, 0);
-            tblPurchase.setRowSelectionInterval(rowCount - 1, rowCount - 1);
-            tblPurchase.requestFocus();
-        }
+        tblPurchase.changeSelection(0, 0, false, false);
+        tblPurchase.requestFocus();
     }
 
     private void initKeyListener() {
@@ -256,7 +254,8 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
         genVouNo();
     }
 
-    public void savePurchase() {
+    public boolean savePurchase() {
+        boolean status = true;
         if (isValidEntry() && purTableModel.isValidEntry()) {
             List<String> delList = purTableModel.getDelList();
             try {
@@ -266,11 +265,13 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
                 }
                 clear();
             } catch (Exception ex) {
+                status = false;
                 LOGGER.error("Save Purchase :" + ex.getMessage());
                 JOptionPane.showMessageDialog(Global.parentForm, "Could'nt saved.");
             }
 
         }
+        return status;
     }
 
     private boolean isValidEntry() {
@@ -295,41 +296,34 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
             status = false;
             txtLocation.requestFocus();
         } else {
-            ph.setPurInvId(txtVouNo.getText());
+            ph.setVouNo(txtVouNo.getText());
             ph.setDueDate(txtDueDate.getDate());
             ph.setLocation(locCompleter.getLocation());
             ph.setVouStatus(vouCompleter.getVouStatus());
             ph.setRemark(txtRemark.getText());
-            //ph.setVouTotal(NumberUtil.getDouble(txtVouTotal.getText()));
-            ph.setPaid(NumberUtil.getDouble(txtVouPaid.getText()));
-            ph.setBalance(NumberUtil.getDouble(txtVouBalance.getText()));
-            ph.setTaxAmt(NumberUtil.getDouble(txtTax.getText()));
+            ph.setPaid(Util1.getFloat(txtVouPaid.getValue()));
+            ph.setBalance(Util1.getFloat(txtVouBalance.getValue()));
+            ph.setTaxP(Util1.getFloat(txtTaxP.getValue()));
+            ph.setTaxAmt(Util1.getFloat(txtTax.getValue()));
             ph.setRefNo(txtRefNo.getText());
-            ph.setIntgUpdStatus(null);
             ph.setDeleted(Util1.getNullTo(ph.getDeleted()));
-            ph.setDiscount(Util1.getDouble(txtVouDiscount.getValue()));
-            ph.setBalance(Util1.getDouble(txtVouBalance.getValue()));
-            if (lblStatus.getText().equals("NEW")) {
-                ph.setPurDate(txtPurDate.getDate());
-            } else {
-                Date tmpDate = txtPurDate.getDate();
-                if (!Util1.isSameDate(tmpDate, ph.getPurDate())) {
-                    ph.setPurDate(txtPurDate.getDate());
-                }
-            }
-            ph.setCurrency((currAutoCompleter.getCurrency())); //Need to change
-            ph.setCustomerId(traderAutoCompleter.getTrader());
+            ph.setDiscP(Util1.getFloat(txtDiscP.getValue()));
+            ph.setDiscount(Util1.getFloat(txtVouDiscount.getValue()));
+            ph.setCurrency(currAutoCompleter.getCurrency());
+            ph.setTrader(traderAutoCompleter.getTrader());
+            ph.setPurDate(txtPurDate.getDate());
             if (lblStatus.getText().equals("NEW")) {
                 ph.setCreatedBy(Global.loginUser);
                 ph.setSession(Global.sessionId);
+                ph.setMacId(Global.machineId);
             } else {
-                ph.setUpdatedBy(Global.loginUser.getUserCode());
-                ph.setUpdatedDate(Util1.getTodayDate());
+                ph.setUpdatedBy(Global.loginUser.getAppUserCode());
             }
+
             //cal total
             Float vouTotal = 0.0f;
             vouTotal = purTableModel.getListPurDetail().stream().filter(pd -> (pd.getStock() != null)).map(pd -> pd.getPurAmt()).reduce(vouTotal, (accumulator, _item) -> accumulator + _item);
-            ph.setVouTotal(vouTotal.doubleValue());
+            ph.setVouTotal(vouTotal);
 
             try {
                 if (tblPurchase.getCellEditor() != null) {
@@ -345,32 +339,30 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
     }
 
     public void setPurchaseVoucher(PurHis purHis, List<PurHisDetail> listDetailHis) {
-        if (!lblStatus.getText().equals("NEW")) {
-            clear();
-        }
         if (purHis != null) {
+            ph = purHis;
             if (purHis.getDeleted()) {
                 lblStatus.setText("DELETED");
             } else {
                 lblStatus.setText("EDIT");
             }
-            txtVouNo.setText(purHis.getPurInvId());
-            txtRemark.setText(purHis.getRemark());
-            txtPurDate.setDate(purHis.getPurDate());
-            txtDueDate.setDate(purHis.getDueDate());
-            locCompleter.setLocation(purHis.getLocation());
-            traderAutoCompleter.setTrader((Supplier) purHis.getCustomerId());
-            vouCompleter.setVouStatus(purHis.getVouStatus());
-            currAutoCompleter.setCurrency(purHis.getCurrency());
-            txtVouTotal.setValue(purHis.getVouTotal());
-            txtVouPaid.setText(purHis.getPaid().toString());
-            txtVouDiscount.setValue(Util1.getDouble(purHis.getDiscount()));
-            txtDiscP.setValue(Util1.getDouble(purHis.getDiscP()));
-            txtVouBalance.setValue(Util1.getDouble(purHis.getBalance()));
-            txtTaxP.setValue(Util1.getDouble(purHis.getTaxP()));
-            txtTax.setValue(Util1.getDouble(purHis.getTaxAmt()));
-            ph.setCreatedBy(purHis.getCreatedBy());
+            txtVouNo.setText(ph.getVouNo());
+            txtRemark.setText(ph.getRemark());
+            txtPurDate.setDate(ph.getPurDate());
+            txtDueDate.setDate(ph.getDueDate());
+            locCompleter.setLocation(ph.getLocation());
+            traderAutoCompleter.setTrader((Supplier) ph.getTrader());
+            vouCompleter.setVouStatus(ph.getVouStatus());
+            currAutoCompleter.setCurrency(ph.getCurrency());
+            txtVouTotal.setValue(Util1.getFloat(ph.getVouTotal()));
+            txtVouPaid.setValue(Util1.getFloat(ph.getPaid()));
+            txtVouDiscount.setValue(Util1.getFloat(ph.getDiscount()));
+            txtDiscP.setValue(Util1.getFloat(ph.getDiscP()));
+            txtVouBalance.setValue(Util1.getFloat(ph.getBalance()));
+            txtTaxP.setValue(Util1.getFloat(ph.getTaxP()));
+            txtTax.setValue(Util1.getFloat(ph.getTaxAmt()));
             purTableModel.setListPurDetail(listDetailHis);
+            purTableModel.addNewRow();
         }
     }
 
@@ -413,30 +405,30 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
     }
 
     private void calculateTotalAmount() {
-        double totalAmount = 0.0;
-        double discountAmt = 0.0;
+        float totalAmount = 0.0f;
+        float discountAmt = 0.0f;
         listDetail = purTableModel.getListPurDetail();
-        totalAmount = listDetail.stream().map(pd -> Util1.getDouble(pd.getPurAmt())).reduce(totalAmount, (accumulator, _item) -> accumulator + _item);
+        totalAmount = listDetail.stream().map(pd -> Util1.getFloat(pd.getPurAmt())).reduce(totalAmount, (accumulator, _item) -> accumulator + _item);
         txtVouTotal.setValue(totalAmount);
         //cal discAmt
-        if (Util1.getDouble(txtDiscP.getValue()) > 0) {
-            double discp = NumberUtil.NZero(txtDiscP.getValue());
+        if (Util1.getFloat(txtDiscP.getValue()) > 0) {
+            float discp = Util1.getFloat(txtDiscP.getValue());
             discountAmt = (totalAmount * (discp / 100));
             txtVouDiscount.setValue(discountAmt);
         }
 
         //calculate taxAmt
-        if (Util1.getDouble(txtTaxP.getValue()) > 0) {
-            double afterDiscountAmt = totalAmount - discountAmt;
-            double totalTax = (afterDiscountAmt * Util1.getDouble(txtTaxP.getValue())) / 100;
+        if (Util1.getFloat(txtTaxP.getValue()) > 0) {
+            float afterDiscountAmt = totalAmount - discountAmt;
+            float totalTax = (afterDiscountAmt * Util1.getFloat(txtTaxP.getValue())) / 100;
             txtTax.setValue(totalTax);
         }
 
-        double grossTotal = Util1.getDouble(txtVouTotal.getValue());
-        double discount = Util1.getDouble(txtVouDiscount.getValue());
-        double tax = Util1.getDouble(txtTax.getValue());
-        double grandTotal = (grossTotal + tax) - discount;
-        double balance = grandTotal - (Util1.getDouble(txtVouPaid.getValue()));
+        float grossTotal = Util1.getFloat(txtVouTotal.getValue());
+        float discount = Util1.getFloat(txtVouDiscount.getValue());
+        float tax = Util1.getFloat(txtTax.getValue());
+        float grandTotal = (grossTotal + tax) - discount;
+        float balance = grandTotal - (Util1.getFloat(txtVouPaid.getValue()));
         txtVouBalance.setValue(balance);
     }
 
@@ -448,6 +440,36 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
             });
         }
         purTableModel.setListPurDetail(listPurDetail);
+    }
+
+    private void printSaveVoucher() {
+        boolean save;
+        if (lblStatus.getText().equals("EDIT")) {
+            voucherNo = txtVouNo.getText();
+            save = true;
+        } else {
+            voucherNo = txtVouNo.getText();
+            save = savePurchase();
+        }
+        if (save) {
+            String reportName = Global.sysProperties.get("system.purchase.report");
+            if (reportName != null) {
+                String compName = Global.sysProperties.get("system.report.company");
+                String address = Global.sysProperties.get("system.report.address");
+                String phone = Global.sysProperties.get("system.report.phone");
+                String reportPath = Global.sysProperties.get("system.report.path");
+                String fontPath = Global.sysProperties.get("system.font.path");
+                reportPath = reportPath + "\\" + reportName;
+                Map<String, Object> parameters = new HashMap();
+                parameters.put("company_name", compName);
+                parameters.put("address", address);
+                parameters.put("phone", phone);
+                parameters.put("vou_no", voucherNo);
+                reportService.reportViewer(reportPath, fontPath, fontPath, parameters);
+            } else {
+                JOptionPane.showMessageDialog(Global.parentForm, "Report Name Not Found.");
+            }
+        }
     }
 
     /**
@@ -734,9 +756,13 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
         txtVouTotal.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         txtVouTotal.setFont(Global.amtFont);
 
+        txtDiscP.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         txtDiscP.setFont(Global.amtFont);
         txtDiscP.setName("txtDiscP"); // NOI18N
         txtDiscP.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtDiscPFocusGained(evt);
+            }
             public void focusLost(java.awt.event.FocusEvent evt) {
                 txtDiscPFocusLost(evt);
             }
@@ -801,6 +827,7 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
         txtVouBalance.setName("txtVouBalance"); // NOI18N
 
         txtTaxP.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
+        txtTaxP.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         txtTaxP.setFont(Global.amtFont);
         txtTaxP.setName("txtDiscP"); // NOI18N
         txtTaxP.addFocusListener(new java.awt.event.FocusAdapter() {
@@ -977,6 +1004,11 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
         calculateTotalAmount();
 
     }//GEN-LAST:event_txtDiscPFocusLost
+
+    private void txtDiscPFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtDiscPFocusGained
+        // TODO add your handling code here:
+        txtDiscP.select(0, txtDiscP.getText().length() - 1);
+    }//GEN-LAST:event_txtDiscPFocusGained
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -1235,6 +1267,7 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
 
     @Override
     public void print() {
+        printSaveVoucher();
     }
 
     @Override

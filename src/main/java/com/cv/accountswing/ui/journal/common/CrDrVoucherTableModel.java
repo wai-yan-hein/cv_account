@@ -142,7 +142,7 @@ public class CrDrVoucherTableModel extends AbstractTableModel {
     }
 
     public void saveGV(VCrDrVoucher cd, String status) {
-        //if (isValidCOA(cd, Global.compCode, Global.loginUser.getUserCode(), status)) {
+        //if (isValidCOA(cd, Global.compCode, Global.loginUser.getAppUserCode(), status)) {
         // coaService.save(cd);
         if (status.equals("NEW")) {
             listVCD.add(new VCrDrVoucher());

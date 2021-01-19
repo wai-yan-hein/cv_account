@@ -221,15 +221,15 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
     }
 
     private void assignGlInfo(Gl gl) {
-        String userId = Global.loginUser.getUserCode();
+        String userCode = Global.loginUser.getAppUserCode();
         String compCode = Global.compCode;
 
         if (gl.getGlCode() == null) {
             gl.setCompCode(compCode);
-            gl.setCreatedBy(userId);
+            gl.setCreatedBy(userCode);
             gl.setCreatedDate(Util1.getTodayDate());
         } else {
-            gl.setModifyBy(userId);
+            gl.setModifyBy(userCode);
             gl.setModifyDate(Util1.getTodayDate());
         }
     }

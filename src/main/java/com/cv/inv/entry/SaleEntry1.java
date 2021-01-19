@@ -401,18 +401,18 @@ public class SaleEntry1 extends javax.swing.JPanel implements SelectionObserver,
             //Need to add
             //saleHis.setDeptId(departmentAutoCompleter.getDepartment().getDeptCode());
             //saleHis.setTraderId(traderAutoCompleter.getTrader().getTraderId());
-            saleHis.setSaleManId(saleManCompleter.getSaleMan());
+            saleHis.setSaleMan(saleManCompleter.getSaleMan());
             //saleHis.setLocationId(locCompleter.getLocation().getLocationId());//need to add
-            saleHis.setVouStatusId(vouCompleter.getVouStatus());
+            saleHis.setVouStatus(vouCompleter.getVouStatus());
             saleHis.setRemark(txtRemark.getText());
-            saleHis.setVouTotal(NumberUtil.getDouble(txtVouTotal.getText()));
+            /*saleHis.setVouTotal(NumberUtil.getDouble(txtVouTotal.getText()));
             saleHis.setDiscP(NumberUtil.getDouble(txtDiscP.getText()));
             saleHis.setDiscount(NumberUtil.getDouble(txtVouDiscount.getText()));
             saleHis.setTaxP(NumberUtil.getDouble(txtTaxP.getText()));
             saleHis.setTaxAmt(NumberUtil.getDouble(txtTax.getText()));
             saleHis.setGrandTotal(NumberUtil.getDouble(txtGrandTotal.getText()));
             saleHis.setPaid(NumberUtil.getDouble(txtVouPaid.getText()));
-            saleHis.setVouBalance(NumberUtil.getDouble(txtVouBalance.getText()));
+            saleHis.setVouBalance(NumberUtil.getDouble(txtVouBalance.getText()));*/
 
             saleHis.setCurrency(currAutoCompleter.getCurrency());
 

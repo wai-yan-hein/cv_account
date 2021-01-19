@@ -135,9 +135,9 @@ public class CrDrVoucherEntryTableModel extends AbstractTableModel {
             case 4:
                 if (value != null) {
                     if (vouType.equals("CR")) {
-                        vgl.setDrAmt(Util1.getDouble(value));
+                        vgl.setDrAmt(Util1.getFloat(value));
                     } else {
-                        vgl.setCrAmt(Util1.getDouble(value));
+                        vgl.setCrAmt(Util1.getFloat(value));
                     }
                     addRow();
                     parent.setRowSelectionInterval(row + 1, row + 1);
@@ -215,7 +215,7 @@ public class CrDrVoucherEntryTableModel extends AbstractTableModel {
     }
 
     public void saveGV(VGl cd, String status) {
-        //if (isValidCOA(cd, Global.compCode, Global.loginUser.getUserCode(), status)) {
+        //if (isValidCOA(cd, Global.compCode, Global.loginUser.getAppUserCode(), status)) {
         // coaService.save(cd);
         if (status.equals("NEW")) {
             listVGl.add(new VGl());

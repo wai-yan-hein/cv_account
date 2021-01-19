@@ -22,7 +22,6 @@ import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.RelationKey;
 import com.cv.inv.entity.Stock;
 import com.cv.inv.entity.StockBalanceTmp;
-import com.cv.inv.entity.StockReport;
 import com.cv.inv.entry.editor.BrandAutoCompleter;
 import com.cv.inv.entry.editor.CategoryAutoCompleter;
 import com.cv.inv.entry.editor.LocationAutoCompleter;
@@ -79,8 +78,8 @@ public class StockReports extends javax.swing.JPanel implements PanelControl {
     private String locId;
     private String unitCode;
     private String stockTypeCode;
-    private String catId;
-    private String brandId;
+    private String catCode;
+    private String brandCode;
     private String stockCode = "";
     private String regionCode = "";
     private String startDate;
@@ -100,10 +99,6 @@ public class StockReports extends javax.swing.JPanel implements PanelControl {
         isShown = true;
     }
 
-    private void search() {
-        List<StockReport> reports = stockReportService.getReports();
-    }
-
     private void initCombo() {
         locationAutoCompleter = new LocationAutoCompleter(txtLocation, Global.listLocation, null);
         unitAutoCompleter = new UnitAutoCompleter(txtUnit, Global.listStockUnit, null);
@@ -118,7 +113,6 @@ public class StockReports extends javax.swing.JPanel implements PanelControl {
         initTableReport();
         initTableStockFilter();
         initTableRegionFilter();
-        search();
     }
 
     private void initTableReport() {
@@ -222,16 +216,16 @@ public class StockReports extends javax.swing.JPanel implements PanelControl {
 
         if (categoryAutoCompleter.getCategory()
                 != null && !txtCategory.getText().isEmpty()) {
-            catId = categoryAutoCompleter.getCategory().getCatCode();
+            catCode = categoryAutoCompleter.getCategory().getCatCode();
         } else {
-            catId = "-";
+            catCode = "-";
         }
 
         if (brandAutoCompleter.getBrand()
                 != null && !txtBrand.getText().isEmpty()) {
-            brandId = brandAutoCompleter.getBrand().getBrandCode();
+            brandCode = brandAutoCompleter.getBrand().getBrandCode();
         } else {
-            brandId = "-";
+            brandCode = "-";
         }
         //stock code
         List<Stock> listStock = filterTableModel.getListStock();
@@ -266,7 +260,7 @@ public class StockReports extends javax.swing.JPanel implements PanelControl {
             listStockBalance.stream().map(tmp -> {
                 String pattern = tmp.getStock().getPattern().getPatternCode();
                 String smallUnit = tmp.getUnit();
-                Float changeWt = getChangeWeight(smallUnit, unitCode, pattern, tmp.getStdWtTotal());
+                Float changeWt = getChangeWeight(smallUnit, unitCode, pattern, tmp.getTotalWt());
                 if (changeWt != null) {
                     tmp.setChangeWt(changeWt);
                     tmp.setChangeUnit(unitCode);
@@ -287,8 +281,12 @@ public class StockReports extends javax.swing.JPanel implements PanelControl {
         log.info("stock balance report ready.");
         String reportPath = Global.sysProperties.get("system.report.path");
         String fontPath = Global.sysProperties.get("system.font.path");
-        reportPath = reportPath + "\\Stock_Balance";
+        reportPath = reportPath + "\\StockBalance";
         Map<String, Object> parameters = new HashMap();
+        parameters.put("mac_id", Global.machineId);
+        parameters.put("brand_code", brandCode);
+        parameters.put("cat_code", catCode);
+        parameters.put("stock_type_code", stockTypeCode);
         reportService.reportViewer(reportPath, reportPath, fontPath, parameters);
 
     }
