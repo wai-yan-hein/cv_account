@@ -30,6 +30,7 @@ public class TraderCellEditor extends AbstractCellEditor implements TableCellEdi
     private static final Logger LOGGER = LoggerFactory.getLogger(TraderCellEditor.class);
     private JComponent component = null;
     private TraderAutoCompleter completer;
+    private boolean filter;
     private final FocusAdapter fa = new FocusAdapter() {
         @Override
         public void focusLost(FocusEvent e) {
@@ -44,8 +45,8 @@ public class TraderCellEditor extends AbstractCellEditor implements TableCellEdi
     };
 
     //private List<Medicine> listTrader = new ArrayList();
-    public TraderCellEditor() {
-
+    public TraderCellEditor(boolean filter) {
+        this.filter = filter;
     }
 
     @Override
@@ -85,7 +86,7 @@ public class TraderCellEditor extends AbstractCellEditor implements TableCellEdi
         if (value != null) {
             jtf.setText(value.toString());
         }
-        completer = new TraderAutoCompleter(jtf, Global.listTrader, this);
+        completer = new TraderAutoCompleter(jtf, Global.listTrader, this, this.filter);
         return component;
     }
 

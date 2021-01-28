@@ -158,9 +158,9 @@ public class CrDrVoucher extends javax.swing.JPanel implements KeyListener, Sele
         if (Global.listCurrency == null) {
             Global.listCurrency = currencyService.search("-", "-", "-");
         }
-        COAAutoCompleter cOAAutoCompleter = new COAAutoCompleter(txtAccount, Global.listCOA, null);
+        COAAutoCompleter cOAAutoCompleter = new COAAutoCompleter(txtAccount, Global.listCOA, null, false);
         cOAAutoCompleter.setSelectionObserver(this);
-        DepartmentAutoCompleter departmentAutoCompleter = new DepartmentAutoCompleter(txtDep, Global.listDepartment, null);
+        DepartmentAutoCompleter departmentAutoCompleter = new DepartmentAutoCompleter(txtDep, Global.listDepartment, null, false);
         departmentAutoCompleter.setSelectionObserver(this);
         CurrencyAutoCompleter currencyAutoCompleter = new CurrencyAutoCompleter();
         currencyAutoCompleter.setSelectionObserver(this);

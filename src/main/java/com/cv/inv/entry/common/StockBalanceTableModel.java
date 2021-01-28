@@ -99,7 +99,11 @@ public class StockBalanceTableModel extends AbstractTableModel {
     }
 
     public void clearList() {
-        this.listStockBalance.clear();
+        if (listStockBalance != null) {
+            this.listStockBalance.clear();
+            fireTableDataChanged();
+        }
     }
 
 }
+ 

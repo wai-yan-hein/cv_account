@@ -17,6 +17,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractCellEditor;
@@ -66,10 +67,16 @@ public class TraderAutoCompleter implements KeyListener {
     }
 
     public TraderAutoCompleter(JTextComponent comp, List<Trader> list,
-            AbstractCellEditor editor) {
+            AbstractCellEditor editor, boolean filter) {
         this.textComp = comp;
         this.editor = editor;
         textComp.putClientProperty(AUTOCOMPLETER, this);
+        if (filter) {
+            list = new ArrayList<>(list);
+            list.add(0, new Trader("-", "All"));
+            list.add(1, new Trader("-", "All Customer"));
+            list.add(2, new Trader("-", "All Supplier"));
+        }
         textComp.setFont(Global.textFont);
         traderTableModel = new TraderTableModel(list);
         table.setModel(traderTableModel);
@@ -165,7 +172,7 @@ public class TraderAutoCompleter implements KeyListener {
             ((JTextField) textComp).setText(trader.getTraderName());
             if (editor == null) {
                 if (selectionObserver != null) {
-                    selectionObserver.selected("CustomerList", trader);
+                    selectionObserver.selected("Trader", trader);
                 }
             }
         }

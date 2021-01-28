@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ReturnInTableModel extends AbstractTableModel {
-
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(ReturnInTableModel.class);
     private String[] columnNames = {"Code", "Description", "Exp-Date",
         "Qty", "Std-W", "Unit", "Price", "Amount"};
@@ -41,22 +41,22 @@ public class ReturnInTableModel extends AbstractTableModel {
     private List<RetInHisDetail> listRetInDtail = new ArrayList();
     private String deletedList;
     private SelectionObserver observer;
-
+    
     public SelectionObserver getObserver() {
         return observer;
     }
-
+    
     public void setObserver(SelectionObserver observer) {
         this.observer = observer;
     }
-
+    
     @Autowired
     private RelationService relationService;
-
+    
     public void setParent(JTable parent) {
         this.parent = parent;
     }
-
+    
     @Override
     public int getRowCount() {
         if (listRetInDtail == null) {
@@ -64,25 +64,25 @@ public class ReturnInTableModel extends AbstractTableModel {
         }
         return listRetInDtail.size();
     }
-
+    
     @Override
     public String getColumnName(int column) {
         return columnNames[column];
     }
-
+    
     @Override
     public int getColumnCount() {
         return columnNames.length;
     }
-
+    
     public String[] getColumnNames() {
         return columnNames;
     }
-
+    
     public void setColumnNames(String[] columnNames) {
         this.columnNames = columnNames;
     }
-
+    
     @Override
     public Object getValueAt(int row, int column) {
         RetInHisDetail record;
@@ -91,11 +91,11 @@ public class ReturnInTableModel extends AbstractTableModel {
         } catch (Exception ex) {
             return null;
         }
-
+        
         if (record == null) {
             return null;
         }
-
+        
         switch (column) {
             case 0: //Code
                 if (record.getStock() == null) {
@@ -151,10 +151,10 @@ public class ReturnInTableModel extends AbstractTableModel {
                 }
             default:
                 return new Object();
-
+            
         }
     }
-
+    
     @Override
     public Class getColumnClass(int column) {
         switch (column) {
@@ -177,14 +177,14 @@ public class ReturnInTableModel extends AbstractTableModel {
             default:
                 return Object.class;
         }
-
+        
     }
-
+    
     @Override
     public boolean isCellEditable(int row, int column) {
         return !(column == 1 || column == 4 || column == 5 || column == 7);
     }
-
+    
     @Override
     public void setValueAt(Object value, int row, int column) {
         try {
@@ -204,7 +204,7 @@ public class ReturnInTableModel extends AbstractTableModel {
                         }
                     }
                     break;
-
+                
                 case 1://Description
                     if (value != null) {
                         record.setStock((Stock) value);
@@ -218,21 +218,27 @@ public class ReturnInTableModel extends AbstractTableModel {
                     break;
                 case 3://Qty
                     if (value != null) {
-                        Float qty = NumberUtil.NZeroFloat(value);
-                        if (qty <= 0) {
-                            JOptionPane.showMessageDialog(Global.parentForm, "Qty must be positive value.",
-                                    "Minus or zero qty.", JOptionPane.ERROR_MESSAGE);
-
-                        } else {
-                            record.setQty(qty);
+                        if (NumberUtil.isNumber(value)) {
+                            Float qty = NumberUtil.NZeroFloat(value);
+                            if (qty <= 0) {
+                                JOptionPane.showMessageDialog(Global.parentForm, "Qty must be positive value.",
+                                        "Minus or zero qty.", JOptionPane.ERROR_MESSAGE);
+                                
+                            } else {
+                                record.setQty(qty);
+                            }
                         }
+                    } else {
+                        JOptionPane.showMessageDialog(Global.parentForm, "Invalid Qty.");
                     }
-
+                    
                     parent.setColumnSelectionInterval(3, 3);
                     break;
                 case 4://Std-w
                     if (NumberUtil.isNumber(value)) {
                         record.setStdWt(Util1.getFloat(value));
+                    } else {
+                        JOptionPane.showMessageDialog(Global.parentForm, "Invalid Weight");
                     }
                     break;
                 case 5://Unit
@@ -246,41 +252,45 @@ public class ReturnInTableModel extends AbstractTableModel {
                             parent.setColumnSelectionInterval(5, 5);
                         }
                     }
-
+                    
                     break;
                 case 6://Price
                     if (value != null) {
-                        Float price = Util1.getFloat(value);
-                        if (price <= 0) {
-                            JOptionPane.showMessageDialog(Global.parentForm, "Price must be positive value.",
-                                    "Minus or zero qty.", JOptionPane.ERROR_MESSAGE);
-                            parent.requestFocusInWindow();
-                            parent.setColumnSelectionInterval(column, column);
-
-                        } else {
-                            record.setPrice(price);
-                            parent.setColumnSelectionInterval(column, column);
+                        if (NumberUtil.isNumber(value)) {
+                            Float price = Util1.getFloat(value);
+                            if (price <= 0) {
+                                JOptionPane.showMessageDialog(Global.parentForm, "Price must be positive value.",
+                                        "Minus or zero qty.", JOptionPane.ERROR_MESSAGE);
+                                parent.requestFocusInWindow();
+                                parent.setColumnSelectionInterval(column, column);
+                                
+                            } else {
+                                record.setPrice(price);
+                                parent.setColumnSelectionInterval(column, column);
+                            }
                         }
+                    } else {
+                        JOptionPane.showMessageDialog(Global.parentForm, "Invalid Price.");
                     }
-
+                    
                     break;
             }
             calAmt(record);
             fireTableRowsUpdated(row, row);
             parent.requestFocusInWindow();
             observer.selected("TOTAL-AMT", "TOTAL-AMT");
-
+            
         } catch (HeadlessException ex) {
             LOGGER.error("setValueAt : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
-
+            
         }
-
+        
     }
-
+    
     public List<RetInHisDetail> getCurrentRow() {
         return this.listRetInDtail;
     }
-
+    
     private void calAmt(RetInHisDetail rd) {
         if (rd.getStock() != null) {
             float amt;
@@ -295,11 +305,11 @@ public class ReturnInTableModel extends AbstractTableModel {
             rd.setAmount(amt);
         }
     }
-
+    
     public List<RetInHisDetail> getRetInDetailHis() {
         return this.listRetInDtail;
     }
-
+    
     private Float getSmallestWeight(Float weight, String fromUnit, String toUnit, String pattern) {
         float sWt = 0.0f;
         if (!fromUnit.equals(toUnit)) {
@@ -322,7 +332,7 @@ public class ReturnInTableModel extends AbstractTableModel {
         }
         return sWt;
     }
-
+    
     public void addNewRow() {
         if (listRetInDtail != null) {
             if (hasEmptyRow()) {
@@ -333,7 +343,7 @@ public class ReturnInTableModel extends AbstractTableModel {
             }
         }
     }
-
+    
     private boolean hasEmptyRow() {
         boolean status = true;
         if (listRetInDtail.size() > 1) {
@@ -344,12 +354,12 @@ public class ReturnInTableModel extends AbstractTableModel {
         }
         return status;
     }
-
+    
     public void clearRetInTable() {
         this.listRetInDtail.clear();
         addNewRow();
     }
-
+    
     private Float calPrice(RetInHisDetail pd, String toUnit) {
         Stock stock = pd.getStock();
         float purAmt = 0.0f;
@@ -359,7 +369,7 @@ public class ReturnInTableModel extends AbstractTableModel {
         float stdWt = stock.getSaleWeight();
         String fromUnit = stock.getSaleUnit().getItemUnitCode();
         String pattern = stock.getPattern().getPatternCode();
-
+        
         if (!fromUnit.equals(toUnit)) {
             RelationKey key = new RelationKey(fromUnit, toUnit, pattern);
             UnitRelation unitRelation = relationService.findByKey(key);
@@ -383,15 +393,15 @@ public class ReturnInTableModel extends AbstractTableModel {
         }
         return purAmt;
     }
-
+    
     public void setRetInDetailList(List<RetInHisDetail> listDetail) {
         this.listRetInDtail = listDetail;
         addNewRow();
         fireTableCellUpdated(listDetail.size() - 1, listDetail.size() - 1);
-
+        
         fireTableDataChanged();
     }
-
+    
     public void delete(int row) {
         if (listRetInDtail == null) {
             return;
@@ -399,9 +409,9 @@ public class ReturnInTableModel extends AbstractTableModel {
         if (listRetInDtail.isEmpty()) {
             return;
         }
-
+        
         RetInHisDetail record = listRetInDtail.get(row);
-
+        
         if (record != null) {
             if (record.getRetInKey() != null) {
                 delList.add(record.getRetInKey().getRetInDetailId());
@@ -412,13 +422,13 @@ public class ReturnInTableModel extends AbstractTableModel {
 //                }
             }
         }
-
+        
         listRetInDtail.remove(row);
-
+        
         addNewRow();
         fireTableRowsDeleted(row, row);
     }
-
+    
     public String getDeleteListStr() {
         String deletedListStr;
         if (deletedList == null || deletedList.isEmpty()) {
@@ -428,11 +438,11 @@ public class ReturnInTableModel extends AbstractTableModel {
         }
         return deletedListStr;
     }
-
+    
     public List<String> getDelList() {
         return delList;
     }
-
+    
     public List<RetInHisDetail> getListRetInDetail() {
         List<RetInHisDetail> listRetInDetailhis = new ArrayList();
         listRetInDtail.stream().filter(pdh2 -> (pdh2.getStock() != null)).filter(pdh2 -> (pdh2.getStock().getStockCode() != null)).forEachOrdered(pdh2 -> {
@@ -440,7 +450,7 @@ public class ReturnInTableModel extends AbstractTableModel {
         });
         return listRetInDetailhis;
     }
-
+    
     public boolean isValidEntry() {
         boolean status = true;
         for (RetInHisDetail sdh2 : listRetInDtail) {
@@ -450,7 +460,7 @@ public class ReturnInTableModel extends AbstractTableModel {
                     JOptionPane.showMessageDialog(Global.parentForm, "Could not saved because Return In amount can't not be zero");
                 }
             }
-
+            
         }
         return status;
     }

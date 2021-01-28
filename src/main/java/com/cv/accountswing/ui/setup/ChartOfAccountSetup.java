@@ -179,6 +179,7 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
             chartOfAccount.setMacId(Global.machineId);
             ChartOfAccount coaSave = coaServcie.save(chartOfAccount);
             if (coaSave != null) {
+                Global.listCOA.add(coaSave);
                 JOptionPane.showMessageDialog(Global.parentForm, "Saved");
                 if (lblStatus.getText().equals("EDIT")) {
                     selectedNode.setUserObject(coaSave);
@@ -253,8 +254,8 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
         txtUsrCode.setText(chartOfAccount.getCoaCodeUsr());
         chkActive.setSelected(Util1.getBoolean(chartOfAccount.isActive()));
         lblStatus.setText("EDIT");
-        if (chartOfAccount.getCoaLevel()!= null) {
-            if (chartOfAccount.getCoaLevel()== 3) {
+        if (chartOfAccount.getCoaLevel() != null) {
+            if (chartOfAccount.getCoaLevel() == 3) {
                 btnCreate.setEnabled(true);
                 Menu menu = hmMenu.get(chartOfAccount.getCode());
                 cboMenu.setSelectedItem(menu == null ? null : menu);

@@ -83,11 +83,13 @@ public class AllCashTableModel extends AbstractTableModel {
 
     @Override
     public boolean isCellEditable(int row, int column) {
-        /*if (column == 6) {
-        if (Global.sysProperties.get("system.multi.currency.flag").equals("0")) {
-        return false;
+        VGl vgl = listVGl.get(row);
+        Integer splidId = vgl.getSplitId();
+        if (splidId != null) {
+            if (splidId == 2 || splidId == 3 || splidId == 5 || splidId == 6) {
+                return false;
+            }
         }
-        }*/
         return column != 6;
     }
 
@@ -252,7 +254,7 @@ public class AllCashTableModel extends AbstractTableModel {
 
                     }
                 }
-                parent.setColumnSelectionInterval(6, 6);
+                parent.setColumnSelectionInterval(7, 7);
                 break;
             case 6:
                 if (value != null) {

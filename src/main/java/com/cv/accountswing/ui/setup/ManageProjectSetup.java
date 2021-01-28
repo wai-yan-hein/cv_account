@@ -139,7 +139,7 @@ public class ManageProjectSetup extends javax.swing.JPanel implements KeyListene
         tblCOA.getColumnModel().getColumn(0).setPreferredWidth(15);// Code
         tblCOA.getColumnModel().getColumn(1).setPreferredWidth(450);// Name
         tblCOA.getColumnModel().getColumn(2).setPreferredWidth(15);// Active    
-        tblCOA.getColumnModel().getColumn(0).setCellEditor(new COACellEditor());
+        tblCOA.getColumnModel().getColumn(0).setCellEditor(new COACellEditor(false));
         tblCOA.setDefaultRenderer(Boolean.class, new TableCellRender());
         tblCOA.setDefaultRenderer(Object.class, new TableCellRender());
 

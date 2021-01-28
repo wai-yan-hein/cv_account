@@ -186,7 +186,11 @@ public class SaleEntryTableModel extends AbstractTableModel {
             case 5://Std-Wt
                 return true;
             case 6://Unit
-                return true;
+                if (Util1.isNull(Global.sysProperties.get("system.sale.multiple.unit"), "0").equals("1")) {
+                    return true;
+                } else {
+                    return false;
+                }
             case 7://Price
                 return true;
             default:
@@ -305,9 +309,7 @@ public class SaleEntryTableModel extends AbstractTableModel {
                     if (NumberUtil.isNumber(value)) {
                         if (NumberUtil.isPositive(value)) {
                             record.setStdWeight(Util1.getFloat(value));
-                            String toUnit = record.getSaleUnit().getItemUnitCode();
-                            Float calAmount = calPrice(record, toUnit);
-                            record.setAmount(calAmount);
+                            calPrice(record);
                         } else {
                             showMessageBox("Input value must be positive");
                             parent.setColumnSelectionInterval(column, column);
@@ -320,12 +322,9 @@ public class SaleEntryTableModel extends AbstractTableModel {
 
                 case 6://Unit
                     if (value != null) {
-                        record.setSaleUnit((StockUnit) value);
-                        String toUnit = record.getSaleUnit().getItemUnitCode();
-                        Float calAmount = calPrice(record, toUnit);
-                        record.setAmount(calAmount);
-                    } else {
-                        record.setSaleUnit(null);
+                        if (value instanceof StockUnit) {
+                            record.setSaleUnit((StockUnit) value);
+                        }
                     }
                     parent.setColumnSelectionInterval(6, 6);
                     break;
@@ -333,7 +332,8 @@ public class SaleEntryTableModel extends AbstractTableModel {
                     if (NumberUtil.isNumber(value)) {
                         if (NumberUtil.isPositive(value)) {
                             record.setPrice(Util1.getFloat(value));
-                            parent.setColumnSelectionInterval(8, 8);
+                            parent.setColumnSelectionInterval(0, 0);
+                            parent.setRowSelectionInterval(row + 1, row + 1);
                         } else {
                             showMessageBox("Input value must be positive");
                             parent.setColumnSelectionInterval(column, column);
@@ -431,14 +431,14 @@ public class SaleEntryTableModel extends AbstractTableModel {
         }
     }
 
-    private Float calPrice(SaleHisDetail sdh, String toUnit) {
+    private void calPrice(SaleHisDetail sdh) {
         Stock stock = sdh.getStock();
         float saleAmount = 0.0f;
-        float stdSalePrice = sdh.getPrice();
-        float stdPrice = sdh.getPrice();
-        float userWt = sdh.getStdWeight();
+        float userPrice = Util1.getFloat(sdh.getPrice());
+        float userWt = Util1.getFloat(sdh.getStdWeight());
         float stdWt = stock.getSaleWeight();
         String fromUnit = stock.getSaleUnit().getItemUnitCode();
+        String toUnit = sdh.getSaleUnit().getItemUnitCode();
         String pattern = stock.getPattern().getPatternCode();
 
         if (!fromUnit.equals(toUnit)) {
@@ -447,22 +447,22 @@ public class SaleEntryTableModel extends AbstractTableModel {
             if (unitRelation != null) {
                 float factor = unitRelation.getFactor();
                 float convertWt = (userWt / factor); //unit change
-                saleAmount = (convertWt / stdWt) * stdPrice; // cal price
+                saleAmount = (convertWt / stdWt) * userPrice; // cal price
 
             } else {
                 key = new RelationKey(toUnit, fromUnit, pattern);
                 Float factor = Global.hmRelation.get(key);
                 if (factor != null) {
                     float convertWt = userWt * factor; // unit change
-                    saleAmount = (convertWt / stdWt) * stdSalePrice; // cal price
+                    saleAmount = (convertWt / stdWt) * userPrice; // cal price
                 } else {
                     JOptionPane.showMessageDialog(Global.parentForm, "Mapping units in Relation Setup.");
                 }
             }
         } else {
-            saleAmount = (userWt / stdWt) * stdSalePrice;
+            saleAmount = (userWt / stdWt) * userPrice;
         }
-        return saleAmount;
+        sdh.setAmount(saleAmount);
     }
 
     private Float getSmallestWeight(Float weight, String unit, String purUnit, String pattern) {

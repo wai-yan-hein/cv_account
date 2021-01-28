@@ -10,7 +10,9 @@ import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.entity.Region;
+import com.cv.accountswing.entity.Trader;
 import com.cv.accountswing.service.RegionService;
+import com.cv.accountswing.service.TraderService;
 import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.util.Util1;
 import java.awt.event.ActionListener;
@@ -56,8 +58,11 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
     private TaskExecutor taskExecutor;
     @Autowired
     private ApplicationMainFrame mainFrame;
+    @Autowired
+    private TraderService traderService;
     private LoadingObserver loadingObserver;
     private boolean isShown = false;
+    private Region region = new Region();
 
     public void setIsShown(boolean isShown) {
         this.isShown = isShown;
@@ -102,6 +107,7 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
     }
 
     private void initKeyListener() {
+        txtRegionCode.addKeyListener(this);
         txtRegionName.addKeyListener(this);
         btnClearR.addKeyListener(this);
         btnSaveR.addKeyListener(this);
@@ -137,9 +143,9 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
     }
 
     private void setRegion(Region region) {
-        txtRegionCode.setText(Util1.getString(region.getRegCode()));
+        txtRegionCode.setText(Util1.getString(region.getUserCode()));
         txtRegionName.setText(region.getRegionName());
-        txtRegionName.selectAll();
+        txtRegionCode.requestFocus();
         labelStatus.setText("EDIT");
     }
 
@@ -147,6 +153,7 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
         txtRegionCode.setText(null);
         txtRegionName.setText(null);
         labelStatus.setText("NEW");
+        region = new Region();
     }
 
     private void initPopup() {
@@ -165,7 +172,6 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
             if (isValidDelete()) {
                 treeModel.removeNodeFromParent(selectedNode);
                 treeModel.reload(selectedNode);
-
             }
         } catch (Exception e) {
             LOGGER.error("Delete Region :" + e.getMessage());
@@ -176,15 +182,17 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
     private boolean isValidDelete() {
         boolean status = false;
         Region reg = (Region) selectedNode.getUserObject();
+        String regCode = reg.getRegCode();
         int showConfirmDialog = JOptionPane.showConfirmDialog(Global.parentForm, "Are you sure to delete");
         if (showConfirmDialog == JOptionPane.OK_OPTION) {
             if (reg.getRegCode() != null) {
-                int delete = regionService.delete(reg.getRegCode().toString(), Global.compCode);
-                if (delete == 1) {
+                List<Trader> listTrader = traderService.search(regCode);
+                if (listTrader.isEmpty()) {
+                    regionService.delete(regCode, Global.compCode);
                     clear();
                     status = true;
                 } else {
-                    JOptionPane.showMessageDialog(Global.parentForm, "Can't delete.");
+                    JOptionPane.showMessageDialog(Global.parentForm, "Can't delete because this region is already used in trader.");
                     status = false;
                 }
             } else {
@@ -195,7 +203,7 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
     }
 
     private void newRegion() {
-        Region region = new Region();
+        region = new Region();
         region.setRegionName("New Region");
         child = new DefaultMutableTreeNode(region);
         selectedNode.add(child);
@@ -204,19 +212,16 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
     }
 
     private void saveRegion() {
-        Region reg = new Region();
-        reg.setRegCode(txtRegionCode.getText());
-        reg.setRegionName(txtRegionName.getText());
-        reg.setCompCode(Global.compCode);
-        reg.setMacId(Global.machineId);
-
-        if (isValidRegion(reg, Global.compCode)) {
-            Region region = regionService.save(reg);
+        region.setUserCode(txtRegionCode.getText());
+        region.setRegionName(txtRegionName.getText());
+        if (isValidRegion(region, Global.compCode)) {
+            Region region = regionService.save(this.region);
             if (region != null) {
                 JOptionPane.showMessageDialog(Global.parentForm, "Saved");
                 if (labelStatus.getText().equals("EDIT")) {
                     selectedNode.setUserObject(region);
                     treeModel.reload(selectedNode);
+                    Global.listRegion.add(region);
                     clear();
 
                 }
@@ -232,21 +237,14 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
             status = false;
             JOptionPane.showMessageDialog(Global.parentForm, "Region can't be blank.");
         } else {
-            if (region.getRegCode().isEmpty()) {
-                //region.setDeptCode(getDeptCode(compCode));
+            if (region.getRegCode() == null) {
+                region.setCompCode(Global.compCode);
+                region.setMacId(Global.machineId);
                 region.setCreatedBy(Global.loginUser);
                 region.setCreatedDate(Util1.getTodayDate());
             } else {
-                List<Region> listDept = regionService.search(region.getRegCode(), "-", compCode.toString(), "-");
-                if (listDept != null) {
-                    if (listDept.size() > 0) {
-                        status = false;
-                        JOptionPane.showMessageDialog(Global.parentForm, "Duplicate reg code.");
-                    } else {
-                    }
-                }
+                region.setUpdatedBy(Global.loginUser);
             }
-            region.setUpdatedBy(Global.loginUser);
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) selectedNode.getParent();
             Object userObject = node.getUserObject();
             if (userObject.toString().equals(parentRootName)) {
@@ -295,8 +293,14 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
         jLabel1.setFont(Global.lableFont);
         jLabel1.setText("Code");
 
-        txtRegionCode.setEditable(false);
         txtRegionCode.setFont(Global.textFont);
+        txtRegionCode.setEnabled(false);
+        txtRegionCode.setName("txtRegionCode"); // NOI18N
+        txtRegionCode.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtRegionCodeFocusGained(evt);
+            }
+        });
 
         jLabel2.setFont(Global.lableFont);
         jLabel2.setText("Region");
@@ -444,6 +448,11 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
         txtRegionName.selectAll();
     }//GEN-LAST:event_txtRegionNameFocusGained
 
+    private void txtRegionCodeFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtRegionCodeFocusGained
+        // TODO add your handling code here:
+        txtRegionCode.selectAll();
+    }//GEN-LAST:event_txtRegionCodeFocusGained
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClearR;
@@ -464,7 +473,7 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
         selectedNode = (DefaultMutableTreeNode) treeRegion.getLastSelectedPathComponent();
         if (selectedNode != null) {
             if (!selectedNode.getUserObject().toString().equals(parentRootName)) {
-                Region region = (Region) selectedNode.getUserObject();
+                region = (Region) selectedNode.getUserObject();
                 setRegion(region);
                 setEnableControl(true);
             } else {
@@ -520,6 +529,12 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
             ctrlName = ((JButton) sourceObj).getName();
         }
         switch (ctrlName) {
+            case "txtRegionCode":
+                if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_DOWN) {
+                    txtRegionName.requestFocus();
+                }
+                tabToTree(e);
+                break;
             case "txtRegionName":
                 if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_DOWN) {
                     btnSaveR.requestFocus();
@@ -577,6 +592,7 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
     }
 
     private void setEnableControl(boolean status) {
+        txtRegionCode.setEnabled(status);
         txtRegionName.setEnabled(status);
         btnSaveR.setEnabled(status);
         btnClearR.setEnabled(status);

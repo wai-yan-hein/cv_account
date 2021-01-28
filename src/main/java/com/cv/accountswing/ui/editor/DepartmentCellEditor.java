@@ -30,6 +30,7 @@ public class DepartmentCellEditor extends AbstractCellEditor implements TableCel
     private static final Logger LOGGER = LoggerFactory.getLogger(DepartmentCellEditor.class);
     private JComponent component = null;
     private DepartmentAutoCompleter completer;
+    private boolean filter;
     private final FocusAdapter fa = new FocusAdapter() {
         @Override
         public void focusLost(FocusEvent e) {
@@ -44,8 +45,8 @@ public class DepartmentCellEditor extends AbstractCellEditor implements TableCel
     };
 
     //private List<Medicine> listDepartment = new ArrayList();
-    public DepartmentCellEditor() {
-
+    public DepartmentCellEditor(boolean filter) {
+        this.filter = filter;
     }
 
     @Override
@@ -85,7 +86,7 @@ public class DepartmentCellEditor extends AbstractCellEditor implements TableCel
         if (value != null) {
             jtf.setText(value.toString());
         }
-        completer = new DepartmentAutoCompleter(jtf, Global.listDepartment, this);
+        completer = new DepartmentAutoCompleter(jtf, Global.listDepartment, this, filter);
 
         return component;
     }

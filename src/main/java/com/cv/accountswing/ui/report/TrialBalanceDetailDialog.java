@@ -34,10 +34,10 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class TrialBalanceDetailDialog extends javax.swing.JDialog implements SelectionObserver {
-    
+
     private static final Logger LOGGER = LoggerFactory.getLogger(TrialBalanceDetailDialog.class);
     private final ImageIcon editIcon = new ImageIcon(getClass().getResource("/images/edit_property.png"));
-    
+
     @Autowired
     private CrAmtTableModel crAmtTableModel;
     @Autowired
@@ -53,32 +53,31 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Sel
     private List<VGl> listVGl;
     private Double openingAmt = 0.0;
     private String targetId;
-    private boolean isShown = false;
-    
+
     public String getTargetId() {
         return targetId;
     }
-    
+
     public void setTargetId(String targetId) {
         this.targetId = targetId;
     }
-    
+
     public Double getOpeningAmt() {
         return openingAmt;
     }
-    
+
     public void setOpeningAmt(Double openingAmt) {
         this.openingAmt = openingAmt;
     }
-    
+
     public List<VGl> getListVGl() {
         return listVGl;
     }
-    
+
     public void setListVGl(List<VGl> listVGl) {
         this.listVGl = listVGl;
     }
-    
+
     public void setDesp(String desp) {
         this.desp = desp;
         lblName.setText(this.desp);
@@ -88,42 +87,43 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Sel
      * Creates new form TrialBalanceDetailDialog
      */
     public TrialBalanceDetailDialog() {
-        super(new JFrame(), true);
+        super(Global.parentForm, true);
         initComponents();
         initTableListener();
     }
-    
+
     private void initMain() {
         initTable();
-        
     }
-    
+
     private void initTableListener() {
         tblCr.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
+                    LOGGER.info("Edit Cash CR Open.");
                     VGl vGl = crAmtTableModel.getVGl(tblCr.convertRowIndexToModel(tblCr.getSelectedRow()));
                     vGl = vGlService.findById(vGl.getGlCode());
                     editCash(vGl, "CR");
                 }
             }
-            
+
         });
         tblDr.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
+                    LOGGER.info("Edit Cash DR Open.");
                     VGl vGl = drAmtTableModel.getVGl(tblDr.convertRowIndexToModel(tblDr.getSelectedRow()));
                     vGl = vGlService.findById(vGl.getGlCode());
                     editCash(vGl, "DR");
                 }
             }
-            
+
         });
-        
+
     }
-    
+
     private void editCash(VGl vgl, String type) {
         if (vgl.getTranSource() == null) {
             editCashDialog.setIconImage(editIcon.getImage());
@@ -145,7 +145,7 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Sel
             }
         }
     }
-    
+
     private void initTable() {
         tblCR();
         tblDR();
@@ -169,7 +169,7 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Sel
             txtClosing.setValue(closingAmt);
         }
     }
-    
+
     private void tblCR() {
         crAmtTableModel.clear();
         tblCr.setModel(crAmtTableModel);
@@ -186,9 +186,9 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Sel
         tblCr.setDefaultRenderer(Object.class, new TableCellRender());
         sorter = new TableRowSorter<>(tblCr.getModel());
         tblCr.setRowSorter(sorter);
-        
+
     }
-    
+
     private void tblDR() {
         drAmtTableModel.clear();
         tblDr.setModel(drAmtTableModel);
@@ -205,7 +205,7 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Sel
         tblDr.setDefaultRenderer(Object.class, new TableCellRender());
         sorter = new TableRowSorter<>(tblDr.getModel());
         tblDr.setRowSorter(sorter);
-        
+
     }
 
     /**
@@ -314,6 +314,8 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Sel
         jScrollPane2.setViewportView(tblCr);
 
         txtOpening.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        txtOpening.setDisabledTextColor(new java.awt.Color(0, 0, 0));
+        txtOpening.setEnabled(false);
         txtOpening.setFont(Global.amtFont);
         txtOpening.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -322,9 +324,13 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Sel
         });
 
         txtClosing.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        txtClosing.setDisabledTextColor(new java.awt.Color(0, 0, 0));
+        txtClosing.setEnabled(false);
         txtClosing.setFont(Global.amtFont);
 
         txtFDrAmt.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        txtFDrAmt.setDisabledTextColor(new java.awt.Color(0, 0, 0));
+        txtFDrAmt.setEnabled(false);
         txtFDrAmt.setFont(Global.amtFont);
         txtFDrAmt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -333,6 +339,8 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Sel
         });
 
         txtFCrAmt.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        txtFCrAmt.setDisabledTextColor(new java.awt.Color(0, 0, 0));
+        txtFCrAmt.setEnabled(false);
         txtFCrAmt.setFont(Global.amtFont);
 
         jLabel1.setFont(Global.lableFont);
@@ -417,9 +425,7 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Sel
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
-        if (!isShown) {
-            initMain();
-        }
+        initMain();
     }//GEN-LAST:event_formComponentShown
 
     private void formFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_formFocusLost
@@ -458,7 +464,7 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Sel
 
     @Override
     public void selected(Object source, Object selectObj) {
-        
+
         if (source.equals("SAVE-GL-DR")) {
             int selectRow = tblDr.convertRowIndexToModel(tblDr.getSelectedRow());
             VGl vgl = (VGl) selectObj;
@@ -476,7 +482,7 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Sel
             crAmtTableModel.setVGl(selectRow, vgl);
         }
     }
-    
+
     private VGl swapDrCr(VGl vgl) {
         float tmp;
         tmp = vgl.getDrAmt();

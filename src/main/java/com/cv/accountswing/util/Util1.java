@@ -659,7 +659,7 @@ public class Util1 {
     }
 
     public static String toFormatPattern(Double value) {
-        final String pattern = "#,##0.00;(#,##0.00)";
+        final String pattern = "#,##0.###;(#,##0.###)";
         DecimalFormat df = (DecimalFormat) DecimalFormat.getInstance();
         df.applyPattern(pattern);
         return df.format(value);

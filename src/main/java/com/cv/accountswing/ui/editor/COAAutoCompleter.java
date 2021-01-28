@@ -11,13 +11,13 @@ import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.ChartOfAccount;
 import com.cv.accountswing.ui.cash.common.COATableModel;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
-import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractCellEditor;
@@ -68,11 +68,15 @@ public class COAAutoCompleter implements KeyListener {
     }
 
     public COAAutoCompleter(JTextComponent comp, List<ChartOfAccount> list,
-            AbstractCellEditor editor) {
+            AbstractCellEditor editor, boolean filter) {
         this.textComp = comp;
         this.editor = editor;
         textComp.putClientProperty(AUTOCOMPLETER, this);
         textComp.setFont(Global.textFont);
+        if (filter) {
+            list = new ArrayList<>(list);
+            list.add(0, new ChartOfAccount("-", "All"));
+        }
         cOATableModel = new COATableModel(list);
         table.setModel(cOATableModel);
         table.getTableHeader().setFont(Global.lableFont);
@@ -208,7 +212,6 @@ public class COAAutoCompleter implements KeyListener {
     }
 
     public void showPopup() {
-
         if (popupOpen) {
             if (!popup.isVisible()) {
                 textComp.addKeyListener(this);
@@ -221,11 +224,10 @@ public class COAAutoCompleter implements KeyListener {
                     textComp.registerKeyboardAction(acceptAction, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
                             JComponent.WHEN_FOCUSED);
                     if (x == 0) {
-                        x = textComp.getWidth() - textComp.getWidth();
+                        x = textComp.getWidth();
                         y = textComp.getHeight();
                     }
                     popup.show(textComp, x, y);
-                    log.info("COA Popup Show.");
                     popupOpen = false;
 
                 } else {
@@ -354,9 +356,6 @@ public class COAAutoCompleter implements KeyListener {
 
             if ("N".equals("Y")) {
                 sorter.setRowFilter(RowFilter.regexFilter(filter));
-                if (table.getSelectedRow() >= 0) {
-                    table.setRowSelectionInterval(0, 0);
-                }
             } else {
                 sorter.setRowFilter(startsWithFilter);
             }
@@ -367,6 +366,7 @@ public class COAAutoCompleter implements KeyListener {
                     }
                 }
             } catch (Exception ex) {
+                log.error("COA Key Released.");
             }
         }
     }
@@ -375,11 +375,12 @@ public class COAAutoCompleter implements KeyListener {
         public boolean include(RowFilter.Entry<? extends Object, ? extends Object> entry) {
             String tmp1 = entry.getStringValue(0).toUpperCase();
             String tmp2 = entry.getStringValue(1).toUpperCase();
-            String tmp3 = entry.getStringValue(3).toUpperCase();
-            String tmp4 = entry.getStringValue(4).toUpperCase();
             String text = textComp.getText().toUpperCase();
-
-            return tmp1.startsWith(text) || tmp2.startsWith(text) || tmp3.startsWith(text) || tmp4.startsWith(text);
+            if (tmp1.startsWith(text) || tmp2.startsWith(text)) {
+                return true;
+            } else {
+                return false;
+            }
         }
     };
 }

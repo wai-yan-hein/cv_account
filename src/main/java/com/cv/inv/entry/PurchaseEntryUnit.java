@@ -146,7 +146,7 @@ public class PurchaseEntryUnit extends javax.swing.JPanel implements SelectionOb
         tblPurchase.getColumnModel().getColumn(8).setPreferredWidth(40);//pur price
         tblPurchase.getColumnModel().getColumn(9).setPreferredWidth(40);//amount
         tblPurchase.getColumnModel().getColumn(0).setCellEditor(new StockCellEditor());//code
-        tblPurchase.getColumnModel().getColumn(2).setCellEditor(new DepartmentCellEditor());
+        tblPurchase.getColumnModel().getColumn(2).setCellEditor(new DepartmentCellEditor(false));
         tblPurchase.getColumnModel().getColumn(3).setCellEditor(new LocationCellEditor());//loc
         tblPurchase.getColumnModel().getColumn(4).setCellEditor(new AutoClearEditor());//qty
         tblPurchase.getColumnModel().getColumn(5).setCellEditor(new AutoClearEditor());//std-wt

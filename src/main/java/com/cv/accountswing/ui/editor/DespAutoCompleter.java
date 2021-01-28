@@ -12,7 +12,6 @@ import com.cv.accountswing.entity.view.VDescription;
 import com.cv.accountswing.service.VDescriptionService;
 import com.cv.accountswing.ui.cash.common.DespTableModel;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
-import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;

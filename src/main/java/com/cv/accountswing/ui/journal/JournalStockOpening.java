@@ -141,7 +141,7 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
     private void initCombo() {
         DateAutoCompleter dateAutoCompleter = new DateAutoCompleter(txtDate, Global.listDateModel, null);
         dateAutoCompleter.setSelectionObserver(this);
-        DepartmentAutoCompleter departmentAutoCompleter = new DepartmentAutoCompleter(txtDepartment, Global.listDepartment, null);
+        DepartmentAutoCompleter departmentAutoCompleter = new DepartmentAutoCompleter(txtDepartment, Global.listDepartment, null, false);
         departmentAutoCompleter.setSelectionObserver(this);
         CurrencyAutoCompleter currencyAutoCompleter = new CurrencyAutoCompleter(txtCurrency, Global.listCurrency, null);
         currencyAutoCompleter.setSelectionObserver(this);

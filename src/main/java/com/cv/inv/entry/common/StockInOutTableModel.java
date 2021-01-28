@@ -20,11 +20,8 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import com.cv.inv.service.StockInOutDetailService;
 import javax.swing.JFormattedTextField;
-import javax.swing.JTextField;
 
 /**
  *
@@ -38,8 +35,6 @@ public class StockInOutTableModel extends AbstractTableModel {
         "In-Qty", "In-Weight", "In-Unit", "Out-Qty", "Out-Weight", "Out-Unit"};
     private JTable parent;
     private List<StockInOutDetail> listStock = new ArrayList();
-    @Autowired
-    private StockInOutDetailService stockInOutService;
 
     private JFormattedTextField inTotal;
     private JFormattedTextField outTotal;
@@ -164,18 +159,7 @@ public class StockInOutTableModel extends AbstractTableModel {
 
     @Override
     public boolean isCellEditable(int row, int column) {
-        switch (column) {
-            case 6:
-                return false;
-            case 7:
-                return false;
-            case 9:
-                return false;
-            case 10:
-                return false;
-            default:
-                return true;
-        }
+        return true;
     }
 
     @Override
@@ -194,10 +178,6 @@ public class StockInOutTableModel extends AbstractTableModel {
                         if (value instanceof Stock) {
                             Stock stock = (Stock) value;
                             stockInOut.setStock(stock);
-                            stockInOut.setInUnit(stock.getPurUnit());
-                            stockInOut.setInWeight(stock.getPurWeight());
-                            stockInOut.setOutWeight(stock.getPurWeight());
-                            stockInOut.setOutUnit(stock.getPurUnit());
                             stockInOut.setLocation(Global.defaultLocation);
                             setColumnSelection(4);
                         }
@@ -211,9 +191,9 @@ public class StockInOutTableModel extends AbstractTableModel {
                         break;
                     case 5:
                         stockInOut.setInQty(Util1.getFloat(value));
-                        stockInOut.setOutQty(0.0f);
-                        parent.setRowSelectionInterval(row + 1, row + 1);
-                        parent.setColumnSelectionInterval(0, 0);
+                        stockInOut.setOutQty(null);
+                        stockInOut.setOutWeight(null);
+                        stockInOut.setOutUnit(null);
                         break;
                     case 6:
                         stockInOut.setInWeight(Util1.getFloat(value));
@@ -226,8 +206,9 @@ public class StockInOutTableModel extends AbstractTableModel {
                         break;
                     case 8:
                         stockInOut.setOutQty(Util1.getFloat(value));
-                        stockInOut.setInQty(0.0f);
-                        parent.changeSelection(row + 1, 0, false, false);
+                        stockInOut.setInQty(null);
+                        stockInOut.setInWeight(null);
+                        stockInOut.setInUnit(null);
                         break;
                     case 9:
                         stockInOut.setOutWeight(Util1.getFloat(value));
@@ -240,6 +221,11 @@ public class StockInOutTableModel extends AbstractTableModel {
                 }
             }
             calStock(stockInOut);
+            fireTableRowsUpdated(row, row);
+            if (Util1.getFloat(stockInOut.getSmallInWeight()) > 0 || Util1.getFloat(stockInOut.getSmallInWeight()) > 0) {
+                parent.setRowSelectionInterval(row + 1, row + 1);
+                parent.setColumnSelectionInterval(0, 0);
+            }
             parent.requestFocus();
         } catch (HeadlessException e) {
             log.error("setValueAt :" + e.getMessage());
@@ -251,8 +237,20 @@ public class StockInOutTableModel extends AbstractTableModel {
         parent.requestFocus();
     }
 
-    private boolean isValidEntry(StockInOutDetail sio) {
+    public boolean isValidEntry() {
         boolean status = true;
+        for (StockInOutDetail od : listStock) {
+            if (od.getStock().getStockCode() != null) {
+                if (Util1.getFloat(od.getSmallInWeight()) < 0 && Util1.getFloat(od.getSmallOutWeight()) < 0) {
+                    status = false;
+                    JOptionPane.showMessageDialog(Global.parentForm, "Could no saved. Need Unit Relation.");
+                }
+                if (od.getLocation() == null) {
+                    status = false;
+                    JOptionPane.showMessageDialog(Global.parentForm, "Invalid Location.");
+                }
+            }
+        }
         return status;
 
     }
@@ -263,14 +261,23 @@ public class StockInOutTableModel extends AbstractTableModel {
             float inQty = Util1.getFloat(od.getInQty());
             float outWt = Util1.getFloat(od.getOutWeight());
             float outQty = Util1.getFloat(od.getOutQty());
-            String inUnit = od.getInUnit().getItemUnitCode();
-            String outUnit = od.getOutUnit().getItemUnitCode();
             StockUnit purUnit = od.getStock().getPurUnit();
             String pattern = od.getStock().getPattern().getPatternCode();
-            od.setSmallInWeight(getSmallestWeight(inWt, inUnit, purUnit.getItemUnitCode(), pattern) * inQty);
-            od.setSmallOutWeight(getSmallestWeight(outWt, outUnit, purUnit.getItemUnitCode(), pattern) * outQty);
-            od.setSmallInUnit(purUnit);
-            od.setSmallOutUnit(purUnit);
+            if (od.getInUnit() != null) {
+                String inUnit = od.getInUnit().getItemUnitCode();
+                od.setSmallInWeight(getSmallestWeight(inWt, inUnit, purUnit.getItemUnitCode(), pattern) * inQty);
+                od.setSmallInUnit(purUnit);
+                od.setSmallOutWeight(0.0f);
+                od.setSmallOutUnit(purUnit);
+            }
+            if (od.getOutUnit() != null) {
+                String outUnit = od.getOutUnit().getItemUnitCode();
+                od.setSmallOutWeight(getSmallestWeight(outWt, outUnit, purUnit.getItemUnitCode(), pattern) * outQty);
+                od.setSmallOutUnit(purUnit);
+                od.setSmallInWeight(0.0f);
+                od.setSmallInUnit(purUnit);
+
+            }
             calTotal();
         }
     }
@@ -279,8 +286,8 @@ public class StockInOutTableModel extends AbstractTableModel {
         float inTtl = 0.0f;
         float outTtl = 0.0f;
         for (StockInOutDetail od : listStock) {
-            inTtl += Util1.getFloat(od.getSmallInWeight());
-            outTtl += Util1.getFloat(od.getSmallOutWeight());
+            inTtl += Util1.getFloat(od.getInQty());
+            outTtl += Util1.getFloat(od.getOutQty());
         }
         this.inTotal.setValue(inTtl);
         this.outTotal.setValue(outTtl);
@@ -327,6 +334,7 @@ public class StockInOutTableModel extends AbstractTableModel {
 
     public void setListStock(List<StockInOutDetail> listStock) {
         this.listStock = listStock;
+        calTotal();
         fireTableDataChanged();
     }
 

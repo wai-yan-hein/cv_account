@@ -110,10 +110,10 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
         tblJournal.getTableHeader().setForeground(ColorUtil.foreground);
         tblJournal.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        tblJournal.getColumnModel().getColumn(0).setCellEditor(new DepartmentCellEditor());
+        tblJournal.getColumnModel().getColumn(0).setCellEditor(new DepartmentCellEditor(false));
         tblJournal.getColumnModel().getColumn(1).setCellEditor(new AutoClearEditor());
         tblJournal.getColumnModel().getColumn(2).setCellEditor(new SupplierCellEditor());
-        tblJournal.getColumnModel().getColumn(3).setCellEditor(new COACellEditor());
+        tblJournal.getColumnModel().getColumn(3).setCellEditor(new COACellEditor(false));
         tblJournal.getColumnModel().getColumn(4).setCellEditor(new AutoClearEditor());
         tblJournal.getColumnModel().getColumn(5).setCellEditor(new AutoClearEditor());
         tblJournal.getColumnModel().getColumn(0).setPreferredWidth(10);//dep

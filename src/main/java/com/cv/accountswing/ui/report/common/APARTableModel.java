@@ -111,6 +111,16 @@ public class APARTableModel extends AbstractTableModel {
 
     public void setListAPAR(List<VApar> listAPAR) {
         this.listAPAR = listAPAR;
+        for (VApar apar : this.listAPAR) {
+            if (Util1.getDouble(apar.getDrAmt()) >= Util1.getDouble(apar.getCrAmt())) {
+                apar.setDrAmt(Util1.getDouble(apar.getDrAmt() - apar.getCrAmt()));
+                apar.setCrAmt(0.0);
+            }
+            if (Util1.getDouble(apar.getCrAmt()) > Util1.getDouble(apar.getDrAmt())) {
+                apar.setCrAmt(Util1.getDouble(apar.getCrAmt()) - Util1.getDouble(apar.getDrAmt()));
+                apar.setDrAmt(0.0);
+            }
+        }
         fireTableDataChanged();
     }
 

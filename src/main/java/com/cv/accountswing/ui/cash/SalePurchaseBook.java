@@ -172,11 +172,11 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
         tblCash.getColumnModel().getColumn(6).setPreferredWidth(1);// Curr      
         tblCash.getColumnModel().getColumn(7).setPreferredWidth(70);// Dr-Amt   
         tblCash.getColumnModel().getColumn(0).setCellEditor(new AutoClearEditor());
-        tblCash.getColumnModel().getColumn(1).setCellEditor(new DepartmentCellEditor());
+        tblCash.getColumnModel().getColumn(1).setCellEditor(new DepartmentCellEditor(true));
         tblCash.getColumnModel().getColumn(2).setCellEditor(new AutoClearEditor());
         tblCash.getColumnModel().getColumn(3).setCellEditor(new AutoClearEditor());
         tblCash.getColumnModel().getColumn(4).setCellEditor(new SupplierCellEditor());
-        tblCash.getColumnModel().getColumn(5).setCellEditor(new COACellEditor());
+        tblCash.getColumnModel().getColumn(5).setCellEditor(new COACellEditor(false));
         tblCash.getColumnModel().getColumn(6).setCellEditor(new CurrencyEditor());
         tblCash.getColumnModel().getColumn(7).setCellEditor(new AutoClearEditor());
 

@@ -7,6 +7,7 @@ package com.cv.inv.entry.common;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.SelectionObserver;
+import com.cv.accountswing.util.NumberUtil;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.RelationKey;
 import com.cv.inv.entity.RetOutHisDetail;
@@ -222,21 +223,26 @@ public class ReturnOutTableModel extends AbstractTableModel {
                     break;
                 case 3://Qty
                     if (value != null) {
-                        float qty = Util1.getFloat(value);
-                        if (qty <= 0) {
-                            JOptionPane.showMessageDialog(Global.parentForm, "Qty must be positive value.",
-                                    "Minus or zero qty.", JOptionPane.ERROR_MESSAGE);
-
+                        if (NumberUtil.isNumber(value)) {
+                            float qty = Util1.getFloat(value);
+                            if (qty <= 0) {
+                                JOptionPane.showMessageDialog(Global.parentForm, "Qty must be positive value.",
+                                        "Minus or zero qty.", JOptionPane.ERROR_MESSAGE);
+                            } else {
+                                record.setQty(qty);
+                            }
                         } else {
-                            record.setQty(qty);
+                            JOptionPane.showMessageDialog(Global.parentForm, "Invalid Qty.");
                         }
                     }
                     parent.setColumnSelectionInterval(6, 6);
                     break;
                 case 4://Std-w
-                    if (Util1.isNumber(value.toString())) {
+                    if (NumberUtil.isNumber(value)) {
                         record.setStdWt(Util1.getFloat(value));
                         parent.setColumnSelectionInterval(4, 4);
+                    } else {
+                        JOptionPane.showMessageDialog(Global.parentForm, "Invalid Weight.");
                     }
                     break;
                 case 5://Unit
@@ -249,21 +255,23 @@ public class ReturnOutTableModel extends AbstractTableModel {
                     }
                     break;
                 case 6://Price
-
                     if (value != null) {
-                        float price = Util1.getFloat(value);
-                        if (price <= 0) {
-                            JOptionPane.showMessageDialog(Global.parentForm, "Price must be positive value.",
-                                    "Minus or zero qty.", JOptionPane.ERROR_MESSAGE);
-                            parent.requestFocusInWindow();
-                            parent.setColumnSelectionInterval(6, 6);
+                        if (NumberUtil.isNumber(value)) {
+                            float price = Util1.getFloat(value);
+                            if (price <= 0) {
+                                JOptionPane.showMessageDialog(Global.parentForm, "Price must be positive value.",
+                                        "Minus or zero qty.", JOptionPane.ERROR_MESSAGE);
+                                parent.requestFocusInWindow();
+                                parent.setColumnSelectionInterval(6, 6);
 
-                        } else {
-                            record.setPrice(price);
-                            parent.setColumnSelectionInterval(6, 6);
+                            } else {
+                                record.setPrice(price);
+                                parent.setColumnSelectionInterval(6, 6);
+                            }
                         }
+                    } else {
+                        JOptionPane.showMessageDialog(Global.parentForm, "Invalid Price");
                     }
-
                     break;
                 case 7://Amount
                     if (value != null) {

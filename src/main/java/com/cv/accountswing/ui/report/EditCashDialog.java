@@ -99,9 +99,9 @@ public class EditCashDialog extends javax.swing.JDialog {
     }
 
     private void initCombo() {
-        departmentAutoCompleter = new DepartmentAutoCompleter(txtDep, Global.listDepartment, null);
+        departmentAutoCompleter = new DepartmentAutoCompleter(txtDep, Global.listDepartment, null, false);
         traderAutoCompleter = new SupplierAutoCompleter(txtPerson, Global.listSupplier, null);
-        cOAAutoCompleter = new COAAutoCompleter(txtAccount, Global.listCOA, null);
+        cOAAutoCompleter = new COAAutoCompleter(txtAccount, Global.listCOA, null, false);
         currencyAutoCompleter = new CurrencyAutoCompleter(txtCurrency, Global.listCurrency, null);
     }
 

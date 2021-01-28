@@ -235,7 +235,7 @@ public class SaleEntry1 extends javax.swing.JPanel implements SelectionObserver,
         vouCompleter.setSelectionObserver(this);
         saleManCompleter = new SaleManAutoCompleter(txtSaleman, Global.listSaleMan, null);
         saleManCompleter.setSelectionObserver(this);
-        departmentAutoCompleter = new DepartmentAutoCompleter(txtDept, Global.listDepartment, null);
+        departmentAutoCompleter = new DepartmentAutoCompleter(txtDept, Global.listDepartment, null, false);
         departmentAutoCompleter.setSelectionObserver(this);
     }
 

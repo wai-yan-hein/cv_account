@@ -69,6 +69,13 @@ public class SalePurchaseTableModel extends AbstractTableModel {
 
     @Override
     public boolean isCellEditable(int row, int column) {
+        VGl vgl = listVGl.get(row);
+        Integer splidId = vgl.getSplitId();
+        if (splidId != null) {
+            if (splidId == 2 || splidId == 3 || splidId == 5 || splidId == 6) {
+                return false;
+            }
+        }
         return true;
     }
 

@@ -247,7 +247,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                 loadingObserver.load(this.getName(), "Stop");
             }
         });
-        uploadToFirebase();
+        //uploadToFirebase();
 
     }
 
@@ -306,24 +306,39 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
             if (!cvId.equals("-")) {
                 opBalanceGL = coaOpDService.getOpBalanceByTrader(getTarget(),
                         Global.finicialPeriodFrom,
-                        stDate, 3, "MMK",
+                        Util1.toDateStrMYSQL(enDate, "dd/MM/yyyy"), 3, "MMK",
                         Global.loginUser.getAppUserCode(),
-                        Util1.isNull(dept, "-"), cvId, Global.machineId.toString());
+                        Util1.isNull(dept, "-"), cvId, Global.machineId.toString(), Global.compCode);
+                if (!opBalanceGL.isEmpty()) {
+                    double opening;
+                    TmpOpeningClosing tmpOC = opBalanceGL.get(0);
+                    if (Util1.getDouble(tmpOC.getCrAmt()) > Util1.getDouble(Util1.getDouble(tmpOC.getDrAmt()))) {
+                        opening = tmpOC.getCrAmt() * -1;
+                    } else {
+                        opening = tmpOC.getDrAmt();
+                    }
+                    trialBalanceDetailDialog.setOpeningAmt(opening);
+                    LOGGER.info("OPENING :" + tmpOC.getOpening());
+                    //txtFOpening.setValue(tmpOC.getOpening());
+                } else {
+                    trialBalanceDetailDialog.setOpeningAmt(0.0);
+                }
             } else {
                 opBalanceGL = coaOpDService.getOpBalanceGL1(getTarget(),
                         Global.finicialPeriodFrom,
                         stDate, 3, "MMK",
                         Global.loginUser.getAppUserCode(),
                         Util1.isNull(dept, "-"), Global.machineId.toString());
+                if (!opBalanceGL.isEmpty()) {
+                    TmpOpeningClosing tmpOC = opBalanceGL.get(0);
+                    trialBalanceDetailDialog.setOpeningAmt(tmpOC.getOpening());
+                    LOGGER.info("OPENING :" + tmpOC.getOpening());
+                    //txtFOpening.setValue(tmpOC.getOpening());
+                } else {
+                    trialBalanceDetailDialog.setOpeningAmt(0.0);
+                }
             }
-            if (!opBalanceGL.isEmpty()) {
-                TmpOpeningClosing tmpOC = opBalanceGL.get(0);
-                trialBalanceDetailDialog.setOpeningAmt(tmpOC.getOpening());
-                LOGGER.info("OPENING :" + tmpOC.getOpening());
-                //txtFOpening.setValue(tmpOC.getOpening());
-            } else {
-                trialBalanceDetailDialog.setOpeningAmt(0.0);
-            }
+
         } catch (Exception ex) {
             LOGGER.error("Calculation Opening :" + ex.getMessage());
         }
@@ -424,7 +439,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         traderAutoCompleter.setSelectionObserver(this);
 
         departmentAutoCompleter = new DepartmentAutoCompleter(txtDep,
-                Global.listDepartment, null);
+                Global.listDepartment, null, true);
         departmentAutoCompleter.setSelectionObserver(this);
         CurrencyAutoCompleter currencyAutoCompleter = new CurrencyAutoCompleter(txtCurrency,
                 Global.listCurrency, null);
@@ -528,6 +543,8 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
             }
         });
 
+        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder(null, java.awt.Color.lightGray));
+
         jLabel1.setFont(Global.lableFont);
         jLabel1.setText("Date");
 
@@ -588,19 +605,19 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                 .addContainerGap()
                 .addComponent(jLabel1)
                 .addGap(18, 18, 18)
-                .addComponent(txtDate, javax.swing.GroupLayout.DEFAULT_SIZE, 131, Short.MAX_VALUE)
+                .addComponent(txtDate, javax.swing.GroupLayout.DEFAULT_SIZE, 130, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel2)
                 .addGap(18, 18, 18)
-                .addComponent(txtDep, javax.swing.GroupLayout.DEFAULT_SIZE, 131, Short.MAX_VALUE)
+                .addComponent(txtDep, javax.swing.GroupLayout.DEFAULT_SIZE, 130, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel3)
                 .addGap(18, 18, 18)
-                .addComponent(txtPerson, javax.swing.GroupLayout.DEFAULT_SIZE, 131, Short.MAX_VALUE)
+                .addComponent(txtPerson, javax.swing.GroupLayout.DEFAULT_SIZE, 130, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel4)
                 .addGap(18, 18, 18)
-                .addComponent(txtCurrency, javax.swing.GroupLayout.DEFAULT_SIZE, 134, Short.MAX_VALUE)
+                .addComponent(txtCurrency, javax.swing.GroupLayout.DEFAULT_SIZE, 133, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -633,6 +650,8 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         ));
         tblAPAR.setRowHeight(Global.tblRowHeight);
         jScrollPane1.setViewportView(tblAPAR);
+
+        jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder(null, java.awt.Color.lightGray));
 
         txtFTotalDrAmt.setEditable(false);
         txtFTotalDrAmt.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
@@ -708,7 +727,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 387, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 379, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())

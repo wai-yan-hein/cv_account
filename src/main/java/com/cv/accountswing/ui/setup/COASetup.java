@@ -22,6 +22,7 @@ import java.awt.event.KeyListener;
 import java.util.List;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
+import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
@@ -88,6 +89,7 @@ public class COASetup extends javax.swing.JPanel implements KeyListener, PanelCo
                 }
             }
         });
+        tblCoaHead.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblCoaHead.getColumnModel().getColumn(0).setPreferredWidth(20);// Code
         tblCoaHead.getColumnModel().getColumn(1).setPreferredWidth(400);// Name
         tblCoaHead.getColumnModel().getColumn(0).setCellEditor(new AutoClearEditor());
@@ -107,6 +109,8 @@ public class COASetup extends javax.swing.JPanel implements KeyListener, PanelCo
     private void tblCOAGroup() {
         tblCoaGroup.setCellSelectionEnabled(true);
         tblCoaGroup.getTableHeader().setFont(Global.tblHeaderFont);
+        tblCoaGroup.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblCoaGroup.getTableHeader().setForeground(ColorUtil.foreground);
         tblCoaGroup.setModel(coaGroupTableModel);
         tblCoaGroup.getTableHeader().setFont(Global.textFont);
         coaGroupTableModel.setParent(tblCoaGroup);
@@ -124,6 +128,7 @@ public class COASetup extends javax.swing.JPanel implements KeyListener, PanelCo
         tblCoaGroup.getColumnModel().getColumn(3).setPreferredWidth(10);// Active
         tblCoaGroup.getColumnModel().getColumn(1).setCellEditor(new AutoClearEditor());
         tblCoaGroup.getColumnModel().getColumn(2).setCellEditor(new AutoClearEditor());
+        tblCoaGroup.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         tblCoaGroup.setDefaultRenderer(Boolean.class, new TableCellRender());
         tblCoaGroup.setDefaultRenderer(Object.class, new TableCellRender());
@@ -137,6 +142,8 @@ public class COASetup extends javax.swing.JPanel implements KeyListener, PanelCo
         tblCOAGroupChild.getTableHeader().setFont(Global.tblHeaderFont);
         tblCOAGroupChild.setModel(cOAGroupChildTableModel);
         tblCOAGroupChild.getTableHeader().setFont(Global.textFont);
+        tblCOAGroupChild.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblCOAGroupChild.getTableHeader().setForeground(ColorUtil.foreground);
         cOAGroupChildTableModel.setParent(tblCOAGroupChild);
         tblCOAGroupChild.getColumnModel().getColumn(0).setPreferredWidth(10);// Sys Code
         tblCOAGroupChild.getColumnModel().getColumn(1).setPreferredWidth(20);// Usr Code
@@ -145,7 +152,7 @@ public class COASetup extends javax.swing.JPanel implements KeyListener, PanelCo
         tblCOAGroupChild.getColumnModel().getColumn(0).setCellEditor(new AutoClearEditor());
         tblCOAGroupChild.getColumnModel().getColumn(1).setCellEditor(new AutoClearEditor());
         tblCOAGroupChild.getColumnModel().getColumn(2).setCellEditor(new AutoClearEditor());
-
+        tblCOAGroupChild.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblCOAGroupChild.setDefaultRenderer(Boolean.class, new TableCellRender());
         tblCOAGroupChild.setDefaultRenderer(Object.class, new TableCellRender());
         tblCOAGroupChild.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
@@ -154,6 +161,7 @@ public class COASetup extends javax.swing.JPanel implements KeyListener, PanelCo
     }
 
     private void getCOAGroup(int row) {
+        clear();
         ChartOfAccount c = coaHeadTableModel.getChartOfAccount(row);
         if (c.getCode() != null) {
             List<ChartOfAccount> listCoaGroup = coaService.search("-", "-", Global.compCode, "-", c.getCode(), "-", "-");
@@ -179,6 +187,13 @@ public class COASetup extends javax.swing.JPanel implements KeyListener, PanelCo
             tblCOAGroupChild.setRowSelectionInterval(listCoaChild.size() - 1, listCoaChild.size() - 1);
             tblCOAGroupChild.requestFocus();
         }
+    }
+
+    private void clear() {
+        coaGroupTableModel.clear();
+        cOAGroupChildTableModel.clear();
+        lblCoaChild.setText("...");
+        lblCoaGroup.setText("...");
     }
 
     /**
@@ -280,8 +295,10 @@ public class COASetup extends javax.swing.JPanel implements KeyListener, PanelCo
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 213, Short.MAX_VALUE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 213, Short.MAX_VALUE))
+                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 144, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                        .addGap(4, 4, 4)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 428, Short.MAX_VALUE)

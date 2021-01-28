@@ -109,7 +109,7 @@ public class CustomerGrid extends javax.swing.JPanel {
             orderDialog.setIconImage(orderImage);
             orderDialog.setCustomer(customer);
             orderDialog.initMain();
-            orderDialog.setSize(Global.width - 400, Global.height - 400);
+            orderDialog.setSize(Global.width - 300, Global.height - 300);
             orderDialog.setLocationRelativeTo(null);
             orderDialog.setVisible(true);
         }

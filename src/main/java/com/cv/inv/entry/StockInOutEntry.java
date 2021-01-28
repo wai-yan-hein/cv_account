@@ -20,6 +20,7 @@ import com.cv.inv.entry.dialog.StockInOutVouSearch;
 import com.cv.inv.entry.editor.LocationCellEditor;
 import com.cv.inv.entry.editor.StockCellEditor;
 import com.cv.inv.entry.editor.StockUnitEditor;
+import com.cv.inv.service.StockInOutDetailService;
 import com.cv.inv.service.VouIdService;
 import com.cv.inv.util.GenVouNoImpl;
 import java.awt.event.KeyEvent;
@@ -51,8 +52,10 @@ public class StockInOutEntry extends javax.swing.JPanel implements PanelControl,
     private VouIdService voudIdService;
     @Autowired
     private ApplicationMainFrame mainFrame;
+    @Autowired
+    private StockInOutDetailService stockInOutDetailService;
     private GenVouNoImpl vouEngine = null;
-    private StockInOut inOut;
+    private StockInOut inOut = new StockInOut();
     @Autowired
     private StockInOutVouSearch stockInOutVouSearch;
 
@@ -71,7 +74,6 @@ public class StockInOutEntry extends javax.swing.JPanel implements PanelControl,
         } catch (ParseException ex) {
             log.error(ex.getMessage());
         }
-
     }
 
     public void initMain() {
@@ -90,8 +92,8 @@ public class StockInOutEntry extends javax.swing.JPanel implements PanelControl,
         tblStock.getTableHeader().setBackground(ColorUtil.btnEdit);
         tblStock.setDefaultRenderer(Object.class, new TableCellRender());
         tblStock.setDefaultRenderer(Float.class, new TableCellRender());
-        tblStock.getColumnModel().getColumn(0).setPreferredWidth(30);
-        tblStock.getColumnModel().getColumn(1).setPreferredWidth(30);
+        tblStock.getColumnModel().getColumn(0).setPreferredWidth(150);
+        tblStock.getColumnModel().getColumn(1).setPreferredWidth(150);
         tblStock.getColumnModel().getColumn(2).setPreferredWidth(20);
         tblStock.getColumnModel().getColumn(3).setPreferredWidth(150);
         tblStock.getColumnModel().getColumn(4).setPreferredWidth(20);
@@ -136,11 +138,10 @@ public class StockInOutEntry extends javax.swing.JPanel implements PanelControl,
             }
             tblStock.requestFocus();
         }
-
     }
 
     private void saveStockInout() {
-        if (isValidEntry()) {
+        if (isValidEntry() && outTableModel.isValidEntry()) {
             try {
                 List<StockInOutDetail> listStock = outTableModel.getListStock();
                 StockInOut save = stockInOutService.save(inOut, listStock);
@@ -155,7 +156,6 @@ public class StockInOutEntry extends javax.swing.JPanel implements PanelControl,
                 log.error("Save In Out :" + e.getMessage());
             }
         }
-
     }
 
     private void clear() {
@@ -175,7 +175,6 @@ public class StockInOutEntry extends javax.swing.JPanel implements PanelControl,
             JOptionPane.showMessageDialog(Global.parentForm, "Invalid Batch No.");
             status = false;
         } else {
-            inOut = new StockInOut();
             inOut.setBatchCode(txtBatchNo.getText());
             inOut.setDescription(txtDesp.getText());
             inOut.setRemark(txtRemark.getText());
@@ -370,7 +369,7 @@ public class StockInOutEntry extends javax.swing.JPanel implements PanelControl,
     private void tblStockKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tblStockKeyReleased
         // TODO add your handling code here:
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            actionKeyEnter();
+            //actionKeyEnter();
         }
     }//GEN-LAST:event_tblStockKeyReleased
 
@@ -405,6 +404,7 @@ public class StockInOutEntry extends javax.swing.JPanel implements PanelControl,
 
     @Override
     public void newForm() {
+        clear();
     }
 
     @Override
@@ -426,6 +426,16 @@ public class StockInOutEntry extends javax.swing.JPanel implements PanelControl,
 
     @Override
     public void selected(Object source, Object selectObj) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if (source.toString().equals("STOCK-SEARCH")) {
+            inOut = (StockInOut) selectObj;
+            List<StockInOutDetail> list = stockInOutDetailService.search(inOut.getBatchCode());
+            outTableModel.setListStock(list);
+            txtBatchNo.setText(inOut.getBatchCode());
+            txtDate.setDate(inOut.getTranDate());
+            txtDesp.setText(inOut.getDescription());
+            txtRemark.setText(inOut.getRemark());
+            lblStatus.setText("EDIT");
+
+        }
     }
 }

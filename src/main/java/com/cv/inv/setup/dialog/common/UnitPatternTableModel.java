@@ -78,10 +78,6 @@ public class UnitPatternTableModel extends AbstractTableModel {
                         up.setUpdatedBy(Global.loginUser);
                         listPattern.set(rowIndex, save);
                         fireTableCellUpdated(rowIndex, columnIndex);
-                    } else {
-
-                        listPattern.add(save);
-                        fireTableDataChanged();
                     }
                     addNewRow();
                 }

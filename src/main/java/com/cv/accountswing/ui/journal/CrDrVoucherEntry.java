@@ -160,7 +160,7 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
         tblCredit.setCellSelectionEnabled(true);
         tblCredit.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblCredit.getColumnModel().getColumn(0).setCellEditor(new SupplierCellEditor());
-        tblCredit.getColumnModel().getColumn(1).setCellEditor(new COACellEditor());
+        tblCredit.getColumnModel().getColumn(1).setCellEditor(new COACellEditor(false));
         tblCredit.getColumnModel().getColumn(0).setPreferredWidth(150);
         tblCredit.getColumnModel().getColumn(1).setPreferredWidth(150);
         tblCredit.getColumnModel().getColumn(2).setPreferredWidth(130);
@@ -196,8 +196,8 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
     };
 
     private void initCombo() {
-        cOAAutoCompleter = new COAAutoCompleter(txtAccount, Global.listCOA, null);
-        departmentAutoCompleter = new DepartmentAutoCompleter(txtDep, Global.listDepartment, null);
+        cOAAutoCompleter = new COAAutoCompleter(txtAccount, Global.listCOA, null, false);
+        departmentAutoCompleter = new DepartmentAutoCompleter(txtDep, Global.listDepartment, null,false);
         currencyAutoCompleter = new CurrencyAutoCompleter(txtCurrency, Global.listCurrency, null);
     }
 

@@ -148,6 +148,7 @@ public class COAGroupTableModel extends AbstractTableModel {
         if (isValidCOA(coa, Global.compCode, Global.loginUser.getAppUserCode())) {
             ChartOfAccount save = coaService.save(coa);
             if (save.getCode() != null) {
+                Global.listCOA.add(save);
                 addEmptyRow();
                 parent.setRowSelectionInterval(row + 1, row + 1);
                 parent.setColumnSelectionInterval(1, 1);
@@ -219,7 +220,7 @@ public class COAGroupTableModel extends AbstractTableModel {
             isTrue = false;
             //JOptionPane.showMessageDialog(Global.parentForm, "Invalid COA Name");
 
-        } else if (coa.getCoaParent()== null) {
+        } else if (coa.getCoaParent() == null) {
             isTrue = false;
             //JOptionPane.showMessageDialog(Global.parentForm, "Please Select Parent.");
 
@@ -248,10 +249,10 @@ public class COAGroupTableModel extends AbstractTableModel {
                 coa.setModifiedDate(Util1.getTodayDate());
             }
 
-            if (coa.getCoaParent()!= null) {
+            if (coa.getCoaParent() != null) {
                 if (!coa.getCoaParent().isEmpty()) {
                     ChartOfAccount coa1 = coaService.findById(coa.getCoaParent());
-                    coa.setCoaLevel(coa1.getCoaLevel()+ 1);
+                    coa.setCoaLevel(coa1.getCoaLevel() + 1);
                     coa.setParentUsrDesp(coa1.getCoaNameEng());
                 }
             } else {
@@ -283,5 +284,12 @@ public class COAGroupTableModel extends AbstractTableModel {
 
         }
 
+    }
+
+    public void clear() {
+        if (listCOA != null) {
+            listCOA.clear();
+            fireTableDataChanged();
+        }
     }
 }

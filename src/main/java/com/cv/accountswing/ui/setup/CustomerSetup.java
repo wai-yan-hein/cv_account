@@ -216,9 +216,11 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener, Pa
                 JOptionPane.showMessageDialog(Global.parentForm, "Saved");
                 if (lblStatus.getText().equals("NEW")) {
                     //customerTabelModel.addCustomer(customer);
+                    Global.listTrader.add(customer);
                     Global.listCustomer.add(customer);
                 } else {
                     //customerTabelModel.setCustomer(selectRow, customer);
+                    Global.listTrader.set(selectRow, customer);
                     Global.listCustomer.set(selectRow, customer);
                 }
                 clear();
@@ -239,10 +241,10 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener, Pa
         chkActive.setSelected(Boolean.TRUE);
         txtCreditLimit.setText(null);
         lblStatus.setText("NEW");
-        txtCusCode.requestFocus();
         txtConPerson.setText(null);
         txtCreditTerm.setText(null);
         customerTabelModel.refresh();
+        txtCusCode.requestFocus();
     }
 
     private void setTableFilter(String filter) {
@@ -584,7 +586,6 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener, Pa
         if (!isShown) {
             initMain();
         }
-        txtCusName.requestFocus();
         clear();
     }//GEN-LAST:event_formComponentShown
 

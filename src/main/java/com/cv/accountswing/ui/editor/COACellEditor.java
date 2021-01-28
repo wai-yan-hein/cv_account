@@ -30,10 +30,12 @@ public class COACellEditor extends AbstractCellEditor implements TableCellEditor
     private static final Logger LOGGER = LoggerFactory.getLogger(COACellEditor.class);
     private JComponent component = null;
     private COAAutoCompleter completer;
+    private boolean filter;
     private final FocusAdapter fa = new FocusAdapter() {
         @Override
         public void focusLost(FocusEvent e) {
         }
+
         @Override
         public void focusGained(FocusEvent e) {
             JTextField jtf = (JTextField) e.getSource();
@@ -43,8 +45,8 @@ public class COACellEditor extends AbstractCellEditor implements TableCellEditor
     };
     //private List<Medicine> listCOA = new ArrayList();
 
-    public COACellEditor() {
-
+    public COACellEditor(boolean filter) {
+        this.filter = filter;
     }
 
     @Override
@@ -85,7 +87,7 @@ public class COACellEditor extends AbstractCellEditor implements TableCellEditor
         if (value != null) {
             jtf.setText(value.toString());
         }
-        completer = new COAAutoCompleter(jtf, Global.listCOA, this);
+        completer = new COAAutoCompleter(jtf, Global.listCOA, this, filter);
         return component;
     }
 

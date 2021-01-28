@@ -212,9 +212,11 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener, Pa
                 JOptionPane.showMessageDialog(Global.parentForm, "Saved");
                 if (lblStatus.getText().equals("NEW")) {
                     //  supplierTabelModel.addCustomer(supplier);
+                    Global.listTrader.add(supplier);
                     Global.listSupplier.add(supplier);
                 } else {
                     // supplierTabelModel.setCustomer(selectRow, supplier);
+                    Global.listTrader.set(selectRow, supplier);
                     Global.listSupplier.set(selectRow, supplier);
                 }
                 clear();
@@ -581,7 +583,6 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener, Pa
             initMain();
         }
         clear();
-        txtCusName.requestFocus();
 
     }//GEN-LAST:event_formComponentShown
 

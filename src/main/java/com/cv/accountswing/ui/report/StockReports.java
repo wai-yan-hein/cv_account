@@ -281,8 +281,10 @@ public class StockReports extends javax.swing.JPanel implements PanelControl {
         log.info("stock balance report ready.");
         String reportPath = Global.sysProperties.get("system.report.path");
         String fontPath = Global.sysProperties.get("system.font.path");
+        String compName = Global.sysProperties.get("system.report.company");
         reportPath = reportPath + "\\StockBalance";
         Map<String, Object> parameters = new HashMap();
+        parameters.put("comp_name", compName);
         parameters.put("mac_id", Global.machineId);
         parameters.put("brand_code", brandCode);
         parameters.put("cat_code", catCode);

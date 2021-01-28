@@ -164,13 +164,14 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
         txtSalePriceC.setText(Util1.getString(stock.getSalePriceC()));
         txtSalePriceD.setText(Util1.getString(stock.getSalePriceD()));
         txtSalePriceStd.setText(Util1.getString(stock.getSttCostPrice()));
+        txtExpDate.setDate(stock.getExpireDate());
         txtStockCode.setEnabled(false);
         lblStatus.setText("EDIT");
     }
 
     private void searchStock() {
         Global.listStock = stockService.findAll();
-        stockTableModel.refresh();
+        stockTableModel.setListStock(Global.listStock);
     }
 
     private void setStockSize() {
@@ -225,13 +226,7 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
                     "Stock Code.", JOptionPane.ERROR_MESSAGE);
             status = false;
         } else {
-            if (txtStockCode.getText().isEmpty()) {
-                // txtStockCode.setText(getMedCode(txtStockName.getText()));
-            }
-
-            if (txtExpDate.getDate() != null) {
-                stock.setExpireDate(txtExpDate.getDate());
-            }
+            stock.setExpireDate(txtExpDate.getDate());
             stock.setUserCode(txtStockCode.getText().trim());
             stock.setStockType((StockType) cboStockType.getSelectedItem());
             stock.setStockName(txtStockName.getText().trim());
@@ -353,22 +348,20 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
         cboPurUnit.getEditor().getEditorComponent().addKeyListener(this);
         cboSaleUnit.getEditor().getEditorComponent().addKeyListener(this);
         cboStockType.getEditor().getEditorComponent().addKeyListener(this);
+        cboUnitPattern.getEditor().getEditorComponent().addKeyListener(this);
 
         cboBrand.getEditor().getEditorComponent().setName("cboBrand");
         cboCategory.getEditor().getEditorComponent().setName("cboCategory");
         cboPurUnit.getEditor().getEditorComponent().setName("cboPurPrice");
         cboSaleUnit.getEditor().getEditorComponent().setName("cboSaleUnit");
         cboStockType.getEditor().getEditorComponent().setName("cboStockType");
+        cboUnitPattern.getEditor().getEditorComponent().setName("cboUnitPattern");
 
         chkActive.addKeyListener(this);
         btnAddBrand.addKeyListener(this);
         btnAddCategory.addKeyListener(this);
         btnAddItemType.addKeyListener(this);
-        //btnNew.addKeyListener(this);
-        btnChNo.addKeyListener(this);
-        //btnSave.addKeyListener(this);
         btnUnit.addKeyListener(this);
-
         tblStock.addKeyListener(this);
     }
 
@@ -406,7 +399,6 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
         jLabel8 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
         btnUnit = new javax.swing.JButton();
-        btnChNo = new javax.swing.JButton();
         jLabel10 = new javax.swing.JLabel();
         txtPurPrice = new javax.swing.JTextField();
         cboPurUnit = new javax.swing.JComboBox<>();
@@ -578,21 +570,15 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
         jLabel9.setFont(Global.lableFont);
         jLabel9.setText("Licene Exp Date");
 
+        btnUnit.setBackground(ColorUtil.btnEdit);
         btnUnit.setFont(Global.lableFont);
+        btnUnit.setForeground(ColorUtil.foreground);
+        btnUnit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/new-button.png"))); // NOI18N
         btnUnit.setText("Unit");
         btnUnit.setName("btnUnit"); // NOI18N
         btnUnit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnUnitActionPerformed(evt);
-            }
-        });
-
-        btnChNo.setFont(Global.lableFont);
-        btnChNo.setText("Char No");
-        btnChNo.setName("btnChNo"); // NOI18N
-        btnChNo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnChNoActionPerformed(evt);
             }
         });
 
@@ -858,8 +844,6 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
                             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
                                 .addComponent(txtExpDate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addGap(18, 18, 18)
-                                .addComponent(btnChNo)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnUnit))
                             .addComponent(txtStockName)
                             .addComponent(cboCategory, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -936,8 +920,7 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jLabel9)
-                        .addComponent(btnUnit)
-                        .addComponent(btnChNo))
+                        .addComponent(btnUnit))
                     .addComponent(txtExpDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -1050,16 +1033,6 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
 
     }//GEN-LAST:event_btnUnitActionPerformed
 
-    private void btnChNoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChNoActionPerformed
-        // TODO add your handling code here:
-        characterNoDialog.setIconImage(image);
-        characterNoDialog.initMain();
-        characterNoDialog.setSize(Global.width / 2, Global.height / 2);
-        characterNoDialog.setLocationRelativeTo(null);
-        characterNoDialog.setVisible(true);
-
-    }//GEN-LAST:event_btnChNoActionPerformed
-
     private void txtStockNameFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtStockNameFocusGained
         // TODO add your handling code here:
         txtStockName.selectAll();
@@ -1152,7 +1125,6 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
     private javax.swing.JButton btnAddCategory;
     private javax.swing.JButton btnAddItemType;
     private javax.swing.JButton btnAddItemType1;
-    private javax.swing.JButton btnChNo;
     private javax.swing.JButton btnUnit;
     private javax.swing.JComboBox<String> cboBrand;
     private javax.swing.JComboBox<String> cboCategory;
@@ -1459,6 +1431,27 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
             case "txtExpDate":
                 switch (e.getKeyCode()) {
                     case KeyEvent.VK_ENTER:
+                        cboUnitPattern.requestFocus();
+                        break;
+                    case KeyEvent.VK_DOWN:
+                        txtPurWt.requestFocus();
+                        break;
+                    case KeyEvent.VK_UP:
+                        txtPurWt.requestFocus();
+                        break;
+                    /*case KeyEvent.VK_RIGHT:
+                        btnChNo.requestFocus();
+                        break;
+                        case KeyEvent.VK_LEFT:
+                        txtShortName.requestFocus();
+                        break;
+                     */
+                }
+                tabToTable(e);
+                break;
+            case "cboUnitPattern":
+                switch (e.getKeyCode()) {
+                    case KeyEvent.VK_ENTER:
                         txtPurWt.requestFocus();
                         break;
                     case KeyEvent.VK_DOWN:
@@ -1528,15 +1521,11 @@ public class StockSetup extends javax.swing.JPanel implements KeyListener, Panel
                     case KeyEvent.VK_DOWN:
                         txtPurPrice.requestFocus();
                         break;
-                    case KeyEvent.VK_UP:
-                        btnChNo.requestFocus();
-                        break;
+
                     case KeyEvent.VK_RIGHT:
                         txtPurPrice.requestFocus();
                         break;
-                    case KeyEvent.VK_LEFT:
-                        btnChNo.requestFocus();
-                        break;
+
                 }
                 tabToTable(e);
 

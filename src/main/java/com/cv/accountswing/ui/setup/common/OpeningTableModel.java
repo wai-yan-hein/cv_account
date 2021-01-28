@@ -127,11 +127,10 @@ public class OpeningTableModel extends AbstractTableModel {
     }
 
     private void save(VCOAOpening vgl, int row) {
-
-        vgl.setCompCode(Global.compCode);
-        vgl.setUserId(Global.loginUser.getAppUserCode());
         String strVGL = gson.toJson(vgl);
         COAOpening op = gson.fromJson(strVGL, COAOpening.class);
+        op.setUserCode(Global.loginUser.getAppUserCode());
+        op.setCreatedDate(Util1.getTodayDate());
         try {
             COAOpening save = opService.save(op);
             if (save != null) {
@@ -140,7 +139,6 @@ public class OpeningTableModel extends AbstractTableModel {
                 int selRow = parent.getSelectedRow();
                 parent.setRowSelectionInterval(selRow + 1, selRow + 1);
                 parent.setColumnSelectionInterval(6, 6);
-                //JOptionPane.showMessageDialog(Global.parentForm, "Saved");
                 selectionObserver.selected("CAL-TOTAL", "-");
             }
         } catch (HeadlessException ex) {

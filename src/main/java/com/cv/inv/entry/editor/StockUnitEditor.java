@@ -30,6 +30,7 @@ public class StockUnitEditor extends AbstractCellEditor implements TableCellEdit
     private static final Logger LOGGER = LoggerFactory.getLogger(StockUnitEditor.class);
     private JComponent component = null;
     private UnitAutoCompleter completer;
+    private Object oldValue;
     private final FocusAdapter fa = new FocusAdapter() {
         @Override
         public void focusLost(FocusEvent e) {
@@ -50,6 +51,7 @@ public class StockUnitEditor extends AbstractCellEditor implements TableCellEdit
     @Override
     public java.awt.Component getTableCellEditorComponent(JTable table, Object value,
             boolean isSelected, int rowIndex, int vColIndex) {
+        oldValue = value;
         JTextField jtf = new JTextField();
         jtf.setFont(Global.textFont);
         jtf.setHighlighter(null);
@@ -94,7 +96,7 @@ public class StockUnitEditor extends AbstractCellEditor implements TableCellEdit
     public Object getCellEditorValue() {
         Object obj;
         StockUnit stock = completer.getStockUnit();
-
+        
         if (stock != null) {
             obj = stock;
         } else {
@@ -125,5 +127,6 @@ public class StockUnitEditor extends AbstractCellEditor implements TableCellEdit
             return true;
         }
     }
+    
 
 }

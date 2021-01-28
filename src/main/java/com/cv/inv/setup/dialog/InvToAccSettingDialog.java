@@ -55,11 +55,11 @@ public class InvToAccSettingDialog extends javax.swing.JDialog {
     }
 
     private void initCombo() {
-        disAutoCompleter = new COAAutoCompleter(txtDiscount, Global.listCOA, null);
-        payAutoCompleter = new COAAutoCompleter(txtPayment, Global.listCOA, null);
-        taxAutoCOmpleter = new COAAutoCompleter(txtTax, Global.listCOA, null);
-        departmentAutoCompleter = new DepartmentAutoCompleter(txtDep, Global.listDepartment, null);
-        sourceAccountCompleter = new COAAutoCompleter(txtSource, Global.listCOA, null);
+        disAutoCompleter = new COAAutoCompleter(txtDiscount, Global.listCOA, null, false);
+        payAutoCompleter = new COAAutoCompleter(txtPayment, Global.listCOA, null, false);
+        taxAutoCOmpleter = new COAAutoCompleter(txtTax, Global.listCOA, null, false);
+        departmentAutoCompleter = new DepartmentAutoCompleter(txtDep, Global.listDepartment, null, false);
+        sourceAccountCompleter = new COAAutoCompleter(txtSource, Global.listCOA, null, false);
 
     }
 

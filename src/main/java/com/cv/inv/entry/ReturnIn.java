@@ -17,6 +17,7 @@ import com.cv.inv.service.RetInService;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.editor.CurrencyAutoCompleter;
 import com.cv.accountswing.ui.editor.CustomerAutoCompleter;
+import com.cv.accountswing.ui.editor.TraderAutoCompleter;
 import com.cv.accountswing.util.NumberUtil;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.RetInHisDetail;
@@ -66,12 +67,13 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
     private final Image historyIcon = new ImageIcon(this.getClass().getResource("/images/history_icon.png")).getImage();
     private static final Logger log = LoggerFactory.getLogger(ReturnIn.class);
     private LoadingObserver loadingObserver;
-    private CustomerAutoCompleter traderAutoCompleter;
+    private CustomerAutoCompleter customerAutoCompleter;
+    private TraderAutoCompleter traderAutoCompleter;
     private LocationAutoCompleter locationAutoCompleter;
     private CurrencyAutoCompleter currencyAutoCompleter;
     private RetInHis retIn = new RetInHis();
     private GenVouNoImpl vouEngine = null;
-    private final boolean isShown = false;
+    private boolean isShown = false;
 
     public void setLoadingObserver(LoadingObserver loadingObserver) {
         this.loadingObserver = loadingObserver;
@@ -108,6 +110,7 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
         initTextBoxAlign();
         initTextBoxValue();
         genVouNo();
+        isShown = true;
     }
 
     private void initTable() {
@@ -170,12 +173,13 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
     }
 
     private void initCombo() {
+        if (Util1.isNull(Global.sysProperties.get("system.customer.supplier"), "-").equals("1")) {
+            traderAutoCompleter = new TraderAutoCompleter(txtCus, Global.listTrader, null, false);
+        } else {
+            customerAutoCompleter = new CustomerAutoCompleter(txtCus, Global.listCustomer, null);
+        }
         currencyAutoCompleter = new CurrencyAutoCompleter(txtCurrency, Global.listCurrency, null);
-        currencyAutoCompleter.setSelectionObserver(this);
         locationAutoCompleter = new LocationAutoCompleter(txtLocation, Global.listLocation, null);
-        locationAutoCompleter.setSelectionObserver(this);
-        traderAutoCompleter = new CustomerAutoCompleter(txtCus, Global.listCustomer, null);
-        traderAutoCompleter.setSelectionObserver(this);
 
     }
 
@@ -190,7 +194,6 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
             txtVouBalance.setFormatterFactory(NumberUtil.getDecimalFormat());
         } catch (ParseException ex) {
             log.error("setFormatterFactory : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.toString());
-
         }
 
     }
@@ -209,6 +212,11 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
         txtVouTotal.setValue(totalAmount);
         txtVouPaid.setValue(totalAmount);
         txtVouBalance.setValue(totalAmount - (Util1.getFloat(txtVouPaid.getValue())));
+    }
+
+    private void requestTable() {
+        tblReturnIn.changeSelection(0, 0, false, false);
+        tblReturnIn.requestFocus();
     }
 
     /**
@@ -251,6 +259,8 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
                 formComponentShown(evt);
             }
         });
+
+        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder(null, java.awt.Color.lightGray));
 
         jLabel1.setFont(Global.lableFont
         );
@@ -330,18 +340,18 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(txtRemark, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(txtVouNo, javax.swing.GroupLayout.DEFAULT_SIZE, 129, Short.MAX_VALUE)
+                        .addComponent(txtVouNo, javax.swing.GroupLayout.DEFAULT_SIZE, 128, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jLabel7)
                         .addGap(18, 18, 18)
-                        .addComponent(txtRetInDate, javax.swing.GroupLayout.DEFAULT_SIZE, 92, Short.MAX_VALUE))
+                        .addComponent(txtRetInDate, javax.swing.GroupLayout.DEFAULT_SIZE, 91, Short.MAX_VALUE))
                     .addComponent(txtCus))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel5)
                         .addGap(18, 18, 18)
-                        .addComponent(txtLocation, javax.swing.GroupLayout.DEFAULT_SIZE, 323, Short.MAX_VALUE))
+                        .addComponent(txtLocation, javax.swing.GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel6)
                         .addGap(18, 18, 18)
@@ -416,6 +426,8 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        jPanel3.setBorder(javax.swing.BorderFactory.createEtchedBorder(null, java.awt.Color.lightGray));
+
         jLabel2.setFont(Global.lableFont);
         jLabel2.setText("Total :");
 
@@ -450,10 +462,11 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
                     .addComponent(jLabel10, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jLabel9, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addGap(18, 18, 18)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtVouPaid)
-                    .addComponent(txtVouBalance, javax.swing.GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE)
-                    .addComponent(txtVouTotal, javax.swing.GroupLayout.Alignment.TRAILING)))
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(txtVouPaid, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 270, Short.MAX_VALUE)
+                    .addComponent(txtVouTotal)
+                    .addComponent(txtVouBalance))
+                .addContainerGap())
         );
 
         jPanel3Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jLabel10, jLabel2, jLabel9});
@@ -497,7 +510,7 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 246, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -519,7 +532,11 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
         if (!isShown) {
             initMain();
         }
-        txtVouNo.requestFocus();
+        if (returnInTableModel.getListRetInDetail().size() > 0) {
+            requestTable();
+        } else {
+            txtCus.requestFocus();
+        }
     }//GEN-LAST:event_formComponentShown
 
     private void txtVouPaidActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtVouPaidActionPerformed
@@ -575,11 +592,15 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
                 txtVouBalance.setValue(Util1.getFloat(retIn.getBalance()));
                 txtRemark.setText(retIn.getRemark());
                 txtRetInDate.setDate(retIn.getRetInDate());
-                traderAutoCompleter.setTrader((Customer) retIn.getCustomer());
                 locationAutoCompleter.setLocation(retIn.getLocation());
                 currencyAutoCompleter.setCurrency(retIn.getCurrency());
                 List<RetInHisDetail> listRetinDetail = retInDetailService.search(retIn.getVouNo());
                 returnInTableModel.setRetInDetailList(listRetinDetail);
+                if (Util1.isNull(Global.sysProperties.get("system.customer.supplier"), "-").equals("1")) {
+                    traderAutoCompleter.setTrader(retIn.getCustomer());
+                } else {
+                    customerAutoCompleter.setTrader((Customer) retIn.getCustomer());
+                }
                 returnInTableModel.addNewRow();
                 break;
             case "TOTAL-AMT":
@@ -752,14 +773,18 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
 
     public void saveReturnIn() {
         if (isValidEntry() && returnInTableModel.isValidEntry()) {
-            List<String> delList = returnInTableModel.getDelList();
-            try {
-                retInService.save(retIn, returnInTableModel.getListRetInDetail(), delList);
-                clear();
-                vouEngine.updateVouNo();
-            } catch (Exception ex) {
-                log.error("Save Purchase :" + ex.getMessage());
-                JOptionPane.showMessageDialog(Global.parentForm, "Could'nt saved.");
+            if (retIn.getCustomer() != null) {
+                List<String> delList = returnInTableModel.getDelList();
+                try {
+                    retInService.save(retIn, returnInTableModel.getListRetInDetail(), delList);
+                    clear();
+                    vouEngine.updateVouNo();
+                } catch (Exception ex) {
+                    log.error("Save Purchase :" + ex.getMessage());
+                    JOptionPane.showMessageDialog(Global.parentForm, "Could'nt saved.");
+                }
+            } else {
+                JOptionPane.showMessageDialog(Global.parentForm, "Invalid Customer");
             }
 
         }
@@ -801,11 +826,6 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
                 JOptionPane.showMessageDialog(Global.parentForm, "Invalid voucher no.",
                         "Invalid Voucher ID", JOptionPane.ERROR_MESSAGE);
                 status = false;
-            } else if (txtCus.getText() == null) {
-                JOptionPane.showMessageDialog(Global.parentForm, "Customer cannot be blank.",
-                        "No customer.", JOptionPane.ERROR_MESSAGE);
-                status = false;
-                txtCus.requestFocusInWindow();
             } else if (locationAutoCompleter.getLocation() == null) {
                 JOptionPane.showMessageDialog(Global.parentForm, "Location cannot be blank.",
                         "Select Location.", JOptionPane.ERROR_MESSAGE);
@@ -816,18 +836,12 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
                         "Select Currency", JOptionPane.ERROR_MESSAGE);
                 status = false;
                 txtCurrency.requestFocusInWindow();
-            } else if (traderAutoCompleter.getTrader() == null) {
-                JOptionPane.showMessageDialog(Global.parentForm, "Trader cannot be blank.",
-                        "Select Trader", JOptionPane.ERROR_MESSAGE);
-                status = false;
-                txtCurrency.requestFocusInWindow();
             } else if (returnInTableModel.getListRetInDetail().size() == 0) {
                 JOptionPane.showMessageDialog(Global.parentForm, "No Return In record.",
                         "No data.", JOptionPane.ERROR_MESSAGE);
                 status = false;
             } else {
                 retIn.setVouNo(txtVouNo.getText());
-                retIn.setCustomer(traderAutoCompleter.getTrader());
                 retIn.setRemark(txtRemark.getText());
                 retIn.setRetInDate(txtRetInDate.getDate());
                 retIn.setCreatedDate(Util1.getTodayDate());
@@ -838,6 +852,11 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
                 retIn.setCreatedBy(Global.loginUser);
                 retIn.setDeleted(Util1.getNullTo(retIn.isDeleted()));
                 retIn.setVouTotal(Util1.getFloat(txtVouTotal.getValue()));
+                if (Util1.isNull(Global.sysProperties.get("system.customer.supplier"), "-").equals("1")) {
+                    retIn.setCustomer(traderAutoCompleter.getTrader());
+                } else {
+                    retIn.setCustomer(customerAutoCompleter.getTrader());
+                }
                 if (lblStatus.getText().equals("NEW")) {
                     retIn.setCreatedBy(Global.loginUser);
                     retIn.setSession(Global.sessionId);
