@@ -332,8 +332,9 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                         Global.finicialPeriodFrom,
                         Util1.toDateStrMYSQL(opDate, "dd/MM/yyyy"), 3, "MMK",
                         Global.loginUser.getAppUserCode(),
-<<<<<<< HEAD
-                        Util1.isNull(dept, "-"), traderCode, Global.machineId.toString(), Global.compCode);
+                        Util1.isNull(dept, "-"), traderCode,
+                         Global.machineId.toString(), Global.compCode
+                );
                 if (!opBalanceGL.isEmpty()) {
                     double opening;
                     TmpOpeningClosing tmpOC = opBalanceGL.get(0);
@@ -347,9 +348,6 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                 } else {
                     trialBalanceDetailDialog.setOpeningAmt(0.0);
                 }
-=======
-                        Util1.isNull(dept, "-"), cvId, Global.machineId.toString(),Global.compCode);
->>>>>>> 415f624399d3444f4d8e4e4a88e81192c4df5321
             } else {
                 opBalanceGL = coaOpDService.getOpBalanceGL1(getTarget(),
                         Global.finicialPeriodFrom,

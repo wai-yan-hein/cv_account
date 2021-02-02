@@ -277,13 +277,10 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     @Autowired
     private CustomerGrid customerGrid;
     @Autowired
-<<<<<<< HEAD
     private UserSetting userSetting;
-
-=======
+    @Autowired
     private RegionService regionService;
-    
->>>>>>> 415f624399d3444f4d8e4e4a88e81192c4df5321
+
     private PanelControl control;
     private FilterObserver filterObserver;
 
@@ -766,7 +763,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             Global.listCategory = categoryService.findAll();
             Global.listStockBrand = stockBrandService.findAll();
             Global.listRegion = regionService.search("-", "-", Global.compCode, "-");
-            
+
             if (Global.listRelation != null) {
                 Global.listRelation.forEach(ur -> {
                     Global.hmRelation.put(ur.getUnitKey(), ur.getFactor());

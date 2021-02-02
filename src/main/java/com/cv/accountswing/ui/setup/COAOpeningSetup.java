@@ -43,8 +43,9 @@ import com.cv.accountswing.service.VOpeningService;
 import com.cv.accountswing.ui.editor.COAL2AutoCompleter;
 import com.cv.accountswing.ui.editor.RegionAutoCompleter;
 import com.cv.accountswing.ui.setup.common.OpeningTableModel;
-import net.coderazzi.filters.gui.AutoChoices;
-import net.coderazzi.filters.gui.TableFilterHeader;
+import javax.swing.RowFilter;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 /**
  *
@@ -68,13 +69,9 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
     private CurrencyService currencyService;
     @Autowired
     private ApplicationMainFrame mainFrame;
-<<<<<<< HEAD
-    private TableFilterHeader filterHeader;
-=======
     @Autowired
     private COAService cOAService;
-    
->>>>>>> 415f624399d3444f4d8e4e4a88e81192c4df5321
+
     private LoadingObserver loadingObserver;
     private boolean isShown = false;
     private boolean isSearch = false;
@@ -82,12 +79,9 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
     private String endDate;
     private String curId;
     private String depCode;
-<<<<<<< HEAD
-=======
     private String regionCode = "-";
     private String coaParent = "-";
     private TableRowSorter<TableModel> sorter;
->>>>>>> 415f624399d3444f4d8e4e4a88e81192c4df5321
 
     public void setIsShown(boolean isShown) {
         this.isShown = isShown;
@@ -152,45 +146,31 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
         tblOpening.setCellSelectionEnabled(true);
         tblOpening.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                 .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
-        filterHeader = new TableFilterHeader(tblOpening, AutoChoices.ENABLED);
-        filterHeader.setPosition(TableFilterHeader.Position.TOP);
-        filterHeader.setFont(Global.textFont);
-        filterHeader.setVisible(false);
+        sorter = new TableRowSorter(tblOpening.getModel());
+        tblOpening.setRowSorter(sorter);
 
     }
 
     private void searchOpening() {
-<<<<<<< HEAD
-        initializeParameter();
-        loadingObserver.load(this.getName(), "Start");
-        taskExecutor.execute(() -> {
-            openingTableModel.clear();
-            List<VCOAOpening> listOpening = openingService.search(stDate, "-", "-", Global.compCode, depCode, curId);
-            openingTableModel.setListOpening(listOpening);
-            btnGen.setEnabled(listOpening.isEmpty());
-            calTotalAmt(listOpening);
-            loadingObserver.load(this.getName(), "Stop");
-        });
-=======
         if (!isSearch) {
             isSearch = true;
             initializeParameter();
             loadingObserver.load(this.getName(), "Start");
-            
+
             final String traderType;
-            if(chkCustomer.isSelected() && chkSupplier.isSelected()){
+            if (chkCustomer.isSelected() && chkSupplier.isSelected()) {
                 traderType = "CUSSUP";
-            }else if(chkCustomer.isSelected() && chkCOA.isSelected()){
+            } else if (chkCustomer.isSelected() && chkCOA.isSelected()) {
                 traderType = "CUSCOA";
-            }else if(chkSupplier.isSelected() && chkCOA.isSelected()){
+            } else if (chkSupplier.isSelected() && chkCOA.isSelected()) {
                 traderType = "SUPCOA";
-            }else if(chkCustomer.isSelected()){
+            } else if (chkCustomer.isSelected()) {
                 traderType = "CUS";
-            }else if(chkSupplier.isSelected()){
+            } else if (chkSupplier.isSelected()) {
                 traderType = "SUP";
-            }else if(chkCOA.isSelected()){
+            } else if (chkCOA.isSelected()) {
                 traderType = "COA";
-            }else{
+            } else {
                 traderType = "-";
             }
             taskExecutor.execute(() -> {
@@ -199,7 +179,7 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
             "-", "-", "-", Global.compCode, "OPENING", "-", "-", "-", "-", "-", "-", "-");
             btnGen.setEnabled(listVGl.isEmpty());
             openingTableModel.setListVGl(listVGl);*/
-                List<VCOAOpening> listOpening = openingService.search(stDate, "-", 
+                List<VCOAOpening> listOpening = openingService.search(stDate, "-",
                         "-", Global.compCode, depCode, curId, traderType, coaParent,
                         regionCode);
                 openingTableModel.setListOpening(listOpening);
@@ -210,7 +190,6 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
                 isSearch = false;
             });
         }
->>>>>>> 415f624399d3444f4d8e4e4a88e81192c4df5321
     }
 
     private void initializeParameter() {
@@ -224,16 +203,11 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
         if (txtDep.getText().isEmpty()) {
             depCode = "-";
         }
-<<<<<<< HEAD
-        if (depCode.equals("-")) {
-            txtDep.setText("All");
-=======
-        if(txtRegion.getText().isEmpty()){
+        if (txtRegion.getText().isEmpty()) {
             regionCode = "-";
         }
-        if(txtCOA.getText().isEmpty()){
+        if (txtCOA.getText().isEmpty()) {
             coaParent = "-";
->>>>>>> 415f624399d3444f4d8e4e4a88e81192c4df5321
         }
         btnGen.setEnabled(false);
     }
@@ -254,7 +228,7 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
 
     private boolean isValidGen() {
         boolean status = true;
-        if (txtDep.getText().isEmpty() || depCode == null || depCode.equals("-")) {
+        if (txtDep.getText().isEmpty() || depCode == null) {
             JOptionPane.showMessageDialog(Global.parentForm, "Select Department.");
             txtDep.requestFocus();
             status = false;
@@ -264,7 +238,6 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
             txtCurrency.requestFocus();
             status = false;
         }
-
         return status;
     }
 
@@ -301,6 +274,10 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
         btnGen.addKeyListener(this);
         tblOpening.addKeyListener(this);
 
+    }
+
+    private void setTableFilter(String text) {
+        sorter.setRowFilter(RowFilter.regexFilter(text));
     }
 
     /**
@@ -342,8 +319,6 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
                 formComponentShown(evt);
             }
         });
-
-        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder(null, java.awt.Color.lightGray));
 
         jLabel1.setFont(Global.lableFont);
         jLabel1.setText("Date");
@@ -430,19 +405,6 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addComponent(jLabel1)
-<<<<<<< HEAD
-                .addGap(18, 18, 18)
-                .addComponent(txtDate, javax.swing.GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)
-                .addGap(18, 18, 18)
-                .addComponent(jLabel2)
-                .addGap(18, 18, 18)
-                .addComponent(txtDep, javax.swing.GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)
-                .addGap(18, 18, 18)
-                .addComponent(jLabel3)
-                .addGap(18, 18, 18)
-                .addComponent(txtCurrency, javax.swing.GroupLayout.DEFAULT_SIZE, 93, Short.MAX_VALUE)
-                .addGap(18, 18, 18)
-=======
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -468,7 +430,6 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(chkCOA)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
->>>>>>> 415f624399d3444f4d8e4e4a88e81192c4df5321
                 .addComponent(btnGen)
                 .addContainerGap())
         );
@@ -510,8 +471,6 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
         tblOpening.setName("tblOpening"); // NOI18N
         tblOpening.setRowHeight(Global.tblRowHeight);
         jScrollPane1.setViewportView(tblOpening);
-
-        jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder(null, java.awt.Color.lightGray));
 
         jLabel4.setFont(Global.lableFont);
         jLabel4.setText("Currency");
@@ -584,7 +543,7 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 265, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -801,11 +760,6 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
 
     @Override
     public void sendFilter(String filter) {
-        if (filterHeader.isVisible()) {
-            filterHeader.setVisible(false);
-        } else {
-            filterHeader.setVisible(true);
-        }
+        setTableFilter(filter);
     }
-
 }
