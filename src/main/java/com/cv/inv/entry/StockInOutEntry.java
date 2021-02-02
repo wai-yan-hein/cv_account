@@ -140,6 +140,17 @@ public class StockInOutEntry extends javax.swing.JPanel implements PanelControl,
         }
     }
 
+    private void deleteVoucher() {
+        if (lblStatus.getText().equals("EDIT")) {
+            int yes_no = JOptionPane.showConfirmDialog(Global.parentForm,
+                    "Are you sure to delete?", "Damage item delete", JOptionPane.YES_NO_OPTION);
+            if (yes_no == 0) {
+                inOut.setDeleted(true);
+                saveStockInout();
+            }
+        }
+    }
+
     private void saveStockInout() {
         if (isValidEntry() && outTableModel.isValidEntry()) {
             try {
@@ -186,6 +197,7 @@ public class StockInOutEntry extends javax.swing.JPanel implements PanelControl,
                 inOut.setCreatedDate(Util1.getTodayDate());
                 inOut.setCompCode(Global.compCode);
                 inOut.setMacId(Global.machineId);
+                inOut.setDeleted(Boolean.FALSE);
             } else {
                 inOut.setUpdatedBy(Global.loginUser);
             }
@@ -369,7 +381,7 @@ public class StockInOutEntry extends javax.swing.JPanel implements PanelControl,
     private void tblStockKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tblStockKeyReleased
         // TODO add your handling code here:
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            //actionKeyEnter();
+            actionKeyEnter();
         }
     }//GEN-LAST:event_tblStockKeyReleased
 
@@ -400,6 +412,7 @@ public class StockInOutEntry extends javax.swing.JPanel implements PanelControl,
 
     @Override
     public void delete() {
+        deleteVoucher();
     }
 
     @Override

@@ -262,6 +262,8 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
                 gl.setReference(ref);
                 gl.setGlDate(Util1.toDate(strGvDate, "dd/MM/yyyy"));
                 gl.setTranSource("GV");
+                gl.setMacId(Global.machineId);
+                gl.setCompCode(Global.compCode);
                 gl.setFromCurId(autoCompleter.getCurrency().getKey().getCode());
             }
         }

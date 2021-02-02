@@ -9,6 +9,7 @@ import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.SaleHis;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
@@ -23,6 +24,15 @@ public class SaleVouSearchTableModel extends AbstractTableModel {
     private final static Logger log = Logger.getLogger(SaleVouSearchTableModel.class.getName());
     private List<SaleHis> listSaleHis = new ArrayList();
     private final String[] columnNames = {"Date", "Vou No", "Ref. Vou.", "Customer", "User", "V-Total"};
+    private JTable parent;
+
+    public JTable getParent() {
+        return parent;
+    }
+
+    public void setParent(JTable parent) {
+        this.parent = parent;
+    }
 
     @Override
     public String getColumnName(int column) {
@@ -61,7 +71,7 @@ public class SaleVouSearchTableModel extends AbstractTableModel {
             case 4: //User
                 return String.class;
             case 5: //V-Total
-                return Double.class;
+                return Float.class;
             default:
                 return Object.class;
         }
@@ -83,7 +93,11 @@ public class SaleVouSearchTableModel extends AbstractTableModel {
                 case 0://date
                     return Util1.toDateStr(his.getSaleDate(), "dd/MM/yyyy");
                 case 1://vou-no
-                    return his.getVouNo();
+                    if (Util1.getBoolean(his.getDeleted())) {
+                        return his.getVouNo() + "***";
+                    } else {
+                        return his.getVouNo();
+                    }
                 case 2://remark
                     return his.getRemark();
                 case 3://customer

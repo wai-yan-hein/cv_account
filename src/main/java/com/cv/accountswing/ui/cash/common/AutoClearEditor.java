@@ -52,13 +52,11 @@ public class AutoClearEditor extends javax.swing.AbstractCellEditor implements T
             jtf.selectAll();
         }
         jtf.selectAll();
-        
         if (kp != null) {
             KeyListener keyListener = new KeyListener() {
                 @Override
                 public void keyPressed(KeyEvent keyEvent) {
                     int keyCode = keyEvent.getKeyCode();
-                    
                     if ((keyEvent.isControlDown() && (keyCode == KeyEvent.VK_F8))
                             || (keyEvent.isShiftDown() && (keyCode == KeyEvent.VK_F8))
                             || (keyCode == KeyEvent.VK_F5)

@@ -39,7 +39,9 @@ public class StockUnitEditor extends AbstractCellEditor implements TableCellEdit
         @Override
         public void focusGained(FocusEvent e) {
             JTextField jtf = (JTextField) e.getSource();
-            jtf.setCaretPosition(jtf.getText().length());
+            String lastString = jtf.getText().substring(jtf.getText().length() - 1);
+            jtf.setText("");
+            jtf.setText(lastString);
         }
 
     };
@@ -96,7 +98,7 @@ public class StockUnitEditor extends AbstractCellEditor implements TableCellEdit
     public Object getCellEditorValue() {
         Object obj;
         StockUnit stock = completer.getStockUnit();
-        
+
         if (stock != null) {
             obj = stock;
         } else {
@@ -127,6 +129,5 @@ public class StockUnitEditor extends AbstractCellEditor implements TableCellEdit
             return true;
         }
     }
-    
 
 }

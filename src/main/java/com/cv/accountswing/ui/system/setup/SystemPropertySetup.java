@@ -6,6 +6,7 @@
 package com.cv.accountswing.ui.system.setup;
 
 import com.cv.accountswing.common.ColorUtil;
+import com.cv.accountswing.common.FilterObserver;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
@@ -24,6 +25,8 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
+import net.coderazzi.filters.gui.AutoChoices;
+import net.coderazzi.filters.gui.TableFilterHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +38,7 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-public class SystemPropertySetup extends javax.swing.JPanel implements KeyListener, PanelControl {
+public class SystemPropertySetup extends javax.swing.JPanel implements KeyListener, PanelControl, FilterObserver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SystemPropertySetup.class);
     private int selectRow = -1;
@@ -49,6 +52,7 @@ public class SystemPropertySetup extends javax.swing.JPanel implements KeyListen
     @Autowired
     private ApplicationMainFrame mainFrame;
     private LoadingObserver loadingObserver;
+    private TableFilterHeader filterHeader;
     private boolean isShown = false;
 
     public void setIsShown(boolean isShown) {
@@ -85,6 +89,10 @@ public class SystemPropertySetup extends javax.swing.JPanel implements KeyListen
             }
         });
         searchSystemProperty();
+        filterHeader = new TableFilterHeader(tblSystemProper, AutoChoices.ENABLED);
+        filterHeader.setPosition(TableFilterHeader.Position.TOP);
+        filterHeader.setFont(Global.textFont);
+        filterHeader.setVisible(false);
 
     }
 
@@ -361,6 +369,7 @@ public class SystemPropertySetup extends javax.swing.JPanel implements KeyListen
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
         mainFrame.setControl(this);
+        mainFrame.setFilterObserver(this);
         if (!isShown) {
             initTable();
         }
@@ -495,7 +504,15 @@ public class SystemPropertySetup extends javax.swing.JPanel implements KeyListen
 
     @Override
     public void refresh() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void sendFilter(String filter) {
+        if (filterHeader.isVisible()) {
+            filterHeader.setVisible(false);
+        } else {
+            filterHeader.setVisible(true);
+        }
     }
 
 }

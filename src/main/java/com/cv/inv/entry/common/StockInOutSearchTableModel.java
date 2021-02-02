@@ -80,9 +80,9 @@ public class StockInOutSearchTableModel extends AbstractTableModel {
                 case 4://user
                     return stock.getRemark();
                 case 5:
-                    return stock.getInTotal() + "-" + stock.getInUnit();
+                    return stock.getInTotal();
                 case 6:
-                    return stock.getOutTotal() + "-" + stock.getOutUnit();
+                    return stock.getOutTotal();
 
             }
         } catch (Exception ex) {

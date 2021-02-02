@@ -82,6 +82,7 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
     }
 
     private void initTableVoucher() {
+        saleVouTableModel.setParent(tblVoucher);
         tblVoucher.setModel(saleVouTableModel);
         tblVoucher.getTableHeader().setFont(Global.tblHeaderFont);
         tblVoucher.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
@@ -92,7 +93,7 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
         tblVoucher.getColumnModel().getColumn(3).setPreferredWidth(130);
         tblVoucher.getColumnModel().getColumn(4).setPreferredWidth(15);
         tblVoucher.getColumnModel().getColumn(5).setPreferredWidth(30);
-        tblVoucher.setDefaultRenderer(Double.class, new TableCellRender());
+        tblVoucher.setDefaultRenderer(Float.class, new TableCellRender());
         tblVoucher.setDefaultRenderer(Object.class, new TableCellRender());
     }
 
@@ -162,13 +163,12 @@ public class SaleVouSearch extends javax.swing.JDialog implements KeyListener {
     private void calAmount() {
         float ttlAmt = 0.0f;
         List<SaleHis> listSale = saleVouTableModel.getListSaleHis();
-        if (!listSale.isEmpty()) {
+        if (listSale != null) {
             for (SaleHis sh : listSale) {
                 ttlAmt = Util1.getFloat(sh.getVouTotal());
             }
             txtTotalAmt.setValue(ttlAmt);
             txtTotalRecord.setValue(listSale.size());
-            tblVoucher.setRowSelectionInterval(0, 0);
             tblVoucher.requestFocus();
         }
     }

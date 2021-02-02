@@ -39,6 +39,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import javax.swing.text.JTextComponent;
+import net.coderazzi.filters.gui.AutoChoices;
+import net.coderazzi.filters.gui.TableFilterHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +56,6 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener, Pa
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Supplier.class);
     private int selectRow = -1;
-    private TableRowSorter<TableModel> sorter;
     private Supplier supplier = new Supplier();
     @Autowired
     private SupplierTabelModel supplierTabelModel;
@@ -74,6 +75,7 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener, Pa
     private SupplierImportDialog importDialog;
     private LoadingObserver loadingObserver;
     private boolean isShown = false;
+    private TableFilterHeader filterHeader;
 
     public void setIsShown(boolean isShown) {
         this.isShown = isShown;
@@ -127,8 +129,10 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener, Pa
 
             }
         });
-        sorter = new TableRowSorter(tblCustomer.getModel());
-        tblCustomer.setRowSorter(sorter);
+        filterHeader = new TableFilterHeader(tblCustomer, AutoChoices.ENABLED);
+        filterHeader.setPosition(TableFilterHeader.Position.TOP);
+        filterHeader.setFont(Global.textFont);
+        filterHeader.setVisible(false);
         searchSupplier();
     }
 
@@ -260,10 +264,6 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener, Pa
         btnClear.addKeyListener(this);
         tblCustomer.addKeyListener(this);
 
-    }
-
-    private void setTableFilter(String filter) {
-        sorter.setRowFilter(RowFilter.regexFilter(filter));
     }
 
     /**
@@ -854,7 +854,11 @@ public class SupplierSetup extends javax.swing.JPanel implements KeyListener, Pa
 
     @Override
     public void sendFilter(String filter) {
-        setTableFilter(filter);
+        if (filterHeader.isVisible()) {
+            filterHeader.setVisible(false);
+        } else {
+            filterHeader.setVisible(true);
+        }
     }
 
 }

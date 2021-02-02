@@ -38,7 +38,10 @@ public class StockCellEditor extends AbstractCellEditor implements TableCellEdit
         @Override
         public void focusGained(FocusEvent e) {
             JTextField jtf = (JTextField) e.getSource();
-            jtf.setCaretPosition(jtf.getText().length());
+            String lastString = jtf.getText().substring(jtf.getText().length() - 1);
+            jtf.setText("");
+            jtf.setText(lastString);
+            //jtf.setCaretPosition(jtf.getText().length());
         }
 
     };
@@ -52,13 +55,10 @@ public class StockCellEditor extends AbstractCellEditor implements TableCellEdit
             boolean isSelected, int rowIndex, int vColIndex) {
         JTextField jtf = new JTextField();
         jtf.setFont(Global.textFont);
-        //List<Medicine> listDepartment = dao.findAll("Medicine", "active = true");
-
         KeyListener keyListener = new KeyListener() {
             @Override
             public void keyPressed(KeyEvent keyEvent) {
                 int keyCode = keyEvent.getKeyCode();
-
                 if ((keyEvent.isControlDown() && (keyCode == KeyEvent.VK_F8))
                         || (keyEvent.isShiftDown() && (keyCode == KeyEvent.VK_F8))
                         || (keyCode == KeyEvent.VK_F5)
@@ -78,16 +78,13 @@ public class StockCellEditor extends AbstractCellEditor implements TableCellEdit
             public void keyTyped(KeyEvent keyEvent) {
             }
         };
-
         jtf.addFocusListener(fa);
         jtf.addKeyListener(keyListener);
         component = jtf;
         if (value != null) {
             jtf.setText(value.toString());
-            //jtf.selectAll();
         }
         completer = new StockAutoCompleter(jtf, Global.listStock, this);
-
         return component;
     }
 
@@ -95,21 +92,14 @@ public class StockCellEditor extends AbstractCellEditor implements TableCellEdit
     public Object getCellEditorValue() {
         Object obj;
         Stock stock = completer.getStock();
-
         if (stock != null) {
             obj = stock;
         } else {
             obj = ((JTextField) component).getText();
         }
-
         return obj;
-
     }
 
-    /*
-     * To prevent mouse click cell editing and 
-     * function key press
-     */
     @Override
     public boolean isCellEditable(EventObject anEvent) {
         if (anEvent instanceof MouseEvent) {

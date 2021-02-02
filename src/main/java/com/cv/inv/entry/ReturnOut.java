@@ -10,10 +10,7 @@ import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.SelectionObserver;
-import com.cv.accountswing.entity.Currency;
-import com.cv.accountswing.entity.CurrencyKey;
 import com.cv.accountswing.entity.Supplier;
-import com.cv.accountswing.service.CurrencyService;
 import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
@@ -22,14 +19,12 @@ import com.cv.accountswing.ui.editor.SupplierAutoCompleter;
 import com.cv.accountswing.ui.editor.TraderAutoCompleter;
 import com.cv.accountswing.util.NumberUtil;
 import com.cv.accountswing.util.Util1;
-import com.cv.inv.entity.Location;
 import com.cv.inv.entity.RetOutHisDetail;
 import com.cv.inv.entity.RetOutHis;
 import com.cv.inv.entry.common.ReturnOutTableModel;
 import com.cv.inv.entry.editor.LocationAutoCompleter;
 import com.cv.inv.entry.editor.StockCellEditor;
 import com.cv.inv.entry.editor.StockUnitEditor;
-import com.cv.inv.service.LocationService;
 import com.cv.inv.service.RetOutDetailService;
 import com.cv.inv.service.RetOutService;
 import com.cv.inv.service.VouIdService;
@@ -79,10 +74,6 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
     @Autowired
     private ReturnOutTableModel retOutTableModel;
     @Autowired
-    private CurrencyService currencyService;
-    @Autowired
-    private LocationService locationService;
-    @Autowired
     private VouIdService vouIdService;
     @Autowired
     private RetInVouSearch retInVouSearch;
@@ -108,7 +99,7 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
     private void initMain() {
         initTable();
         actionMapping();
-        initKeyListener();
+        //initKeyListener();
         setTodayDate();
         initCombo();
         assignDefaultValue();
@@ -147,8 +138,7 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
         tblRetOut.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                 .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
         tblRetOut.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        tblRetOut.changeSelection(0, 0, false, false);
-        tblRetOut.requestFocus();
+
     }
 
     private void initKeyListener() {
@@ -198,12 +188,14 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
     }
 
     private void assignDefaultValue() {
-        String currCode = Global.sysProperties.get("system.parent.currency");
-        String locId = Global.sysProperties.get("system.default.location");
-        Currency currency = currencyService.findById(new CurrencyKey(currCode, Global.compCode));
-        Location location = locationService.findById(locId);
-        currencyAutoCompleter.setCurrency(currency);
-        locationAutoCompleter.setLocation(location);
+        if (traderAutoCompleter != null) {
+            traderAutoCompleter.setTrader(null);
+        }
+        if (supplierAutoCompleter != null) {
+            supplierAutoCompleter.setTrader(null);
+        }
+        currencyAutoCompleter.setCurrency(Global.defalutCurrency);
+        locationAutoCompleter.setLocation(Global.defaultLocation);
 
     }
 
@@ -612,6 +604,7 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
                 List<RetOutHisDetail> listRetOut = retOutDetailService.search(retOut.getVouNo());
                 retOutTableModel.setRetOutDetailList(listRetOut);
                 retOutTableModel.addNewRow();
+                requestTable();
                 break;
             case "CAL-TOTAL":
                 calculateTotalAmount();
@@ -837,9 +830,8 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
         retInVouSearch.setPanelName(this.getName());
         retInVouSearch.initMain();
         retInVouSearch.setTitle("Return Out Voucher Search");
-        retInVouSearch.setSize(Global.width - 400, Global.height - 200);
+        retInVouSearch.setSize(Global.width - 200, Global.height - 200);
         retInVouSearch.setResizable(false);
-        //retInVouSearch.setLocation(Global.width/2, Global.height/2);
         retInVouSearch.setLocationRelativeTo(this);
         retInVouSearch.setSelectionObserver(this);
         retInVouSearch.setVisible(true);
@@ -849,10 +841,10 @@ public class ReturnOut extends javax.swing.JPanel implements SelectionObserver, 
         int yes_no = JOptionPane.showConfirmDialog(Global.parentForm,
                 "Are you sure to delete?", "Return in item delete", JOptionPane.YES_NO_OPTION);
         if (yes_no == 0) {
-            String vouNo = txtVouNo.getText();
             if (lblStatus.getText().equals("EDIT")) {
                 try {
-                    retOutService.delete(vouNo);
+                    retOut.setDeleted(true);
+                    saveReturnOut();
                     clear();
                 } catch (Exception ex) {
                     log.error("Return Out Voucher Delete :" + ex.getMessage());

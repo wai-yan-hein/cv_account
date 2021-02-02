@@ -39,9 +39,8 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
 import com.cv.accountswing.service.VOpeningService;
 import com.cv.accountswing.ui.setup.common.OpeningTableModel;
-import javax.swing.RowFilter;
-import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
+import net.coderazzi.filters.gui.AutoChoices;
+import net.coderazzi.filters.gui.TableFilterHeader;
 
 /**
  *
@@ -65,13 +64,13 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
     private CurrencyService currencyService;
     @Autowired
     private ApplicationMainFrame mainFrame;
+    private TableFilterHeader filterHeader;
     private LoadingObserver loadingObserver;
     private boolean isShown = false;
     private String stDate;
     private String endDate;
     private String curId;
     private String depCode;
-    private TableRowSorter<TableModel> sorter;
 
     public void setIsShown(boolean isShown) {
         this.isShown = isShown;
@@ -97,7 +96,7 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
     }
 
     private void initCombo() {
-        DepartmentAutoCompleter departmentAutoCompleter = new DepartmentAutoCompleter(txtDep, Global.listDepartment, null, false);
+        DepartmentAutoCompleter departmentAutoCompleter = new DepartmentAutoCompleter(txtDep, Global.listDepartment, null, true);
         departmentAutoCompleter.setSelectionObserver(this);
         CurrencyAutoCompleter currencyAutoCompleter = new CurrencyAutoCompleter(txtCurrency, Global.listCurrency, null);
         curId = Global.sysProperties.get("system.default.currency");
@@ -131,8 +130,10 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
         tblOpening.setCellSelectionEnabled(true);
         tblOpening.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                 .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
-        sorter = new TableRowSorter(tblOpening.getModel());
-        tblOpening.setRowSorter(sorter);
+        filterHeader = new TableFilterHeader(tblOpening, AutoChoices.ENABLED);
+        filterHeader.setPosition(TableFilterHeader.Position.TOP);
+        filterHeader.setFont(Global.textFont);
+        filterHeader.setVisible(false);
 
     }
 
@@ -141,15 +142,10 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
         loadingObserver.load(this.getName(), "Start");
         taskExecutor.execute(() -> {
             openingTableModel.clear();
-            /*List<VGl> listVGl = vGlService.search(stDate, endDate, "-", "-", "-", curId, "-", "-", depCode,
-            "-", "-", "-", Global.compCode, "OPENING", "-", "-", "-", "-", "-", "-", "-");
-            btnGen.setEnabled(listVGl.isEmpty());
-            openingTableModel.setListVGl(listVGl);*/
             List<VCOAOpening> listOpening = openingService.search(stDate, "-", "-", Global.compCode, depCode, curId);
             openingTableModel.setListOpening(listOpening);
             btnGen.setEnabled(listOpening.isEmpty());
             calTotalAmt(listOpening);
-            //btnGen.setEnabled(false);
             loadingObserver.load(this.getName(), "Stop");
         });
     }
@@ -164,6 +160,9 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
         }
         if (txtDep.getText().isEmpty()) {
             depCode = "-";
+        }
+        if (depCode.equals("-")) {
+            txtDep.setText("All");
         }
         btnGen.setEnabled(false);
     }
@@ -184,7 +183,7 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
 
     private boolean isValidGen() {
         boolean status = true;
-        if (txtDep.getText().isEmpty() || depCode == null) {
+        if (txtDep.getText().isEmpty() || depCode == null || depCode.equals("-")) {
             JOptionPane.showMessageDialog(Global.parentForm, "Select Department.");
             txtDep.requestFocus();
             status = false;
@@ -194,6 +193,7 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
             txtCurrency.requestFocus();
             status = false;
         }
+
         return status;
     }
 
@@ -232,10 +232,6 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
         btnGen.addKeyListener(this);
         tblOpening.addKeyListener(this);
 
-    }
-
-    private void setTableFilter(String text) {
-        sorter.setRowFilter(RowFilter.regexFilter(text));
     }
 
     /**
@@ -440,7 +436,7 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 257, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -622,6 +618,11 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
 
     @Override
     public void sendFilter(String filter) {
-        setTableFilter(filter);
+        if (filterHeader.isVisible()) {
+            filterHeader.setVisible(false);
+        } else {
+            filterHeader.setVisible(true);
+        }
     }
+
 }

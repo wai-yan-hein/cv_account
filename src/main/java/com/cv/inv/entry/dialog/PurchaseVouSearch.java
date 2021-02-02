@@ -137,7 +137,7 @@ public class PurchaseVouSearch extends javax.swing.JDialog implements KeyListene
 
     private void calAmount() {
         float ttlAmt = 0.0f;
-        if (!purVouTableModel.getListPurHis().isEmpty()) {
+        if (purVouTableModel.getListPurHis() != null) {
             ttlAmt = purVouTableModel.getListPurHis().stream().map(p -> p.getVouTotal()).reduce(ttlAmt, (accumulator, _item) -> accumulator + _item);
             txtTotalAmt.setValue(ttlAmt);
             txtTotalRecord.setValue(purVouTableModel.getListPurHis().size());

@@ -172,6 +172,13 @@
             <artifactId>mariadb-java-client</artifactId>
             <version>2.7.1</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/net.coderazzi/tablefilter-swing -->
+        <dependency>
+            <groupId>net.coderazzi</groupId>
+            <artifactId>tablefilter-swing</artifactId>
+            <version>5.5.2</version>
+        </dependency>
+
     </dependencies>
     
 

@@ -324,7 +324,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     }
 
     private JPanel getPanel(String className) {
-        LOGGER.info("Class Name :" + className);
         String[] split = className.split(",");
         String cName = split[0]; // group name
         String sourceId = split[1];
@@ -1005,10 +1004,9 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         btnHistory = new javax.swing.JButton();
         btnClear = new javax.swing.JButton();
         btnLogout = new javax.swing.JButton();
+        btnFilter = new javax.swing.JButton();
         lblNeworkImage = new javax.swing.JLabel();
         lblNeworkPing = new javax.swing.JLabel();
-        txtSearch = new javax.swing.JTextField();
-        jLabel1 = new javax.swing.JLabel();
         tabMain = new javax.swing.JTabbedPane();
         menuBar = new javax.swing.JMenuBar();
 
@@ -1134,41 +1132,34 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         });
         toolBar.add(btnLogout);
 
+        btnFilter.setBackground(ColorUtil.mainColor);
+        btnFilter.setFont(Global.lableFont);
+        btnFilter.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/slider_20px.png"))); // NOI18N
+        btnFilter.setToolTipText("Filter Bar");
+        btnFilter.setFocusable(false);
+        btnFilter.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnFilter.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnFilter.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnFilterActionPerformed(evt);
+            }
+        });
+        toolBar.add(btnFilter);
+
         lblNeworkImage.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/online-signal.png"))); // NOI18N
 
         lblNeworkPing.setText("2344ms");
         lblNeworkPing.setToolTipText("Internet Connection Status");
-
-        txtSearch.setFont(Global.textFont);
-        txtSearch.setFocusable(false);
-        txtSearch.setRequestFocusEnabled(false);
-        txtSearch.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                txtSearchKeyReleased(evt);
-            }
-        });
-
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/search.png"))); // NOI18N
-        jLabel1.setToolTipText("Search");
-        jLabel1.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jLabel1MouseClicked(evt);
-            }
-        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(toolBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(lblCompanyName, javax.swing.GroupLayout.PREFERRED_SIZE, 204, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(toolBar, javax.swing.GroupLayout.DEFAULT_SIZE, 286, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addComponent(lblCompanyName, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(184, 184, 184)
                 .addComponent(lblNeworkImage)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblNeworkPing)
@@ -1182,16 +1173,10 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                     .addComponent(toolBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(0, 0, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jLabel1))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(lblNeworkImage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(lblNeworkPing, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))))
+                    .addComponent(lblNeworkImage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblNeworkPing, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -1279,7 +1264,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed
         // TODO add your handling code here:
         if (control != null) {
-            txtSearch.setText(null);
             control.newForm();
         }
 
@@ -1314,32 +1298,26 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
         // TODO add your handling code here:
         if (control != null) {
-            txtSearch.setText(null);
             control.refresh();
         }
     }//GEN-LAST:event_btnRefreshActionPerformed
 
-    private void txtSearchKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchKeyReleased
+    private void btnFilterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFilterActionPerformed
         // TODO add your handling code here:
         if (filterObserver != null) {
-            filterObserver.sendFilter(txtSearch.getText());
+            filterObserver.sendFilter("-");
         }
-    }//GEN-LAST:event_txtSearchKeyReleased
-
-    private void jLabel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseClicked
-        // TODO add your handling code here:
-        txtSearch.requestFocus();
-    }//GEN-LAST:event_jLabel1MouseClicked
+    }//GEN-LAST:event_btnFilterActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClear;
     private javax.swing.JButton btnDelete;
+    private javax.swing.JButton btnFilter;
     private javax.swing.JButton btnHistory;
     private javax.swing.JButton btnLogout;
     private javax.swing.JButton btnPrint;
     private javax.swing.JButton btnRefresh;
     private javax.swing.JButton btnSave;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel lblCompanyName;
     private javax.swing.JLabel lblNeworkImage;
@@ -1347,7 +1325,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JTabbedPane tabMain;
     private javax.swing.JToolBar toolBar;
-    private javax.swing.JTextField txtSearch;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -1366,18 +1343,18 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                 case "Start":
                     JLabel sLoading = hmTabLoading.get(parent);
                     taskExecutor.execute(() -> {
-                        LOGGER.info("Loading Visible Start");
+                        //LOGGER.info("Loading Visible Start");
                         sLoading.setVisible(true);
-                        LOGGER.info("Loading Visible End");
+                        //LOGGER.info("Loading Visible End");
                     });
 
                     break;
                 case "Stop":
                     JLabel eLoading = hmTabLoading.get(parent);
                     taskExecutor.execute(() -> {
-                        LOGGER.info("Loading Invisbile Start");
+                        //LOGGER.info("Loading Invisbile Start");
                         eLoading.setVisible(false);
-                        LOGGER.info("Loading Invisbile End");
+                        //LOGGER.info("Loading Invisbile End");
                     });
 
                     break;

@@ -99,7 +99,7 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
     public ReturnIn() {
         initComponents();
         actionMapping();
-        initKeyListener();
+        //initKeyListener();
     }
 
     private void initMain() {
@@ -602,6 +602,7 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
                     customerAutoCompleter.setTrader((Customer) retIn.getCustomer());
                 }
                 returnInTableModel.addNewRow();
+                requestTable();
                 break;
             case "TOTAL-AMT":
                 calculateTotalAmount();
@@ -747,6 +748,12 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
     };
 
     private void assignDefaultValue() {
+        if (traderAutoCompleter != null) {
+            traderAutoCompleter.setTrader(null);
+        }
+        if (customerAutoCompleter != null) {
+            customerAutoCompleter.setTrader(null);
+        }
         currencyAutoCompleter.setCurrency(Global.defalutCurrency);
         locationAutoCompleter.setLocation(Global.defaultLocation);
     }
@@ -795,10 +802,10 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
         int yes_no = JOptionPane.showConfirmDialog(Global.parentForm,
                 "Are you sure to delete?", "Return in item delete", JOptionPane.YES_NO_OPTION);
         if (yes_no == 0) {
-            String vouNo = txtVouNo.getText();
             if (lblStatus.getText().equals("EDIT")) {
                 try {
-                    retInService.delete(vouNo);
+                    retIn.setDeleted(true);
+                    saveReturnIn();
                     clear();
                 } catch (Exception ex) {
                     log.error("Return In Voucher Delete :" + ex.getMessage());
@@ -812,7 +819,7 @@ public class ReturnIn extends javax.swing.JPanel implements SelectionObserver, K
         retInVouSearch.setPanelName(this.getName());
         retInVouSearch.initMain();
         retInVouSearch.setTitle("Return In Voucher Search");
-        retInVouSearch.setSize(Global.width - 500, Global.height - 300);
+        retInVouSearch.setSize(Global.width - 200, Global.height - 200);
         retInVouSearch.setResizable(false);
         retInVouSearch.setLocationRelativeTo(null);
         retInVouSearch.setSelectionObserver(this);

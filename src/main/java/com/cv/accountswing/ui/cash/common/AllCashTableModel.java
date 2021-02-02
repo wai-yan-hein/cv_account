@@ -240,7 +240,6 @@ public class AllCashTableModel extends AbstractTableModel {
                             parent.setColumnSelectionInterval(5, 5);
                         }
                     } else {
-                        JOptionPane.showMessageDialog(Global.parentForm, "Trader Not Found.");
                         parent.setColumnSelectionInterval(column, column);
                     }
                 }

@@ -14,6 +14,7 @@ import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.CompanyInfo;
 import com.cv.accountswing.entity.SystemProperty;
 import com.cv.accountswing.entity.SystemPropertyKey;
+import com.cv.accountswing.entity.Trader;
 import com.cv.accountswing.entity.temp.TmpOpeningClosing;
 import com.cv.accountswing.entity.view.VApar;
 import com.cv.accountswing.entity.view.VGl;
@@ -32,6 +33,7 @@ import com.cv.accountswing.ui.editor.CurrencyAutoCompleter;
 import com.cv.accountswing.ui.editor.DateAutoCompleter;
 import com.cv.accountswing.ui.editor.DepartmentAutoCompleter;
 import com.cv.accountswing.ui.editor.SupplierAutoCompleter;
+import com.cv.accountswing.ui.editor.TraderAutoCompleter;
 import com.cv.accountswing.ui.report.common.APARTableModel;
 import com.cv.accountswing.ui.report.common.GLListingTableModel;
 import com.cv.accountswing.util.Util1;
@@ -49,10 +51,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
-import javax.swing.RowFilter;
 import javax.swing.SwingUtilities;
-import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
+import net.coderazzi.filters.gui.AutoChoices;
+import net.coderazzi.filters.gui.TableFilterHeader;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
@@ -67,7 +68,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         PanelControl, FilterObserver, KeyListener {
 
     private int selectRow = -1;
-    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(AparGlReport.class);
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(AparGlReport.class);
     private final ImageIcon account = new ImageIcon(getClass().getResource("/images/accountant.png"));
 
     /**
@@ -99,18 +100,20 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
     private ApplicationMainFrame mainFrame;
     @Autowired
     private FirebaseService firebaseService;
-    private TableRowSorter<TableModel> sorter;
     private boolean isShown = false;
     private LoadingObserver loadingObserver;
     private JPopupMenu popup;
     private DepartmentAutoCompleter departmentAutoCompleter;
     private String stDate;
     private String enDate;
-    private String cvId;
+    private String traderCode;
     private String dept;
     private String currency;
     private String userCode;
     private String panelName;
+    private TableFilterHeader filterHeader;
+    private boolean isApPrCal = false;
+    private boolean isGLCal = false;
 
     public void setIsShown(boolean isShown) {
         this.isShown = isShown;
@@ -176,8 +179,6 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         tblAPAR.getColumnModel().getColumn(5).setPreferredWidth(50);
         tblAPAR.setDefaultRenderer(Double.class, new TableCellRender());
         tblAPAR.setDefaultRenderer(Object.class, new TableCellRender());
-        sorter = new TableRowSorter<>(tblAPAR.getModel());
-        tblAPAR.setRowSorter(sorter);
 
         tblAPAR.addMouseListener(new MouseAdapter() {
             @Override
@@ -190,11 +191,11 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                         selectRow = tblAPAR.convertRowIndexToModel(tblAPAR.getSelectedRow());
                         if (panelName.equals("AR/AP")) {
                             VApar apar = aPARTableModel.getAPAR(selectRow);
-                            String cvId = apar.getKey().getTraderCode();
+                            String traderCode = apar.getKey().getTraderCode();
                             String desp = apar.getTraderName();
                             Double netChange = apar.getClosing();
 
-                            searchTriBalDetail(cvId, "-", desp, netChange);
+                            searchTriBalDetail(traderCode, "-", desp, netChange);
                         } else if (panelName.equals("G/L Listing")) {
                             VTriBalance vtb = glListingTableModel.getTBAL(selectRow);
                             String coaId = vtb.getKey().getCoaId();
@@ -209,6 +210,10 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
             }
 
         });
+        filterHeader = new TableFilterHeader(tblAPAR, AutoChoices.ENABLED);
+        filterHeader.setPosition(TableFilterHeader.Position.TOP);
+        filterHeader.setFont(Global.textFont);
+        filterHeader.setVisible(false);
 
     }
 
@@ -225,29 +230,36 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
     }
 
     private void searchAPAR() {
-        loadingObserver.load(this.getName(), "Start");
-        clearTable();
-        initializeParameter();
-        taskExecutor.execute(() -> {
-            try {
-                coaOpDService.genArAp1(Global.compCode,
-                        Util1.toDateStrMYSQL(stDate, "dd/MM/yyyy"), Global.finicialPeriodFrom,
-                        Util1.toDateStrMYSQL(enDate, "dd/MM/yyyy"), "-",
-                        currency, dept, cvId,
-                        userCode);
-                List<VApar> listApar = aParService.getApAr(userCode,
-                        Global.compCode);
-                if (!listApar.isEmpty()) {
-                    aPARTableModel.setListAPAR(listApar);
-                    calAPARTotalAmount(listApar);
+        if (!isApPrCal) {
+            log.info("AP/PR Calculating Start.");
+            isApPrCal = true;
+            clearTable();
+            initializeParameter();
+            loadingObserver.load(this.getName(), "Start");
+            taskExecutor.execute(() -> {
+                try {
+                    coaOpDService.genArAp1(Global.compCode,
+                            Util1.toDateStrMYSQL(stDate, "dd/MM/yyyy"), Global.finicialPeriodFrom,
+                            Util1.toDateStrMYSQL(enDate, "dd/MM/yyyy"), "-",
+                            currency, dept, traderCode,
+                            userCode);
+                    List<VApar> listApar = aParService.getApAr(userCode,
+                            Global.compCode);
+                    if (!listApar.isEmpty()) {
+                        aPARTableModel.setListAPAR(listApar);
+                        calAPARTotalAmount(listApar);
+                    }
+                    log.info("AP/PR Calculating End.");
+                    isApPrCal = false;
+                    loadingObserver.load(this.getName(), "Stop");
+                } catch (Exception ex) {
+                    isApPrCal = false;
+                    log.error("SEARCH APAR -----" + ex.getMessage());
+                    loadingObserver.load(this.getName(), "Stop");
                 }
-                loadingObserver.load(this.getName(), "Stop");
-            } catch (Exception ex) {
-                LOGGER.error("SEARCH APAR -----" + ex.getMessage());
-                loadingObserver.load(this.getName(), "Stop");
-            }
-        });
-        //uploadToFirebase();
+            });
+            //uploadToFirebase();
+        }
 
     }
 
@@ -256,42 +268,48 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
             try {
                 firebaseService.uploadCustomerBalance(aPARTableModel.getListAPAR());
             } catch (Exception e) {
-                LOGGER.info("User Offline...");
+                log.info("User Offline...");
             }
         });
     }
 
     private void searchGLListing() {
         loadingObserver.load(this.getName(), "Start");
-        clearTable();
-        initializeParameter();
-        taskExecutor.execute(() -> {
-            try {
-                LOGGER.info("START DATE :" + stDate + "---" + "END DATE :" + enDate);
-                coaOpDService.genTriBalance1(Global.compCode,
-                        Util1.toDateStrMYSQL(stDate, "dd/MM/yyyy"),
-                        Global.finicialPeriodFrom, Util1.toDateStrMYSQL(enDate, "dd/MM/yyyy"),
-                        "-", currency, dept, cvId, userCode, Global.machineId.toString());
-                List<VTriBalance> listVTB = vTriBalanceService.getTriBalance(Global.machineId.toString());
-                glListingTableModel.setListTBAL(listVTB);
-                calGLTotlaAmount(listVTB);
-                loadingObserver.load(this.getName(), "Stop");
-            } catch (Exception ex) {
-                LOGGER.error("searchGLListing -----" + ex.getMessage());
-                loadingObserver.load(this.getName(), "Stop");
-            }
-        });
+        if (!isGLCal) {
+            log.info("G/L Calculation Start.");
+            isGLCal = true;
+            clearTable();
+            initializeParameter();
+            taskExecutor.execute(() -> {
+                try {
+                    coaOpDService.genTriBalance1(Global.compCode,
+                            Util1.toDateStrMYSQL(stDate, "dd/MM/yyyy"),
+                            Global.finicialPeriodFrom, Util1.toDateStrMYSQL(enDate, "dd/MM/yyyy"),
+                            "-", currency, dept, traderCode, userCode, Global.machineId.toString());
+                    List<VTriBalance> listVTB = vTriBalanceService.getTriBalance(Global.machineId.toString());
+                    glListingTableModel.setListTBAL(listVTB);
+                    calGLTotlaAmount(listVTB);
+                    isGLCal = false;
+                    log.info("G/L Calculation End.");
+                    loadingObserver.load(this.getName(), "Stop");
+                } catch (Exception ex) {
+                    isGLCal = false;
+                    log.error("searchGLListing -----" + ex.getMessage());
+                    loadingObserver.load(this.getName(), "Stop");
+                }
+            });
+        }
 
     }
 
-    private void searchTriBalDetail(String cvId, String coaId, String desp, Double netChange) {
+    private void searchTriBalDetail(String traderCode, String coaId, String desp, Double netChange) {
         try {
             List<VGl> listVGL = vGlService.searchGlDrCr(Util1.isNull(stDate, "-"),
                     Util1.isNull(enDate, "-"), coaId, currency, dept,
-                    cvId, Global.compCode,
+                    traderCode, Global.compCode,
                     "DR");
             swapDrCrAmt(listVGL, getTarget());
-            calculateOpening(cvId);
+            calculateOpening(traderCode);
             openTBDDialog(listVGL, desp, netChange);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(Global.parentForm, e.getMessage());
@@ -300,15 +318,21 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
 
     }
 
-    private void calculateOpening(String cvId) {
+    private void calculateOpening(String traderCode) {
         List<TmpOpeningClosing> opBalanceGL;
         try {
-            if (!cvId.equals("-")) {
+            if (!traderCode.equals("-")) {
+                String opDate;
+                if (txtDate.getText().equals("All")) {
+                    opDate = stDate;
+                } else {
+                    opDate = enDate;
+                }
                 opBalanceGL = coaOpDService.getOpBalanceByTrader(getTarget(),
                         Global.finicialPeriodFrom,
-                        Util1.toDateStrMYSQL(enDate, "dd/MM/yyyy"), 3, "MMK",
+                        Util1.toDateStrMYSQL(opDate, "dd/MM/yyyy"), 3, "MMK",
                         Global.loginUser.getAppUserCode(),
-                        Util1.isNull(dept, "-"), cvId, Global.machineId.toString(), Global.compCode);
+                        Util1.isNull(dept, "-"), traderCode, Global.machineId.toString(), Global.compCode);
                 if (!opBalanceGL.isEmpty()) {
                     double opening;
                     TmpOpeningClosing tmpOC = opBalanceGL.get(0);
@@ -318,8 +342,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                         opening = tmpOC.getDrAmt();
                     }
                     trialBalanceDetailDialog.setOpeningAmt(opening);
-                    LOGGER.info("OPENING :" + tmpOC.getOpening());
-                    //txtFOpening.setValue(tmpOC.getOpening());
+                    log.info("OPENING :" + tmpOC.getOpening());
                 } else {
                     trialBalanceDetailDialog.setOpeningAmt(0.0);
                 }
@@ -332,7 +355,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                 if (!opBalanceGL.isEmpty()) {
                     TmpOpeningClosing tmpOC = opBalanceGL.get(0);
                     trialBalanceDetailDialog.setOpeningAmt(tmpOC.getOpening());
-                    LOGGER.info("OPENING :" + tmpOC.getOpening());
+                    log.info("OPENING :" + tmpOC.getOpening());
                     //txtFOpening.setValue(tmpOC.getOpening());
                 } else {
                     trialBalanceDetailDialog.setOpeningAmt(0.0);
@@ -340,7 +363,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
             }
 
         } catch (Exception ex) {
-            LOGGER.error("Calculation Opening :" + ex.getMessage());
+            log.error("Calculation Opening :" + ex.getMessage());
         }
 
     }
@@ -422,11 +445,12 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
 
     private void initializeParameter() {
         dept = Util1.isNull(dept, "-");
-        cvId = Util1.isNull(cvId, "-1");
+        traderCode = Util1.isNull(traderCode, "-1");
         currency = Global.defalutCurrency.getKey().getCode();
         stDate = Util1.isNull(stDate, Util1.toDateStr(Util1.getTodayDate(), "dd/MM/yyyy"));
         enDate = Util1.isNull(enDate, Util1.toDateStr(Util1.getTodayDate(), "dd/MM/yyyy"));
         userCode = Global.loginUser.getAppUserCode();
+
     }
 
     private void initCombo() {
@@ -434,8 +458,8 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                 Global.listDateModel, null);
         dateAutoCompleter.setSelectionObserver(this);
 
-        SupplierAutoCompleter traderAutoCompleter = new SupplierAutoCompleter(txtPerson,
-                Global.listSupplier, null);
+        TraderAutoCompleter traderAutoCompleter = new TraderAutoCompleter(txtPerson,
+                Global.listTrader, null, true);
         traderAutoCompleter.setSelectionObserver(this);
 
         departmentAutoCompleter = new DepartmentAutoCompleter(txtDep,
@@ -476,7 +500,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                 rService.genCreditVoucher(reportPath, filePath, fontPath, parameters);
                 loadingObserver.load(this.getName(), "Stop");
             } catch (Exception ex) {
-                LOGGER.error("PRINT APAR REPORT :::" + ex.getMessage());
+                log.error("PRINT APAR REPORT :::" + ex.getMessage());
             }
         });
 
@@ -503,11 +527,6 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         } else if (this.getName().equals("G/L Listing")) {
             glListingTableModel.clear();
         }
-    }
-
-    private void setTableFilter(String filter) {
-        sorter.setRowFilter(RowFilter.regexFilter(filter));
-
     }
 
     /**
@@ -809,7 +828,21 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                     currency = selectObj.toString();
                     break;
                 case "Trader":
-                    cvId = selectObj.toString();
+                    if (selectObj instanceof Trader) {
+                        Trader trader = (Trader) selectObj;
+                        switch (trader.getTraderName()) {
+                            case "All Customer":
+                                //traderType = "CUS";
+                                break;
+                            case "All Supplier":
+                                //traderType = "SUP";
+                                break;
+                            default:
+                                //traderType = "-";
+                                break;
+                        }
+                        traderCode = trader.getCode();
+                    }
                     break;
             }
             search();
@@ -847,7 +880,11 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
 
     @Override
     public void sendFilter(String filter) {
-        setTableFilter(filter);
+        if (filterHeader.isVisible()) {
+            filterHeader.setVisible(false);
+        } else {
+            filterHeader.setVisible(true);
+        }
     }
 
     @Override

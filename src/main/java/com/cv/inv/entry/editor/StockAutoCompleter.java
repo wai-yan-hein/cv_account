@@ -234,8 +234,8 @@ public class StockAutoCompleter implements KeyListener {
                     if (x == 0) {
                         x = textComp.getCaretPosition();
                     }
+
                     popup.show(textComp, x, textComp.getHeight());
-                    log.info("Show Popup...");
                     popupOpen = false;
                 } else {
                     popup.setVisible(false);
@@ -317,7 +317,6 @@ public class StockAutoCompleter implements KeyListener {
 
             }
         }
-
         Rectangle rect = table.getCellRect(table.getSelectedRow(), 0, true);
         table.scrollRectToVisible(rect);
     }
@@ -349,17 +348,10 @@ public class StockAutoCompleter implements KeyListener {
     @Override
     public void keyReleased(KeyEvent e) {
         String filter = textComp.getText();
-
         if (filter.length() == 0) {
             sorter.setRowFilter(null);
         } else {
-            //String value = Util1.getPropValue("system.iac.filter");
-
-            if ("N".equals("Y")) {
-                sorter.setRowFilter(RowFilter.regexFilter(filter));
-            } else {
-                sorter.setRowFilter(startsWithFilter);
-            }
+            sorter.setRowFilter(startsWithFilter);
             try {
                 if (e.getKeyCode() != KeyEvent.VK_DOWN && e.getKeyCode() != KeyEvent.VK_UP) {
                     if (table.getSelectedRow() >= 0) {
@@ -373,25 +365,11 @@ public class StockAutoCompleter implements KeyListener {
     private final RowFilter<Object, Object> startsWithFilter = new RowFilter<Object, Object>() {
         @Override
         public boolean include(RowFilter.Entry<? extends Object, ? extends Object> entry) {
-            //for (int i = entry.getValueCount() - 1; i >= 0; i--) {
-            /*
-             * if (NumberUtil.isNumber(textComp.getText())) { if
-             * (entry.getStringValue(0).toUpperCase().startsWith(
-             * textComp.getText().toUpperCase())) { return true; } } else {
-             *
-             * if (entry.getStringValue(1).toUpperCase().contains(
-             * textComp.getText().toUpperCase())) { return true; } else if
-             * (entry.getStringValue(2).toUpperCase().contains(
-             * textComp.getText().toUpperCase())) { return true; }
-             }
-             */
-
             String tmp1 = entry.getStringValue(0).toUpperCase();
             String tmp2 = entry.getStringValue(1).toUpperCase();
             String tmp3 = entry.getStringValue(3).toUpperCase();
             String tmp4 = entry.getStringValue(4).toUpperCase();
             String text = textComp.getText().toUpperCase();
-
             if (tmp1.startsWith(text) || tmp2.startsWith(text) || tmp3.startsWith(text) || tmp4.startsWith(text)) {
                 return true;
             } else {

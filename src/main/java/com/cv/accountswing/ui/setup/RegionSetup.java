@@ -186,7 +186,7 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
         int showConfirmDialog = JOptionPane.showConfirmDialog(Global.parentForm, "Are you sure to delete");
         if (showConfirmDialog == JOptionPane.OK_OPTION) {
             if (reg.getRegCode() != null) {
-                List<Trader> listTrader = traderService.search(regCode);
+                List<Trader> listTrader = traderService.search(regCode, "-");
                 if (listTrader.isEmpty()) {
                     regionService.delete(regCode, Global.compCode);
                     clear();

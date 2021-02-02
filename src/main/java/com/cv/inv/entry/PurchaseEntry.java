@@ -178,7 +178,7 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
         txtPurDate.getDateEditor().getUiComponent().addKeyListener(this);
         txtDueDate.getDateEditor().getUiComponent().setName("txtDueDate");
         txtDueDate.getDateEditor().getUiComponent().addKeyListener(this);
-        txtSupplier.addKeyListener(this);
+        //txtSupplier.addKeyListener(this);
         txtRemark.addKeyListener(this);
         txtRefNo.addKeyListener(this);
         txtCurrency.addKeyListener(this);
@@ -235,6 +235,12 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
 
     private void assignDefalutValue() {
         try {
+            if (traderAutoCompleter != null) {
+                traderAutoCompleter.setTrader(null);
+            }
+            if (supplierAutoCompleter != null) {
+                supplierAutoCompleter.setTrader(null);
+            }
             txtPurDate.setDate(Util1.getTodayDate());
             currAutoCompleter.setCurrency(Global.defalutCurrency);
             vouCompleter.setVouStatus(Global.defaultVouStatus);
@@ -282,7 +288,10 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
 
     private boolean isValidEntry() {
         boolean status = true;
-        if (txtVouNo.getText().isEmpty()) {
+        if (lblStatus.getText().equals("DELETED")) {
+            status = false;
+            JOptionPane.showMessageDialog(Global.parentForm, "Can't Save Deleted Voucher.");
+        } else if (txtVouNo.getText().isEmpty()) {
             JOptionPane.showMessageDialog(Global.parentForm, "Invalid voucher no.",
                     "Invalid Voucher ID.", JOptionPane.ERROR_MESSAGE);
             status = false;
@@ -372,6 +381,8 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
             }
             purTableModel.setListPurDetail(listDetailHis);
             purTableModel.addNewRow();
+            tblPurchase.setRowSelectionInterval(0, 0);
+            tblPurchase.requestFocus();
         }
     }
 
@@ -401,10 +412,10 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
         int yes_no = JOptionPane.showConfirmDialog(Global.parentForm,
                 "Are you sure to delete?", "Damage item delete", JOptionPane.YES_NO_OPTION);
         if (yes_no == 0) {
-            String vouNo = txtVouNo.getText();
             if (lblStatus.getText().equals("EDIT")) {
                 try {
-                    phService.delete(vouNo);
+                    ph.setDeleted(true);
+                    savePurchase();
                 } catch (Exception ex) {
                     LOGGER.error("Delete Purchase Voucher :" + ex.getMessage());
                 }
@@ -1271,7 +1282,7 @@ public class PurchaseEntry extends javax.swing.JPanel implements SelectionObserv
     public void history() {
         pvSearchDialog.setIconImage(historyIcon);
         pvSearchDialog.initMain();
-        pvSearchDialog.setSize(Global.width - 500, Global.height - 300);
+        pvSearchDialog.setSize(Global.width - 200, Global.height - 200);
         pvSearchDialog.setLocationRelativeTo(null);
         pvSearchDialog.setVisible(true);
     }

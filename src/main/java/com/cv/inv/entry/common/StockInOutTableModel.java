@@ -179,6 +179,10 @@ public class StockInOutTableModel extends AbstractTableModel {
                             Stock stock = (Stock) value;
                             stockInOut.setStock(stock);
                             stockInOut.setLocation(Global.defaultLocation);
+                            stockInOut.setInWeight(stock.getPurWeight());
+                            stockInOut.setOutWeight(stock.getPurWeight());
+                            stockInOut.setInUnit(stock.getPurUnit());
+                            stockInOut.setOutUnit(stock.getPurUnit());
                             setColumnSelection(4);
                         }
                         addNewRow();
@@ -223,6 +227,9 @@ public class StockInOutTableModel extends AbstractTableModel {
             calStock(stockInOut);
             fireTableRowsUpdated(row, row);
             if (Util1.getFloat(stockInOut.getSmallInWeight()) > 0 || Util1.getFloat(stockInOut.getSmallInWeight()) > 0) {
+                if (stockInOut.getLocation() == null) {
+                    JOptionPane.showMessageDialog(Global.parentForm, "Invalid Location");
+                }
                 parent.setRowSelectionInterval(row + 1, row + 1);
                 parent.setColumnSelectionInterval(0, 0);
             }

@@ -44,7 +44,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class SaleEntryTableModel extends AbstractTableModel {
-
+    
     private static final Logger log = LoggerFactory.getLogger(SaleEntryTableModel.class);
     private String[] columnNames = {"Code", "Description", "Department", "Location",
         "Qty", "Std-Wt", "Unit", "Sale Price", "Amount"};
@@ -72,70 +72,70 @@ public class SaleEntryTableModel extends AbstractTableModel {
     private TaskExecutor taskExecutor;
     private JLabel lblStockName;
     private JButton btnProgress;
-
+    
     public JLabel getLblStockName() {
         return lblStockName;
     }
-
+    
     public void setLblStockName(JLabel lblStockName) {
         this.lblStockName = lblStockName;
     }
-
+    
     public JButton getBtnProgress() {
         return btnProgress;
     }
-
+    
     public void setBtnProgress(JButton btnProgress) {
         this.btnProgress = btnProgress;
     }
-
+    
     public JTable getParent() {
         return parent;
     }
-
+    
     public void setParent(JTable parent) {
         this.parent = parent;
     }
-
+    
     public LocationAutoCompleter getLocationAutoCompleter() {
         return locationAutoCompleter;
     }
-
+    
     public void setLocationAutoCompleter(LocationAutoCompleter locationAutoCompleter) {
         this.locationAutoCompleter = locationAutoCompleter;
     }
-
+    
     public SelectionObserver getSelectionObserver() {
         return selectionObserver;
     }
-
+    
     public void setSelectionObserver(SelectionObserver selectionObserver) {
         this.selectionObserver = selectionObserver;
     }
-
+    
     public SaleEntryTableModel(List<SaleHisDetail> listDetail, StockUP stockUp) {
         this.listDetail = listDetail;
         this.stockUp = stockUp;
     }
-
+    
     @Override
     public String getColumnName(int column) {
         return columnNames[column];
     }
-
+    
     @Override
     public int getColumnCount() {
         return columnNames.length;
     }
-
+    
     public String[] getColumnNames() {
         return columnNames;
     }
-
+    
     public void setColumnNames(String[] columnNames) {
         this.columnNames = columnNames;
     }
-
+    
     @Override
     public int getRowCount() {
         if (listDetail == null) {
@@ -143,7 +143,7 @@ public class SaleEntryTableModel extends AbstractTableModel {
         }
         return listDetail.size();
     }
-
+    
     @Override
     public Class getColumnClass(int column) {
         switch (column) {
@@ -161,7 +161,7 @@ public class SaleEntryTableModel extends AbstractTableModel {
                 return Object.class;
         }
     }
-
+    
     @Override
     public boolean isCellEditable(int row, int column) {
         if (listDetail == null) {
@@ -170,7 +170,7 @@ public class SaleEntryTableModel extends AbstractTableModel {
         if (listDetail.isEmpty()) {
             return false;
         }
-
+        
         SaleHisDetail record = listDetail.get(row);
         switch (column) {
             case 0://Code
@@ -197,7 +197,7 @@ public class SaleEntryTableModel extends AbstractTableModel {
                 return false;
         }
     }
-
+    
     @Override
     public Object getValueAt(int row, int column) {
         try {
@@ -243,13 +243,13 @@ public class SaleEntryTableModel extends AbstractTableModel {
         }
         return null;
     }
-
+    
     @Override
     public void setValueAt(Object value, int row, int column) {
         if (listDetail == null) {
             return;
         }
-
+        
         if (listDetail.isEmpty()) {
             return;
         }
@@ -319,7 +319,7 @@ public class SaleEntryTableModel extends AbstractTableModel {
                         parent.setColumnSelectionInterval(column, column);
                     }
                     break;
-
+                
                 case 6://Unit
                     if (value != null) {
                         if (value instanceof StockUnit) {
@@ -358,7 +358,7 @@ public class SaleEntryTableModel extends AbstractTableModel {
             log.error("setValueAt : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
         }
     }
-
+    
     public void addNewRow() {
         if (listDetail != null) {
             if (hasEmptyRow()) {
@@ -370,7 +370,7 @@ public class SaleEntryTableModel extends AbstractTableModel {
             }
         }
     }
-
+    
     private boolean hasEmptyRow() {
         boolean status = true;
         if (listDetail.size() > 1) {
@@ -381,44 +381,44 @@ public class SaleEntryTableModel extends AbstractTableModel {
         }
         return status;
     }
-
+    
     public Department getDepartment() {
         return department;
     }
-
+    
     public void setDepartment(Department dept) {
         this.department = dept;
     }
-
+    
     public void setListDetail(List<SaleHisDetail> listDetail) {
         this.listDetail = listDetail;
         addNewRow();
         fireTableDataChanged();
     }
-
+    
     private String getCusType() {
         if (cusType == null) {
             cusType = "N";
         }
-
+        
         return cusType;
     }
-
+    
     public void setCusType(String type) {
         cusType = type;
     }
-
+    
     public void removeListDetail() {
         this.listDetail.clear();
         addNewRow();
     }
-
+    
     private void calculateAmount(SaleHisDetail sale) {
         if (sale.getStock() != null) {
             Stock stock = sale.getStock();
-            float saleQty = sale.getQuantity();
-            float stdSalePrice = sale.getPrice();
-            float userWt = sale.getStdWeight();
+            float saleQty = Util1.getFloat(sale.getQuantity());
+            float stdSalePrice = Util1.getFloat(sale.getPrice());
+            float userWt = Util1.getFloat(sale.getStdWeight());
             String saleUnit = sale.getSaleUnit().getItemUnitCode();
             String purUnit = stock.getPurUnit().getItemUnitCode();
             String pattern = stock.getPattern().getPatternCode();
@@ -427,10 +427,10 @@ public class SaleEntryTableModel extends AbstractTableModel {
             sale.setSmallestUnit(stock.getPurUnit().getItemUnitCode());
             float amount = saleQty * stdSalePrice;
             sale.setAmount(amount);
-
+            
         }
     }
-
+    
     private void calPrice(SaleHisDetail sdh) {
         Stock stock = sdh.getStock();
         float saleAmount = 0.0f;
@@ -440,7 +440,7 @@ public class SaleEntryTableModel extends AbstractTableModel {
         String fromUnit = stock.getSaleUnit().getItemUnitCode();
         String toUnit = sdh.getSaleUnit().getItemUnitCode();
         String pattern = stock.getPattern().getPatternCode();
-
+        
         if (!fromUnit.equals(toUnit)) {
             RelationKey key = new RelationKey(fromUnit, toUnit, pattern);
             UnitRelation unitRelation = relationService.findByKey(key);
@@ -464,7 +464,7 @@ public class SaleEntryTableModel extends AbstractTableModel {
         }
         sdh.setAmount(saleAmount);
     }
-
+    
     private Float getSmallestWeight(Float weight, String unit, String purUnit, String pattern) {
         float sWt = 0.0f;
         if (!unit.equals(purUnit)) {
@@ -487,24 +487,24 @@ public class SaleEntryTableModel extends AbstractTableModel {
         }
         return sWt;
     }
-
+    
     private void showMessageBox(String text) {
         JOptionPane.showMessageDialog(Global.parentForm, text);
     }
-
+    
     public List<SaleHisDetail> getListSaleDetail() {
         List<SaleHisDetail> listpurDetail = new ArrayList();
         listDetail.stream().filter(pdh2 -> (pdh2.getStock() != null)).filter(pdh2 -> (pdh2.getStock().getStockCode() != null)).forEachOrdered(pdh2 -> {
             listpurDetail.add(pdh2);
         });
-
+        
         return listpurDetail;
     }
-
+    
     public void setTxtTotalItem(JTextField txtTtlItem) {
         this.txtTotalItem = txtTtlItem;
     }
-
+    
     public boolean isValidEntry() {
         boolean status = true;
         for (SaleHisDetail sdh : listDetail) {
@@ -520,31 +520,31 @@ public class SaleEntryTableModel extends AbstractTableModel {
         }
         return status;
     }
-
+    
     public List<String> getDelList() {
         return deleteList;
     }
-
+    
     public void clearDelList() {
         if (deleteList != null) {
             deleteList.clear();
         }
     }
-
+    
     public void delete(int row) {
         if (listDetail == null) {
             return;
         }
-
+        
         if (listDetail.isEmpty()) {
             return;
         }
-
+        
         SaleHisDetail sdh = listDetail.get(row);
         if (sdh.getSaleDetailKey() != null) {
             deleteList.add(sdh.getSaleDetailKey().getSaleDetailId());
         }
-
+        
         listDetail.remove(row);
         addNewRow();
         fireTableRowsDeleted(row, row);
@@ -554,20 +554,20 @@ public class SaleEntryTableModel extends AbstractTableModel {
             parent.setRowSelectionInterval(0, 0);
         }
     }
-
+    
     public void addSale(SaleHisDetail sd) {
         if (listDetail != null) {
             listDetail.add(sd);
             fireTableRowsInserted(listDetail.size() - 1, listDetail.size() - 1);
         }
     }
-
+    
     public void clear() {
         if (listDetail != null) {
             listDetail.clear();
         }
     }
-
+    
     public void calStockBalance(int row, boolean refresh) {
         if (listDetail != null) {
             SaleHisDetail sd = listDetail.get(row);
@@ -578,7 +578,7 @@ public class SaleEntryTableModel extends AbstractTableModel {
             }
         }
     }
-
+    
     private void calStockBalance(Stock stock, boolean refresh) {
         String isStock = Global.sysProperties.get("system.sale.stock.balance");
         if (Util1.isNull(isStock, "0").equals("1")) {
@@ -606,5 +606,5 @@ public class SaleEntryTableModel extends AbstractTableModel {
             });
         }
     }
-
+    
 }
