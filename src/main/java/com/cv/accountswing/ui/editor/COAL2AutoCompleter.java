@@ -8,16 +8,15 @@ package com.cv.accountswing.ui.editor;
 import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.SelectionObserver;
-import com.cv.accountswing.entity.Trader;
+import com.cv.accountswing.entity.ChartOfAccount;
+import com.cv.accountswing.ui.cash.common.COAL2TableModel;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
-import com.cv.accountswing.ui.cash.common.TraderTableModel;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractCellEditor;
@@ -43,58 +42,50 @@ import org.slf4j.LoggerFactory;
  *
  * @author Lenovo
  */
-public class TraderAutoCompleter implements KeyListener {
+public class COAL2AutoCompleter implements KeyListener {
 
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(TraderAutoCompleter.class);
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(COAL2AutoCompleter.class);
     private JTable table = new JTable();
     private JPopupMenu popup = new JPopupMenu();
     private JTextComponent textComp;
     private static final String AUTOCOMPLETER = "AUTOCOMPLETER"; //NOI18N
-    private TraderTableModel traderTableModel;
-    private Trader trader;
+    private COAL2TableModel cOATableModel;
+    private ChartOfAccount coa;
     public AbstractCellEditor editor;
     private TableRowSorter<TableModel> sorter;
     private int x = 0;
     private int y = 0;
-    private boolean popupOpen = false;
+    boolean popupOpen = false;
     private SelectionObserver selectionObserver;
 
     public void setSelectionObserver(SelectionObserver selectionObserver) {
         this.selectionObserver = selectionObserver;
     }
 
-    public TraderAutoCompleter() {
+    //private CashFilter cashFilter = Global.allCash;
+    public COAL2AutoCompleter() {
     }
 
-    public TraderAutoCompleter(JTextComponent comp, List<Trader> list,
-            AbstractCellEditor editor, boolean filter) {
+    public COAL2AutoCompleter(JTextComponent comp, List<ChartOfAccount> list,
+            AbstractCellEditor editor) {
         this.textComp = comp;
         this.editor = editor;
         textComp.putClientProperty(AUTOCOMPLETER, this);
-        if (filter) {
-            list = new ArrayList<>(list);
-            list.add(0, new Trader("-", "All"));
-            list.add(1, new Trader("-", "All Customer"));
-            list.add(2, new Trader("-", "All Supplier"));
-        }
         textComp.setFont(Global.textFont);
-        traderTableModel = new TraderTableModel(list);
-        table.setModel(traderTableModel);
-        table.getTableHeader().setFont(Global.textFont);
-        table.setFont(Global.textFont); // NOI18N
-        table.setRowHeight(Global.tblRowHeight);
+        cOATableModel = new COAL2TableModel(list);
+        table.setModel(cOATableModel);
+        table.getTableHeader().setFont(Global.lableFont);
         table.getTableHeader().setBackground(ColorUtil.btnEdit);
         table.getTableHeader().setForeground(ColorUtil.foreground);
+        table.setFont(Global.textFont); // NOI18N
+        table.setRowHeight(Global.tblRowHeight);
         table.setDefaultRenderer(Object.class, new TableCellRender());
         sorter = new TableRowSorter(table.getModel());
         table.setRowSorter(sorter);
         JScrollPane scroll = new JScrollPane(table);
-
-        scroll.setBorder(null);
-        table.setFocusable(false);
         table.getColumnModel().getColumn(0).setPreferredWidth(10);//Code
         table.getColumnModel().getColumn(1).setPreferredWidth(120);//Name
-
+        table.getColumnModel().getColumn(2).setPreferredWidth(120);//Name
         table.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -109,7 +100,6 @@ public class TraderAutoCompleter implements KeyListener {
 
         popup.setBorder(BorderFactory.createLineBorder(ColorUtil.mainColor));
         popup.setPopupSize(400, 200);
-
         popup.add(scroll);
 
         if (textComp instanceof JTextField) {
@@ -137,13 +127,13 @@ public class TraderAutoCompleter implements KeyListener {
         popup.addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+
             }
 
             @Override
             public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
                 textComp.unregisterKeyboardAction(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
                 popupOpen = false;
-
             }
 
             @Override
@@ -153,26 +143,25 @@ public class TraderAutoCompleter implements KeyListener {
                         editor.stopCellEditing();
                     }
                 }
+
             }
         });
 
         table.setRequestFocusEnabled(false);
 
-        if (list != null) {
-            if (list.size() > 0) {
-                table.setRowSelectionInterval(0, 0);
-            }
+        if (list.size() > 0) {
+            table.setRowSelectionInterval(0, 0);
         }
     }
 
     public void mouseSelect() {
         if (table.getSelectedRow() != -1) {
-            trader = traderTableModel.getTrader(table.convertRowIndexToModel(
+            coa = cOATableModel.getCOA(table.convertRowIndexToModel(
                     table.getSelectedRow()));
-            ((JTextField) textComp).setText(trader.getTraderName());
+            ((JTextField) textComp).setText(coa.getCoaNameEng());
             if (editor == null) {
                 if (selectionObserver != null) {
-                    selectionObserver.selected("Trader", trader);
+                    selectionObserver.selected("COAL2", coa.getCode());
                 }
             }
         }
@@ -188,7 +177,6 @@ public class TraderAutoCompleter implements KeyListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             mouseSelect();
-
         }
     };
     DocumentListener documentListener = new DocumentListener() {
@@ -219,6 +207,7 @@ public class TraderAutoCompleter implements KeyListener {
     }
 
     public void showPopup() {
+
         if (popupOpen) {
             if (!popup.isVisible()) {
                 textComp.addKeyListener(this);
@@ -231,12 +220,11 @@ public class TraderAutoCompleter implements KeyListener {
                     textComp.registerKeyboardAction(acceptAction, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
                             JComponent.WHEN_FOCUSED);
                     if (x == 0) {
-                        x = textComp.getWidth();
+                        x = textComp.getWidth() - textComp.getWidth();
                         y = textComp.getHeight();
                     }
-
                     popup.show(textComp, x, y);
-                    log.info("Show Popup...");
+                    log.info("COA Popup Show.");
                     popupOpen = false;
 
                 } else {
@@ -251,7 +239,7 @@ public class TraderAutoCompleter implements KeyListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             JComponent tf = (JComponent) e.getSource();
-            TraderAutoCompleter completer = (TraderAutoCompleter) tf.getClientProperty(AUTOCOMPLETER);
+            COAL2AutoCompleter completer = (COAL2AutoCompleter) tf.getClientProperty(AUTOCOMPLETER);
             if (tf.isEnabled()) {
                 if (completer.popup.isVisible()) {
                     completer.selectNextPossibleValue();
@@ -260,16 +248,15 @@ public class TraderAutoCompleter implements KeyListener {
                         popupOpen = true;
                         completer.showPopup();
                     }
-
                 }
             }
         }
     };
-    static Action upAction = new AbstractAction() {
+    Action upAction = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
             JComponent tf = (JComponent) e.getSource();
-            TraderAutoCompleter completer = (TraderAutoCompleter) tf.getClientProperty(AUTOCOMPLETER);
+            COAL2AutoCompleter completer = (COAL2AutoCompleter) tf.getClientProperty(AUTOCOMPLETER);
             if (tf.isEnabled()) {
                 if (completer.popup.isVisible()) {
                     completer.selectPreviousPossibleValue();
@@ -281,7 +268,7 @@ public class TraderAutoCompleter implements KeyListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             JComponent tf = (JComponent) e.getSource();
-            TraderAutoCompleter completer = (TraderAutoCompleter) tf.getClientProperty(AUTOCOMPLETER);
+            COAL2AutoCompleter completer = (COAL2AutoCompleter) tf.getClientProperty(AUTOCOMPLETER);
             if (tf.isEnabled()) {
                 completer.popup.setVisible(false);
                 popupOpen = false;
@@ -323,16 +310,16 @@ public class TraderAutoCompleter implements KeyListener {
         table.scrollRectToVisible(rect);
     }
 
-    public Trader getTrader() {
-        return trader;
+    public ChartOfAccount getCOA() {
+        return coa;
     }
 
-    public void setTrader(Trader trader) {
-        this.trader = trader;
-        if (trader != null) {
-            this.textComp.setText(trader.getTraderName());
+    public void setCoa(ChartOfAccount coa) {
+        this.coa = coa;
+        if (this.coa != null) {
+            textComp.setText(coa.getCoaNameEng());
         } else {
-            this.textComp.setText(null);
+            textComp.setText(null);
         }
     }
 
@@ -341,7 +328,6 @@ public class TraderAutoCompleter implements KeyListener {
      */
     /**
      * Handle the key typed event from the text field.
-     * @param e
      */
     @Override
     public void keyTyped(KeyEvent e) {
@@ -349,7 +335,6 @@ public class TraderAutoCompleter implements KeyListener {
 
     /**
      * Handle the key-pressed event from the text field.
-     * @param e
      */
     @Override
     public void keyPressed(KeyEvent e) {
@@ -357,7 +342,6 @@ public class TraderAutoCompleter implements KeyListener {
 
     /**
      * Handle the key-released event from the text field.
-     * @param e
      */
     @Override
     public void keyReleased(KeyEvent e) {
@@ -369,33 +353,25 @@ public class TraderAutoCompleter implements KeyListener {
 
             if ("N".equals("Y")) {
                 sorter.setRowFilter(RowFilter.regexFilter(filter));
-            } else {
-                sorter.setRowFilter(startsWithFilter);
-            }
-            if (e.getKeyCode() != KeyEvent.VK_DOWN && e.getKeyCode() != KeyEvent.VK_UP) {
                 if (table.getSelectedRow() >= 0) {
                     table.setRowSelectionInterval(0, 0);
                 }
+            } else {
+                sorter.setRowFilter(startsWithFilter);
             }
-
+            try {
+                if (e.getKeyCode() != KeyEvent.VK_DOWN && e.getKeyCode() != KeyEvent.VK_UP) {
+                    if (table.getSelectedRow() >= 0) {
+                        table.setRowSelectionInterval(0, 0);
+                    }
+                }
+            } catch (Exception ex) {
+            }
         }
     }
     private final RowFilter<Object, Object> startsWithFilter = new RowFilter<Object, Object>() {
         @Override
         public boolean include(RowFilter.Entry<? extends Object, ? extends Object> entry) {
-            //for (int i = entry.getValueCount() - 1; i >= 0; i--) {
-            /*
-             * if (NumberUtil.isNumber(textComp.getText())) { if
-             * (entry.getStringValue(0).toUpperCase().startsWith(
-             * textComp.getText().toUpperCase())) { return true; } } else {
-             *
-             * if (entry.getStringValue(1).toUpperCase().contains(
-             * textComp.getText().toUpperCase())) { return true; } else if
-             * (entry.getStringValue(2).toUpperCase().contains(
-             * textComp.getText().toUpperCase())) { return true; }
-             }
-             */
-
             String tmp1 = entry.getStringValue(0).toUpperCase();
             String tmp2 = entry.getStringValue(1).toUpperCase();
             String tmp3 = entry.getStringValue(3).toUpperCase();
