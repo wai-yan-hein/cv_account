@@ -24,6 +24,7 @@ import com.cv.accountswing.service.CurrencyService;
 import com.cv.accountswing.service.CustomerService;
 import com.cv.accountswing.service.DepartmentService;
 import com.cv.accountswing.service.MenuService;
+import com.cv.accountswing.service.RegionService;
 import com.cv.accountswing.service.SupplierService;
 import com.cv.accountswing.service.SystemPropertyService;
 import com.cv.accountswing.service.TraderService;
@@ -274,7 +275,9 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private VouStatusService vouStatusService;
     @Autowired
     private CustomerGrid customerGrid;
-
+    @Autowired
+    private RegionService regionService;
+    
     private PanelControl control;
     private FilterObserver filterObserver;
 
@@ -754,6 +757,8 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             Global.listStockType = stockTypeService.findAll();
             Global.listCategory = categoryService.findAll();
             Global.listStockBrand = stockBrandService.findAll();
+            Global.listRegion = regionService.search("-", "-", Global.compCode, "-");
+            
             if (Global.listRelation != null) {
                 Global.listRelation.forEach(ur -> {
                     Global.hmRelation.put(ur.getUnitKey(), ur.getFactor());

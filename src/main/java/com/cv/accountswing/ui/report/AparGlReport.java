@@ -308,7 +308,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                         Global.finicialPeriodFrom,
                         stDate, 3, "MMK",
                         Global.loginUser.getAppUserCode(),
-                        Util1.isNull(dept, "-"), cvId, Global.machineId.toString());
+                        Util1.isNull(dept, "-"), cvId, Global.machineId.toString(),Global.compCode);
             } else {
                 opBalanceGL = coaOpDService.getOpBalanceGL1(getTarget(),
                         Global.finicialPeriodFrom,

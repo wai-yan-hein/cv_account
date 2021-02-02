@@ -11,10 +11,12 @@ import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.SelectionObserver;
+import com.cv.accountswing.entity.ChartOfAccount;
 import com.cv.accountswing.entity.Currency;
 import com.cv.accountswing.entity.CurrencyKey;
 import com.cv.accountswing.entity.view.VCOAOpening;
 import com.cv.accountswing.service.COAOpeningService;
+import com.cv.accountswing.service.COAService;
 import com.cv.accountswing.service.CurrencyService;
 import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.AutoClearEditor;
@@ -38,6 +40,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
 import com.cv.accountswing.service.VOpeningService;
+import com.cv.accountswing.ui.editor.COAL2AutoCompleter;
+import com.cv.accountswing.ui.editor.RegionAutoCompleter;
 import com.cv.accountswing.ui.setup.common.OpeningTableModel;
 import javax.swing.RowFilter;
 import javax.swing.table.TableModel;
@@ -65,12 +69,18 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
     private CurrencyService currencyService;
     @Autowired
     private ApplicationMainFrame mainFrame;
+    @Autowired
+    private COAService cOAService;
+    
     private LoadingObserver loadingObserver;
     private boolean isShown = false;
+    private boolean isSearch = false;
     private String stDate;
     private String endDate;
     private String curId;
     private String depCode;
+    private String regionCode = "-";
+    private String coaParent = "-";
     private TableRowSorter<TableModel> sorter;
 
     public void setIsShown(boolean isShown) {
@@ -106,6 +116,11 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
         key.setCompCode(Global.compCode);
         Currency currency = currencyService.findById(key);
         currencyAutoCompleter.setCurrency(currency);
+        List<ChartOfAccount> listCOA = cOAService.search("-", "-", Global.compCode, "2", "-", "-", "-");
+        COAL2AutoCompleter coaAutoCompleter = new COAL2AutoCompleter(txtCOA, listCOA, null);
+        coaAutoCompleter.setSelectionObserver(this);
+        RegionAutoCompleter regionAutoCompleter = new RegionAutoCompleter(txtRegion, Global.listRegion, null);
+        regionAutoCompleter.setSelectionObserver(this);
     }
 
     private void initTable() {
@@ -137,21 +152,44 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
     }
 
     private void searchOpening() {
-        initializeParameter();
-        loadingObserver.load(this.getName(), "Start");
-        taskExecutor.execute(() -> {
-            openingTableModel.clear();
-            /*List<VGl> listVGl = vGlService.search(stDate, endDate, "-", "-", "-", curId, "-", "-", depCode,
+        if (!isSearch) {
+            isSearch = true;
+            initializeParameter();
+            loadingObserver.load(this.getName(), "Start");
+            
+            final String traderType;
+            if(chkCustomer.isSelected() && chkSupplier.isSelected()){
+                traderType = "CUSSUP";
+            }else if(chkCustomer.isSelected() && chkCOA.isSelected()){
+                traderType = "CUSCOA";
+            }else if(chkSupplier.isSelected() && chkCOA.isSelected()){
+                traderType = "SUPCOA";
+            }else if(chkCustomer.isSelected()){
+                traderType = "CUS";
+            }else if(chkSupplier.isSelected()){
+                traderType = "SUP";
+            }else if(chkCOA.isSelected()){
+                traderType = "COA";
+            }else{
+                traderType = "-";
+            }
+            taskExecutor.execute(() -> {
+                openingTableModel.clear();
+                /*List<VGl> listVGl = vGlService.search(stDate, endDate, "-", "-", "-", curId, "-", "-", depCode,
             "-", "-", "-", Global.compCode, "OPENING", "-", "-", "-", "-", "-", "-", "-");
             btnGen.setEnabled(listVGl.isEmpty());
             openingTableModel.setListVGl(listVGl);*/
-            List<VCOAOpening> listOpening = openingService.search(stDate, "-", "-", Global.compCode, depCode, curId);
-            openingTableModel.setListOpening(listOpening);
-            btnGen.setEnabled(listOpening.isEmpty());
-            calTotalAmt(listOpening);
-            //btnGen.setEnabled(false);
-            loadingObserver.load(this.getName(), "Stop");
-        });
+                List<VCOAOpening> listOpening = openingService.search(stDate, "-", 
+                        "-", Global.compCode, depCode, curId, traderType, coaParent,
+                        regionCode);
+                openingTableModel.setListOpening(listOpening);
+                btnGen.setEnabled(listOpening.isEmpty());
+                calTotalAmt(listOpening);
+                //btnGen.setEnabled(false);
+                loadingObserver.load(this.getName(), "Stop");
+                isSearch = false;
+            });
+        }
     }
 
     private void initializeParameter() {
@@ -164,6 +202,12 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
         }
         if (txtDep.getText().isEmpty()) {
             depCode = "-";
+        }
+        if(txtRegion.getText().isEmpty()){
+            regionCode = "-";
+        }
+        if(txtCOA.getText().isEmpty()){
+            coaParent = "-";
         }
         btnGen.setEnabled(false);
     }
@@ -218,10 +262,8 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
                     JOptionPane.showMessageDialog(Global.parentForm, ex.getMessage(), "GENERATE OPENING", JOptionPane.ERROR_MESSAGE);
                     btnGen.setEnabled(true);
                 }
-
             });
         }
-
     }
 
     private void initKeyListener() {
@@ -255,6 +297,13 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
         txtCurrency = new javax.swing.JTextField();
         btnGen = new javax.swing.JButton();
         txtDate = new com.toedter.calendar.JDateChooser();
+        jLabel7 = new javax.swing.JLabel();
+        txtRegion = new javax.swing.JTextField();
+        chkCustomer = new javax.swing.JCheckBox();
+        chkSupplier = new javax.swing.JCheckBox();
+        jLabel8 = new javax.swing.JLabel();
+        txtCOA = new javax.swing.JTextField();
+        chkCOA = new javax.swing.JCheckBox();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblOpening = new javax.swing.JTable();
         jPanel2 = new javax.swing.JPanel();
@@ -312,24 +361,75 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
         txtDate.setDateFormatString("dd/MM/yyyy");
         txtDate.setFont(Global.shortCutFont);
 
+        jLabel7.setFont(Global.lableFont);
+        jLabel7.setText("Region");
+
+        txtRegion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtRegionActionPerformed(evt);
+            }
+        });
+
+        chkCustomer.setText("Customer");
+        chkCustomer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkCustomerActionPerformed(evt);
+            }
+        });
+
+        chkSupplier.setText("Supplier");
+        chkSupplier.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkSupplierActionPerformed(evt);
+            }
+        });
+
+        jLabel8.setText("COA");
+
+        txtCOA.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtCOAActionPerformed(evt);
+            }
+        });
+
+        chkCOA.setText("COA");
+        chkCOA.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkCOAActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
                 .addComponent(jLabel1)
-                .addGap(18, 18, 18)
-                .addComponent(txtDate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel2)
-                .addGap(18, 18, 18)
-                .addComponent(txtDep, javax.swing.GroupLayout.DEFAULT_SIZE, 103, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtDep, javax.swing.GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel3)
-                .addGap(18, 18, 18)
-                .addComponent(txtCurrency, javax.swing.GroupLayout.DEFAULT_SIZE, 103, Short.MAX_VALUE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtCurrency, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel7)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtRegion, javax.swing.GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel8)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtCOA, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkCustomer)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(chkSupplier)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(chkCOA)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnGen)
                 .addContainerGap())
         );
@@ -345,7 +445,14 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
                         .addComponent(txtDep, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jLabel3)
                         .addComponent(txtCurrency, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(btnGen)))
+                        .addComponent(btnGen)
+                        .addComponent(jLabel7)
+                        .addComponent(txtRegion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(chkCustomer)
+                        .addComponent(chkSupplier)
+                        .addComponent(jLabel8)
+                        .addComponent(txtCOA, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(chkCOA)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -467,25 +574,52 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
         generate();
     }//GEN-LAST:event_btnGenActionPerformed
 
+    private void txtRegionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtRegionActionPerformed
+        searchOpening();
+    }//GEN-LAST:event_txtRegionActionPerformed
+
+    private void txtCOAActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCOAActionPerformed
+        searchOpening();
+    }//GEN-LAST:event_txtCOAActionPerformed
+
+    private void chkCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkCustomerActionPerformed
+        searchOpening();
+    }//GEN-LAST:event_chkCustomerActionPerformed
+
+    private void chkSupplierActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkSupplierActionPerformed
+        searchOpening();
+    }//GEN-LAST:event_chkSupplierActionPerformed
+
+    private void chkCOAActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkCOAActionPerformed
+        searchOpening();
+    }//GEN-LAST:event_chkCOAActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnGen;
+    private javax.swing.JCheckBox chkCOA;
+    private javax.swing.JCheckBox chkCustomer;
+    private javax.swing.JCheckBox chkSupplier;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable tblOpening;
+    private javax.swing.JTextField txtCOA;
     private javax.swing.JTextField txtCurrency;
     private com.toedter.calendar.JDateChooser txtDate;
     private javax.swing.JTextField txtDep;
     private javax.swing.JTextField txtDisplayCur;
     private javax.swing.JFormattedTextField txtFCrAmt;
     private javax.swing.JFormattedTextField txtFDrAmt;
+    private javax.swing.JTextField txtRegion;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -503,6 +637,14 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
                 break;
             case "CAL-TOTAL":
                 calTotalAmt(openingTableModel.getListOpening());
+                break;
+            case "RegionList":
+                regionCode = selectObj.toString();
+                searchOpening();
+                break;
+            case "COAL2":
+                coaParent = selectObj.toString();
+                searchOpening();
                 break;
         }
 

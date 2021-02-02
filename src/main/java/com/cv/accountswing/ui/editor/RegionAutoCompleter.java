@@ -8,9 +8,9 @@ package com.cv.accountswing.ui.editor;
 import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.SelectionObserver;
-import com.cv.accountswing.entity.Trader;
+import com.cv.accountswing.entity.Region;
+import com.cv.accountswing.ui.cash.common.RegionTableModel;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
-import com.cv.accountswing.ui.cash.common.TraderTableModel;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -42,15 +42,15 @@ import org.slf4j.LoggerFactory;
  *
  * @author Lenovo
  */
-public class TraderAutoCompleter implements KeyListener {
+public class RegionAutoCompleter implements KeyListener {
 
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(TraderAutoCompleter.class);
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(RegionAutoCompleter.class);
     private JTable table = new JTable();
     private JPopupMenu popup = new JPopupMenu();
     private JTextComponent textComp;
     private static final String AUTOCOMPLETER = "AUTOCOMPLETER"; //NOI18N
-    private TraderTableModel traderTableModel;
-    private Trader trader;
+    private RegionTableModel regionTableModel;
+    private Region region;
     public AbstractCellEditor editor;
     private TableRowSorter<TableModel> sorter;
     private int x = 0;
@@ -62,17 +62,17 @@ public class TraderAutoCompleter implements KeyListener {
         this.selectionObserver = selectionObserver;
     }
 
-    public TraderAutoCompleter() {
+    public RegionAutoCompleter() {
     }
 
-    public TraderAutoCompleter(JTextComponent comp, List<Trader> list,
+    public RegionAutoCompleter(JTextComponent comp, List<Region> list,
             AbstractCellEditor editor) {
         this.textComp = comp;
         this.editor = editor;
         textComp.putClientProperty(AUTOCOMPLETER, this);
         textComp.setFont(Global.textFont);
-        traderTableModel = new TraderTableModel(list);
-        table.setModel(traderTableModel);
+        regionTableModel = new RegionTableModel(list);
+        table.setModel(regionTableModel);
         table.getTableHeader().setFont(Global.textFont);
         table.setFont(Global.textFont); // NOI18N
         table.setRowHeight(Global.tblRowHeight);
@@ -85,8 +85,8 @@ public class TraderAutoCompleter implements KeyListener {
 
         scroll.setBorder(null);
         table.setFocusable(false);
-        table.getColumnModel().getColumn(0).setPreferredWidth(10);//Code
-        table.getColumnModel().getColumn(1).setPreferredWidth(120);//Name
+        table.getColumnModel().getColumn(0).setPreferredWidth(5);//Code
+        table.getColumnModel().getColumn(1).setPreferredWidth(200);//Name
 
         table.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
@@ -160,12 +160,12 @@ public class TraderAutoCompleter implements KeyListener {
 
     public void mouseSelect() {
         if (table.getSelectedRow() != -1) {
-            trader = traderTableModel.getTrader(table.convertRowIndexToModel(
+            region = regionTableModel.getRegion(table.convertRowIndexToModel(
                     table.getSelectedRow()));
-            ((JTextField) textComp).setText(trader.getTraderName());
+            ((JTextField) textComp).setText(region.getRegionName());
             if (editor == null) {
                 if (selectionObserver != null) {
-                    selectionObserver.selected("CustomerList", trader);
+                    selectionObserver.selected("RegionList", region.getRegCode());
                 }
             }
         }
@@ -244,7 +244,7 @@ public class TraderAutoCompleter implements KeyListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             JComponent tf = (JComponent) e.getSource();
-            TraderAutoCompleter completer = (TraderAutoCompleter) tf.getClientProperty(AUTOCOMPLETER);
+            RegionAutoCompleter completer = (RegionAutoCompleter) tf.getClientProperty(AUTOCOMPLETER);
             if (tf.isEnabled()) {
                 if (completer.popup.isVisible()) {
                     completer.selectNextPossibleValue();
@@ -262,7 +262,7 @@ public class TraderAutoCompleter implements KeyListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             JComponent tf = (JComponent) e.getSource();
-            TraderAutoCompleter completer = (TraderAutoCompleter) tf.getClientProperty(AUTOCOMPLETER);
+            RegionAutoCompleter completer = (RegionAutoCompleter) tf.getClientProperty(AUTOCOMPLETER);
             if (tf.isEnabled()) {
                 if (completer.popup.isVisible()) {
                     completer.selectPreviousPossibleValue();
@@ -274,7 +274,7 @@ public class TraderAutoCompleter implements KeyListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             JComponent tf = (JComponent) e.getSource();
-            TraderAutoCompleter completer = (TraderAutoCompleter) tf.getClientProperty(AUTOCOMPLETER);
+            RegionAutoCompleter completer = (RegionAutoCompleter) tf.getClientProperty(AUTOCOMPLETER);
             if (tf.isEnabled()) {
                 completer.popup.setVisible(false);
                 popupOpen = false;
@@ -316,14 +316,14 @@ public class TraderAutoCompleter implements KeyListener {
         table.scrollRectToVisible(rect);
     }
 
-    public Trader getTrader() {
-        return trader;
+    public Region getRegion() {
+        return region;
     }
 
-    public void setTrader(Trader trader) {
-        this.trader = trader;
-        if (trader != null) {
-            this.textComp.setText(trader.getTraderName());
+    public void setRegion(Region region) {
+        this.region = region;
+        if (region != null) {
+            this.textComp.setText(region.getRegionName());
         }
     }
 
