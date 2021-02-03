@@ -140,6 +140,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         assingDefaultValue();
         initCombo();
         initTable();
+        search();
         isShown = true;
     }
 
@@ -333,7 +334,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                         Util1.toDateStrMYSQL(opDate, "dd/MM/yyyy"), 3, "MMK",
                         Global.loginUser.getAppUserCode(),
                         Util1.isNull(dept, "-"), traderCode,
-                         Global.machineId.toString(), Global.compCode
+                        Global.machineId.toString(), Global.compCode
                 );
                 if (!opBalanceGL.isEmpty()) {
                     double opening;
@@ -762,7 +763,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         if (!isShown) {
             initMain();
         }
-        search();
+        //search();
     }//GEN-LAST:event_formComponentShown
 
     private void txtDepActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDepActionPerformed

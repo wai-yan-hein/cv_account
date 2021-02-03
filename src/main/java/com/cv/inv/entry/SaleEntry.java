@@ -424,7 +424,6 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
             int yes_no = JOptionPane.showConfirmDialog(Global.parentForm,
                     "Are you sure to delete?", "Sale item delete", JOptionPane.YES_NO_OPTION);
             if (yes_no == 0) {
-                String vouNo = txtVouNo.getText();
                 try {
                     saleHis.setDeleted(true);
                     saveSale();

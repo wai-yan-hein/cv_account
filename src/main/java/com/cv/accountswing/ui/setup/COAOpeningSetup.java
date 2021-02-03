@@ -46,6 +46,8 @@ import com.cv.accountswing.ui.setup.common.OpeningTableModel;
 import javax.swing.RowFilter;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
+import net.coderazzi.filters.gui.AutoChoices;
+import net.coderazzi.filters.gui.TableFilterHeader;
 
 /**
  *
@@ -71,7 +73,7 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
     private ApplicationMainFrame mainFrame;
     @Autowired
     private COAService cOAService;
-
+    private TableFilterHeader filterHeader;
     private LoadingObserver loadingObserver;
     private boolean isShown = false;
     private boolean isSearch = false;
@@ -81,7 +83,6 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
     private String depCode;
     private String regionCode = "-";
     private String coaParent = "-";
-    private TableRowSorter<TableModel> sorter;
 
     public void setIsShown(boolean isShown) {
         this.isShown = isShown;
@@ -146,8 +147,10 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
         tblOpening.setCellSelectionEnabled(true);
         tblOpening.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                 .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
-        sorter = new TableRowSorter(tblOpening.getModel());
-        tblOpening.setRowSorter(sorter);
+        filterHeader = new TableFilterHeader(tblOpening, AutoChoices.ENABLED);
+        filterHeader.setPosition(TableFilterHeader.Position.TOP);
+        filterHeader.setFont(Global.textFont);
+        filterHeader.setVisible(false);
 
     }
 
@@ -274,10 +277,6 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
         btnGen.addKeyListener(this);
         tblOpening.addKeyListener(this);
 
-    }
-
-    private void setTableFilter(String text) {
-        sorter.setRowFilter(RowFilter.regexFilter(text));
     }
 
     /**
@@ -760,6 +759,10 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
 
     @Override
     public void sendFilter(String filter) {
-        setTableFilter(filter);
+        if (filterHeader.isVisible()) {
+            filterHeader.setVisible(false);
+        } else {
+            filterHeader.setVisible(true);
+        }
     }
 }

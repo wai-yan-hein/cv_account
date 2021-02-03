@@ -672,7 +672,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
         } else {
             //requestFoucsTable();
         }
-        searchCash();
+        //searchCash();
 
     }//GEN-LAST:event_formComponentShown
 
