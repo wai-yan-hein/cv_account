@@ -32,7 +32,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
-                      <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                      <Group type="103" groupAlignment="1" attributes="0">
                           <Component id="jLabel2" linkSize="1" max="32767" attributes="0"/>
                           <Component id="jLabel1" linkSize="1" max="32767" attributes="0"/>
                           <Component id="jLabel3" linkSize="1" pref="70" max="32767" attributes="0"/>
@@ -41,11 +41,11 @@
                           <Component id="jLabel6" linkSize="1" pref="70" max="32767" attributes="0"/>
                           <Component id="jLabel7" linkSize="1" pref="70" max="32767" attributes="0"/>
                           <Component id="jLabel8" linkSize="1" pref="70" max="32767" attributes="0"/>
-                          <Component id="jLabel9" linkSize="1" pref="70" max="32767" attributes="0"/>
+                          <Component id="jLabel9" linkSize="1" alignment="0" min="-2" pref="82" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="txtDate" pref="300" max="32767" attributes="0"/>
+                          <Component id="txtDate" pref="304" max="32767" attributes="0"/>
                           <Component id="txtDep" max="32767" attributes="0"/>
                           <Component id="txtDesp" max="32767" attributes="0"/>
                           <Component id="txtRef" max="32767" attributes="0"/>
@@ -135,6 +135,9 @@
     <Component class="com.toedter.calendar.JDateChooser" name="txtDate">
       <Properties>
         <Property name="dateFormatString" type="java.lang.String" value="dd/MM/yyyy"/>
+        <Property name="nextFocusableComponent" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+          <ComponentRef name="txtDep"/>
+        </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel2">
@@ -149,6 +152,9 @@
       <Properties>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
           <Connection code="Global.textFont" type="code"/>
+        </Property>
+        <Property name="nextFocusableComponent" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+          <ComponentRef name="txtDesp"/>
         </Property>
       </Properties>
     </Component>
@@ -165,6 +171,9 @@
         <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
           <Connection code="Global.textFont" type="code"/>
         </Property>
+        <Property name="nextFocusableComponent" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+          <ComponentRef name="txtRef"/>
+        </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel4">
@@ -179,6 +188,9 @@
       <Properties>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
           <Connection code="Global.textFont" type="code"/>
+        </Property>
+        <Property name="nextFocusableComponent" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+          <ComponentRef name="txtPerson"/>
         </Property>
       </Properties>
     </Component>
@@ -195,12 +207,18 @@
         <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
           <Connection code="Global.textFont" type="code"/>
         </Property>
+        <Property name="nextFocusableComponent" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+          <ComponentRef name="txtAccount"/>
+        </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="txtAccount">
       <Properties>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
           <Connection code="Global.textFont" type="code"/>
+        </Property>
+        <Property name="nextFocusableComponent" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+          <ComponentRef name="txtCashIn"/>
         </Property>
       </Properties>
     </Component>
@@ -272,6 +290,9 @@
         <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
           <Connection code="Global.textFont" type="code"/>
         </Property>
+        <Property name="nextFocusableComponent" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+          <ComponentRef name="txtCashOut"/>
+        </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JFormattedTextField" name="txtCashOut">
@@ -281,6 +302,9 @@
         </Property>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
           <Connection code="Global.textFont" type="code"/>
+        </Property>
+        <Property name="nextFocusableComponent" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+          <ComponentRef name="jButton1"/>
         </Property>
       </Properties>
     </Component>

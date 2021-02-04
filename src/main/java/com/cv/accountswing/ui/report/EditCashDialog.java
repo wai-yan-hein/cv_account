@@ -210,28 +210,34 @@ public class EditCashDialog extends javax.swing.JDialog {
         jLabel1.setText("Date");
 
         txtDate.setDateFormatString("dd/MM/yyyy");
+        txtDate.setNextFocusableComponent(txtDep);
 
         jLabel2.setFont(Global.lableFont);
         jLabel2.setText("Department");
 
         txtDep.setFont(Global.textFont);
+        txtDep.setNextFocusableComponent(txtDesp);
 
         jLabel3.setFont(Global.lableFont);
         jLabel3.setText("Description");
 
         txtDesp.setFont(Global.textFont);
+        txtDesp.setNextFocusableComponent(txtRef);
 
         jLabel4.setFont(Global.lableFont);
         jLabel4.setText("Ref");
 
         txtRef.setFont(Global.textFont);
+        txtRef.setNextFocusableComponent(txtPerson);
 
         jLabel5.setFont(Global.lableFont);
         jLabel5.setText("Person");
 
         txtPerson.setFont(Global.textFont);
+        txtPerson.setNextFocusableComponent(txtAccount);
 
         txtAccount.setFont(Global.textFont);
+        txtAccount.setNextFocusableComponent(txtCashIn);
 
         jLabel6.setFont(Global.lableFont);
         jLabel6.setText("Account");
@@ -261,9 +267,11 @@ public class EditCashDialog extends javax.swing.JDialog {
 
         txtCashIn.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
         txtCashIn.setFont(Global.textFont);
+        txtCashIn.setNextFocusableComponent(txtCashOut);
 
         txtCashOut.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
         txtCashOut.setFont(Global.textFont);
+        txtCashOut.setNextFocusableComponent(jButton1);
 
         panel.setBackground(ColorUtil.mainColor);
         panel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
@@ -299,7 +307,7 @@ public class EditCashDialog extends javax.swing.JDialog {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, 70, Short.MAX_VALUE)
@@ -308,10 +316,10 @@ public class EditCashDialog extends javax.swing.JDialog {
                             .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, 70, Short.MAX_VALUE)
                             .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, 70, Short.MAX_VALUE)
                             .addComponent(jLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, 70, Short.MAX_VALUE)
-                            .addComponent(jLabel9, javax.swing.GroupLayout.DEFAULT_SIZE, 70, Short.MAX_VALUE))
+                            .addComponent(jLabel9, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtDate, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
+                            .addComponent(txtDate, javax.swing.GroupLayout.DEFAULT_SIZE, 304, Short.MAX_VALUE)
                             .addComponent(txtDep)
                             .addComponent(txtDesp)
                             .addComponent(txtRef)
