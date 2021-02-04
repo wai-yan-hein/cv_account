@@ -26,9 +26,9 @@ import com.cv.accountswing.service.VDescriptionService;
 import com.cv.accountswing.service.VGlService;
 import com.cv.accountswing.service.VRefService;
 import com.cv.accountswing.ui.ApplicationMainFrame;
+import com.cv.accountswing.ui.cash.common.AllBankTableModel;
 import com.cv.accountswing.ui.editor.CurrencyEditor;
 import com.cv.accountswing.ui.editor.DepartmentCellEditor;
-import com.cv.accountswing.ui.cash.common.AllCashTableModel;
 import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.editor.COACellEditor;
@@ -37,7 +37,6 @@ import com.cv.accountswing.ui.editor.RefCellEditor;
 import com.cv.accountswing.ui.editor.TraderCellEditor;
 import com.cv.accountswing.ui.filter.FilterPanel;
 import com.cv.accountswing.util.Util1;
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.HeadlessException;
@@ -93,7 +92,7 @@ public class AllBank extends javax.swing.JPanel implements SelectionObserver,
     @Autowired
     private TaskExecutor taskExecutor;
     @Autowired
-    private AllCashTableModel allCashTableModel;
+    private AllBankTableModel allCashTableModel;
     @Autowired
     private COAOpeningDService coaOpDService;
     @Autowired
@@ -162,7 +161,6 @@ public class AllBank extends javax.swing.JPanel implements SelectionObserver,
     }
 
     private void initMain() {
-        filterPanel();
         initTable();
         clearFilter();
         isShown = true;
@@ -320,16 +318,6 @@ public class AllBank extends javax.swing.JPanel implements SelectionObserver,
         }
 
         return msg;
-    }
-
-    private void filterPanel() {
-        panelFilter.setLayout(new BorderLayout());
-        filterPanel.setSelectionObserver(this);
-        filterPanel.initMain();
-        panelFilter.add(filterPanel, BorderLayout.CENTER);
-        panelFilter.revalidate();
-        panelFilter.repaint();
-
     }
 
     private final Action actionItemDeleteExp = new AbstractAction() {
@@ -522,7 +510,6 @@ public class AllBank extends javax.swing.JPanel implements SelectionObserver,
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        panelFilter = new javax.swing.JPanel();
         tblScrollPane = new javax.swing.JScrollPane();
         tblCash = new javax.swing.JTable();
         jPanel1 = new javax.swing.JPanel();
@@ -532,23 +519,29 @@ public class AllBank extends javax.swing.JPanel implements SelectionObserver,
         txtFDebitAmt = new javax.swing.JFormattedTextField();
         txtFCreditAmt = new javax.swing.JFormattedTextField();
         txtFOpening = new javax.swing.JFormattedTextField();
+        jPanel2 = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
+        txtDate = new javax.swing.JFormattedTextField();
+        jLabel4 = new javax.swing.JLabel();
+        txtDepartment = new javax.swing.JTextField();
+        jLabel5 = new javax.swing.JLabel();
+        txtPerson = new javax.swing.JTextField();
+        jLabel6 = new javax.swing.JLabel();
+        txtAccount = new javax.swing.JTextField();
+        jLabel7 = new javax.swing.JLabel();
+        txtDesp = new javax.swing.JTextField();
+        jLabel8 = new javax.swing.JLabel();
+        txtRefrence = new javax.swing.JTextField();
+        txtCurrency = new javax.swing.JTextField();
+        jLabel9 = new javax.swing.JLabel();
+        jLabel10 = new javax.swing.JLabel();
+        txtBank = new javax.swing.JTextField();
 
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentShown(java.awt.event.ComponentEvent evt) {
                 formComponentShown(evt);
             }
         });
-
-        javax.swing.GroupLayout panelFilterLayout = new javax.swing.GroupLayout(panelFilter);
-        panelFilter.setLayout(panelFilterLayout);
-        panelFilterLayout.setHorizontalGroup(
-            panelFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
-        panelFilterLayout.setVerticalGroup(
-            panelFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
 
         tblCash.setFont(Global.textFont);
         tblCash.setModel(new javax.swing.table.DefaultTableModel(
@@ -628,7 +621,7 @@ public class AllBank extends javax.swing.JPanel implements SelectionObserver,
                     .addComponent(txtFCreditAmt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(9, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(txtFOpening, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -639,24 +632,239 @@ public class AllBank extends javax.swing.JPanel implements SelectionObserver,
                 .addContainerGap())
         );
 
+        jPanel2.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Filter Bar"));
+        jPanel2.addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentShown(java.awt.event.ComponentEvent evt) {
+                jPanel2formComponentShown(evt);
+            }
+        });
+
+        jLabel3.setFont(Global.lableFont);
+        jLabel3.setText("Date");
+
+        txtDate.setFont(Global.textFont);
+        txtDate.setName("txtDate"); // NOI18N
+        txtDate.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtDateFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtDateFocusLost(evt);
+            }
+        });
+        txtDate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtDateActionPerformed(evt);
+            }
+        });
+
+        jLabel4.setFont(Global.lableFont);
+        jLabel4.setText("Department");
+
+        txtDepartment.setFont(Global.textFont);
+        txtDepartment.setName("txtDepartment"); // NOI18N
+        txtDepartment.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtDepartmentFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtDepartmentFocusLost(evt);
+            }
+        });
+        txtDepartment.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtDepartmentActionPerformed(evt);
+            }
+        });
+
+        jLabel5.setFont(Global.lableFont);
+        jLabel5.setText("Person");
+
+        txtPerson.setFont(Global.textFont);
+        txtPerson.setName("txtPerson"); // NOI18N
+        txtPerson.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtPersonFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtPersonFocusLost(evt);
+            }
+        });
+        txtPerson.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtPersonActionPerformed(evt);
+            }
+        });
+
+        jLabel6.setFont(Global.lableFont);
+        jLabel6.setText("Account");
+
+        txtAccount.setFont(Global.textFont);
+        txtAccount.setName("txtAccount"); // NOI18N
+        txtAccount.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtAccountFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtAccountFocusLost(evt);
+            }
+        });
+        txtAccount.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtAccountActionPerformed(evt);
+            }
+        });
+
+        jLabel7.setFont(Global.lableFont);
+        jLabel7.setText("Description");
+
+        txtDesp.setFont(Global.textFont);
+        txtDesp.setName("txtDesp"); // NOI18N
+        txtDesp.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtDespFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtDespFocusLost(evt);
+            }
+        });
+        txtDesp.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtDespActionPerformed(evt);
+            }
+        });
+
+        jLabel8.setFont(Global.lableFont);
+        jLabel8.setText("Refrence");
+
+        txtRefrence.setFont(Global.textFont);
+        txtRefrence.setName("txtRefrence"); // NOI18N
+        txtRefrence.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtRefrenceFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtRefrenceFocusLost(evt);
+            }
+        });
+        txtRefrence.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtRefrenceActionPerformed(evt);
+            }
+        });
+
+        txtCurrency.setFont(Global.textFont);
+        txtCurrency.setDisabledTextColor(new java.awt.Color(0, 0, 0));
+        txtCurrency.setEnabled(false);
+        txtCurrency.setName("txtCurrency"); // NOI18N
+        txtCurrency.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtCurrencyFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtCurrencyFocusLost(evt);
+            }
+        });
+        txtCurrency.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtCurrencyActionPerformed(evt);
+            }
+        });
+
+        jLabel9.setFont(Global.lableFont);
+        jLabel9.setText("Currency");
+
+        jLabel10.setText("Bank");
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel10, javax.swing.GroupLayout.DEFAULT_SIZE, 39, Short.MAX_VALUE)
+                    .addComponent(txtBank))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtDate)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, 63, Short.MAX_VALUE)
+                    .addComponent(txtDepartment))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtPerson)
+                    .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, 39, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtAccount)
+                    .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, 45, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtDesp)
+                    .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, 59, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtRefrence)
+                    .addComponent(jLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, 50, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(txtCurrency, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel9, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 50, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(jLabel9)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtCurrency, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel4)
+                            .addComponent(jLabel6)
+                            .addComponent(jLabel7)
+                            .addComponent(jLabel8)
+                            .addComponent(jLabel5)
+                            .addComponent(jLabel10))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txtDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtDepartment, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtDesp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtRefrence, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtPerson, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtAccount, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtBank, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(panelFilter, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(tblScrollPane))
+                    .addComponent(tblScrollPane)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(panelFilter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap()
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tblScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 261, Short.MAX_VALUE)
+                .addComponent(tblScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 216, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -680,18 +888,153 @@ public class AllBank extends javax.swing.JPanel implements SelectionObserver,
         // TODO add your handling code here:
     }//GEN-LAST:event_txtFOpeningActionPerformed
 
+    private void txtDateFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtDateFocusGained
+        // TODO add your handling code here:
+        txtDate.selectAll();
+    }//GEN-LAST:event_txtDateFocusGained
+
+    private void txtDateFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtDateFocusLost
+        // TODO add your handling code here:
+        //dateAutoCompleter.closePopup();
+        //messageBean.setValue(txtDate.getText());
+    }//GEN-LAST:event_txtDateFocusLost
+
+    private void txtDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDateActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtDateActionPerformed
+
+    private void txtDepartmentFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtDepartmentFocusGained
+        // TODO add your handling code here:
+        txtDepartment.selectAll();
+        //departmentAutoCompleter.showPopup();
+    }//GEN-LAST:event_txtDepartmentFocusGained
+
+    private void txtDepartmentFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtDepartmentFocusLost
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtDepartmentFocusLost
+
+    private void txtDepartmentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDepartmentActionPerformed
+        // TODO add your handling code here:
+        if (txtDepartment.getText().isEmpty()) {
+            selectionObserver.selected("Department", "-");
+        }
+    }//GEN-LAST:event_txtDepartmentActionPerformed
+
+    private void txtPersonFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtPersonFocusGained
+        // TODO add your handling code here:
+        txtPerson.selectAll();
+        //traderAutoCompleter.showPopup();
+    }//GEN-LAST:event_txtPersonFocusGained
+
+    private void txtPersonFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtPersonFocusLost
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtPersonFocusLost
+
+    private void txtPersonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPersonActionPerformed
+        // TODO add your handling code here:
+        if (txtPerson.getText().isEmpty()) {
+            selectionObserver.selected("Trader", "-");
+        }
+    }//GEN-LAST:event_txtPersonActionPerformed
+
+    private void txtAccountFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtAccountFocusGained
+        // TODO add your handling code here:
+
+        txtAccount.selectAll();
+        //coaAutoCompleter.showPopup();
+    }//GEN-LAST:event_txtAccountFocusGained
+
+    private void txtAccountFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtAccountFocusLost
+        // TODO add your handling code here:
+        //coaAutoCompleter.closePopup();
+    }//GEN-LAST:event_txtAccountFocusLost
+
+    private void txtAccountActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtAccountActionPerformed
+        // TODO add your handling code here:
+        if (txtAccount.getText().isEmpty()) {
+            selectionObserver.selected("COA", "-");
+        }
+    }//GEN-LAST:event_txtAccountActionPerformed
+
+    private void txtDespFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtDespFocusGained
+        // TODO add your handling code here:
+        txtDesp.selectAll();
+    }//GEN-LAST:event_txtDespFocusGained
+
+    private void txtDespFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtDespFocusLost
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtDespFocusLost
+
+    private void txtDespActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDespActionPerformed
+        // TODO add your handling code here:
+        selectionObserver.selected("Description", Util1.isNull(txtDesp.getText(), "-"));
+    }//GEN-LAST:event_txtDespActionPerformed
+
+    private void txtRefrenceFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtRefrenceFocusGained
+        // TODO add your handling code here:
+        txtRefrence.selectAll();
+    }//GEN-LAST:event_txtRefrenceFocusGained
+
+    private void txtRefrenceFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtRefrenceFocusLost
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtRefrenceFocusLost
+
+    private void txtRefrenceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtRefrenceActionPerformed
+        // TODO add your handling code here:
+        selectionObserver.selected("Ref", Util1.isNull(txtRefrence.getText(), "-"));
+    }//GEN-LAST:event_txtRefrenceActionPerformed
+
+    private void txtCurrencyFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtCurrencyFocusGained
+        // TODO add your handling code here:
+
+        txtCurrency.selectAll();
+        // currencyAutoCompleter.showPopup();
+    }//GEN-LAST:event_txtCurrencyFocusGained
+
+    private void txtCurrencyFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtCurrencyFocusLost
+        // TODO add your handling code here:
+        //currencyAutoCompleter.closePopup();
+    }//GEN-LAST:event_txtCurrencyFocusLost
+
+    private void txtCurrencyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCurrencyActionPerformed
+        // TODO add your handling code here:
+        if (txtCurrency.getText().isEmpty()) {
+            selectionObserver.selected("Currency", "-");
+        }
+    }//GEN-LAST:event_txtCurrencyActionPerformed
+
+    private void jPanel2formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jPanel2formComponentShown
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jPanel2formComponentShown
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel panelFilter;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JTable tblCash;
     private javax.swing.JScrollPane tblScrollPane;
+    private javax.swing.JTextField txtAccount;
+    private javax.swing.JTextField txtBank;
+    private javax.swing.JTextField txtCurrency;
+    private javax.swing.JFormattedTextField txtDate;
+    private javax.swing.JTextField txtDepartment;
+    private javax.swing.JTextField txtDesp;
     private javax.swing.JFormattedTextField txtFClosing;
     private javax.swing.JFormattedTextField txtFCreditAmt;
     private javax.swing.JFormattedTextField txtFDebitAmt;
     private javax.swing.JFormattedTextField txtFOpening;
+    private javax.swing.JTextField txtPerson;
+    private javax.swing.JTextField txtRefrence;
     // End of variables declaration//GEN-END:variables
 
     private void calDebitCredit() {
