@@ -129,7 +129,7 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Sel
             editCashDialog.setIconImage(editIcon.getImage());
             editCashDialog.setdType(type);
             editCashDialog.setSelectionObserver(this);
-            editCashDialog.setSize(Global.width - 1000, Global.height - 380);
+            editCashDialog.setSize(Global.width - 1000, Global.height - 300);
             editCashDialog.setLocationRelativeTo(null);
             editCashDialog.setvGl(vgl);
             editCashDialog.setVisible(true);

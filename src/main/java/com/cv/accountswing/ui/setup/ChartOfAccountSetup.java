@@ -424,6 +424,7 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
 
         txtSysCode.setEditable(false);
         txtSysCode.setFont(Global.textFont);
+        txtSysCode.setName("txtSysCode"); // NOI18N
 
         jLabel2.setFont(Global.lableFont);
         jLabel2.setText("User Code");
