@@ -540,7 +540,7 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
         if (sourceObj instanceof JTextField) {
             ctrlName = ((JTextField) sourceObj).getName();
             switch (ctrlName) {
-                case "txtDate":
+                case "txtDate" -> {
                     if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_RIGHT) {
                         txtDepartment.requestFocus();
                         closePopup();
@@ -549,9 +549,9 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
                         closePopup();
                     }
                     tabToCashTable(e);
-                    break;
+                }
 
-                case "txtDepartment":
+                case "txtDepartment" -> {
                     if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_RIGHT) {
                         txtDesp.requestFocus();
                         closePopup();
@@ -571,9 +571,8 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
                         }
                     }
                     tabToCashTable(e);
-
-                    break;
-                case "txtPerson":
+                }
+                case "txtPerson" -> {
                     if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_RIGHT) {
                         txtAccount.requestFocus();
                         closePopup();
@@ -593,10 +592,9 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
                         }
                     }
                     tabToCashTable(e);
+                }
 
-                    break;
-
-                case "txtAccount":
+                case "txtAccount" -> {
                     if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_RIGHT) {
                         txtCurrency.requestFocus();
                         closePopup();
@@ -616,10 +614,9 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
                         }
                     }
                     tabToCashTable(e);
+                }
 
-                    break;
-
-                case "txtDesp":
+                case "txtDesp" -> {
                     if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_RIGHT) {
                         txtRefrence.requestFocus();
                         closePopup();
@@ -639,10 +636,9 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
                         }
                     }
                     tabToCashTable(e);
+                }
 
-                    break;
-
-                case "txtCurrency":
+                case "txtCurrency" -> {
                     if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_RIGHT) {
                         closePopup();
 
@@ -653,9 +649,8 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
 
                     }
                     tabToCashTable(e);
-
-                    break;
-                case "txtRefrence":
+                }
+                case "txtRefrence" -> {
                     if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_RIGHT) {
                         txtPerson.requestFocus();
                         closePopup();
@@ -676,8 +671,7 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
                         break;
                     }
                     tabToCashTable(e);
-
-                    break;
+                }
 
             }
 

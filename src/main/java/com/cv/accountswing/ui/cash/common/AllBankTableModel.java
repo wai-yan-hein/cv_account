@@ -39,11 +39,11 @@ import org.springframework.stereotype.Component;
  * @author winswe
  */
 @Component
-public class AllCashTableModel extends AbstractTableModel {
+public class AllBankTableModel extends AbstractTableModel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AllCashTableModel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AllBankTableModel.class);
     private List<VGl> listVGl = new ArrayList();
-    private String[] columnNames = {"Date", "Dept:", "Description", "Ref :", "Person", "Account", "Curr", "Cash In / Dr", "Cash Out / Cr"};
+    private String[] columnNames = {"Date", "Bank", "Dept:", "Description", "Ref :", "Person", "Account", "Curr", "Cash In / Dr", "Cash Out / Cr"};
     private final Gson gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
 
     @Autowired
@@ -90,7 +90,7 @@ public class AllCashTableModel extends AbstractTableModel {
                 return false;
             }
         }
-        return column != 6;
+        return column != 7;
     }
 
     @Override
@@ -116,20 +116,22 @@ public class AllCashTableModel extends AbstractTableModel {
                     if (vgi.getGlDate() != null) {
                         return Util1.toDateStr(vgi.getGlDate(), "dd/MM/yyyy");
                     }
-                case 1: //Department
+                case 1: //Bank
+                    return vgi.getSrcAccName();
+                case 2: //Department
                     return vgi.getDeptUsrCode();
-                case 2://Desp
+                case 3://Desp
                     return vgi.getDescription();
-                case 3://Ref
+                case 4://Ref
                     return vgi.getReference();
-                case 4://Person
+                case 5://Person
                     return vgi.getTraderName();
-                case 5:
+                case 6:
                     //Account
                     return vgi.getAccName();
-                case 6:
-                    return vgi.getFromCurId();
                 case 7:
+                    return vgi.getFromCurId();
+                case 8:
                     if (vgi.getDrAmt() != null) {
                         if (vgi.getDrAmt() == 0) {
                             return null;
@@ -139,7 +141,7 @@ public class AllCashTableModel extends AbstractTableModel {
                     } else {
                         return vgi.getDrAmt();
                     }
-                case 8:
+                case 9:
                     if (vgi.getCrAmt() != null) {
                         if (vgi.getCrAmt() == 0) {
                             return null;
@@ -149,6 +151,7 @@ public class AllCashTableModel extends AbstractTableModel {
                     } else {
                         return vgi.getCrAmt();
                     }
+
                 default:
                     return null;
             }
@@ -181,6 +184,8 @@ public class AllCashTableModel extends AbstractTableModel {
 
                 break;
             case 1:
+                break;
+            case 2:
                 if (value != null) {
                     if (value instanceof Department) {
                         Department dep = (Department) value;
@@ -188,9 +193,9 @@ public class AllCashTableModel extends AbstractTableModel {
                         vgl.setDeptId(dep.getDeptCode());
                     }
                 }
-                parent.setColumnSelectionInterval(2, 2);
+                parent.setColumnSelectionInterval(3, 3);
                 break;
-            case 2:
+            case 3:
                 if (value != null) {
                     if (value instanceof VDescription) {
                         VDescription autoText = (VDescription) value;
@@ -203,10 +208,10 @@ public class AllCashTableModel extends AbstractTableModel {
                     }
 
                 }
-                parent.setColumnSelectionInterval(3, 3);
+                parent.setColumnSelectionInterval(4, 4);
 
                 break;
-            case 3:
+            case 4:
                 if (value != null) {
                     if (value instanceof VRef) {
                         VRef autoText = (VRef) value;
@@ -219,9 +224,9 @@ public class AllCashTableModel extends AbstractTableModel {
                     }
 
                 }
-                parent.setColumnSelectionInterval(4, 4);
+                parent.setColumnSelectionInterval(5, 5);
                 break;
-            case 4:
+            case 5:
                 if (value != null) {
                     if (value instanceof Trader) {
                         trader = (Trader) value;
@@ -234,16 +239,16 @@ public class AllCashTableModel extends AbstractTableModel {
                         if (trader.getAccount() != null) {
                             vgl.setAccountId(trader.getAccount().getCode());
                             vgl.setAccName(trader.getAccount().getCoaNameEng());
-                            parent.setColumnSelectionInterval(7, 7);
+                            parent.setColumnSelectionInterval(8, 8);
                         } else {
-                            parent.setColumnSelectionInterval(5, 5);
+                            parent.setColumnSelectionInterval(6, 6);
                         }
                     } else {
                         parent.setColumnSelectionInterval(column, column);
                     }
                 }
                 break;
-            case 5:
+            case 6:
                 if (value != null) {
                     if (value instanceof ChartOfAccount) {
                         ChartOfAccount coa = (ChartOfAccount) value;
@@ -252,9 +257,9 @@ public class AllCashTableModel extends AbstractTableModel {
 
                     }
                 }
-                parent.setColumnSelectionInterval(7, 7);
+                parent.setColumnSelectionInterval(8, 8);
                 break;
-            case 6:
+            case 7:
                 if (value != null) {
                     if (value instanceof Currency) {
                         Currency curr = (Currency) value;
@@ -262,14 +267,14 @@ public class AllCashTableModel extends AbstractTableModel {
                         vgl.setFromCurId(cuCode);
                     }
                 }
-                parent.setColumnSelectionInterval(7, 7);
+                parent.setColumnSelectionInterval(8, 8);
                 break;
-            case 7:
+            case 8:
                 if (value != null) {
                     vgl.setDrAmt(Util1.getFloat(value));
                 }
                 break;
-            case 8:
+            case 9:
                 if (value != null) {
                     vgl.setCrAmt(Util1.getFloat(value));
                 }
@@ -282,7 +287,7 @@ public class AllCashTableModel extends AbstractTableModel {
 
     private void save(VGl vgl, int row, int column) {
         if (isValidEntry(vgl, row, column)) {
-            vgl.setSourceAcId(sourceAccId);
+            //vgl.setSourceAcId(sourceAccId);
             vgl.setCreatedBy(Global.loginUser.getAppUserCode());
             String strVGL = gson.toJson(vgl);
             Gl gl = gson.fromJson(strVGL, Gl.class);
@@ -323,14 +328,14 @@ public class AllCashTableModel extends AbstractTableModel {
                 parent.setColumnSelectionInterval(5, 5);
                 parent.setRowSelectionInterval(row, row);
             }
-        }
-        if (Util1.getDouble(vgl.getDrAmt()) + Util1.getDouble(vgl.getCrAmt()) <= 0) {
+        } else if (vgl.getSourceAcId() == null) {
+            status = false;
+        } else if (Util1.getDouble(vgl.getDrAmt()) + Util1.getDouble(vgl.getCrAmt()) <= 0) {
             status = false;
             /*JOptionPane.showMessageDialog(Global.parentForm, "Dr / Cr missing.");
             parent.setColumnSelectionInterval(7, 7);
             parent.setRowSelectionInterval(row, row);*/
-        }
-        if (vgl.getDeptId() == null) {
+        } else if (vgl.getDeptId() == null) {
             status = false;
             if (column > 1) {
                 JOptionPane.showMessageDialog(Global.parentForm, "Missing Department.");
@@ -420,7 +425,7 @@ public class AllCashTableModel extends AbstractTableModel {
                             trader = traderService.findById(vgl.getTraderCode());
                             sendDeletePaymentToInv(trader, vgl.getGlCode());
                         }
-                        fireTableRowsDeleted(row, row);
+                        fireTableRowsDeleted(0, listVGl.size());
                     }
                 }
             } catch (Exception ex) {
