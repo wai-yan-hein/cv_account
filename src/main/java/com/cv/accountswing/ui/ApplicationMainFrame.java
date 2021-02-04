@@ -48,6 +48,7 @@ import com.cv.accountswing.ui.setup.DepartmentSetup;
 import com.cv.accountswing.ui.setup.ManageProjectSetup;
 import com.cv.accountswing.ui.setup.RegionSetup;
 import com.cv.accountswing.ui.setup.RoleAssignSetup;
+import com.cv.accountswing.ui.setup.StaffSetup;
 import com.cv.accountswing.ui.setup.SupplierSetup;
 import com.cv.accountswing.ui.system.setup.Company;
 import com.cv.accountswing.ui.system.setup.MenuSetup;
@@ -280,7 +281,8 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private UserSetting userSetting;
     @Autowired
     private RegionService regionService;
-
+    @Autowired
+    private StaffSetup staffSetup;
     private PanelControl control;
     private FilterObserver filterObserver;
 
@@ -350,6 +352,10 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                         customerSetup.setName(menuName);
                         customerSetup.setLoadingObserver(this);
                         return customerSetup;
+                    case "Staff And Others":
+                        staffSetup.setName(menuName);
+                        staffSetup.setLoadingObserver(this);
+                        return staffSetup;
                     case "Currency":
                         currencySetup.setName(menuName);
                         currencySetup.setLoadingObserver(this);

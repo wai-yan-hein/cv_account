@@ -11,16 +11,14 @@ import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.entity.ChartOfAccount;
-import com.cv.accountswing.entity.Customer;
+import com.cv.accountswing.entity.Staff;
 import com.cv.accountswing.entity.Region;
-import com.cv.accountswing.entity.TraderType;
 import com.cv.accountswing.service.COAService;
-import com.cv.accountswing.service.CustomerService;
 import com.cv.accountswing.service.RegionService;
-import com.cv.accountswing.service.TraderTypeService;
+import com.cv.accountswing.service.StaffService;
 import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
-import com.cv.accountswing.ui.setup.common.CustomerTabelModel;
+import com.cv.accountswing.ui.setup.common.StaffTabelModel;
 import com.cv.accountswing.util.BindingUtil;
 import com.cv.accountswing.util.Util1;
 import java.awt.event.KeyEvent;
@@ -33,10 +31,7 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.RowFilter;
 import javax.swing.event.ListSelectionEvent;
-import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
 import javax.swing.text.JTextComponent;
 import net.coderazzi.filters.gui.AutoChoices;
 import net.coderazzi.filters.gui.TableFilterHeader;
@@ -55,15 +50,13 @@ public class StaffSetup extends javax.swing.JPanel implements KeyListener, Panel
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StaffSetup.class);
     private int selectRow = -1;
-    private Customer customer = new Customer();
+    private Staff staff = new Staff();
     @Autowired
-    private CustomerTabelModel customerTabelModel;
+    private StaffTabelModel staffTableModel;
     @Autowired
-    private CustomerService customerService;
+    private StaffService staffService;
     @Autowired
     private COAService coaService;
-    @Autowired
-    private TraderTypeService traderTypeService;
     @Autowired
     private RegionService regionService;
     @Autowired
@@ -100,15 +93,14 @@ public class StaffSetup extends javax.swing.JPanel implements KeyListener, Panel
     }
 
     private void initCombo() {
-        String strList = Global.sysProperties.get("system.customer.setup.account");
+        String strList = Global.sysProperties.get("system.staff.setup.account");
         List<ChartOfAccount> listCOA = coaService.searchWhereIn(strList, Global.compCode);
         BindingUtil.BindComboFilter(cboAccount, listCOA, null, true, false);
-        BindingUtil.BindComboFilter(cboPriceType, traderTypeService.findAll(), null, true, false);
         BindingUtil.BindComboFilter(cboRegion, regionService.search("-", "-", Global.compCode, "-"), null, true, false);
     }
 
     private void initTable() {
-        tblCustomer.setModel(customerTabelModel);
+        tblCustomer.setModel(staffTableModel);
         tblCustomer.getTableHeader().setFont(Global.textFont);
         tblCustomer.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
         tblCustomer.getTableHeader().setForeground(ColorUtil.foreground);
@@ -121,7 +113,7 @@ public class StaffSetup extends javax.swing.JPanel implements KeyListener, Panel
             if (e.getValueIsAdjusting()) {
                 if (tblCustomer.getSelectedRow() >= 0) {
                     selectRow = tblCustomer.convertRowIndexToModel(tblCustomer.getSelectedRow());
-                    setCustomer(customerTabelModel.getCustomer(selectRow));
+                    setCustomer(staffTableModel.getStaff(selectRow));
                 }
 
             }
@@ -138,32 +130,28 @@ public class StaffSetup extends javax.swing.JPanel implements KeyListener, Panel
         loadingObserver.load(this.getName(), "Start");
         taskExecutor.execute(() -> {
             try {
-                Global.listCustomer = customerService.search("-", "-", "-", "-", Global.compCode);
-                customerTabelModel.setListCustomer(Global.listCustomer);
+                Global.listStaff = staffService.search("-", "-", "-", "-", Global.compCode);
+                staffTableModel.setListStaff(Global.listStaff);
                 loadingObserver.load(this.getName(), "Stop");
             } catch (Exception e) {
-                LOGGER.error("Search Customer :" + e.getMessage());
-                JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Search Customer ", JOptionPane.ERROR_MESSAGE);
+                LOGGER.error("Search Staff :" + e.getMessage());
+                JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Search Staff ", JOptionPane.ERROR_MESSAGE);
                 loadingObserver.load(this.getName(), "Stop");
             }
         });
 
     }
 
-    private void setCustomer(Customer cus) {
-        customer = cus;
-        txtCusCode.setText(customer.getUserCode());
-        txtConPerson.setText(customer.getContactPerson());
-        txtCusName.setText(customer.getTraderName());
-        txtCusEmail.setText(customer.getEmail());
-        txtCusPhone.setText(customer.getPhone());
-        cboRegion.setSelectedItem(customer.getRegion());
-        cboPriceType.setSelectedItem(customer.getTraderType());
-        cboAccount.setSelectedItem(customer.getAccount());
-        txtCusAddress.setText(customer.getAddress());
-        chkActive.setSelected(customer.getActive());
-        txtCreditLimit.setText(Util1.getString(cus.getCreditLimit()));
-        txtCreditTerm.setText(Util1.getString(cus.getCreditDays()));
+    private void setCustomer(Staff cus) {
+        staff = cus;
+        txtCusCode.setText(staff.getUserCode());
+        txtCusName.setText(staff.getTraderName());
+        txtCusEmail.setText(staff.getEmail());
+        txtCusPhone.setText(staff.getPhone());
+        cboRegion.setSelectedItem(staff.getRegion());
+        cboAccount.setSelectedItem(staff.getAccount());
+        txtCusAddress.setText(staff.getAddress());
+        chkActive.setSelected(staff.getActive());
         lblStatus.setText("EDIT");
 
     }
@@ -171,41 +159,33 @@ public class StaffSetup extends javax.swing.JPanel implements KeyListener, Panel
     private boolean isValidEntry() {
         boolean status;
         if (txtCusName.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(Global.parentForm, "Customer Name can't be empty");
+            JOptionPane.showMessageDialog(Global.parentForm, "Staff Name can't be empty");
             status = false;
         } else if (!(cboRegion.getSelectedItem() instanceof Region)) {
-            JOptionPane.showConfirmDialog(Global.parentForm, "Invalid Region.");
+            JOptionPane.showMessageDialog(Global.parentForm, "Invalid Region.");
             cboRegion.requestFocus();
             status = false;
-        } else if (!(cboPriceType.getSelectedItem() instanceof TraderType)) {
-            JOptionPane.showConfirmDialog(Global.parentForm, "Invalid Price Type.");
-            cboPriceType.requestFocus();
-            status = false;
         } else if (!(cboAccount.getSelectedItem() instanceof ChartOfAccount)) {
-            JOptionPane.showConfirmDialog(Global.parentForm, "Invalid Acoount.");
+            JOptionPane.showMessageDialog(Global.parentForm, "Invalid Acoount.");
             cboAccount.requestFocus();
             status = false;
         } else {
-            customer.setUserCode(txtCusCode.getText());
-            customer.setTraderName(txtCusName.getText());
-            customer.setContactPerson(txtConPerson.getText());
-            customer.setPhone(txtCusPhone.getText());
-            customer.setEmail(txtCusEmail.getText());
-            customer.setAddress(txtCusAddress.getText());
-            customer.setActive(chkActive.isSelected());
-            customer.setCompCode(Global.compCode);
-            customer.setUpdatedDate(Util1.getTodayDate());
-            customer.setCreditLimit(Util1.getInteger(txtCreditLimit.getText()));
-            customer.setCreditDays(Util1.getInteger(txtCreditTerm.getText()));
-            customer.setAccount((ChartOfAccount) cboAccount.getSelectedItem());
-            customer.setTraderType((TraderType) cboPriceType.getSelectedItem());
-            customer.setRegion((Region) cboRegion.getSelectedItem());
+            staff.setUserCode(txtCusCode.getText());
+            staff.setTraderName(txtCusName.getText());
+            staff.setPhone(txtCusPhone.getText());
+            staff.setEmail(txtCusEmail.getText());
+            staff.setAddress(txtCusAddress.getText());
+            staff.setActive(chkActive.isSelected());
+            staff.setCompCode(Global.compCode);
+            staff.setUpdatedDate(Util1.getTodayDate());
+            staff.setAccount((ChartOfAccount) cboAccount.getSelectedItem());
+            staff.setRegion((Region) cboRegion.getSelectedItem());
             if (lblStatus.getText().equals("NEW")) {
-                customer.setMacId(Global.machineId);
-                customer.setCreatedBy(Global.loginUser);
-                customer.setCreatedDate(Util1.getTodayDate());
+                staff.setMacId(Global.machineId);
+                staff.setCreatedBy(Global.loginUser);
+                staff.setCreatedDate(Util1.getTodayDate());
             } else {
-                customer.setUpdatedBy(Global.loginUser);
+                staff.setUpdatedBy(Global.loginUser);
             }
             status = true;
         }
@@ -215,17 +195,17 @@ public class StaffSetup extends javax.swing.JPanel implements KeyListener, Panel
     private void saveCustomer() {
         if (isValidEntry()) {
             String traderCodeLength = Global.sysProperties.get("system.trader.id.length");
-            Customer save = customerService.save(customer, traderCodeLength);
+            Staff save = staffService.save(staff, traderCodeLength);
             if (save.getUserCode() != null) {
                 JOptionPane.showMessageDialog(Global.parentForm, "Saved");
                 if (lblStatus.getText().equals("NEW")) {
-                    //customerTabelModel.addCustomer(customer);
-                    Global.listTrader.add(customer);
-                    Global.listCustomer.add(customer);
+                    //staffTableModel.addCustomer(staff);
+                    Global.listTrader.add(staff);
+                    //Global.listCustomer.add(staff);
                 } else {
-                    //customerTabelModel.setCustomer(selectRow, customer);
-                    Global.listTrader.set(selectRow, customer);
-                    Global.listCustomer.set(selectRow, customer);
+                    //staffTableModel.setCustomer(selectRow, staff);
+                    Global.listTrader.set(selectRow, staff);
+                    //Global.listCustomer.set(selectRow, staff);
                 }
                 clear();
             }
@@ -233,21 +213,18 @@ public class StaffSetup extends javax.swing.JPanel implements KeyListener, Panel
     }
 
     public void clear() {
-        customer = new Customer();
+        staff = new Staff();
         txtCusCode.setText(null);
         txtCusName.setText(null);
         txtCusEmail.setText(null);
         txtCusPhone.setText(null);
         cboAccount.setSelectedItem(null);
-        cboPriceType.setSelectedItem(null);
         cboRegion.setSelectedItem(null);
         txtCusAddress.setText(null);
         chkActive.setSelected(Boolean.TRUE);
-        txtCreditLimit.setText(null);
         lblStatus.setText("NEW");
         txtConPerson.setText(null);
-        txtCreditTerm.setText(null);
-        customerTabelModel.refresh();
+        staffTableModel.refresh();
         txtCusCode.requestFocus();
     }
 
@@ -272,8 +249,6 @@ public class StaffSetup extends javax.swing.JPanel implements KeyListener, Panel
         jLabel5 = new javax.swing.JLabel();
         txtCusAddress = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
-        txtCreditLimit = new javax.swing.JTextField();
-        jLabel7 = new javax.swing.JLabel();
         txtConPerson = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
         btnSave = new javax.swing.JButton();
@@ -283,10 +258,6 @@ public class StaffSetup extends javax.swing.JPanel implements KeyListener, Panel
         lblStatus = new javax.swing.JLabel();
         cboAccount = new javax.swing.JComboBox<>();
         cboRegion = new javax.swing.JComboBox<>();
-        jLabel10 = new javax.swing.JLabel();
-        cboPriceType = new javax.swing.JComboBox<>();
-        jLabel11 = new javax.swing.JLabel();
-        txtCreditTerm = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         tblCustomer = new javax.swing.JTable();
@@ -335,12 +306,6 @@ public class StaffSetup extends javax.swing.JPanel implements KeyListener, Panel
         jLabel6.setFont(Global.lableFont);
         jLabel6.setText("A/C Type");
 
-        txtCreditLimit.setFont(Global.textFont);
-        txtCreditLimit.setName("txtCreditLimit"); // NOI18N
-
-        jLabel7.setFont(Global.lableFont);
-        jLabel7.setText("Credit Limit");
-
         txtConPerson.setFont(Global.textFont);
         txtConPerson.setName("txtConPerson"); // NOI18N
 
@@ -388,18 +353,6 @@ public class StaffSetup extends javax.swing.JPanel implements KeyListener, Panel
         cboRegion.setFont(Global.textFont);
         cboRegion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
-        jLabel10.setFont(Global.lableFont);
-        jLabel10.setText("Price Type");
-
-        cboPriceType.setFont(Global.textFont);
-        cboPriceType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-
-        jLabel11.setFont(Global.lableFont);
-        jLabel11.setText("Credit Term");
-
-        txtCreditTerm.setFont(Global.textFont);
-        txtCreditTerm.setName("txtCreditTerm"); // NOI18N
-
         jButton1.setBackground(ColorUtil.btnEdit);
         jButton1.setFont(Global.lableFont);
         jButton1.setForeground(ColorUtil.foreground);
@@ -418,18 +371,15 @@ public class StaffSetup extends javax.swing.JPanel implements KeyListener, Panel
             .addGroup(panelEntryLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panelEntryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jLabel11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel8, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(lblStatus, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
-                    .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
                     .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jLabel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(panelEntryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(txtConPerson, javax.swing.GroupLayout.Alignment.TRAILING)
@@ -438,12 +388,9 @@ public class StaffSetup extends javax.swing.JPanel implements KeyListener, Panel
                     .addComponent(txtCusPhone)
                     .addComponent(txtCusEmail)
                     .addComponent(txtCusAddress)
-                    .addComponent(txtCreditLimit)
                     .addComponent(chkActive, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(cboAccount, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(cboRegion, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(cboPriceType, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(txtCreditTerm)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelEntryLayout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(jButton1)
@@ -492,18 +439,6 @@ public class StaffSetup extends javax.swing.JPanel implements KeyListener, Panel
                     .addComponent(jLabel6)
                     .addComponent(cboAccount, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panelEntryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel10)
-                    .addComponent(cboPriceType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panelEntryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel7)
-                    .addComponent(txtCreditLimit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panelEntryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel11)
-                    .addComponent(txtCreditTerm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkActive)
                 .addGap(2, 2, 2)
                 .addGroup(panelEntryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -511,10 +446,10 @@ public class StaffSetup extends javax.swing.JPanel implements KeyListener, Panel
                     .addComponent(lblStatus)
                     .addComponent(jButton1)
                     .addComponent(btnClear))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(195, Short.MAX_VALUE))
         );
 
-        panelEntryLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {txtConPerson, txtCreditLimit, txtCusAddress, txtCusCode, txtCusEmail, txtCusName, txtCusPhone});
+        panelEntryLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {txtConPerson, txtCusAddress, txtCusCode, txtCusEmail, txtCusName, txtCusPhone});
 
         tblCustomer.setFont(Global.textFont);
         tblCustomer.setModel(new javax.swing.table.DefaultTableModel(
@@ -565,7 +500,7 @@ public class StaffSetup extends javax.swing.JPanel implements KeyListener, Panel
             saveCustomer();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(Global.parentForm, e.getMessage());
-            LOGGER.error("Save Customer :" + e.getMessage());
+            LOGGER.error("Save Staff :" + e.getMessage());
 
         }
     }//GEN-LAST:event_btnSaveActionPerformed
@@ -606,19 +541,15 @@ public class StaffSetup extends javax.swing.JPanel implements KeyListener, Panel
     private javax.swing.JButton btnClear;
     private javax.swing.JButton btnSave;
     private javax.swing.JComboBox<String> cboAccount;
-    private javax.swing.JComboBox<String> cboPriceType;
     private javax.swing.JComboBox<String> cboRegion;
     private javax.swing.JCheckBox chkActive;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
-    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane2;
@@ -626,8 +557,6 @@ public class StaffSetup extends javax.swing.JPanel implements KeyListener, Panel
     private javax.swing.JPanel panelEntry;
     private javax.swing.JTable tblCustomer;
     private javax.swing.JTextField txtConPerson;
-    private javax.swing.JTextField txtCreditLimit;
-    private javax.swing.JTextField txtCreditTerm;
     private javax.swing.JTextField txtCusAddress;
     private javax.swing.JTextField txtCusCode;
     private javax.swing.JTextField txtCusEmail;
@@ -640,18 +569,14 @@ public class StaffSetup extends javax.swing.JPanel implements KeyListener, Panel
         txtCusName.addKeyListener(this);
         txtCusPhone.addKeyListener(this);
         txtCusAddress.addKeyListener(this);
-        cboPriceType.getEditor().getEditorComponent().addKeyListener(this);
         cboRegion.getEditor().getEditorComponent().addKeyListener(this);
         cboAccount.getEditor().getEditorComponent().addKeyListener(this);
 
-        cboPriceType.getEditor().getEditorComponent().setName("cboPriceType");
         cboRegion.getEditor().getEditorComponent().setName("cboRegion");
         cboAccount.getEditor().getEditorComponent().setName("cboAccount");
 
         txtCusEmail.addKeyListener(this);
         cboAccount.addKeyListener(this);
-        txtCreditLimit.addKeyListener(this);
-        txtCreditTerm.addKeyListener(this);
         txtConPerson.addKeyListener(this);
         chkActive.addKeyListener(this);
         btnSave.addKeyListener(this);
@@ -777,14 +702,12 @@ public class StaffSetup extends javax.swing.JPanel implements KeyListener, Panel
             case "cboAccount":
                 switch (e.getKeyCode()) {
                     case KeyEvent.VK_ENTER:
-                        cboPriceType.requestFocus();
                         break;
                     /*case KeyEvent.VK_UP:
                         txtCusAddress.requestFocus();
                         break;
                      */
                     case KeyEvent.VK_RIGHT:
-                        cboPriceType.requestFocus();
                         break;
                     case KeyEvent.VK_LEFT:
                         txtCusAddress.requestFocus();
@@ -796,14 +719,12 @@ public class StaffSetup extends javax.swing.JPanel implements KeyListener, Panel
             case "cboPriceType":
                 switch (e.getKeyCode()) {
                     case KeyEvent.VK_ENTER:
-                        txtCreditLimit.requestFocus();
                         break;
                     /*case KeyEvent.VK_UP:
                         cboAccount.requestFocus();
                         break;
                      */
                     case KeyEvent.VK_RIGHT:
-                        txtCreditLimit.requestFocus();
                         break;
                     case KeyEvent.VK_LEFT:
                         cboAccount.requestFocus();
@@ -818,17 +739,14 @@ public class StaffSetup extends javax.swing.JPanel implements KeyListener, Panel
                     chkActive.requestFocus();
                 }
                 if (e.getKeyCode() == KeyEvent.VK_UP) {
-                    txtCreditLimit.requestFocus();
                 }
                 tabToTable(e);
 
                 break;
             case "txtCreditLimit":
                 if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_DOWN) {
-                    txtCreditTerm.requestFocus();
                 }
                 if (e.getKeyCode() == KeyEvent.VK_UP) {
-                    cboPriceType.requestFocus();
                 }
                 tabToTable(e);
 
@@ -866,7 +784,7 @@ public class StaffSetup extends javax.swing.JPanel implements KeyListener, Panel
             case "tblCustomer":
                 if (e.getKeyCode() == KeyEvent.VK_UP || e.getKeyCode() == KeyEvent.VK_DOWN) {
                     selectRow = tblCustomer.convertRowIndexToModel(tblCustomer.getSelectedRow());
-                    setCustomer(customerTabelModel.getCustomer(selectRow));
+                    setCustomer(staffTableModel.getStaff(selectRow));
                 }
 
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {

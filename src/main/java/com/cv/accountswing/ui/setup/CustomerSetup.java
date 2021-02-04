@@ -174,15 +174,15 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener, Pa
             JOptionPane.showMessageDialog(Global.parentForm, "Customer Name can't be empty");
             status = false;
         } else if (!(cboRegion.getSelectedItem() instanceof Region)) {
-            JOptionPane.showConfirmDialog(Global.parentForm, "Invalid Region.");
+            JOptionPane.showMessageDialog(Global.parentForm, "Invalid Region.");
             cboRegion.requestFocus();
             status = false;
         } else if (!(cboPriceType.getSelectedItem() instanceof TraderType)) {
-            JOptionPane.showConfirmDialog(Global.parentForm, "Invalid Price Type.");
+            JOptionPane.showMessageDialog(Global.parentForm, "Invalid Price Type.");
             cboPriceType.requestFocus();
             status = false;
         } else if (!(cboAccount.getSelectedItem() instanceof ChartOfAccount)) {
-            JOptionPane.showConfirmDialog(Global.parentForm, "Invalid Acoount.");
+            JOptionPane.showMessageDialog(Global.parentForm, "Invalid Acoount.");
             cboAccount.requestFocus();
             status = false;
         } else {

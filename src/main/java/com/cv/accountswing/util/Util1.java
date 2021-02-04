@@ -8,7 +8,6 @@ import com.cv.accountswing.common.Global;
 import com.google.gson.JsonElement;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.io.File;
@@ -369,8 +368,6 @@ public class Util1 {
         }
     }
 
-    
-
     public static String isNullObj(Object obj, String value) {
         if (obj == null) {
             return value;
@@ -614,6 +611,22 @@ public class Util1 {
     public static JDialog getLoading(JDialog owner, ImageIcon icon) {
         JDialog dialog = new JDialog(owner, false);
         dialog.getContentPane().setBackground(Color.white);
+        dialog.setSize(70, 70);
+        dialog.getContentPane().setLayout(new BorderLayout());
+        JLabel lblImg = new JLabel(icon);
+        lblImg.setLocation(70, 0);
+        dialog.add(lblImg);
+        dialog.getContentPane().add(lblImg, BorderLayout.CENTER);
+        dialog.setLocationRelativeTo(null);
+        dialog.setUndecorated(true);
+        dialog.validate();
+        return dialog;
+    }
+
+    public static JDialog getLoading(JFrame owner, ImageIcon icon) {
+        JDialog dialog = new JDialog(owner, false);
+        dialog.getContentPane().setBackground(Color.white);
+        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         dialog.setSize(70, 70);
         dialog.getContentPane().setLayout(new BorderLayout());
         JLabel lblImg = new JLabel(icon);
