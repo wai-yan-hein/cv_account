@@ -43,9 +43,6 @@ import com.cv.accountswing.service.VOpeningService;
 import com.cv.accountswing.ui.editor.COAL2AutoCompleter;
 import com.cv.accountswing.ui.editor.RegionAutoCompleter;
 import com.cv.accountswing.ui.setup.common.OpeningTableModel;
-import javax.swing.RowFilter;
-import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
 import net.coderazzi.filters.gui.AutoChoices;
 import net.coderazzi.filters.gui.TableFilterHeader;
 

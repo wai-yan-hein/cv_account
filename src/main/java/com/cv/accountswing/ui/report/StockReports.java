@@ -311,7 +311,10 @@ public class StockReports extends javax.swing.JPanel implements PanelControl {
         Map<String, Object> parameters = new HashMap();
         parameters.put("from_date", startDate);
         parameters.put("to_date", endDate);
-        parameters.put("machine_id", Global.machineId);
+        parameters.put("mac_id", Global.machineId);
+        parameters.put("stock_type_code", stockTypeCode);
+        parameters.put("cat_code", catCode);
+        parameters.put("company_name", Global.sysProperties.get("system.report.company"));
         parameters.put("region_filter", regionFilter);
         reportService.reportViewer(reportPath, reportPath, fontPath, parameters);
     }

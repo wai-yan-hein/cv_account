@@ -34,7 +34,7 @@ public class NetworkDetector extends Thread {
     public void run() {
         try {
             //LOGGER.info("Network Detector Started.");
-            String ipAddress = "graph.facebook.com";
+            String ipAddress = "www.google.com";
             InetAddress inet = InetAddress.getByName(ipAddress);
             long start = new GregorianCalendar().getTimeInMillis();
             if (inet.isReachable(timeOut)) {
