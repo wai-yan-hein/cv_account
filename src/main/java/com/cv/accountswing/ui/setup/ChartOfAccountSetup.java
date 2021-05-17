@@ -9,6 +9,7 @@ import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
+import com.cv.accountswing.common.TreeTransferHandler;
 import com.cv.accountswing.entity.ChartOfAccount;
 import com.cv.accountswing.entity.Menu;
 import com.cv.accountswing.entity.Privilege;
@@ -31,6 +32,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.HashMap;
 import java.util.List;
+import javax.swing.DropMode;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JMenuItem;
@@ -43,6 +45,7 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeSelectionModel;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
@@ -57,7 +60,7 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
         MouseListener,
         TreeSelectionListener, KeyListener,
         PanelControl {
-    
+
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(ChartOfAccountSetup.class);
     private DefaultMutableTreeNode selectedNode;
     DefaultTreeModel treeModel;
@@ -85,15 +88,15 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
     private boolean isShown = false;
     private ChartOfAccount chartOfAccount;
     private boolean isNew = false;
-    
+
     public void setIsShown(boolean isShown) {
         this.isShown = isShown;
     }
-    
+
     public void setLoadingObserver(LoadingObserver loadingObserver) {
         this.loadingObserver = loadingObserver;
     }
-    
+
     private final ActionListener menuListener = (java.awt.event.ActionEvent evt) -> {
         JMenuItem actionMenu = (JMenuItem) evt.getSource();
         String menuName = actionMenu.getText();
@@ -108,7 +111,7 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
             default:
                 break;
         }
-        
+
     };
 
     /**
@@ -119,13 +122,13 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
         initKeyListener();
         initPopup();
     }
-    
+
     private void initMain() {
         initTree();
         initCombo();
         isShown = true;
     }
-    
+
     private void initCombo() {
         List<Menu> listMenu = menuService.getParentChildMenu();
         BindingUtil.BindCombo(cboMenu, listMenu, null, false);
@@ -137,9 +140,8 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
             }
         });
         cboMenu.setSelectedItem(null);
-        
     }
-    
+
     private void newCOA() {
         ChartOfAccount coa = new ChartOfAccount();
         coa.setCoaNameEng("New Chart of Account");
@@ -147,10 +149,12 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
         if (selectedNode != null) {
             selectedNode.add(child);
             treeModel.insertNodeInto(child, selectedNode, selectedNode.getChildCount() - 1);
+            treeCOA.setSelectionInterval(selectedNode.getChildCount(), selectedNode.getChildCount());
+
         }
         isNew = true;
     }
-    
+
     private void saveChartAcc() {
         String parentCode;
         String option;
@@ -193,9 +197,9 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
                 }
             }
         }
-        
+
     }
-    
+
     private void deleteCOA() {
         try {
             if (selectedNode != null) {
@@ -210,14 +214,14 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
                         JOptionPane.showMessageDialog(Global.parentForm, "Can't delete this account is already used.");
                     }
                 }
-                
+
             }
         } catch (Exception e) {
             LOGGER.error("Delete ChartOfAccount :" + e.getMessage());
             JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Delete ChartOfAccount", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
+
     private boolean isValidDel(String code) {
         boolean status = true;
         List<Trader> search = traderService.search("-", code);
@@ -226,7 +230,7 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
         }
         return status;
     }
-    
+
     private void initPopup() {
         popupmenu = new JPopupMenu("Edit");
         JMenuItem cut = new JMenuItem("New");
@@ -235,11 +239,16 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
         copy.addActionListener(menuListener);
         popupmenu.add(cut);
         popupmenu.add(copy);
-        
+
     }
-    
+
     private void initTree() {
         loadingObserver.load(this.getName(), "Start");
+        treeCOA.setDragEnabled(true);
+        treeCOA.setDropMode(DropMode.ON_OR_INSERT);
+        treeCOA.setTransferHandler(new TreeTransferHandler());
+        treeCOA.getSelectionModel().setSelectionMode(
+                TreeSelectionModel.CONTIGUOUS_TREE_SELECTION);
         treeRoot = new DefaultMutableTreeNode(parentRootName);
         taskExecutor.execute(() -> {
             createTreeNode("#", treeRoot);
@@ -250,20 +259,17 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
         treeModel.setRoot(treeRoot);
         //treMenu.addPropertyChangeListener(propertyChangeListener);
     }
-    
+
     private void createTreeNode(String parentMenuID, DefaultMutableTreeNode treeRoot) {
         List<ChartOfAccount> listChild = coaServcie.getChild(Global.compCode, parentMenuID);
         listChild.forEach(child -> {
             DefaultMutableTreeNode root = new DefaultMutableTreeNode(child);
             treeRoot.add(root);
-            if (!treeRoot.isLeaf()) {
-                treeModel.setRoot(treeRoot);
-            }
             createTreeNode(child.getCode(), root);
         });
-        
+
     }
-    
+
     private void setCOA(ChartOfAccount coa) {
         chartOfAccount = coa;
         setEnabledControl(true);
@@ -281,8 +287,9 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
                 btnCreate.setEnabled(false);
             }
         }
+        txtUsrCode.requestFocus();
     }
-    
+
     public void clear() {
         txtSysCode.setText(null);
         txtName.setText(null);
@@ -292,7 +299,7 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
         chartOfAccount = new ChartOfAccount();
         isNew = false;
     }
-    
+
     private void initKeyListener() {
         txtName.addKeyListener(this);
         txtSysCode.addKeyListener(this);
@@ -303,9 +310,9 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
         btnClear.addKeyListener(this);
         treeCOA.addMouseListener(this);
         treeCOA.addTreeSelectionListener(this);
-        
+
     }
-    
+
     private void setEnabledControl(boolean status) {
         txtUsrCode.setEnabled(status);
         txtName.setEnabled(status);
@@ -313,9 +320,9 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
         btnClear.setEnabled(status);
         chkActive.setEnabled(status);
         btnImport.setEnabled(status);
-        
+
     }
-    
+
     private void saveMenu() {
         if (cboMenu.getSelectedItem() != null) {
             if (cboMenu.getSelectedItem() instanceof Menu) {
@@ -348,16 +355,16 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
                             });
                         }
                         JOptionPane.showMessageDialog(Global.parentForm, "Successfully Created");
-                        
+
                     }
                 } catch (HeadlessException e) {
                     JOptionPane.showMessageDialog(Global.parentForm, e.getMessage());
                     LOGGER.info("Save Menu :" + e.getMessage());
                 }
-                
+
             }
         }
-        
+
     }
 
     /**
@@ -417,6 +424,7 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
         treeCOA.setName("treeCOA"); // NOI18N
         jScrollPane1.setViewportView(treeCOA);
 
+        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.RAISED));
         jPanel1.setFont(Global.textFont);
 
         jLabel1.setFont(Global.lableFont);
@@ -555,7 +563,7 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
                             .addComponent(txtName)
                             .addComponent(txtUsrCode)
                             .addComponent(txtSysCode)
-                            .addComponent(chkActive, javax.swing.GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE)))
+                            .addComponent(chkActive, javax.swing.GroupLayout.DEFAULT_SIZE, 203, Short.MAX_VALUE)))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(btnImport)
@@ -600,7 +608,7 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 235, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 233, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
@@ -715,7 +723,7 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
             popupmenu.show(this, e.getX(), e.getY());
         }
     }
-    
+
     @Override
     public void valueChanged(TreeSelectionEvent e) {
         selectedNode = (DefaultMutableTreeNode) treeCOA.getLastSelectedPathComponent();
@@ -728,38 +736,38 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
                 setEnabledControl(false);
             }
         }
-        
+
     }
-    
+
     @Override
     public void mousePressed(MouseEvent e) {
     }
-    
+
     @Override
     public void mouseReleased(MouseEvent e) {
     }
-    
+
     @Override
     public void mouseEntered(MouseEvent e) {
     }
-    
+
     @Override
     public void mouseExited(MouseEvent e) {
     }
-    
+
     @Override
     public void keyTyped(KeyEvent e) {
     }
-    
+
     @Override
     public void keyPressed(KeyEvent e) {
     }
-    
+
     @Override
     public void keyReleased(KeyEvent e) {
         Object sourceObj = e.getSource();
         String ctrlName = "-";
-        
+
         if (sourceObj instanceof JTree) {
             ctrlName = ((JTree) sourceObj).getName();
         } else if (sourceObj instanceof JCheckBox) {
@@ -788,7 +796,7 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
                     txtUsrCode.requestFocus();
                 }
                 tabToTree(e);
-                
+
                 break;
             case "chkActive":
                 if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_DOWN) {
@@ -798,7 +806,7 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
                     txtName.requestFocus();
                 }
                 tabToTree(e);
-                
+
                 break;
             case "btnSave":
                 if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_DOWN) {
@@ -808,7 +816,7 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
                     chkActive.requestFocus();
                 }
                 tabToTree(e);
-                
+
                 break;
             case "btnClear":
                 if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_DOWN) {
@@ -831,7 +839,7 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
                         } else {
                             clear();
                             setEnabledControl(false);
-                            
+
                         }
                     }
                 }
@@ -840,40 +848,40 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
                 }
         }
     }
-    
+
     private void tabToTree(KeyEvent e) {
         if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_RIGHT) {
             treeCOA.requestFocus();
         }
     }
-    
+
     @Override
     public void delete() {
     }
-    
+
     @Override
     public void newForm() {
         clear();
         isShown = false;
-        
+
     }
-    
+
     @Override
     public void history() {
     }
-    
+
     @Override
     public void print() {
     }
-    
+
     @Override
     public void save() {
         saveChartAcc();
     }
-    
+
     @Override
     public void refresh() {
         initTree();
     }
-    
+
 }

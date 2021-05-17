@@ -26,6 +26,10 @@ public class CustomerTableModel extends AbstractTableModel {
         this.listTrader = listTrader;
     }
 
+    public CustomerTableModel() {
+    }
+    
+
     @Override
     public String getColumnName(int column) {
         return columnNames[column];
@@ -103,5 +107,26 @@ public class CustomerTableModel extends AbstractTableModel {
         } else {
             return listTrader.size();
         }
+    }
+     public void addNewRow() {
+        if (hasEmptyRow()) {
+            Customer customer = new Customer();
+            listTrader.add(customer);
+            fireTableRowsInserted(listTrader.size() - 1, listTrader.size() - 1);
+        }
+    }
+
+    public boolean hasEmptyRow() {
+        boolean status = true;
+        if (listTrader.isEmpty() || listTrader == null) {
+            status = true;
+        } else {
+            Customer customer = listTrader.get(listTrader.size() - 1);
+            if (customer.getCode()== null) {
+                status = false;
+            }
+        }
+
+        return status;
     }
 }

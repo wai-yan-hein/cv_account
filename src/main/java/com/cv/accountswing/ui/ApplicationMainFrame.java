@@ -6,7 +6,6 @@
 package com.cv.accountswing.ui;
 
 import com.cv.accountswing.AccountSwingApplication;
-import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.FilterObserver;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
@@ -15,7 +14,10 @@ import com.cv.accountswing.common.NetworkObserver;
 import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.ReloadData;
 import com.cv.accountswing.common.SelectionObserver;
+import com.cv.accountswing.entity.ChartOfAccount;
+import com.cv.accountswing.entity.Currency;
 import com.cv.accountswing.entity.CurrencyKey;
+import com.cv.accountswing.entity.Department;
 import com.cv.accountswing.entity.SystemProperty;
 import com.cv.accountswing.entity.view.VRoleMenu;
 import com.cv.accountswing.entity.view.VUsrCompAssign;
@@ -47,14 +49,16 @@ import com.cv.accountswing.ui.setup.CustomerSetup;
 import com.cv.accountswing.ui.setup.DepartmentSetup;
 import com.cv.accountswing.ui.setup.ManageProjectSetup;
 import com.cv.accountswing.ui.setup.RegionSetup;
-import com.cv.accountswing.ui.setup.RoleAssignSetup;
+import com.cv.accountswing.ui.system.setup.RoleAssignSetup;
 import com.cv.accountswing.ui.setup.StaffSetup;
 import com.cv.accountswing.ui.setup.SupplierSetup;
 import com.cv.accountswing.ui.system.setup.Company;
+import com.cv.accountswing.ui.system.setup.Default;
+import com.cv.accountswing.ui.system.setup.Mapping;
 import com.cv.accountswing.ui.system.setup.MenuSetup;
 import com.cv.accountswing.ui.system.setup.RoleSetup;
 import com.cv.accountswing.ui.system.setup.SystemPropertySetup;
-import com.cv.accountswing.ui.system.setup.UserSetting;
+import com.cv.accountswing.ui.system.setup.RoleSetting;
 import com.cv.accountswing.ui.system.setup.UserSetup;
 import com.cv.inv.entry.Adjustment;
 import com.cv.inv.entry.Damage;
@@ -69,6 +73,7 @@ import com.cv.inv.service.SaleManService;
 import com.cv.inv.service.VouStatusService;
 import com.cv.accountswing.util.Util1;
 import com.cv.inv.entity.AccSetting;
+import com.cv.inv.entity.Location;
 import com.cv.inv.entry.CustomerGrid;
 import com.cv.inv.entry.SaleEntry;
 import com.cv.inv.entry.StockInOutEntry;
@@ -114,6 +119,7 @@ import javax.swing.SwingUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -132,9 +138,9 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private final HashMap<String, JLabel> hmTabLoading = new HashMap();
     private final HashMap<String, JPanel> hmPanel = new HashMap<>();
     private JPopupMenu popupmenu;
-    private final ImageIcon onlineIcon = new ImageIcon(this.getClass().getResource("/images/online-signal.png"));
-    private final ImageIcon lowIcon = new ImageIcon(this.getClass().getResource("/images/low-signal.png"));
-    private final ImageIcon offlineIcon = new ImageIcon(this.getClass().getResource("/images/offline-signal.png"));
+    private final ImageIcon onlineIcon = new ImageIcon(this.getClass().getResource("/images/signal_20px.png"));
+    private final ImageIcon offlineIcon = new ImageIcon(this.getClass().getResource("/images/no_connection_20px.png"));
+    private final ImageIcon lowIcon = new ImageIcon(this.getClass().getResource("/images/low_connection_20px.png"));
     private final ImageIcon loadingIcon = new ImageIcon(this.getClass().getResource("/images/dual-loading.gif"));
     private final ImageIcon companyIcon = new ImageIcon(this.getClass().getResource("/images/museum_50px.png"));
     private final ActionListener menuListener = (java.awt.event.ActionEvent evt) -> {
@@ -148,6 +154,8 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private CareServerSender sender;
     @Autowired
     private CareServerListener listener;*/
+    @Value("${ping.server.ip}")
+    private String pingServer;
     @Autowired
     private MenuService menuService;
     @Autowired
@@ -256,6 +264,8 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private SaleManService saleManService;
     @Autowired
     private StockService stockService;
+    @Autowired
+    private Default defaultMap;
 
     @Autowired
     private StockUnitService stockUnitService;
@@ -278,11 +288,13 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     @Autowired
     private CustomerGrid customerGrid;
     @Autowired
-    private UserSetting userSetting;
+    private RoleSetting roleSetting;
     @Autowired
     private RegionService regionService;
     @Autowired
     private StaffSetup staffSetup;
+    @Autowired
+    private Mapping mapping;
     private PanelControl control;
     private FilterObserver filterObserver;
 
@@ -364,10 +376,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                         supplierSetup.setName(menuName);
                         supplierSetup.setLoadingObserver(this);
                         return supplierSetup;
-                    case "Role Assign":
-                        roleAssignSetup.setName(menuName);
-                        roleAssignSetup.setLoadingObserver(this);
-                        return roleAssignSetup;
                     case "COA":
                         coaSetup.setName(menuName);
                         coaSetup.setLoadingObserver(this);
@@ -544,9 +552,13 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                     case "Role Setup":
                         roleSetup.setName(menuName);
                         return roleSetup;
-                    case "User Setting":
-                        userSetting.setName(menuName);
-                        return userSetting;
+                    case "Role Setting":
+                        roleSetting.setName(menuName);
+                        return roleSetting;
+                    case "Role Assign":
+                        roleAssignSetup.setName(menuName);
+                        roleAssignSetup.setLoadingObserver(this);
+                        return roleAssignSetup;
                     default:
                         return null;
 
@@ -748,61 +760,56 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
 
     private void initializeData() {
         this.setTitle(this.getTitle() + "(" + Global.loginUser.getUserName() + ")");
+        lblCompanyName.setText(Global.companyName);
         try {
 
             Global.listStock = stockService.findAll();
             Global.listAppUser = userService.search("-", "-", "-", "-");
-            Global.listCOA = cOAService.search("-", "-", Global.compCode, "3", "-", "-", "-");
-            Global.listCurrency = currencyService.search("-", "-", Global.compCode);
-            Global.listDepartment = departmentService.search("-", "-", Global.compCode,
-                    "-", "-");
+            //coa
+            List<ChartOfAccount> roleCOA = mapping.getRoleCOA(Global.roleCode);
+            Global.listCOA = roleCOA.isEmpty() ? cOAService.search("-", "-", Global.compCode, "3", "-", "-", "-") : roleCOA;
+            //currency
+            List<Currency> roleCurrency = mapping.getRoleCurrency(Global.roleCode);
+            Global.listCurrency = roleCurrency.isEmpty() ? currencyService.search("-", "-", Global.compCode) : roleCurrency;
+            //department
+            List<Department> roleDepartment = mapping.getRoleDepartment(Global.roleCode);
+            Global.listDepartment = roleDepartment.isEmpty() ? departmentService.search("-", "-", Global.compCode,
+                    "-", "-") : roleDepartment;
+            //
             Global.listCustomer = customerService.search("-", "-", "-", "-", Global.compCode);
             Global.listSupplier = supplierService.search("-", "-", "-", "-", Global.compCode);
             Global.listTrader = traderService.searchTrader("-", "-", "-", "-", "-", Global.compCode, "-");
-            Global.listLocation = locationService.findAll();
-            Global.listVou = vouService.findAll();
-            Global.listSaleMan = saleManService.findAll();
-            Global.listStockUnit = stockUnitService.findAll();
-            Global.listRelation = relationService.findAll();
-            Global.listMachine = machineInfoService.findAll();
-            Global.listStockType = stockTypeService.findAll();
-            Global.listCategory = categoryService.findAll();
-            Global.listStockBrand = stockBrandService.findAll();
+            //location
+            List<Location> roleLocaiton = mapping.getRoleLocaiton(Global.roleCode);
+            Global.listLocation = roleLocaiton.isEmpty() ? locationService.findAll(Global.compCode) : roleLocaiton;
+            //voucher
+
+            //Global.listVou = vouService.findAll();
+            //Global.listSaleMan = saleManService.findAll();
+            //Global.listStockUnit = stockUnitService.findAll();
+            //Global.listRelation = relationService.findAll();
+            //Global.listMachine = machineInfoService.findAll();
+            //Global.listStockType = stockTypeService.findAll();
+            //Global.listCategory = categoryService.findAll();
+            //Global.listStockBrand = stockBrandService.findAll();
             Global.listRegion = regionService.search("-", "-", Global.compCode, "-");
 
-            if (Global.listRelation != null) {
-                Global.listRelation.forEach(ur -> {
-                    Global.hmRelation.put(ur.getUnitKey(), ur.getFactor());
-                });
-            }
-            Global.listChargeType = chargeTypeService.findAll();
-            String cuId = Global.sysProperties.get("system.default.currency");
-            //Default Currency
-            CurrencyKey key = new CurrencyKey();
-            key.setCode(cuId);
-            key.setCompCode(Global.compCode);
-            Global.defalutCurrency = currencyService.findById(key);
+            /*if (Global.listRelation != null) {
+            Global.listRelation.forEach(ur -> {
+            Global.hmRelation.put(ur.getUnitKey(), ur.getFactor());
+            });
+            }*/
+            Global.defalutCurrency = defaultMap.getCurrency(Global.roleCode);
             //Default department
-            String depId = Global.sysProperties.get("system.default.department");
-            Global.defaultDepartment = departmentService.findById(depId);
+            Global.defaultDepartment = defaultMap.getDepartment(Global.roleCode);
             //Defatult Loction
-            String locId = Global.sysProperties.get("system.default.location");
-            Global.defaultLocation = locationService.findById(locId);
+            Global.defaultLocation = defaultMap.getLocation(Global.roleCode);
 
             //Default VouStatus
-            String vouStausId = Global.sysProperties.get("system.default.vou.status");
-            Global.defaultVouStatus = vouStatusService.findById(vouStausId);
-            //Default SaleMan
-            String saleManId = Global.sysProperties.get("system.default.saleman");
-            if (saleManId != null) {
-                Global.defaultSaleMan = saleManService.findById(saleManId);
-            }
             //Default Customer
-            String cusId = Global.sysProperties.get("system.default.customer");
-            Global.defaultCustomer = customerService.findById(cusId);
+            Global.defaultCustomer = defaultMap.getCutomer(Global.roleCode);
             //Default Supplier
-            String supId = Global.sysProperties.get("system.default.supplier");
-            Global.defaultSupplier = supplierService.findById(supId);
+            Global.defaultSupplier = defaultMap.getSuppplier(Global.roleCode);
         } catch (Exception e) {
             LOGGER.error("Initialize Data :" + e.getMessage());
             JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Initialize Data", JOptionPane.ERROR_MESSAGE);
@@ -929,7 +936,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         Global.y = this.getY();
         Global.height = this.getHeight();
         Global.width = this.getWidth();
-        lblCompanyName.setText(Global.companyName);
+        //lblCompanyName.setText(Global.companyName);
     }
 
     @Override
@@ -937,7 +944,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         LOGGER.info("MainFrame reload : " + msg);
         switch (msg) {
             case "SENT-INV":
-                lblCompanyName.setText(data.toString());
+                //lblCompanyName.setText(data.toString());
                 break;
             default:
                 break;
@@ -948,6 +955,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         LOGGER.info("Network Dector Start.");
         NetworkDetector detector = new NetworkDetector();
         detector.setNetworkObserver(this);
+        detector.setIpAddress(pingServer);
         scheduler.scheduleAtFixedRate(detector, Duration.ofSeconds(10));
         startPhoneService();
     }
@@ -959,7 +967,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                 LOGGER.info("Phone Serivce Thread Started.");
                 try {
                     while (true) {
-                        try (Socket s = Global.sock.accept()) {
+                        try ( Socket s = Global.sock.accept()) {
                             DataInputStream dis = new DataInputStream(s.getInputStream());
                             String phoneNo = (String) dis.readUTF();
                             if (!phoneNo.isEmpty()) {
@@ -1006,7 +1014,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        lblCompanyName = new javax.swing.JLabel();
         toolBar = new javax.swing.JToolBar();
         btnSave = new javax.swing.JButton();
         btnPrint = new javax.swing.JButton();
@@ -1018,6 +1025,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         btnFilter = new javax.swing.JButton();
         lblNeworkImage = new javax.swing.JLabel();
         lblNeworkPing = new javax.swing.JLabel();
+        lblCompanyName = new javax.swing.JLabel();
         tabMain = new javax.swing.JTabbedPane();
         menuBar = new javax.swing.JMenuBar();
 
@@ -1057,13 +1065,8 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         jPanel1.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         jPanel1.setFocusable(false);
 
-        lblCompanyName.setFont(Global.textFont);
-        lblCompanyName.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        lblCompanyName.setText("Welcome     ");
-
         toolBar.setOpaque(false);
 
-        btnSave.setBackground(ColorUtil.mainColor);
         btnSave.setFont(Global.lableFont);
         btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save_20px.png"))); // NOI18N
         btnSave.setToolTipText("F5 - Save");
@@ -1074,7 +1077,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         });
         toolBar.add(btnSave);
 
-        btnPrint.setBackground(ColorUtil.mainColor);
         btnPrint.setFont(Global.lableFont);
         btnPrint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/print_20px.png"))); // NOI18N
         btnPrint.setToolTipText("F6 - Print");
@@ -1086,7 +1088,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         });
         toolBar.add(btnPrint);
 
-        btnRefresh.setBackground(ColorUtil.mainColor);
         btnRefresh.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/refresh_20px.png"))); // NOI18N
         btnRefresh.setToolTipText("F7 - Refresh");
         btnRefresh.addActionListener(new java.awt.event.ActionListener() {
@@ -1096,7 +1097,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         });
         toolBar.add(btnRefresh);
 
-        btnDelete.setBackground(ColorUtil.mainColor);
         btnDelete.setFont(Global.lableFont);
         btnDelete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/trash_20px.png"))); // NOI18N
         btnDelete.setToolTipText("F8 - Delete");
@@ -1108,7 +1108,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         });
         toolBar.add(btnDelete);
 
-        btnHistory.setBackground(ColorUtil.mainColor);
         btnHistory.setFont(Global.lableFont);
         btnHistory.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/time_machine_20px.png"))); // NOI18N
         btnHistory.setToolTipText("F9-History");
@@ -1120,7 +1119,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         });
         toolBar.add(btnHistory);
 
-        btnClear.setBackground(ColorUtil.mainColor);
         btnClear.setFont(Global.lableFont);
         btnClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/add_file_20px.png"))); // NOI18N
         btnClear.setToolTipText("F10 - New");
@@ -1132,7 +1130,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         });
         toolBar.add(btnClear);
 
-        btnLogout.setBackground(ColorUtil.mainColor);
         btnLogout.setFont(Global.lableFont);
         btnLogout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/logout_rounded_down_20px.png"))); // NOI18N
         btnLogout.setToolTipText("Logout");
@@ -1143,7 +1140,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         });
         toolBar.add(btnLogout);
 
-        btnFilter.setBackground(ColorUtil.mainColor);
         btnFilter.setFont(Global.lableFont);
         btnFilter.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/slider_20px.png"))); // NOI18N
         btnFilter.setToolTipText("Filter Bar");
@@ -1157,20 +1153,35 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         });
         toolBar.add(btnFilter);
 
-        lblNeworkImage.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/online-signal.png"))); // NOI18N
+        lblNeworkImage.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/no_connection_20px.png"))); // NOI18N
 
+        lblNeworkPing.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         lblNeworkPing.setText("2344ms");
-        lblNeworkPing.setToolTipText("Internet Connection Status");
+        lblNeworkPing.setToolTipText("Server Connection Status");
+        lblNeworkPing.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
+
+        lblCompanyName.setFont(Global.menuFont);
+        lblCompanyName.setForeground(new java.awt.Color(0, 0, 255));
+        lblCompanyName.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        lblCompanyName.setText("Company Name");
+        lblCompanyName.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblCompanyNameMouseClicked(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                lblCompanyNameMouseEntered(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(toolBar, javax.swing.GroupLayout.DEFAULT_SIZE, 286, Short.MAX_VALUE)
+                .addComponent(toolBar, javax.swing.GroupLayout.PREFERRED_SIZE, 254, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(lblCompanyName, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(184, 184, 184)
+                .addComponent(lblCompanyName, javax.swing.GroupLayout.DEFAULT_SIZE, 331, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
                 .addComponent(lblNeworkImage)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblNeworkPing)
@@ -1179,15 +1190,16 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblCompanyName, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(toolBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(toolBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+            .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(lblNeworkImage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lblNeworkPing, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblNeworkImage, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(lblNeworkPing, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(lblCompanyName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(4, 4, 4)))
                 .addContainerGap())
         );
 
@@ -1319,6 +1331,15 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             filterObserver.sendFilter("-");
         }
     }//GEN-LAST:event_btnFilterActionPerformed
+
+    private void lblCompanyNameMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblCompanyNameMouseEntered
+        // TODO add your handling code here:
+    }//GEN-LAST:event_lblCompanyNameMouseEntered
+
+    private void lblCompanyNameMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblCompanyNameMouseClicked
+        // TODO add your handling code here:
+
+    }//GEN-LAST:event_lblCompanyNameMouseClicked
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClear;

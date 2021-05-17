@@ -21,6 +21,15 @@ public class NetworkDetector extends Thread {
     private NetworkObserver networkObserver;
     private boolean error = false;
     private final int timeOut = 10000;
+    private String ipAddress;
+
+    public String getIpAddress() {
+        return ipAddress;
+    }
+
+    public void setIpAddress(String ipAddress) {
+        this.ipAddress = ipAddress;
+    }
 
     public NetworkObserver getNetworkObserver() {
         return networkObserver;
@@ -34,7 +43,6 @@ public class NetworkDetector extends Thread {
     public void run() {
         try {
             //LOGGER.info("Network Detector Started.");
-            String ipAddress = "www.google.com";
             InetAddress inet = InetAddress.getByName(ipAddress);
             long start = new GregorianCalendar().getTimeInMillis();
             if (inet.isReachable(timeOut)) {

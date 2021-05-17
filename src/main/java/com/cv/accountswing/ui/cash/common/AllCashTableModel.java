@@ -21,6 +21,7 @@ import com.cv.accountswing.service.TraderService;
 import com.cv.accountswing.util.Util1;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import java.awt.HeadlessException;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -109,48 +110,50 @@ public class AllCashTableModel extends AbstractTableModel {
     public Object getValueAt(int row, int column) {
 
         try {
-            VGl vgi = listVGl.get(row);
+            if (!listVGl.isEmpty()) {
+                VGl vgi = listVGl.get(row);
 
-            switch (column) {
-                case 0: //Id
-                    if (vgi.getGlDate() != null) {
-                        return Util1.toDateStr(vgi.getGlDate(), "dd/MM/yyyy");
-                    }
-                case 1: //Department
-                    return vgi.getDeptUsrCode();
-                case 2://Desp
-                    return vgi.getDescription();
-                case 3://Ref
-                    return vgi.getReference();
-                case 4://Person
-                    return vgi.getTraderName();
-                case 5:
-                    //Account
-                    return vgi.getAccName();
-                case 6:
-                    return vgi.getFromCurId();
-                case 7:
-                    if (vgi.getDrAmt() != null) {
-                        if (vgi.getDrAmt() == 0) {
-                            return null;
+                switch (column) {
+                    case 0: //Id
+                        if (vgi.getGlDate() != null) {
+                            return Util1.toDateStr(vgi.getGlDate(), "dd/MM/yyyy");
+                        }
+                    case 1: //Department
+                        return vgi.getDeptUsrCode();
+                    case 2://Desp
+                        return vgi.getDescription();
+                    case 3://Ref
+                        return vgi.getReference();
+                    case 4://Person
+                        return vgi.getTraderName();
+                    case 5:
+                        //Account
+                        return vgi.getAccName();
+                    case 6:
+                        return vgi.getFromCurId();
+                    case 7:
+                        if (vgi.getDrAmt() != null) {
+                            if (vgi.getDrAmt() == 0) {
+                                return null;
+                            } else {
+                                return vgi.getDrAmt();
+                            }
                         } else {
                             return vgi.getDrAmt();
                         }
-                    } else {
-                        return vgi.getDrAmt();
-                    }
-                case 8:
-                    if (vgi.getCrAmt() != null) {
-                        if (vgi.getCrAmt() == 0) {
-                            return null;
+                    case 8:
+                        if (vgi.getCrAmt() != null) {
+                            if (vgi.getCrAmt() == 0) {
+                                return null;
+                            } else {
+                                return vgi.getCrAmt();
+                            }
                         } else {
                             return vgi.getCrAmt();
                         }
-                    } else {
-                        return vgi.getCrAmt();
-                    }
-                default:
-                    return null;
+                    default:
+                        return null;
+                }
             }
         } catch (Exception ex) {
             LOGGER.error("getValueAt : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
@@ -161,140 +164,145 @@ public class AllCashTableModel extends AbstractTableModel {
 
     @Override
     public void setValueAt(Object value, int row, int column) {
-        VGl vgl = listVGl.get(row);
-        switch (column) {
-            case 0:
-                if (value != null) {
-                    if (Util1.isValidDateFormat(value.toString(), "dd/MM/yyyy")) {
-                        vgl.setGlDate(Util1.toDate(value, "dd/MM/yyyy"));
-                    } else {
-                        if (value.toString().length() == 8) {
-                            String toFormatDate = Util1.toFormatDate(value.toString());
-                            vgl.setGlDate(Util1.toDate(toFormatDate, "dd/MM/yyyy"));
+        try {
+            VGl vgl = listVGl.get(row);
+            switch (column) {
+                case 0:
+                    if (value != null) {
+                        if (Util1.isValidDateFormat(value.toString(), "dd/MM/yyyy")) {
+                            vgl.setGlDate(Util1.toDate(value, "dd/MM/yyyy"));
                         } else {
-                            vgl.setGlDate(Util1.getTodayDate());
-                            JOptionPane.showMessageDialog(Global.parentForm, "Invalid Date");
+                            if (value.toString().length() == 8) {
+                                String toFormatDate = Util1.toFormatDate(value.toString());
+                                vgl.setGlDate(Util1.toDate(toFormatDate, "dd/MM/yyyy"));
+                            } else {
+                                vgl.setGlDate(Util1.getTodayDate());
+                                JOptionPane.showMessageDialog(Global.parentForm, "Invalid Date");
+                            }
                         }
                     }
-                }
-                parent.setColumnSelectionInterval(1, 1);
-
-                break;
-            case 1:
-                if (value != null) {
-                    if (value instanceof Department) {
-                        Department dep = (Department) value;
-                        vgl.setDeptUsrCode(dep.getUsrCode());
-                        vgl.setDeptId(dep.getDeptCode());
-                    }
-                }
-                parent.setColumnSelectionInterval(2, 2);
-                break;
-            case 2:
-                if (value != null) {
-                    if (value instanceof VDescription) {
-                        VDescription autoText = (VDescription) value;
-                        vgl.setDescription(autoText.getDescription());
-                    } else {
-                        vgl.setDescription(value.toString());
-                        if (!vgl.getDescription().isEmpty()) {
-                            Global.listDesp.add(new VDescription(vgl.getDescription()));
+                    parent.setColumnSelectionInterval(1, 1);
+                    break;
+                case 1:
+                    if (value != null) {
+                        if (value instanceof Department) {
+                            Department dep = (Department) value;
+                            vgl.setDeptUsrCode(dep.getUsrCode());
+                            vgl.setDeptId(dep.getDeptCode());
                         }
                     }
-
-                }
-                parent.setColumnSelectionInterval(3, 3);
-
-                break;
-            case 3:
-                if (value != null) {
-                    if (value instanceof VRef) {
-                        VRef autoText = (VRef) value;
-                        vgl.setReference(autoText.getReference());
-                    } else {
-                        vgl.setReference(value.toString());
-                        if (!vgl.getReference().isEmpty()) {
-                            Global.listRef.add(new VRef(vgl.getReference()));
-                        }
-                    }
-
-                }
-                parent.setColumnSelectionInterval(4, 4);
-                break;
-            case 4:
-                if (value != null) {
-                    if (value instanceof Trader) {
-                        trader = (Trader) value;
-                    } else {
-                        trader = getTrader(String.valueOf(value));
-                    }
-                    if (trader != null) {
-                        vgl.setTraderCode(trader.getCode());
-                        vgl.setTraderName(trader.getTraderName());
-                        if (trader.getAccount() != null) {
-                            vgl.setAccountId(trader.getAccount().getCode());
-                            vgl.setAccName(trader.getAccount().getCoaNameEng());
-                            parent.setColumnSelectionInterval(7, 7);
+                    parent.setColumnSelectionInterval(2, 2);
+                    break;
+                case 2:
+                    if (value != null) {
+                        if (value instanceof VDescription) {
+                            VDescription autoText = (VDescription) value;
+                            vgl.setDescription(autoText.getDescription());
                         } else {
-                            parent.setColumnSelectionInterval(5, 5);
+                            vgl.setDescription(value.toString());
+                            if (vgl.getDescription().length() > 0) {
+                                Global.listDesp.add(new VDescription(vgl.getDescription()));
+                            }
                         }
-                    } else {
-                        parent.setColumnSelectionInterval(column, column);
-                    }
-                }
-                break;
-            case 5:
-                if (value != null) {
-                    if (value instanceof ChartOfAccount) {
-                        ChartOfAccount coa = (ChartOfAccount) value;
-                        vgl.setAccountId(coa.getCode());
-                        vgl.setAccName(coa.getCoaNameEng());
 
                     }
-                }
-                parent.setColumnSelectionInterval(7, 7);
-                break;
-            case 6:
-                if (value != null) {
-                    if (value instanceof Currency) {
-                        Currency curr = (Currency) value;
-                        String cuCode = curr.getKey().getCode();
-                        vgl.setFromCurId(cuCode);
+                    parent.setColumnSelectionInterval(3, 3);
+
+                    break;
+                case 3:
+                    if (value != null) {
+                        if (value instanceof VRef) {
+                            VRef autoText = (VRef) value;
+                            vgl.setReference(autoText.getReference());
+                        } else {
+                            vgl.setReference(value.toString());
+                            if (vgl.getReference().length() > 0) {
+                                Global.listRef.add(new VRef(vgl.getReference()));
+                            }
+                        }
+
                     }
-                }
-                parent.setColumnSelectionInterval(7, 7);
-                break;
-            case 7:
-                if (value != null) {
-                    vgl.setDrAmt(Util1.getFloat(value));
-                }
-                break;
-            case 8:
-                if (value != null) {
-                    vgl.setCrAmt(Util1.getFloat(value));
-                }
-                break;
+                    parent.setColumnSelectionInterval(4, 4);
+                    break;
+                case 4:
+                    if (value != null) {
+                        if (value instanceof Trader) {
+                            trader = (Trader) value;
+                        } else {
+                            trader = getTrader(String.valueOf(value));
+                        }
+                        if (trader != null) {
+                            vgl.setTraderCode(trader.getCode());
+                            vgl.setTraderName(trader.getTraderName());
+                            if (trader.getAccount() != null) {
+                                vgl.setAccountId(trader.getAccount().getCode());
+                                vgl.setAccName(trader.getAccount().getCoaNameEng());
+                                parent.setColumnSelectionInterval(7, 7);
+                            } else {
+                                parent.setColumnSelectionInterval(5, 5);
+                            }
+                        } else {
+                            parent.setColumnSelectionInterval(column, column);
+                        }
+                    }
+                    break;
+                case 5:
+                    if (value != null) {
+                        if (value instanceof ChartOfAccount) {
+                            ChartOfAccount coa = (ChartOfAccount) value;
+                            vgl.setAccountId(coa.getCode());
+                            vgl.setAccName(coa.getCoaNameEng());
+
+                        }
+                    }
+                    parent.setColumnSelectionInterval(7, 7);
+                    break;
+                case 6:
+                    if (value != null) {
+                        if (value instanceof Currency) {
+                            Currency curr = (Currency) value;
+                            String cuCode = curr.getKey().getCode();
+                            vgl.setFromCurId(cuCode);
+                        }
+                    }
+                    parent.setColumnSelectionInterval(7, 7);
+                    break;
+                case 7:
+                    if (value != null) {
+                        vgl.setDrAmt(Util1.getFloat(value));
+                    }
+                    break;
+                case 8:
+                    if (value != null) {
+                        vgl.setCrAmt(Util1.getFloat(value));
+                    }
+                    break;
+            }
+            save(vgl, row, column);
+            parent.requestFocus();
+
+        } catch (HeadlessException e) {
+            LOGGER.info("setValueAt : " + e.getMessage());
         }
-        save(vgl, row, column);
-        parent.requestFocus();
-
     }
 
     private void save(VGl vgl, int row, int column) {
         if (isValidEntry(vgl, row, column)) {
-            vgl.setSourceAcId(sourceAccId);
-            vgl.setCreatedBy(Global.loginUser.getAppUserCode());
-            String strVGL = gson.toJson(vgl);
-            Gl gl = gson.fromJson(strVGL, Gl.class);
-            if (gl.getGlCode() == null) {
-                gl.setCreatedBy(Global.loginUser.getAppUserCode());
-                gl.setCreatedDate(Util1.getTodayDate());
+            try {
+                vgl.setSourceAcId(sourceAccId);
+                String strVGL = gson.toJson(vgl);
+                Gl gl = gson.fromJson(strVGL, Gl.class);
+                if (gl.getCompCode() == null) {
+                    LOGGER.info("Null");
+                }
                 gl.setMacId(Global.machineId);
                 gl.setCompCode(Global.compCode);
-            } else {
-                gl.setModifyBy(Global.loginUser.getAppUserCode());
-            }
-            try {
+                if (gl.getGlCode() == null) {
+                    gl.setCreatedBy(Global.loginUser.getAppUserCode());
+                    gl.setCreatedDate(Util1.getTodayDate());
+                } else {
+                    gl.setModifyBy(Global.loginUser.getAppUserCode());
+                }
                 Gl glSave = glService.save(gl);
                 if (glSave != null) {
                     VGl saveVGl = listVGl.get(row);

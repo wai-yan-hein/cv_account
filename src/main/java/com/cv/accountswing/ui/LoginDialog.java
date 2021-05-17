@@ -78,11 +78,16 @@ public class LoginDialog extends javax.swing.JDialog implements KeyListener {
 
     public void checkMachineRegister() {
         try {
+            
             Global.machineName = Util1.getComputerName();
             Global.machineId = machineInfoService.getMax(Global.machineName);
             if (Global.machineId == 0) {
-                String inputKey = JOptionPane.showInputDialog(Global.parentForm, "Enter Security Key");
-                String toDayKey = Util1.toDateStr(Util1.getTodayDate(), "yyyy-MM-dd".replaceAll("-", ""));
+                SecurityDialog dialog = new SecurityDialog();
+                dialog.setLocationRelativeTo(null);
+                dialog.setVisible(true);
+                String inputKey = dialog.getKey();
+                String toDayKey = Util1.toDateStr(Util1.getTodayDate(), "yyyy-MM-dd");
+                toDayKey = toDayKey.replaceAll("-", "");
                 if (inputKey.equals(toDayKey)) {
                     register();
                 } else {

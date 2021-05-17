@@ -233,20 +233,19 @@ public class COAGroupTableModel extends AbstractTableModel {
                     if (listSearch != null) {
                         if (listSearch.size() > 0) {
                             isTrue = false;
-                            JOptionPane.showMessageDialog(Global.parentForm, "Duplicate Account Code");
+                            JOptionPane.showMessageDialog(Global.parentForm, "Duplicate Account User Code");
                         }
                     }
-                    coa.setCompCode(compCode);
-                    coa.setCreatedBy(userCode);
-                    coa.setCreatedDate(Util1.getTodayDate());
-                    coa.setActive(true);
-                    if (Util1.isNull(coa.getOption(), "-").equals("-")) {
-                        coa.setOption("USR");
-                    }
+                }
+                coa.setCompCode(compCode);
+                coa.setCreatedBy(userCode);
+                coa.setCreatedDate(Util1.getTodayDate());
+                coa.setActive(true);
+                if (Util1.isNull(coa.getOption(), "-").equals("-")) {
+                    coa.setOption("USR");
                 }
             } else {
                 coa.setModifiedBy(userCode);
-                coa.setModifiedDate(Util1.getTodayDate());
             }
 
             if (coa.getCoaParent() != null) {
@@ -264,13 +263,16 @@ public class COAGroupTableModel extends AbstractTableModel {
     }
 
     private boolean hasEmptyRow() {
-        boolean status = false;
-        if (!listCOA.isEmpty()) {
+        boolean status = true;
+        if (listCOA.isEmpty() || listCOA == null) {
+            status = true;
+        } else {
             ChartOfAccount coa = listCOA.get(listCOA.size() - 1);
-            if (coa.getCode() != null) {
-                status = true;
+            if (coa.getCode() == null) {
+                status = false;
             }
         }
+
         return status;
     }
 

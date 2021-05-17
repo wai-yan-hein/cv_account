@@ -119,4 +119,11 @@ public class UsrCompRoleTableModel extends AbstractTableModel {
         }
     }
 
+    public void clear() {
+        if (!listUCR.isEmpty()) {
+            listUCR.clear();
+            fireTableDataChanged();
+        }
+    }
+
 }

@@ -43,22 +43,13 @@ public class DespTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int row, int column) {
-        if (listAutoText == null) {
-            return null;
-        }
-
-        if (listAutoText.isEmpty()) {
-            return null;
-        }
-
         try {
-            VDescription auto = listAutoText.get(row);
-
-            switch (column) {
-                case 0: //Code
-                    return auto.getDescription();
-                default:
-                    return null;
+            if (!listAutoText.isEmpty()) {
+                VDescription auto = listAutoText.get(row);
+                switch (column) {
+                    case 0: //Code
+                        return auto == null ? null : auto.getDescription();
+                }
             }
         } catch (Exception ex) {
             log.error("getValueAt : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());

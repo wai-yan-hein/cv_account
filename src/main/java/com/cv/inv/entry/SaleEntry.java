@@ -200,7 +200,7 @@ public class SaleEntry extends javax.swing.JPanel implements SelectionObserver, 
 
     private void initCombo() {
         if (Util1.isNull(Global.sysProperties.get("system.customer.supplier"), "-").equals("1")) {
-            traderAutoCompleter = new TraderAutoCompleter(txtCus, Global.listTrader, null, false);
+            traderAutoCompleter = new TraderAutoCompleter(txtCus, Global.listTrader, null, false, 0);
         } else {
             customerAutoCompleter = new CustomerAutoCompleter(txtCus, Global.listCustomer, null);
         }

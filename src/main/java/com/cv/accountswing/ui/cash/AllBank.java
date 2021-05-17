@@ -208,7 +208,7 @@ public class AllBank extends javax.swing.JPanel implements SelectionObserver,
         tblCash.getColumnModel().getColumn(1).setCellEditor(new DepartmentCellEditor(false));
         tblCash.getColumnModel().getColumn(2).setCellEditor(new DespEditor(descriptionService));
         tblCash.getColumnModel().getColumn(3).setCellEditor(new RefCellEditor(refService));
-        tblCash.getColumnModel().getColumn(4).setCellEditor(new TraderCellEditor(false));
+        tblCash.getColumnModel().getColumn(4).setCellEditor(new TraderCellEditor(false,0));
         tblCash.getColumnModel().getColumn(5).setCellEditor(new COACellEditor(false));
         tblCash.getColumnModel().getColumn(6).setCellEditor(new CurrencyEditor());
         tblCash.getColumnModel().getColumn(7).setCellEditor(new AutoClearEditor());

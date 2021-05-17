@@ -67,15 +67,20 @@ public class TraderAutoCompleter implements KeyListener {
     }
 
     public TraderAutoCompleter(JTextComponent comp, List<Trader> list,
-            AbstractCellEditor editor, boolean filter) {
+            AbstractCellEditor editor, boolean filter, int max) {
         this.textComp = comp;
         this.editor = editor;
         textComp.putClientProperty(AUTOCOMPLETER, this);
         if (filter) {
-            list = new ArrayList<>(list);
-            list.add(0, new Trader("-", "All"));
-            list.add(1, new Trader("-", "All Customer"));
-            list.add(2, new Trader("-", "All Supplier"));
+            if (max == 1) {
+                list = new ArrayList<>(list);
+                list.add(0, new Trader("-", "All"));
+            } else {
+                list = new ArrayList<>(list);
+                list.add(0, new Trader("-", "All"));
+                list.add(1, new Trader("-", "All Customer"));
+                list.add(2, new Trader("-", "All Supplier"));
+            }
         }
         textComp.setFont(Global.textFont);
         traderTableModel = new TraderTableModel(list);
@@ -341,6 +346,7 @@ public class TraderAutoCompleter implements KeyListener {
      */
     /**
      * Handle the key typed event from the text field.
+     *
      * @param e
      */
     @Override
@@ -349,6 +355,7 @@ public class TraderAutoCompleter implements KeyListener {
 
     /**
      * Handle the key-pressed event from the text field.
+     *
      * @param e
      */
     @Override
@@ -357,6 +364,7 @@ public class TraderAutoCompleter implements KeyListener {
 
     /**
      * Handle the key-released event from the text field.
+     *
      * @param e
      */
     @Override

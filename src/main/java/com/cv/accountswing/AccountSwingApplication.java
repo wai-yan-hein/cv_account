@@ -12,6 +12,7 @@ import javax.annotation.PostConstruct;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JRootPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import org.apache.log4j.Logger;
@@ -29,7 +30,7 @@ public class AccountSwingApplication {
     private static final Logger LOGGER = Logger.getLogger(AccountSwingApplication.class);
     private static final SplashWindow SPLASH_WINDOW = new SplashWindow();
     private static ConfigurableApplicationContext context;
-    private static final ImageIcon accIcon = new ImageIcon(AccountSwingApplication.class.getResource("/images/user-account.png"));
+    private static final ImageIcon accIcon = new ImageIcon(AccountSwingApplication.class.getResource("/images/male_user_26px.png"));
 
     @PostConstruct
     void started() {
@@ -45,6 +46,11 @@ public class AccountSwingApplication {
             JDialog.setDefaultLookAndFeelDecorated(true);*/
 
             UIManager.setLookAndFeel(new FlatLightLaf());
+            System.setProperty("flatlaf.useWindowDecorations", "false");
+            System.setProperty("flatlaf.menuBarEmbedded", "false");
+            System.setProperty("flatlaf.animation", "true");
+            System.setProperty("flatlaf.uiScale.enabled", "true");
+
             /*UIManager.getDefaults().entrySet().stream().sorted((o1, o2) -> {
             return o1.getKey().toString().compareTo(o2.getKey().toString());
             }).forEach(entry -> {
@@ -55,7 +61,7 @@ public class AccountSwingApplication {
         }
 
         try {
-            Global.sock = new ServerSocket(10003);//Pharmacy
+            Global.sock = new ServerSocket(10004);//Pharmacy
 
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(new JFrame(), "You cannot run two program at the same time in the same machine.",

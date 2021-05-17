@@ -10,7 +10,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
-import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.DateFormat;
@@ -25,7 +24,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import org.apache.commons.io.FileUtils;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -235,19 +233,7 @@ public class Util1 {
         return date;
     }
 
-    public static boolean saveFile(String path, String fileName, byte[] content) {
-        boolean status = true;
-
-        try {
-            File file = new File(path + "/" + fileName);
-            FileUtils.writeByteArrayToFile(file, content);
-        } catch (Exception ex) {
-            logger.error("saveFile : " + ex.toString());
-            status = false;
-        }
-
-        return status;
-    }
+   
 
     public static String getFileExtension(String content) {
         String extension = "";

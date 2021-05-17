@@ -23,6 +23,7 @@ import com.cv.accountswing.ui.editor.DepartmentAutoCompleter;
 import com.cv.accountswing.util.Util1;
 import java.util.HashMap;
 import java.util.Map;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
@@ -35,7 +36,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class BalanceSheet extends javax.swing.JPanel implements SelectionObserver, PanelControl {
 
-    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(BalanceSheet.class);
+    private static final Logger log = LoggerFactory.getLogger(BalanceSheet.class);
 
     private LoadingObserver loadingObserver;
     private String stDate;
@@ -92,9 +93,9 @@ public class BalanceSheet extends javax.swing.JPanel implements SelectionObserve
                 String userCode = Global.loginUser.getAppUserCode();
                 CompanyInfo ci = ciService.findById(Global.compCode);
                 String from = Global.finicialPeriodFrom;
-                rService.genBalanceSheet(from, enDate, depId, userCode, Global.compCode, currency);
-
-                SystemPropertyKey key = new SystemPropertyKey();
+                rService.genBalanceSheet(from, enDate, depId, userCode, Global.compCode, currency, Global.machineId.toString());
+                log.info("Balance Sheet Generation Success. ");
+                /*SystemPropertyKey key = new SystemPropertyKey();
                 key.setCompCode(Global.compCode);
                 key.setPropKey("system.report.path");
                 SystemProperty sp = spService.findById(key);
@@ -102,26 +103,26 @@ public class BalanceSheet extends javax.swing.JPanel implements SelectionObserve
                 String reportPath = sp.getPropValue();
                 //String reportPath1 = reportPath;
                 String filePath = reportPath + "/temp/" + fileName;
-
+                
                 reportPath = reportPath + "LedgerReport";
                 key = new SystemPropertyKey();
                 key.setCompCode(Global.compCode);
                 key.setPropKey("system.font.path");
                 sp = spService.findById(key);
                 String fontPath = sp.getPropValue();
-
+                
                 Map<String, Object> parameters = new HashMap();
                 parameters.put("p_company_name", ci.getName());
                 parameters.put("p_comp_id", Global.compCode);
                 parameters.put("p_report_info", from
-                        + " to " + enDate);
+                + " to " + enDate);
                 parameters.put("p_from", from);
                 parameters.put("p_to", enDate);
                 parameters.put("p_user_id", userCode);
-                rService.genCreditVoucher(reportPath, filePath, fontPath, parameters);
+                rService.genCreditVoucher(reportPath, filePath, fontPath, parameters);*/
                 loadingObserver.load(this.getName(), "Stop");
             } catch (Exception ex) {
-                LOGGER.error("getBalanceSheet : " + ex.getMessage());
+                log.error("getBalanceSheet : " + ex.getMessage());
 
             }
         });
@@ -152,7 +153,7 @@ public class BalanceSheet extends javax.swing.JPanel implements SelectionObserve
 
                 //Need to calculate sub todal
                 ProfitAndLostRetObj obj = rService.getPLCalculateValue(userCode, Global.compCode);
-                LOGGER.info("cost of sale : " + obj.getCostOfSale());
+                log.info("cost of sale : " + obj.getCostOfSale());
                 //==================================================================
 
                 Map<String, Object> parameters = new HashMap();
@@ -169,7 +170,7 @@ public class BalanceSheet extends javax.swing.JPanel implements SelectionObserve
                 rService.genCreditVoucher(reportPath, filePath, fontPath, parameters);
                 loadingObserver.load(this.getName(), "Stop");
             } catch (Exception ex) {
-                LOGGER.error("getProfitAndLostReport : " + ex);
+                log.error("getProfitAndLostReport : " + ex);
             }
         });
 

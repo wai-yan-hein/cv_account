@@ -138,7 +138,7 @@ public class VouStatusSetupDialog extends javax.swing.JDialog implements KeyList
     }
 
     private void searchVouStatus() {
-        vouStatusTableModel.setListVouStatus(Global.listVou);
+        vouStatusTableModel.setListVou(Global.listVou);
     }
 
     private void delete() {

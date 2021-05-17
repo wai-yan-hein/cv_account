@@ -10,9 +10,11 @@ import com.cv.accountswing.entity.UserRole;
 import com.cv.accountswing.service.MenuService;
 import com.cv.accountswing.service.PrivilegeService;
 import com.cv.accountswing.service.UserRoleService;
+import com.cv.accountswing.util.Util1;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +37,15 @@ public class UserRoleTableModel extends AbstractTableModel {
     private PrivilegeService privilegeService;
     @Autowired
     private MenuService menuService;
+    private JTable table;
+
+    public JTable getTable() {
+        return table;
+    }
+
+    public void setTable(JTable table) {
+        this.table = table;
+    }
 
     @Override
     public String getColumnName(int column) {
@@ -61,7 +72,6 @@ public class UserRoleTableModel extends AbstractTableModel {
             switch (column) {
                 case 0: //Id
                     return user.getRoleName();
-
                 default:
                     return null;
             }
@@ -94,9 +104,14 @@ public class UserRoleTableModel extends AbstractTableModel {
         boolean hasMenu = false;
         try {
             if (user.getRoleCode() != null) {
+                user.setUpdatedBy(Global.loginUser);
                 hasMenu = true;
+            } else {
+                user.setCompCode(Global.compCode);
+                user.setMacId(Global.machineId);
+                user.setCreatedBy(Global.loginUser);
+                user.setCreatedDate(Util1.getTodayDate());
             }
-            user.setCompCode(Global.compCode);
             UserRole saveUserRole = userRoleService.save(user);
             if (!hasMenu) {
                 // create menu with role id
@@ -115,7 +130,7 @@ public class UserRoleTableModel extends AbstractTableModel {
     public void addEmptyRow() {
         if (hasEmptyRow()) {
             UserRole user = new UserRole();
-            listRole.add(user);
+            addRole(user);
         }
     }
 
@@ -170,10 +185,17 @@ public class UserRoleTableModel extends AbstractTableModel {
 
     public void deleteRole(int row) {
         if (!listRole.isEmpty()) {
-            listRole.remove(row);
-            fireTableRowsDeleted(0, listRole.size());
+            String roleCode = getRole(row).getRoleCode();
+            if (roleCode != null) {
+                userRoleService.delete(roleCode);
+                privilegeService.delete(roleCode, "-");
+                listRole.remove(row);
+                fireTableRowsDeleted(row, row);
+                if (table.getCellEditor() != null) {
+                    table.getCellEditor().stopCellEditing();
+                }
+            }
         }
-
     }
 
     public void addRole(UserRole user) {

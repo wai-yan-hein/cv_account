@@ -10,6 +10,7 @@ import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.entity.Region;
 import com.cv.accountswing.entity.view.VRoleMenu;
+import com.cv.accountswing.service.COAOpeningDService;
 import com.cv.accountswing.service.MenuService;
 import com.cv.accountswing.service.RegionService;
 import com.cv.accountswing.ui.ApplicationMainFrame;
@@ -36,6 +37,7 @@ import org.springframework.stereotype.Component;
 import com.cv.inv.service.SReportService;
 import com.cv.inv.service.StockBalanceTmpService;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.ImageIcon;
@@ -71,6 +73,8 @@ public class StockReports extends javax.swing.JPanel implements PanelControl {
     private RegionService regionService;
     @Autowired
     private ApplicationMainFrame mainFrame;
+    @Autowired
+    private COAOpeningDService coaOpDService;
     private LocationAutoCompleter locationAutoCompleter;
     private UnitAutoCompleter unitAutoCompleter;
     private StockTypeAutoCompleter stockTypeAutoCompleter;
@@ -161,12 +165,19 @@ public class StockReports extends javax.swing.JPanel implements PanelControl {
             if (selectRow >= 0) {
                 VRoleMenu report = reportTableModel.getReport(selectRow);
                 String name = report.getMenuName();
+                String reportName = report.getMenuUrl();
                 switch (name) {
                     case "Stock Balance":
                         reportStockBalance();
                         break;
                     case "Sale By Stock":
-                        reportSaleByStock(report.getMenuUrl());
+                        reportSaleByStock(reportName);
+                        break;
+                    case "Customer Balance":
+                        reportCustomerBalance(reportName);
+                        break;
+                    case "Supplier Balance":
+                        reportCustomerBalance(reportName);
                         break;
                 }
             } else {
@@ -329,6 +340,34 @@ public class StockReports extends javax.swing.JPanel implements PanelControl {
         log.info("Sale By Stock End.");
     }
 
+    private void reportCustomerBalance(String reportName) {
+        log.info("Reporting : " + reportName);
+        try {
+            //generating
+            String stDate = Util1.toDateStr(Util1.getTodayDate(), "dd/MM/yyyy");
+            coaOpDService.genArAp1(Global.compCode,
+                    Util1.toDateStrMYSQL(stDate, "dd/MM/yyyy"), Global.finicialPeriodFrom,
+                    Util1.toDateStrMYSQL(stDate, "dd/MM/yyyy"), "-",
+                    "-", "-", "-",
+                    Global.loginUser.getAppUserCode());
+            //report
+            String compName = Global.sysProperties.get("system.report.company");
+            String reportPath = Global.sysProperties.get("system.report.path");
+            String fontPath = Global.sysProperties.get("system.font.path");
+            String filePath = reportPath + File.separator + reportName;
+            Map<String, Object> parameters = new HashMap();
+            parameters.put("p_company_name", compName);
+            parameters.put("p_comp_id", Global.compCode);
+            parameters.put("p_user_id", Global.loginUser.getAppUserCode());
+            parameters.put("p_report_info", "Testing");
+            parameters.put("trader_code", "-");
+            reportService.reportViewer(filePath, filePath, fontPath, parameters);
+        } catch (Exception ex) {
+            log.error("Reporting Customer Balance : " + ex.getMessage());
+        }
+        log.info("Reporting Finished : " + reportName);
+    }
+
     private void searchReports() {
         log.info("Search Reports");
         if (cboReport.getSelectedItem() instanceof VRoleMenu) {
@@ -377,16 +416,19 @@ public class StockReports extends javax.swing.JPanel implements PanelControl {
         jLabel2 = new javax.swing.JLabel();
         txtUnit = new javax.swing.JTextField();
         txtToDate = new com.toedter.calendar.JDateChooser();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        tblStockFilter = new javax.swing.JTable();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        tblRegion = new javax.swing.JTable();
         txtStockType = new javax.swing.JTextField();
         txtCategory = new javax.swing.JTextField();
         txtBrand = new javax.swing.JTextField();
+        jPanel3 = new javax.swing.JPanel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        tblStockFilter = new javax.swing.JTable();
+        jPanel4 = new javax.swing.JPanel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        tblRegion = new javax.swing.JTable();
+        jPanel5 = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
         tblRegion1 = new javax.swing.JTable();
         jPanel2 = new javax.swing.JPanel();
@@ -454,7 +496,35 @@ public class StockReports extends javax.swing.JPanel implements PanelControl {
         txtToDate.setDateFormatString("dd/MM/yyyy");
         txtToDate.setFont(Global.shortCutFont);
 
-        tblStockFilter.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Stock Filter", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, Global.lableFont));
+        jLabel3.setFont(Global.lableFont);
+        jLabel3.setText("Stock Type");
+
+        jLabel4.setFont(Global.lableFont);
+        jLabel4.setText("Category");
+
+        jLabel5.setFont(Global.lableFont);
+        jLabel5.setText("Brand");
+
+        txtStockType.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtStockTypeFocusGained(evt);
+            }
+        });
+
+        txtCategory.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtCategoryFocusGained(evt);
+            }
+        });
+
+        txtBrand.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtBrandFocusGained(evt);
+            }
+        });
+
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Stock Filter", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, Global.lableFont));
+
         tblStockFilter.setFont(Global.textFont);
         tblStockFilter.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -475,16 +545,25 @@ public class StockReports extends javax.swing.JPanel implements PanelControl {
         });
         jScrollPane2.setViewportView(tblStockFilter);
 
-        jLabel3.setFont(Global.lableFont);
-        jLabel3.setText("Stock Type");
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
 
-        jLabel4.setFont(Global.lableFont);
-        jLabel4.setText("Category");
+        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Region Filter", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, Global.lableFont));
 
-        jLabel5.setFont(Global.lableFont);
-        jLabel5.setText("Brand");
-
-        tblRegion.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Region Filter", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, Global.lableFont));
         tblRegion.setFont(Global.textFont);
         tblRegion.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -505,25 +584,26 @@ public class StockReports extends javax.swing.JPanel implements PanelControl {
         });
         jScrollPane3.setViewportView(tblRegion);
 
-        txtStockType.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                txtStockTypeFocusGained(evt);
-            }
-        });
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
 
-        txtCategory.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                txtCategoryFocusGained(evt);
-            }
-        });
+        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Cus / Sup Filter", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, Global.lableFont));
+        jPanel5.setToolTipText("Cus / Sup Filter");
 
-        txtBrand.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                txtBrandFocusGained(evt);
-            }
-        });
-
-        tblRegion1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Cus / Sup Filter", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, Global.amtFont));
         tblRegion1.setFont(Global.textFont);
         tblRegion1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -544,6 +624,23 @@ public class StockReports extends javax.swing.JPanel implements PanelControl {
         });
         jScrollPane4.setViewportView(tblRegion1);
 
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -551,7 +648,6 @@ public class StockReports extends javax.swing.JPanel implements PanelControl {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -574,8 +670,9 @@ public class StockReports extends javax.swing.JPanel implements PanelControl {
                             .addComponent(txtBrand)
                             .addComponent(txtLocation)
                             .addComponent(txtUnit)))
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -608,15 +705,13 @@ public class StockReports extends javax.swing.JPanel implements PanelControl {
                     .addComponent(txtUnit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel7))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-
-        jPanel1Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jScrollPane2, jScrollPane3, jScrollPane4});
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -732,6 +827,9 @@ public class StockReports extends javax.swing.JPanel implements PanelControl {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;

@@ -268,6 +268,8 @@ public class StaffSetup extends javax.swing.JPanel implements KeyListener, Panel
             }
         });
 
+        panelEntry.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.RAISED));
+
         jLabel1.setFont(Global.lableFont);
         jLabel1.setText("User Code");
 
@@ -383,7 +385,7 @@ public class StaffSetup extends javax.swing.JPanel implements KeyListener, Panel
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(panelEntryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(txtConPerson, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(txtCusName, javax.swing.GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE)
+                    .addComponent(txtCusName, javax.swing.GroupLayout.DEFAULT_SIZE, 275, Short.MAX_VALUE)
                     .addComponent(txtCusCode)
                     .addComponent(txtCusPhone)
                     .addComponent(txtCusEmail)
@@ -446,7 +448,7 @@ public class StaffSetup extends javax.swing.JPanel implements KeyListener, Panel
                     .addComponent(lblStatus)
                     .addComponent(jButton1)
                     .addComponent(btnClear))
-                .addContainerGap(195, Short.MAX_VALUE))
+                .addContainerGap(191, Short.MAX_VALUE))
         );
 
         panelEntryLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {txtConPerson, txtCusAddress, txtCusCode, txtCusEmail, txtCusName, txtCusPhone});
@@ -478,7 +480,7 @@ public class StaffSetup extends javax.swing.JPanel implements KeyListener, Panel
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 451, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 449, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(panelEntry, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())

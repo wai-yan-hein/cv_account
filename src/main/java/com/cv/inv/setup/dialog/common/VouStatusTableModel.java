@@ -8,6 +8,7 @@ package com.cv.inv.setup.dialog.common;
 import com.cv.inv.entity.VouStatus;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,9 +21,27 @@ import org.springframework.stereotype.Component;
 @Component
 public class VouStatusTableModel extends AbstractTableModel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(VouStatusTableModel.class);
+    private static final Logger log = LoggerFactory.getLogger(VouStatusTableModel.class);
     private final String[] columnNames = {"Description"};
     private List<VouStatus> listVou = new ArrayList<>();
+    private JTable table;
+
+    public List<VouStatus> getListVou() {
+        return listVou;
+    }
+
+    public void setListVou(List<VouStatus> listVou) {
+        this.listVou = listVou;
+        fireTableDataChanged();
+    }
+
+    public JTable getTable() {
+        return table;
+    }
+
+    public void setTable(JTable table) {
+        this.table = table;
+    }
 
     @Override
     public int getRowCount() {
@@ -68,11 +87,6 @@ public class VouStatusTableModel extends AbstractTableModel {
         }
     }
 
-    public void setListVouStatus(List<VouStatus> listVou) {
-        this.listVou = listVou;
-        fireTableDataChanged();
-    }
-
     public void deleteVouStatus(int row) {
         if (listVou != null) {
             if (!listVou.isEmpty()) {
@@ -84,6 +98,86 @@ public class VouStatusTableModel extends AbstractTableModel {
 
     public void refresh() {
         fireTableDataChanged();
+    }
+
+    public void addNewRow() {
+        if (hasEmptyRow()) {
+            VouStatus vou = new VouStatus();
+            listVou.add(vou);
+            fireTableRowsInserted(listVou.size() - 1, listVou.size() - 1);
+        }
+    }
+
+    public boolean hasEmptyRow() {
+        boolean status = true;
+        if (listVou.isEmpty() || listVou == null) {
+            status = true;
+        } else {
+            VouStatus vou = listVou.get(listVou.size() - 1);
+            if (vou.getVouStatusCode() == null) {
+                status = false;
+            }
+        }
+
+        return status;
+    }
+
+    private void reqTable() {
+        int row = table.getRowCount();
+        if (row >= 0) {
+            table.setRowSelectionInterval(row - 1, row - 1);
+            table.setColumnSelectionInterval(0, 0);
+            table.requestFocus();
+        }
+    }
+
+    @Override
+    public void setValueAt(Object value, int row, int column) {
+        try {
+            if (!listVou.isEmpty()) {
+                if (value != null) {
+                    switch (column) {
+                        case 0:
+                            if (value instanceof VouStatus) {
+                                VouStatus trader = (VouStatus) value;
+                                listVou.set(row, trader);
+
+                            }
+                            break;
+                        case 1:
+                            if (value instanceof VouStatus) {
+                                VouStatus loc = (VouStatus) value;
+                                VouStatus trader = (VouStatus) value;
+                                listVou.set(row, trader);
+                            }
+                            break;
+                    }
+                    addNewRow();
+                    reqTable();
+
+                }
+            }
+        } catch (Exception e) {
+            log.error("setValueAt : " + e.getMessage());
+        }
+    }
+
+    @Override
+    public boolean isCellEditable(int rowIndex, int columnIndex) {
+        return true;
+    }
+
+    public void delete(int row) {
+        if (!listVou.isEmpty()) {
+            VouStatus t = listVou.get(row);
+            if (t.getVouStatusCode() != null) {
+                listVou.remove(row);
+                if (table.getCellEditor() != null) {
+                    table.getCellEditor().stopCellEditing();
+                }
+                fireTableRowsDeleted(row - 1, row - 1);
+            }
+        }
     }
 
 }

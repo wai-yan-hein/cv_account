@@ -16,7 +16,6 @@ import com.cv.accountswing.service.CompanyInfoService;
 import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.system.setup.common.CompanyTableModel;
 import com.cv.accountswing.util.BindingUtil;
-import com.cv.accountswing.util.Util1;
 import java.awt.HeadlessException;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -125,8 +124,8 @@ public class Company extends javax.swing.JPanel implements KeyListener, PanelCon
         txtEmail.setText(companyInfo.getEmail());
         txtSecurityCode.setText(companyInfo.getSecurityCode());
         txtAddress.setText(companyInfo.getAddress());
-        txtFromDate.setText(Util1.toDateStr(companyInfo.getFinicialPeriodFrom(), "dd-MM-yyyy"));
-        txtToDate.setText(Util1.toDateStr(companyInfo.getFinicialPeriodTo(), "dd-MM-yyyy"));
+        txtFromDate.setDate(companyInfo.getFinicialPeriodFrom());
+        txtToDate.setDate(companyInfo.getFinicialPeriodTo());
         if (cInfo.getActive() != null) {
             chkActive.setSelected(companyInfo.getActive());
         }
@@ -160,6 +159,10 @@ public class Company extends javax.swing.JPanel implements KeyListener, PanelCon
             JOptionPane.showMessageDialog(Global.parentForm, "Invalid Name");
             txtName.requestFocus();
             status = false;
+        } else if (txtFromDate.getDate() == null || txtToDate.getDate() == null) {
+            status = false;
+            JOptionPane.showMessageDialog(Global.parentForm, "Invalid Companay Date");
+            txtFromDate.requestFocusInWindow();
         } else {
             //companyInfo = new CompanyInfo();
             companyInfo.setUserCode(txtCode.getText());
@@ -169,8 +172,8 @@ public class Company extends javax.swing.JPanel implements KeyListener, PanelCon
             companyInfo.setEmail(txtEmail.getText());
             companyInfo.setSecurityCode(txtSecurityCode.getText());
             companyInfo.setAddress(txtAddress.getText());
-            companyInfo.setFinicialPeriodFrom(Util1.toDate(txtFromDate.getText(), "dd-MM-yyyy"));
-            companyInfo.setFinicialPeriodTo(Util1.toDate(txtToDate.getText(), "dd-MM-yyyy"));
+            companyInfo.setFinicialPeriodFrom(txtFromDate.getDate());
+            companyInfo.setFinicialPeriodTo(txtToDate.getDate());
             companyInfo.setActive(chkActive.isSelected());
             companyInfo.setBusinessType((BusinessType) cboBusiness.getSelectedItem());
             companyInfo.setMacId(Global.machineId);
@@ -188,8 +191,8 @@ public class Company extends javax.swing.JPanel implements KeyListener, PanelCon
         txtEmail.setText(null);
         txtSecurityCode.setText(null);
         txtAddress.setText(null);
-        txtFromDate.setText(null);
-        txtToDate.setText(null);
+        txtFromDate.setDate(null);
+        txtToDate.setDate(null);
         chkActive.setSelected(Boolean.FALSE);
         lblStatus.setText("NEW");
         companyInfo = new CompanyInfo();
@@ -248,16 +251,16 @@ public class Company extends javax.swing.JPanel implements KeyListener, PanelCon
         txtSecurityCode = new javax.swing.JTextField();
         txtAddress = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
-        txtFromDate = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
-        txtToDate = new javax.swing.JTextField();
         jLabel10 = new javax.swing.JLabel();
         chkActive = new javax.swing.JCheckBox();
         btnClear = new javax.swing.JButton();
         btnSave = new javax.swing.JButton();
         lblStatus = new javax.swing.JLabel();
         cboBusiness = new javax.swing.JComboBox<>();
+        txtFromDate = new com.toedter.calendar.JDateChooser();
+        txtToDate = new com.toedter.calendar.JDateChooser();
 
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentShown(java.awt.event.ComponentEvent evt) {
@@ -323,17 +326,11 @@ public class Company extends javax.swing.JPanel implements KeyListener, PanelCon
         jLabel7.setFont(Global.lableFont);
         jLabel7.setText("Address");
 
-        txtFromDate.setFont(Global.textFont);
-        txtFromDate.setName("txtFromDate"); // NOI18N
-
         jLabel8.setFont(Global.lableFont);
         jLabel8.setText("From Date");
 
         jLabel9.setFont(Global.lableFont);
         jLabel9.setText("To Date");
-
-        txtToDate.setFont(Global.textFont);
-        txtToDate.setName("txtToDate"); // NOI18N
 
         jLabel10.setFont(Global.lableFont);
         jLabel10.setText("Business");
@@ -372,6 +369,12 @@ public class Company extends javax.swing.JPanel implements KeyListener, PanelCon
 
         cboBusiness.setName("cboBusiness"); // NOI18N
 
+        txtFromDate.setDateFormatString("dd/MM/yyyy");
+        txtFromDate.setFont(Global.textFont);
+
+        txtToDate.setDateFormatString("dd/MM/yyyy");
+        txtToDate.setFont(Global.textFont);
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -408,14 +411,6 @@ public class Company extends javax.swing.JPanel implements KeyListener, PanelCon
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(txtAddress, javax.swing.GroupLayout.DEFAULT_SIZE, 266, Short.MAX_VALUE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(txtFromDate, javax.swing.GroupLayout.DEFAULT_SIZE, 266, Short.MAX_VALUE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(txtToDate, javax.swing.GroupLayout.DEFAULT_SIZE, 266, Short.MAX_VALUE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addComponent(lblStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jLabel10, javax.swing.GroupLayout.DEFAULT_SIZE, 101, Short.MAX_VALUE))
@@ -427,7 +422,15 @@ public class Company extends javax.swing.JPanel implements KeyListener, PanelCon
                                 .addComponent(btnSave)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(btnClear))
-                            .addComponent(cboBusiness, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addComponent(cboBusiness, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(txtToDate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(txtFromDate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -462,11 +465,11 @@ public class Company extends javax.swing.JPanel implements KeyListener, PanelCon
                     .addComponent(jLabel7)
                     .addComponent(txtAddress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel8)
                     .addComponent(txtFromDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel9)
                     .addComponent(txtToDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -480,7 +483,7 @@ public class Company extends javax.swing.JPanel implements KeyListener, PanelCon
                             .addComponent(btnClear)
                             .addComponent(chkActive)
                             .addComponent(lblStatus))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(149, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -553,12 +556,12 @@ public class Company extends javax.swing.JPanel implements KeyListener, PanelCon
     private javax.swing.JTextField txtAddress;
     private javax.swing.JTextField txtCode;
     private javax.swing.JTextField txtEmail;
-    private javax.swing.JTextField txtFromDate;
+    private com.toedter.calendar.JDateChooser txtFromDate;
     private javax.swing.JTextField txtName;
     private javax.swing.JTextField txtPhone;
     private javax.swing.JTextField txtSecurityCode;
     private javax.swing.JTextField txtShortCode;
-    private javax.swing.JTextField txtToDate;
+    private com.toedter.calendar.JDateChooser txtToDate;
     // End of variables declaration//GEN-END:variables
 
     @Override

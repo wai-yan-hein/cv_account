@@ -75,7 +75,7 @@ public class LocationAutoCompleter implements KeyListener, SelectionObserver {
         table.setModel(locTableModel);
         table.setSize(50, 50);
         table.setTableHeader(null);
-        table.setFont(Global.lableFont); // NOI18N
+        table.setFont(Global.textFont); // NOI18N
         table.setRowHeight(Global.tblRowHeight);
         table.setDefaultRenderer(Object.class, new TableCellRender());
         sorter = new TableRowSorter(table.getModel());

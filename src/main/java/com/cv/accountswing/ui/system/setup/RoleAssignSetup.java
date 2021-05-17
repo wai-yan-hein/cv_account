@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.cv.accountswing.ui.setup;
+package com.cv.accountswing.ui.system.setup;
 
 import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
@@ -174,30 +174,53 @@ public class RoleAssignSetup extends javax.swing.JPanel implements KeyListener, 
     }
 
     private void getAssignRole(String userCode) {
-        List assignCompany = usrCompRoleService.getAssignRole(userCode);
-        List<VUsrCompRole> listUCR = (List<VUsrCompRole>) (List<?>) assignCompany;
-        compRoleTableModel.setListUCR(listUCR);
-        btnAdd.setEnabled(true);
+        List<VUsrCompRole> listUCR = usrCompRoleService.getAssignRole(userCode, Global.compCode);
+        if (!listUCR.isEmpty()) {
+            compRoleTableModel.setListUCR(listUCR);
+            btnAdd.setEnabled(true);
+        } else {
+            compRoleTableModel.clear();
+        }
+
     }
 
     private void saveRoleAssign() {
-        AppUser user = userTableModel.getUser(selectRow);
-        CompanyInfo cInfo = (CompanyInfo) cboComInfo.getSelectedItem();
-        UserRole uRole = (UserRole) cboRole.getSelectedItem();
-        UsrCompRoleKey key = new UsrCompRoleKey();
-        key.setCompCode(cInfo.getCompCode());
-        key.setRoleCode(uRole.getRoleCode());
-        key.setUserCode(user.getAppUserCode());
-        UsrCompRole ucr = new UsrCompRole();
-        ucr.setKey(key);
+        if (tblUser.getSelectedRow() >= 0) {
+            AppUser user = userTableModel.getUser(selectRow);
+            CompanyInfo cInfo = (CompanyInfo) cboComInfo.getSelectedItem();
+            UserRole uRole = (UserRole) cboRole.getSelectedItem();
+            UsrCompRoleKey key = new UsrCompRoleKey();
+            key.setCompCode(cInfo.getCompCode());
+            key.setRoleCode(uRole.getRoleCode());
+            key.setUserCode(user.getAppUserCode());
+            UsrCompRole ucr = new UsrCompRole();
+            ucr.setKey(key);
 
-        UsrCompRole save = usrCompRoleService.save(ucr);
-        if (save != null) {
-            JOptionPane.showMessageDialog(Global.parentForm, "Saved");
-            VUsrCompRole vucr = new VUsrCompRole();
-            vucr.setCompName(cInfo.getName());
-            vucr.setRoleName(uRole.getRoleName());
-            compRoleTableModel.addVUsrCompRole(vucr);
+            UsrCompRole save = usrCompRoleService.save(ucr);
+            if (save != null) {
+                JOptionPane.showMessageDialog(Global.parentForm, "Saved");
+                VUsrCompRole vucr = new VUsrCompRole();
+                vucr.setCompName(cInfo.getName());
+                vucr.setRoleName(uRole.getRoleName());
+                compRoleTableModel.addVUsrCompRole(vucr);
+            }
+        } else {
+            JOptionPane.showMessageDialog(Global.parentForm, "Select User .");
+        }
+
+    }
+
+    private void removeRole() {
+        int yes_no = JOptionPane.showConfirmDialog(Global.parentForm, "Are you sure to delete?");
+        if (yes_no == JOptionPane.YES_OPTION) {
+            int row = tblRoleAssign.convertRowIndexToModel(tblRoleAssign.getSelectedRow());
+            VUsrCompRole vc = compRoleTableModel.getVUsrCompRole(row);
+            String compCode = vc.getKey().getCompCode();
+            String roleCode = vc.getKey().getRoleCode();
+            String userCode = vc.getKey().getUserCode();
+            usrCompRoleService.delete(userCode, compCode, roleCode);
+            compRoleTableModel.deleteVUsrCompRole(row);
+
         }
 
     }
@@ -211,14 +234,16 @@ public class RoleAssignSetup extends javax.swing.JPanel implements KeyListener, 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
-        tblUser = new javax.swing.JTable();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         cboComInfo = new javax.swing.JComboBox<>();
         jLabel2 = new javax.swing.JLabel();
         cboRole = new javax.swing.JComboBox<>();
         btnAdd = new javax.swing.JButton();
+        jPanel2 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tblUser = new javax.swing.JTable();
+        jPanel3 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         tblRoleAssign = new javax.swing.JTable();
 
@@ -227,6 +252,71 @@ public class RoleAssignSetup extends javax.swing.JPanel implements KeyListener, 
                 formComponentShown(evt);
             }
         });
+
+        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.RAISED));
+
+        jLabel1.setFont(Global.lableFont);
+        jLabel1.setText("Company");
+
+        cboComInfo.setFont(Global.textFont);
+        cboComInfo.setName("cboComInfo"); // NOI18N
+
+        jLabel2.setFont(Global.lableFont);
+        jLabel2.setText("Role");
+
+        cboRole.setFont(Global.textFont);
+        cboRole.setName("cboRole"); // NOI18N
+
+        btnAdd.setBackground(ColorUtil.mainColor);
+        btnAdd.setFont(Global.lableFont);
+        btnAdd.setForeground(ColorUtil.foreground);
+        btnAdd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/select-button.png"))); // NOI18N
+        btnAdd.setText("Assign ");
+        btnAdd.setEnabled(false);
+        btnAdd.setName("btnAdd"); // NOI18N
+        btnAdd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAddActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(cboRole, 0, 380, Short.MAX_VALUE)
+                            .addComponent(cboComInfo, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(btnAdd)))
+                .addContainerGap())
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(cboComInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(cboRole, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnAdd)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.RAISED));
 
         tblUser.setFont(Global.textFont);
         tblUser.setModel(new javax.swing.table.DefaultTableModel(
@@ -244,27 +334,24 @@ public class RoleAssignSetup extends javax.swing.JPanel implements KeyListener, 
         tblUser.setRowHeight(Global.tblRowHeight);
         jScrollPane1.setViewportView(tblUser);
 
-        jLabel1.setFont(Global.lableFont);
-        jLabel1.setText("Company");
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 466, Short.MAX_VALUE)
+                .addContainerGap())
+        );
 
-        cboComInfo.setFont(Global.textFont);
-        cboComInfo.setName("cboComInfo"); // NOI18N
-
-        jLabel2.setFont(Global.lableFont);
-        jLabel2.setText("Role");
-
-        cboRole.setFont(Global.textFont);
-        cboRole.setName("cboRole"); // NOI18N
-
-        btnAdd.setFont(Global.lableFont);
-        btnAdd.setText("Add");
-        btnAdd.setEnabled(false);
-        btnAdd.setName("btnAdd"); // NOI18N
-        btnAdd.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnAddActionPerformed(evt);
-            }
-        });
+        jPanel3.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.RAISED));
 
         tblRoleAssign.setFont(Global.textFont);
         tblRoleAssign.setModel(new javax.swing.table.DefaultTableModel(
@@ -280,46 +367,28 @@ public class RoleAssignSetup extends javax.swing.JPanel implements KeyListener, 
         ));
         tblRoleAssign.setName("tblRoleAssign"); // NOI18N
         tblRoleAssign.setRowHeight(Global.tblRowHeight);
+        tblRoleAssign.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                tblRoleAssignKeyReleased(evt);
+            }
+        });
         jScrollPane2.setViewportView(tblRoleAssign);
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(cboRole, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(cboComInfo, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
-                                .addComponent(btnAdd))))
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 437, Short.MAX_VALUE))
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                 .addContainerGap())
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(cboComInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(cboRole, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnAdd)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -328,18 +397,23 @@ public class RoleAssignSetup extends javax.swing.JPanel implements KeyListener, 
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 413, Short.MAX_VALUE)
+                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(0, 0, 0))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 488, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -362,6 +436,13 @@ public class RoleAssignSetup extends javax.swing.JPanel implements KeyListener, 
         }
     }//GEN-LAST:event_formComponentShown
 
+    private void tblRoleAssignKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tblRoleAssignKeyReleased
+        // TODO add your handling code here:
+        if (evt.getKeyCode() == KeyEvent.VK_DELETE) {
+            removeRole();
+        }
+    }//GEN-LAST:event_tblRoleAssignKeyReleased
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;
@@ -370,6 +451,8 @@ public class RoleAssignSetup extends javax.swing.JPanel implements KeyListener, 
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTable tblRoleAssign;

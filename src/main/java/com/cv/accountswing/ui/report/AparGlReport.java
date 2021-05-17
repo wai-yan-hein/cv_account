@@ -11,9 +11,7 @@ import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.SelectionObserver;
-import com.cv.accountswing.entity.CompanyInfo;
-import com.cv.accountswing.entity.SystemProperty;
-import com.cv.accountswing.entity.SystemPropertyKey;
+import com.cv.accountswing.entity.Department;
 import com.cv.accountswing.entity.Trader;
 import com.cv.accountswing.entity.temp.TmpOpeningClosing;
 import com.cv.accountswing.entity.view.VApar;
@@ -32,21 +30,19 @@ import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.editor.CurrencyAutoCompleter;
 import com.cv.accountswing.ui.editor.DateAutoCompleter;
 import com.cv.accountswing.ui.editor.DepartmentAutoCompleter;
-import com.cv.accountswing.ui.editor.SupplierAutoCompleter;
 import com.cv.accountswing.ui.editor.TraderAutoCompleter;
 import com.cv.accountswing.ui.report.common.APARTableModel;
 import com.cv.accountswing.ui.report.common.GLListingTableModel;
 import com.cv.accountswing.util.Util1;
-import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.ImageIcon;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
@@ -110,6 +106,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
     private String dept;
     private String currency;
     private String userCode;
+    private String traderType;
     private String panelName;
     private TableFilterHeader filterHeader;
     private boolean isApPrCal = false;
@@ -126,7 +123,6 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
 
     public AparGlReport() {
         initComponents();
-        initPopup();
         initKeyListener();
     }
 
@@ -142,18 +138,6 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         initTable();
         search();
         isShown = true;
-    }
-
-    private void initPopup() {
-        popup = new JPopupMenu();
-        JMenuItem print = new JMenuItem("Print");
-        popup.add(print);
-        print.addActionListener((ActionEvent e) -> {
-            if (panelName.equals("AR/AP")) {
-                printApar();
-            } else if (panelName.equals("G/L Listing")) {
-            }
-        });
     }
 
     private void assingDefaultValue() {
@@ -194,15 +178,12 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                             VApar apar = aPARTableModel.getAPAR(selectRow);
                             String traderCode = apar.getKey().getTraderCode();
                             String desp = apar.getTraderName();
-                            Double netChange = apar.getClosing();
-
-                            searchTriBalDetail(traderCode, "-", desp, netChange);
+                            searchTriBalDetail(traderCode, "-", desp);
                         } else if (panelName.equals("G/L Listing")) {
                             VTriBalance vtb = glListingTableModel.getTBAL(selectRow);
                             String coaId = vtb.getKey().getCoaId();
                             String coaName = vtb.getCoaName();
-                            Double netChange = vtb.getClosing();
-                            searchTriBalDetail("-", coaId, coaName, netChange);
+                            searchTriBalDetail("-", coaId, coaName);
 
                         }
 
@@ -245,7 +226,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                             currency, dept, traderCode,
                             userCode);
                     List<VApar> listApar = aParService.getApAr(userCode,
-                            Global.compCode);
+                            Global.compCode, traderType);
                     if (!listApar.isEmpty()) {
                         aPARTableModel.setListAPAR(listApar);
                         calAPARTotalAmount(listApar);
@@ -303,7 +284,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
 
     }
 
-    private void searchTriBalDetail(String traderCode, String coaId, String desp, Double netChange) {
+    private void searchTriBalDetail(String traderCode, String coaId, String desp) {
         try {
             List<VGl> listVGL = vGlService.searchGlDrCr(Util1.isNull(stDate, "-"),
                     Util1.isNull(enDate, "-"), coaId, currency, dept,
@@ -311,7 +292,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                     "DR");
             swapDrCrAmt(listVGL, getTarget());
             calculateOpening(traderCode);
-            openTBDDialog(listVGL, desp, netChange);
+            openTBDDialog(listVGL, desp, traderCode);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(Global.parentForm, e.getMessage());
             loadingObserver.load(this.getName(), "Stop");
@@ -371,12 +352,13 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
 
     }
 
-    private void openTBDDialog(List<VGl> listVGl, String traderName, Double netChange) {
+    private void openTBDDialog(List<VGl> listVGl, String traderName, String traderCode) {
         trialBalanceDetailDialog.setIconImage(account.getImage());
         trialBalanceDetailDialog.setDesp(traderName);
+        trialBalanceDetailDialog.setTraderCode(traderCode);
         trialBalanceDetailDialog.setTargetId(getTarget());
         trialBalanceDetailDialog.setListVGl(listVGl);
-        trialBalanceDetailDialog.setSize(Global.width - 200, Global.height - 200);
+        trialBalanceDetailDialog.setSize(Global.width - 100, Global.height - 100);
         trialBalanceDetailDialog.setLocationRelativeTo(null);
         trialBalanceDetailDialog.setVisible(true);
     }
@@ -448,11 +430,12 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
 
     private void initializeParameter() {
         dept = Util1.isNull(dept, "-");
-        traderCode = Util1.isNull(traderCode, "-1");
+        traderCode = Util1.isNull(traderCode, "-");
         currency = Global.defalutCurrency.getKey().getCode();
         stDate = Util1.isNull(stDate, Util1.toDateStr(Util1.getTodayDate(), "dd/MM/yyyy"));
         enDate = Util1.isNull(enDate, Util1.toDateStr(Util1.getTodayDate(), "dd/MM/yyyy"));
         userCode = Global.loginUser.getAppUserCode();
+        traderType = Util1.isNull(traderType, "-");
 
     }
 
@@ -462,12 +445,13 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         dateAutoCompleter.setSelectionObserver(this);
 
         TraderAutoCompleter traderAutoCompleter = new TraderAutoCompleter(txtPerson,
-                Global.listTrader, null, true);
+                Global.listTrader, null, true, 1);
         traderAutoCompleter.setSelectionObserver(this);
-
+        traderAutoCompleter.setTrader(new Trader("-", "All"));
         departmentAutoCompleter = new DepartmentAutoCompleter(txtDep,
                 Global.listDepartment, null, true);
         departmentAutoCompleter.setSelectionObserver(this);
+        departmentAutoCompleter.setDepartment(new Department("-", "All"));
         CurrencyAutoCompleter currencyAutoCompleter = new CurrencyAutoCompleter(txtCurrency,
                 Global.listCurrency, null);
         currencyAutoCompleter.setSelectionObserver(this);
@@ -478,29 +462,17 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         loadingObserver.load(this.getName(), "Start");
         taskExecutor.execute(() -> {
             try {
-                CompanyInfo ci = ciService.findById(Global.compCode);
-                SystemPropertyKey key = new SystemPropertyKey();
-                key.setCompCode(Global.compCode);
-                key.setPropKey("system.report.path");
-                SystemProperty sp = spService.findById(key);
-                String fileName = userCode + "_apar.pdf";
-                String reportPath = sp.getPropValue();
-                String imgPath = reportPath;
-                String filePath = reportPath + "/temp/" + fileName;
-
-                reportPath = reportPath + "APAR";
-                key = new SystemPropertyKey();
-                key.setCompCode(Global.compCode);
-                key.setPropKey("system.font.path");
-                sp = spService.findById(key);
-                String fontPath = sp.getPropValue();
-
+                String compName = Global.sysProperties.get("system.report.company");
+                String reportPath = Global.sysProperties.get("system.report.path");
+                String fontPath = Global.sysProperties.get("system.font.path");
+                String filePath = reportPath + File.separator + "APAR";
                 Map<String, Object> parameters = new HashMap();
-                parameters.put("p_company_name", ci.getName());
+                parameters.put("p_company_name", compName);
                 parameters.put("p_comp_id", Global.compCode);
-                parameters.put("img_path", imgPath);
-
-                rService.genCreditVoucher(reportPath, filePath, fontPath, parameters);
+                parameters.put("p_user_id", Global.loginUser.getAppUserCode());
+                parameters.put("p_report_info", "Testing");
+                parameters.put("trader_code", "-");
+                rService.genCreditVoucher(filePath, filePath, fontPath, parameters);
                 loadingObserver.load(this.getName(), "Stop");
             } catch (Exception ex) {
                 log.error("PRINT APAR REPORT :::" + ex.getMessage());
@@ -700,22 +672,18 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                        .addComponent(txtFTotalDrAmt, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(txtFTotalDrAmt, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(txtFTotalCrAmt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(txtFNetChange, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel5)
-                        .addGap(18, 18, 18)
-                        .addComponent(txtFOFB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(txtFTotalCrAmt, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel5))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(txtFNetChange, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
+                    .addComponent(txtFOFB))
                 .addContainerGap())
         );
-
-        jPanel2Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {txtFNetChange, txtFOFB, txtFTotalCrAmt, txtFTotalDrAmt});
-
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
@@ -835,21 +803,23 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                         Trader trader = (Trader) selectObj;
                         switch (trader.getTraderName()) {
                             case "All Customer":
-                                //traderType = "CUS";
+                                traderType = "CUS";
+                                traderCode = "-";
                                 break;
                             case "All Supplier":
-                                //traderType = "SUP";
+                                traderType = "SUP";
+                                traderCode = "-";
                                 break;
                             default:
-                                //traderType = "-";
+                                traderCode = trader.getCode();
+                                traderType = "-";
                                 break;
                         }
-                        traderCode = trader.getCode();
                     }
                     break;
+
             }
             search();
-
         }
     }
 
@@ -874,6 +844,10 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
 
     @Override
     public void print() {
+        if (panelName.equals("AR/AP")) {
+            printApar();
+        } else if (panelName.equals("G/L Listing")) {
+        }
     }
 
     @Override

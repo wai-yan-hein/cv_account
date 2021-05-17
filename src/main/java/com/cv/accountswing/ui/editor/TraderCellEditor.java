@@ -31,6 +31,7 @@ public class TraderCellEditor extends AbstractCellEditor implements TableCellEdi
     private JComponent component = null;
     private TraderAutoCompleter completer;
     private boolean filter;
+    private int max;
     private final FocusAdapter fa = new FocusAdapter() {
         @Override
         public void focusLost(FocusEvent e) {
@@ -46,11 +47,14 @@ public class TraderCellEditor extends AbstractCellEditor implements TableCellEdi
 
     };
 
-    //private List<Medicine> listTrader = new ArrayList();
-    public TraderCellEditor(boolean filter) {
+    public TraderCellEditor(boolean filter, int max) {
         this.filter = filter;
+        this.max = max;
     }
 
+    
+    //private List<Medicine> listTrader = new ArrayList();
+   
     @Override
     public java.awt.Component getTableCellEditorComponent(JTable table, Object value,
             boolean isSelected, int rowIndex, int vColIndex) {
@@ -88,7 +92,7 @@ public class TraderCellEditor extends AbstractCellEditor implements TableCellEdi
         if (value != null) {
             jtf.setText(value.toString());
         }
-        completer = new TraderAutoCompleter(jtf, Global.listTrader, this, this.filter);
+        completer = new TraderAutoCompleter(jtf, Global.listTrader, this, this.filter,this.max);
         return component;
     }
 

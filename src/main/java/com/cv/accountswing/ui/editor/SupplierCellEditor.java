@@ -6,15 +6,13 @@
 package com.cv.accountswing.ui.editor;
 
 import com.cv.accountswing.common.Global;
-import com.cv.accountswing.entity.Customer;
-import com.cv.accountswing.entity.Trader;
+import com.cv.accountswing.entity.Supplier;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.util.EventObject;
-import java.util.List;
 import javax.swing.AbstractCellEditor;
 import javax.swing.JComponent;
 import javax.swing.JTable;
@@ -94,7 +92,7 @@ public class SupplierCellEditor extends AbstractCellEditor implements TableCellE
     @Override
     public Object getCellEditorValue() {
         Object obj;
-        Trader trader = completer.getTrader();
+        Supplier trader = completer.getTrader();
 
         if (trader != null) {
             obj = trader;

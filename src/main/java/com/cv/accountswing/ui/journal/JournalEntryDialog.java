@@ -29,6 +29,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.text.DateFormat;
 import java.util.List;
+import java.util.Objects;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
@@ -171,22 +172,14 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
                             glService.save(gl);
                         }
                     }
-                    //listGl = glService.saveBatchGL(listGl);
                     if (!listGl.isEmpty()) {
                         journalTablModel.clear();
                         JOptionPane.showMessageDialog(Global.parentForm, "Saved");
+                        this.dispose();
                         if (selectionObserver != null) {
                             selectionObserver.selected("SEARCHVOUCHER", "-");
                         }
                     }
-                    //Delete row
-                    /* if (!strDeleteIds.equals("-")) {
-                String[] ids = strDeleteIds.split(",");
-                for (String id : ids) {
-                Long lid = Long.parseLong(id);
-                glService.delete(lid);
-                }
-                }*/
 
                 } catch (NumberFormatException ex) {
                     LOGGER.error("saveGeneralVoucher : " + ex);
@@ -206,10 +199,14 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
             return false;
         }
         for (VGl vgl : journalTablModel.getListGV()) {
-            /*if (vgl.getSourceAcId() == null) {
-            status = false;
-            JOptionPane.showMessageDialog(Global.parentForm, "Select Account.");
-            }*/
+            if (Util1.getFloat(vgl.getDrAmt()) + Util1.getFloat(vgl.getCrAmt()) > 0) {
+                if (vgl.getSourceAcId() == null) {
+                    status = false;
+                    JOptionPane.showMessageDialog(Global.parentForm, "Select Account.");
+                    tblJournal.requestFocus();
+                }
+            }
+
         }
         return status;
     }
@@ -247,10 +244,16 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
     private boolean isGeneralVoucher(List<Gl> listGV,
             String strGvId, String vouNo, String ref, String strGvDate) {
         boolean status = true;
-
-        if (!txtFCrdAmt.getValue().equals(txtFCrdAmt.getValue())) {
+        Float ttlCrdAmt = Util1.getFloat(txtFCrdAmt.getValue());
+        Float ttlDrAmt = Util1.getFloat(txtFDrAmt.getValue());
+        if (!Objects.equals(ttlCrdAmt, ttlDrAmt)) {
             JOptionPane.showMessageDialog(Global.parentForm, "Out of balance.");
             status = false;
+            tblJournal.requestFocus();
+        } else if (ttlCrdAmt + ttlDrAmt <= 0) {
+            JOptionPane.showMessageDialog(Global.parentForm, "Invalid Total Amount.");
+            status = false;
+            tblJournal.requestFocus();
         }
         if (status) {
             if (vouNo.equals("-")) {
@@ -359,7 +362,10 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
             }
         });
 
+        btnSave.setBackground(ColorUtil.mainColor);
         btnSave.setFont(Global.textFont);
+        btnSave.setForeground(ColorUtil.foreground);
+        btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save-button-white.png"))); // NOI18N
         btnSave.setText("Save");
         btnSave.setName("btnSave"); // NOI18N
         btnSave.addActionListener(new java.awt.event.ActionListener() {
@@ -381,7 +387,10 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
             }
         });
 
+        btnPrint.setBackground(ColorUtil.btnEdit);
         btnPrint.setFont(Global.textFont);
+        btnPrint.setForeground(ColorUtil.foreground);
+        btnPrint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/print_18px.png"))); // NOI18N
         btnPrint.setText("Print");
         btnPrint.setName("btnSave"); // NOI18N
         btnPrint.addActionListener(new java.awt.event.ActionListener() {
@@ -411,10 +420,10 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
                 .addComponent(jLabel7)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(txtCurrency, javax.swing.GroupLayout.DEFAULT_SIZE, 138, Short.MAX_VALUE)
-                .addGap(30, 30, 30)
-                .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnPrint, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnSave)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnPrint, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(

@@ -9,9 +9,6 @@ import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.SelectionObserver;
-import com.cv.accountswing.entity.CompanyInfo;
-import com.cv.accountswing.entity.SystemProperty;
-import com.cv.accountswing.entity.SystemPropertyKey;
 import com.cv.accountswing.entity.helper.ProfitAndLostRetObj;
 import com.cv.accountswing.service.CompanyInfoService;
 import com.cv.accountswing.service.ReportService;
@@ -23,6 +20,7 @@ import com.cv.accountswing.util.Util1;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JOptionPane;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
@@ -35,7 +33,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ProtfitAndLost extends javax.swing.JPanel implements SelectionObserver, PanelControl {
 
-    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(ProtfitAndLost.class);
+    private static final Logger log = LoggerFactory.getLogger(ProtfitAndLost.class);
 
     private LoadingObserver loadingObserver;
     private String stDate;
@@ -93,15 +91,16 @@ public class ProtfitAndLost extends javax.swing.JPanel implements SelectionObser
                     JOptionPane.showMessageDialog(Global.parentForm, "Invalid profit & lost process");
                 } else {
                     try {
-                        rService.getProfitLost(process, stDate, enDate, depId, currency, Global.compCode, Global.loginUser.getAppUserCode());
-                        //ro.setObj();
+                        rService.getProfitLost(process, stDate, enDate, depId,
+                                currency, Global.compCode, Global.loginUser.getAppUserCode(), Global.machineId.toString());
+                        log.info("Generation Profit And Lost Sucess. ");
                         btnCalculate.setEnabled(true);
                         loadingObserver.load(this.getName(), "Stop");
 
                     } catch (Exception ex) {
                         btnCalculate.setEnabled(true);
                         loadingObserver.load(this.getName(), "Stop");
-                        LOGGER.error("searchProfitAndList ----" + ex.getMessage());
+                        log.error("searchProfitAndList ----" + ex.getMessage());
                     }
                 }
             } else {
@@ -117,44 +116,30 @@ public class ProtfitAndLost extends javax.swing.JPanel implements SelectionObser
         taskExecutor.execute(() -> {
             try {
                 loadingObserver.load(this.getName(), "Start");
-                String userCode = Global.loginUser.getAppUserCode();
-                CompanyInfo ci = ciService.findById(Global.compCode);
-                SystemPropertyKey key = new SystemPropertyKey();
-                key.setCompCode(Global.compCode);
-                key.setPropKey("system.report.path");
-                SystemProperty sp = spService.findById(key);
-                String fileName = userCode + "_profit_lost.pdf";
-                String reportPath = sp.getPropValue();
-                String reportPath1 = reportPath;
-                String filePath = reportPath + "/temp/" + fileName;
 
+                String reportPath = Global.sysProperties.get("system.report.path");
                 reportPath = reportPath + "/ProfitAndLost";
-                key = new SystemPropertyKey();
-                key.setCompCode(Global.compCode);
-                key.setPropKey("system.font.path");
-                sp = spService.findById(key);
-                String fontPath = sp.getPropValue();
-
+                String fontPath = Global.sysProperties.get("system.font.path");
                 //Need to calculate sub todal
-                ProfitAndLostRetObj obj = rService.getPLCalculateValue(userCode, Global.compCode);
-                LOGGER.info("cost of sale : " + obj.getCostOfSale());
+                ProfitAndLostRetObj obj = rService.getPLCalculateValue(Global.loginUser.getAppUserCode(), Global.compCode);
+                log.info("cost of sale : " + obj.getCostOfSale());
                 //==================================================================
 
                 Map<String, Object> parameters = new HashMap();
-                parameters.put("p_company_name", ci.getName());
+                parameters.put("p_company_name", Global.companyName);
                 parameters.put("p_comp_id", Global.compCode);
-                parameters.put("SUBREPORT_DIR", reportPath1);
-                parameters.put("p_user_id", userCode);
+                parameters.put("SUBREPORT_DIR", reportPath);
+                parameters.put("p_user_id", Global.loginUser.getAppUserCode());
                 parameters.put("gross_profit", obj.getGrossProfit());
                 parameters.put("net_profit", obj.getNetProfit());
                 parameters.put("p_report_info", Util1.isNull(stDate, "-")
                         + " to " + Util1.isNull(enDate, "-"));
                 parameters.put("p_cost_of_sale", obj.getCostOfSale());
 
-                rService.genCreditVoucher(reportPath, filePath, fontPath, parameters);
+                rService.genCreditVoucher(reportPath, reportPath, fontPath, parameters);
                 loadingObserver.load(this.getName(), "Stop");
             } catch (Exception ex) {
-                LOGGER.error("getProfitAndLostReport : " + ex);
+                log.error("getProfitAndLostReport : " + ex);
             }
         });
 

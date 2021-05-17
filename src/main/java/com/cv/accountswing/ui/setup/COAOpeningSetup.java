@@ -70,6 +70,8 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
     private ApplicationMainFrame mainFrame;
     @Autowired
     private COAService cOAService;
+    @Autowired
+    private COAOptionDialog cOAOptionDialog;
     private TableFilterHeader filterHeader;
     private LoadingObserver loadingObserver;
     private boolean isShown = false;
@@ -241,29 +243,37 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
         return status;
     }
 
-    private void generate() {
+    private void selectOption() {
         if (isValidGen()) {
-            loadingObserver.load(this.getName(), "Start");
-            taskExecutor.execute(() -> {
-                btnGen.setEnabled(false);
-                try {
-                    String userCode = Global.loginUser.getAppUserCode();
-                    String coaGroup = Global.sysProperties.get("system.opening.coa.group");
-                    if (coaGroup != null) {
-                        cOAOpeningService.generateZeroOpening(Util1.toDateStr(txtDate.getDate(), "dd/MM/yyyy"),
-                                userCode, Global.compCode, curId, depCode, coaGroup);
-                        searchOpening();
-                        btnGen.setEnabled(true);
-                    } else {
-                        JOptionPane.showMessageDialog(Global.parentForm, "COA Group Openning in System Property.");
-                    }
-                } catch (Exception ex) {
-                    LOGGER.error("GENERATE  :" + ex.getMessage());
-                    JOptionPane.showMessageDialog(Global.parentForm, ex.getMessage(), "GENERATE OPENING", JOptionPane.ERROR_MESSAGE);
-                    btnGen.setEnabled(true);
-                }
-            });
+            cOAOptionDialog.initTable();
+            cOAOptionDialog.setObserver(this);
+            cOAOptionDialog.setSize(Global.width - 350, Global.height - 350);
+            cOAOptionDialog.setLocationRelativeTo(null);
+            cOAOptionDialog.setVisible(true);
         }
+    }
+
+    private void generate(String coaGroup) {
+        loadingObserver.load(this.getName(), "Start");
+        taskExecutor.execute(() -> {
+            btnGen.setEnabled(false);
+            try {
+                String userCode = Global.loginUser.getAppUserCode();
+                if (coaGroup != null) {
+                    cOAOpeningService.generateZeroOpening(Util1.toDateStr(txtDate.getDate(), "dd/MM/yyyy"),
+                            userCode, Global.compCode, curId, depCode, coaGroup);
+                    searchOpening();
+                    btnGen.setEnabled(true);
+                } else {
+                    JOptionPane.showMessageDialog(Global.parentForm, "COA Group Openning in System Property.");
+                }
+            } catch (Exception ex) {
+                LOGGER.error("GENERATE  :" + ex.getMessage());
+                JOptionPane.showMessageDialog(Global.parentForm, ex.getMessage(), "GENERATE OPENING", JOptionPane.ERROR_MESSAGE);
+                btnGen.setEnabled(true);
+            }
+        });
+
     }
 
     private void initKeyListener() {
@@ -316,6 +326,8 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
             }
         });
 
+        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.RAISED));
+
         jLabel1.setFont(Global.lableFont);
         jLabel1.setText("Date");
 
@@ -344,7 +356,9 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
             }
         });
 
+        btnGen.setBackground(ColorUtil.mainColor);
         btnGen.setFont(Global.lableFont);
+        btnGen.setForeground(ColorUtil.foreground);
         btnGen.setText("Genearte Zero");
         btnGen.setEnabled(false);
         btnGen.setName("btnGen"); // NOI18N
@@ -401,24 +415,24 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(txtDate, javax.swing.GroupLayout.DEFAULT_SIZE, 97, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtDep, javax.swing.GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(txtDep, javax.swing.GroupLayout.DEFAULT_SIZE, 97, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtCurrency, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(txtCurrency, javax.swing.GroupLayout.DEFAULT_SIZE, 97, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel7)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtRegion, javax.swing.GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(txtRegion, javax.swing.GroupLayout.DEFAULT_SIZE, 97, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel8)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtCOA, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(txtCOA, javax.swing.GroupLayout.DEFAULT_SIZE, 97, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkCustomer)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -539,7 +553,7 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 265, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 261, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -567,7 +581,7 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
 
     private void btnGenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGenActionPerformed
         // TODO add your handling code here:
-        generate();
+        selectOption();
     }//GEN-LAST:event_btnGenActionPerformed
 
     private void txtRegionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtRegionActionPerformed
@@ -642,6 +656,11 @@ public class COAOpeningSetup extends javax.swing.JPanel implements SelectionObse
                 coaParent = selectObj.toString();
                 searchOpening();
                 break;
+            case "COA-GROUP":
+                LOGGER.info("COA Group : " + selectObj.toString());
+                generate(selectObj.toString());
+                break;
+
         }
 
     }

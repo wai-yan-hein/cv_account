@@ -9,6 +9,7 @@ import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.view.VGl;
+import com.cv.accountswing.service.ReportService;
 import com.cv.accountswing.service.VGlService;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.journal.JournalEntryDialog;
@@ -17,9 +18,11 @@ import com.cv.accountswing.ui.report.common.DrAmtTableModel;
 import com.cv.accountswing.util.Util1;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.swing.ImageIcon;
-import javax.swing.JFrame;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
@@ -35,7 +38,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class TrialBalanceDetailDialog extends javax.swing.JDialog implements SelectionObserver {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TrialBalanceDetailDialog.class);
+    private static final Logger log = LoggerFactory.getLogger(TrialBalanceDetailDialog.class);
     private final ImageIcon editIcon = new ImageIcon(getClass().getResource("/images/edit_property.png"));
 
     @Autowired
@@ -48,11 +51,22 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Sel
     private VGlService vGlService;
     @Autowired
     private JournalEntryDialog journalEntryDialog;
+    @Autowired
+    private ReportService rService;
     private TableRowSorter<TableModel> sorter;
     private String desp;
     private List<VGl> listVGl;
     private Double openingAmt = 0.0;
     private String targetId;
+    private String traderCode;
+
+    public String getTraderCode() {
+        return traderCode;
+    }
+
+    public void setTraderCode(String traderCode) {
+        this.traderCode = traderCode;
+    }
 
     public String getTargetId() {
         return targetId;
@@ -101,7 +115,7 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Sel
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
-                    LOGGER.info("Edit Cash CR Open.");
+                    log.info("Edit Cash CR Open.");
                     VGl vGl = crAmtTableModel.getVGl(tblCr.convertRowIndexToModel(tblCr.getSelectedRow()));
                     vGl = vGlService.findById(vGl.getGlCode());
                     editCash(vGl, "CR");
@@ -113,7 +127,7 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Sel
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
-                    LOGGER.info("Edit Cash DR Open.");
+                    log.info("Edit Cash DR Open.");
                     VGl vGl = drAmtTableModel.getVGl(tblDr.convertRowIndexToModel(tblDr.getSelectedRow()));
                     vGl = vGlService.findById(vGl.getGlCode());
                     editCash(vGl, "DR");
@@ -178,7 +192,7 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Sel
         tblCr.getTableHeader().setForeground(ColorUtil.foreground);
         tblCr.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblCr.setRowHeight(Global.tblRowHeight);
-        tblCr.getColumnModel().getColumn(0).setPreferredWidth(10);
+        tblCr.getColumnModel().getColumn(0).setPreferredWidth(15);
         tblCr.getColumnModel().getColumn(1).setPreferredWidth(200);
         tblCr.getColumnModel().getColumn(2).setPreferredWidth(150);
         tblCr.getColumnModel().getColumn(3).setPreferredWidth(10);
@@ -197,7 +211,7 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Sel
         tblDr.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblDr.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
         tblDr.getTableHeader().setForeground(ColorUtil.foreground);
-        tblDr.getColumnModel().getColumn(0).setPreferredWidth(10);
+        tblDr.getColumnModel().getColumn(0).setPreferredWidth(15);
         tblDr.getColumnModel().getColumn(1).setPreferredWidth(200);
         tblDr.getColumnModel().getColumn(2).setPreferredWidth(150);
         tblDr.getColumnModel().getColumn(3).setPreferredWidth(10);
@@ -206,6 +220,26 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Sel
         sorter = new TableRowSorter<>(tblDr.getModel());
         tblDr.setRowSorter(sorter);
 
+    }
+
+    private void print() {
+
+        try {
+
+            String compName = Global.sysProperties.get("system.report.company");
+            String reportPath = Global.sysProperties.get("system.report.path");
+            String fontPath = Global.sysProperties.get("system.font.path");
+            String filePath = reportPath + File.separator + "APAR";
+            Map<String, Object> parameters = new HashMap();
+            parameters.put("p_company_name", compName);
+            parameters.put("p_comp_id", Global.compCode);
+            parameters.put("p_user_id", Global.loginUser.getAppUserCode());
+            parameters.put("p_report_info", "Testing");
+            parameters.put("trader_code", traderCode);
+            rService.genCreditVoucher(filePath, filePath, fontPath, parameters);
+        } catch (Exception ex) {
+            log.error("PRINT APAR REPORT :::" + ex.getMessage());
+        }
     }
 
     /**
@@ -220,6 +254,7 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Sel
         jPanel2 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         lblName = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblDr = new javax.swing.JTable();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -246,6 +281,7 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Sel
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Trial Balance");
+        setModalityType(java.awt.Dialog.ModalityType.MODELESS);
         addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
                 formFocusLost(evt);
@@ -264,6 +300,14 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Sel
         lblName.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblName.setText("Name");
 
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/print_20px.png"))); // NOI18N
+        jButton1.setText("Print");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -271,13 +315,17 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Sel
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(lblName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton1)
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblName, javax.swing.GroupLayout.DEFAULT_SIZE, 27, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblName, javax.swing.GroupLayout.DEFAULT_SIZE, 27, Short.MAX_VALUE)
+                    .addComponent(jButton1))
                 .addContainerGap())
         );
 
@@ -383,7 +431,7 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Sel
                                         .addComponent(txtFDrAmt, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 427, Short.MAX_VALUE)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 481, Short.MAX_VALUE)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addGap(0, 0, Short.MAX_VALUE)
                                 .addComponent(jLabel2)
@@ -440,11 +488,17 @@ public class TrialBalanceDetailDialog extends javax.swing.JDialog implements Sel
         // TODO add your handling code here:
     }//GEN-LAST:event_txtFDrAmtActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        print();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
     /**
      * @param args the command line arguments
      */
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel5;

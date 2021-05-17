@@ -19,7 +19,9 @@ import com.cv.accountswing.service.COAService;
 import com.cv.accountswing.service.MenuService;
 import com.cv.accountswing.service.PrivilegeService;
 import com.cv.accountswing.service.UserRoleService;
+import com.cv.accountswing.service.VDescriptionService;
 import com.cv.accountswing.ui.ApplicationMainFrame;
+import com.cv.accountswing.ui.editor.MenuClassAutoCompleter;
 import com.cv.accountswing.util.Util1;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -65,6 +67,8 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
     private UserRoleService userRoleService;
     @Autowired
     private PrivilegeService privilegeService;
+    @Autowired
+    private VDescriptionService descriptionService;
     private LoadingObserver loadingObserver;
     private boolean isShown = false;
     private final String parentRootName = "Root Menu";
@@ -108,8 +112,15 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
     }
 
     private void initMain() {
+        initAutoCompler();
         initTree();
         isShown = true;
+    }
+
+    private void initAutoCompler() {
+        MenuClassAutoCompleter menuClassAutoCompleter = new MenuClassAutoCompleter(txtClass, Global.listMenuClass,
+                null, descriptionService);
+
     }
 
     private void initKeyListener() {
@@ -294,10 +305,13 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
     private void deleteMenu() {
         try {
             if (selectedNode != null) {
-                VRoleMenu rMenu = (VRoleMenu) selectedNode.getUserObject();
-                menuService.delete(rMenu.getKey().getMenuCode().toString());
-                treeModel.removeNodeFromParent(selectedNode);
-                treeModel.reload(selectedNode);
+                int yes_no = JOptionPane.showConfirmDialog(Global.parentForm, "Are you sure to delete?");
+                if (yes_no == JOptionPane.YES_OPTION) {
+                    VRoleMenu rMenu = (VRoleMenu) selectedNode.getUserObject();
+                    menuService.delete(rMenu.getKey().getMenuCode());
+                    treeModel.removeNodeFromParent(selectedNode);
+                    treeModel.reload(selectedNode);
+                }
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(Global.parentForm, e.getMessage());
@@ -371,6 +385,8 @@ public class MenuSetup extends javax.swing.JPanel implements TreeSelectionListen
         });
 
         treeCOA.setFont(Global.textFont);
+        javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("Menu");
+        treeCOA.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
         jScrollPane1.setViewportView(treeCOA);
 
         jPanel1.setFont(Global.textFont);

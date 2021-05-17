@@ -24,6 +24,8 @@ import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
+import net.coderazzi.filters.gui.AutoChoices;
+import net.coderazzi.filters.gui.TableFilterHeader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
@@ -50,6 +52,7 @@ public class COASetup extends javax.swing.JPanel implements KeyListener, PanelCo
     private ApplicationMainFrame mainFrame;
     private LoadingObserver loadingObserver;
     private boolean isShown = false;
+    private TableFilterHeader filterHeader;
 
     public void setLoadingObserver(LoadingObserver loadingObserver) {
         this.loadingObserver = loadingObserver;
@@ -97,6 +100,10 @@ public class COASetup extends javax.swing.JPanel implements KeyListener, PanelCo
         tblCoaHead.setDefaultRenderer(Object.class, new TableCellRender());
         tblCoaHead.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                 .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
+        filterHeader = new TableFilterHeader(tblCoaHead, AutoChoices.ENABLED);
+        filterHeader.setPosition(TableFilterHeader.Position.TOP);
+        filterHeader.setFont(Global.textFont);
+        filterHeader.setVisible(false);
         searchHead();
     }
 
@@ -134,6 +141,10 @@ public class COASetup extends javax.swing.JPanel implements KeyListener, PanelCo
         tblCoaGroup.setDefaultRenderer(Object.class, new TableCellRender());
         tblCoaGroup.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                 .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
+        filterHeader = new TableFilterHeader(tblCoaGroup, AutoChoices.ENABLED);
+        filterHeader.setPosition(TableFilterHeader.Position.TOP);
+        filterHeader.setFont(Global.textFont);
+        filterHeader.setVisible(false);
 
     }
 
@@ -157,6 +168,10 @@ public class COASetup extends javax.swing.JPanel implements KeyListener, PanelCo
         tblCOAGroupChild.setDefaultRenderer(Object.class, new TableCellRender());
         tblCOAGroupChild.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                 .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
+        filterHeader = new TableFilterHeader(tblCOAGroupChild, AutoChoices.ENABLED);
+        filterHeader.setPosition(TableFilterHeader.Position.TOP);
+        filterHeader.setFont(Global.textFont);
+        filterHeader.setVisible(false);
 
     }
 
@@ -169,8 +184,15 @@ public class COASetup extends javax.swing.JPanel implements KeyListener, PanelCo
             coaGroupTableModel.setListCOA(listCoaGroup);
             coaGroupTableModel.addEmptyRow();
             lblCoaGroup.setText(c.getCoaNameEng());
+            reqCoaGroup();
+        }
+    }
+
+    private void reqCoaGroup() {
+        int row = tblCoaGroup.getRowCount();
+        if (row >= 0) {
+            tblCoaGroup.setRowSelectionInterval(row - 1, row - 1);
             tblCoaGroup.setColumnSelectionInterval(1, 1);
-            tblCoaGroup.setRowSelectionInterval(listCoaGroup.size() - 1, listCoaGroup.size() - 1);
             tblCoaGroup.requestFocus();
         }
     }
@@ -183,8 +205,18 @@ public class COASetup extends javax.swing.JPanel implements KeyListener, PanelCo
             cOAGroupChildTableModel.setCoaGroupCode(coa.getCode());
             cOAGroupChildTableModel.addEmptyRow();
             lblCoaChild.setText(coa.getCoaNameEng());
+            reqCOAGroupChild();
+        } else {
+            cOAGroupChildTableModel.clear();
+            lblCoaChild.setText("...");
+        }
+    }
+
+    private void reqCOAGroupChild() {
+        int row = tblCOAGroupChild.getRowCount();
+        if (row >= 0) {
+            tblCOAGroupChild.setRowSelectionInterval(row - 1, row - 1);
             tblCOAGroupChild.setColumnSelectionInterval(1, 1);
-            tblCOAGroupChild.setRowSelectionInterval(listCoaChild.size() - 1, listCoaChild.size() - 1);
             tblCOAGroupChild.requestFocus();
         }
     }

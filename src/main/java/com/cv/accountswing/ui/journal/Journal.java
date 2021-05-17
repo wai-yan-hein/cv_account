@@ -222,6 +222,7 @@ public class Journal extends javax.swing.JPanel implements KeyListener, Selectio
         btnEntry = new javax.swing.JButton();
         txtFromDate = new com.toedter.calendar.JDateChooser();
         txtToDate = new com.toedter.calendar.JDateChooser();
+        btnEntry1 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblJournal = new javax.swing.JTable();
 
@@ -230,6 +231,8 @@ public class Journal extends javax.swing.JPanel implements KeyListener, Selectio
                 formComponentShown(evt);
             }
         });
+
+        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.RAISED));
 
         jLabel1.setFont(Global.lableFont);
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -277,6 +280,19 @@ public class Journal extends javax.swing.JPanel implements KeyListener, Selectio
         txtToDate.setDateFormatString("dd/MM/yyyy");
         txtToDate.setFont(Global.shortCutFont);
 
+        btnEntry1.setBackground(ColorUtil.mainColor);
+        btnEntry1.setFont(Global.lableFont);
+        btnEntry1.setForeground(ColorUtil.foreground);
+        btnEntry1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/search-button.png"))); // NOI18N
+        btnEntry1.setText("Search");
+        btnEntry1.setToolTipText("New Journal");
+        btnEntry1.setName("btnEntry"); // NOI18N
+        btnEntry1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEntry1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -285,11 +301,11 @@ public class Journal extends javax.swing.JPanel implements KeyListener, Selectio
                 .addContainerGap()
                 .addComponent(jLabel1)
                 .addGap(18, 18, 18)
-                .addComponent(txtFromDate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(txtFromDate, javax.swing.GroupLayout.DEFAULT_SIZE, 92, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addComponent(jLabel2)
                 .addGap(18, 18, 18)
-                .addComponent(txtToDate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(txtToDate, javax.swing.GroupLayout.DEFAULT_SIZE, 92, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addComponent(jLabel3)
                 .addGap(18, 18, 18)
@@ -298,6 +314,8 @@ public class Journal extends javax.swing.JPanel implements KeyListener, Selectio
                 .addComponent(jLabel4)
                 .addGap(18, 18, 18)
                 .addComponent(txtRefrence)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnEntry1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnEntry)
                 .addContainerGap())
@@ -313,7 +331,8 @@ public class Journal extends javax.swing.JPanel implements KeyListener, Selectio
                         .addComponent(jLabel3)
                         .addComponent(jLabel4)
                         .addComponent(txtRefrence, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(btnEntry, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(btnEntry, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnEntry1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
@@ -358,7 +377,7 @@ public class Journal extends javax.swing.JPanel implements KeyListener, Selectio
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 61, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 57, Short.MAX_VALUE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -381,8 +400,14 @@ public class Journal extends javax.swing.JPanel implements KeyListener, Selectio
         // TODO add your handling code here:
     }//GEN-LAST:event_txtRefrenceActionPerformed
 
+    private void btnEntry1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEntry1ActionPerformed
+        // TODO add your handling code here:
+        searchGV();
+    }//GEN-LAST:event_btnEntry1ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnEntry;
+    private javax.swing.JButton btnEntry1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

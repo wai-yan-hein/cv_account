@@ -6,7 +6,7 @@
 package com.cv.accountswing.ui.editor;
 
 import com.cv.accountswing.common.Global;
-import com.cv.accountswing.entity.Trader;
+import com.cv.accountswing.entity.Supplier;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
@@ -94,7 +94,7 @@ public class CustomerCellEditor extends AbstractCellEditor implements TableCellE
     @Override
     public Object getCellEditorValue() {
         Object obj;
-        Trader trader = completer.getTrader();
+        Supplier trader = completer.getTrader();
 
         if (trader != null) {
             obj = trader;

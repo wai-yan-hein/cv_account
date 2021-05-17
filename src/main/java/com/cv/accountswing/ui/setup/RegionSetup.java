@@ -117,6 +117,7 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
     }
 
     private void initTree() {
+       
         treeModel = (DefaultTreeModel) treeRegion.getModel();
         treeModel.setRoot(null);
         root = new DefaultMutableTreeNode(parentRootName);
@@ -208,6 +209,7 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
         child = new DefaultMutableTreeNode(region);
         selectedNode.add(child);
         treeModel.insertNodeInto(child, selectedNode, selectedNode.getChildCount() - 1);
+        treeRegion.setSelectionRow(selectedNode.getChildCount());
 
     }
 
@@ -288,6 +290,7 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
             }
         });
 
+        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.RAISED));
         jPanel1.setFont(Global.textFont);
 
         jLabel1.setFont(Global.lableFont);
@@ -360,7 +363,7 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
                             .addComponent(txtRegionCode)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(labelStatus)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 170, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 168, Short.MAX_VALUE)
                         .addComponent(btnSaveR)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnClearR)))
@@ -385,7 +388,7 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
                     .addComponent(labelStatus)
                     .addComponent(btnClearR)
                     .addComponent(btnSaveR))
-                .addContainerGap(328, Short.MAX_VALUE))
+                .addContainerGap(327, Short.MAX_VALUE))
         );
 
         treeRegion.setFont(Global.textFont);
@@ -402,7 +405,7 @@ public class RegionSetup extends javax.swing.JPanel implements TreeSelectionList
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 147, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 145, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())

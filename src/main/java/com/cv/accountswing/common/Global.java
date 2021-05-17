@@ -22,6 +22,7 @@ import com.cv.accountswing.entity.Staff;
 import com.cv.accountswing.entity.Supplier;
 import com.cv.accountswing.entity.Trader;
 import com.cv.accountswing.entity.view.VDescription;
+import com.cv.accountswing.entity.view.VMenuClass;
 import com.cv.accountswing.entity.view.VRef;
 import com.cv.inv.entity.Category;
 import com.cv.inv.entity.CharacterNo;
@@ -97,6 +98,7 @@ public class Global {
     public static List<MachineInfo> listMachine;
     public static List<VRef> listRef = new ArrayList<>();
     public static List<VDescription> listDesp = new ArrayList<>();
+    public static List<VMenuClass> listMenuClass = new ArrayList<>();
     public static HashMap<String, String> sysProperties;
     public static HashMap<String, String> hmCashFilter = new HashMap<>();
     public static HashMap<RelationKey, Float> hmRelation = new HashMap<>();
@@ -125,5 +127,20 @@ public class Global {
     public static Supplier defaultSupplier;
 
     public static HashMap<String, Float> hasQtyInSmallest = new HashMap();
+    public static final String DEP_KEY = "default-dep";
+    public static final String LOC_KEY = "default-loc";
+    public static final String CUR_KEY = "default-cur";
+    public static final String SUP_KEY = "default-sup";
+    public static final String CUS_KEY = "default-cus";
+    public static final String VOU_KEY = "default-vou";
+    public static final String SALE_KEY = "default-sale-man";
+    public static final String DEP_LIST_KEY = "default-dep-list";
+    public static final String LOC_LIST_KEY = "default-loc-list";
+    public static final String CUR_LIST_KEY = "default-cur-list";
+    public static final String SUP_LIST_KEY = "default-sup-list";
+    public static final String CUS_LIST_KEY = "default-cus-list";
+    public static final String VOU_LIST_KEY = "default-vou-list";
+    public static final String SALE_LIST_KEY = "default-sale-man-list";
+    public static final String COA_LIST_KEY = "default-coa-list";
 
 }

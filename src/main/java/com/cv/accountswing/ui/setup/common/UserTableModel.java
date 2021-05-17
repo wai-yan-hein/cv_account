@@ -124,4 +124,9 @@ public class UserTableModel extends AbstractTableModel {
         }
     }
 
+    public void modifyColumn() {
+        String[] newColumn = {"User Name"};
+        this.columnNames = newColumn;
+        fireTableStructureChanged();
+    }
 }

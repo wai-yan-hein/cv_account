@@ -198,7 +198,7 @@ public class SaleEntry1 extends javax.swing.JPanel implements SelectionObserver,
         if (Util1.getPropValue("system.default.location").equals("23")) {
             JComboBox cboLocationCell = new JComboBox();
             cboLocationCell.setFont(Global.textFont);
-            BindingUtil.BindCombo(cboLocationCell, locationService.findAll());
+            BindingUtil.BindCombo(cboLocationCell, locationService.findAll(Global.compCode));
             tblSale.getColumnModel().getColumn(10).setCellEditor(new DefaultCellEditor(cboLocationCell));
             saleTableModel.setLocation((Location) cboLocationCell.getSelectedItem());
             tblSale.getColumnModel().getColumn(10).setPreferredWidth(30);

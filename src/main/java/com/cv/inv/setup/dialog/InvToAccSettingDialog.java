@@ -37,6 +37,7 @@ public class InvToAccSettingDialog extends javax.swing.JDialog {
     private COAAutoCompleter taxAutoCOmpleter;
     private DepartmentAutoCompleter departmentAutoCompleter;
     private COAAutoCompleter sourceAccountCompleter;
+    private COAAutoCompleter balanceAccCompleter;
 
     /**
      * Creates new form InvToAccSetting
@@ -60,6 +61,7 @@ public class InvToAccSettingDialog extends javax.swing.JDialog {
         taxAutoCOmpleter = new COAAutoCompleter(txtTax, Global.listCOA, null, false);
         departmentAutoCompleter = new DepartmentAutoCompleter(txtDep, Global.listDepartment, null, false);
         sourceAccountCompleter = new COAAutoCompleter(txtSource, Global.listCOA, null, false);
+        balanceAccCompleter = new COAAutoCompleter(txtBal, Global.listCOA, null, false);
 
     }
 
@@ -72,6 +74,7 @@ public class InvToAccSettingDialog extends javax.swing.JDialog {
             taxAutoCOmpleter.setCoa(setting.getTaxAccount());
             departmentAutoCompleter.setDepartment(setting.getDepartment());
             sourceAccountCompleter.setCoa(setting.getSoureAccount());
+            balanceAccCompleter.setCoa(setting.getBalAccount());
         } else {
             JOptionPane.showMessageDialog(Global.parentForm, "Select Type");
         }
@@ -86,6 +89,7 @@ public class InvToAccSettingDialog extends javax.swing.JDialog {
             setting.setTaxAccount(taxAutoCOmpleter.getCOA());
             setting.setDepartment(departmentAutoCompleter.getDepartment());
             setting.setSoureAccount(sourceAccountCompleter.getCOA());
+            setting.setBalAccount(balanceAccCompleter.getCOA());
             accSettingService.save(setting);
             model.setSetting(setting, row);
             clear();
@@ -125,6 +129,8 @@ public class InvToAccSettingDialog extends javax.swing.JDialog {
         txtDep = new javax.swing.JTextField();
         txtSource = new javax.swing.JTextField();
         lblTax2 = new javax.swing.JLabel();
+        lblTax3 = new javax.swing.JLabel();
+        txtBal = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -169,6 +175,9 @@ public class InvToAccSettingDialog extends javax.swing.JDialog {
         lblTax2.setFont(Global.lableFont);
         lblTax2.setText("Source Account");
 
+        lblTax3.setFont(Global.lableFont);
+        lblTax3.setText("Vou-Balance");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -184,14 +193,16 @@ public class InvToAccSettingDialog extends javax.swing.JDialog {
                             .addComponent(lblPay, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(lblDis, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(lblTax1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(lblTax2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(lblTax2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(lblTax3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtDiscount, javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(txtPayment)
                             .addComponent(txtTax, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 107, Short.MAX_VALUE)
                             .addComponent(txtDep, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 107, Short.MAX_VALUE)
-                            .addComponent(txtSource, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 107, Short.MAX_VALUE)))
+                            .addComponent(txtSource, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 107, Short.MAX_VALUE)
+                            .addComponent(txtBal, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 107, Short.MAX_VALUE)))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(jButton1)))
@@ -226,9 +237,13 @@ public class InvToAccSettingDialog extends javax.swing.JDialog {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(lblTax2)
                             .addComponent(txtSource, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblTax3)
+                            .addComponent(txtBal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(34, 34, 34)
                         .addComponent(jButton1)
-                        .addGap(0, 91, Short.MAX_VALUE))
+                        .addGap(0, 63, Short.MAX_VALUE))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -255,7 +270,9 @@ public class InvToAccSettingDialog extends javax.swing.JDialog {
     private javax.swing.JLabel lblTax;
     private javax.swing.JLabel lblTax1;
     private javax.swing.JLabel lblTax2;
+    private javax.swing.JLabel lblTax3;
     private javax.swing.JTable tblSetting;
+    private javax.swing.JTextField txtBal;
     private javax.swing.JTextField txtDep;
     private javax.swing.JTextField txtDiscount;
     private javax.swing.JTextField txtPayment;

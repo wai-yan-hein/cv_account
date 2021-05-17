@@ -113,11 +113,9 @@ public class COAGroupChildTableModel extends AbstractTableModel {
                         parent.setColumnSelectionInterval(2, 2);
                     }
                     break;
-
                 case 2:
                     if (value != null) {
                         coa.setCoaNameEng(value.toString());
-                        save(coa, row);
                     }
                     break;
                 case 3:
@@ -127,13 +125,12 @@ public class COAGroupChildTableModel extends AbstractTableModel {
                     } else {
                         coa.setActive(Boolean.TRUE);
                     }
-                    save(coa, row);
 
                     break;
                 default:
                     break;
-
             }
+            save(coa, row);
             parent.requestFocus();
         } catch (Exception ex) {
             LOGGER.error("setValueAt : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
@@ -237,13 +234,14 @@ public class COAGroupChildTableModel extends AbstractTableModel {
                             JOptionPane.showMessageDialog(Global.parentForm, "Duplicate Account Code");
                         }
                     }
-                    coa.setCompCode(compCode);
-                    coa.setCreatedBy(userCode);
-                    coa.setCreatedDate(Util1.getTodayDate());
-                    coa.setActive(true);
-                    if (Util1.isNull(coa.getOption(), "-").equals("-")) {
-                        coa.setOption("USR");
-                    }
+
+                }
+                coa.setCompCode(compCode);
+                coa.setCreatedBy(userCode);
+                coa.setCreatedDate(Util1.getTodayDate());
+                coa.setActive(true);
+                if (Util1.isNull(coa.getOption(), "-").equals("-")) {
+                    coa.setOption("USR");
                 }
             } else {
                 coa.setModifiedBy(userCode);
@@ -265,15 +263,16 @@ public class COAGroupChildTableModel extends AbstractTableModel {
     }
 
     private boolean hasEmptyRow() {
-        boolean status = false;
-        if (!listCOA.isEmpty()) {
-            ChartOfAccount coa = listCOA.get(listCOA.size() - 1);
-            if (coa.getCode() != null) {
-                status = true;
-            }
-        } else {
+        boolean status = true;
+        if (listCOA.isEmpty() || listCOA == null) {
             status = true;
+        } else {
+            ChartOfAccount coa = listCOA.get(listCOA.size() - 1);
+            if (coa.getCode() == null) {
+                status = false;
+            }
         }
+
         return status;
     }
 

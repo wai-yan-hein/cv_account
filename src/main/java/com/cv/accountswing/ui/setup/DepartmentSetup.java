@@ -115,7 +115,7 @@ public class DepartmentSetup extends javax.swing.JPanel implements TreeSelection
     }
 
     private void createTreeNode(String parentMenuID, DefaultMutableTreeNode treeRoot) {
-        List<Department> deparments = deptService.search("-", "-", "-", "-", parentMenuID);
+        List<Department> deparments = deptService.search("-", "-", Global.compCode, "-", parentMenuID);
         deparments.forEach(deparment -> {
             DefaultMutableTreeNode root = new DefaultMutableTreeNode(deparment);
             treeRoot.add(root);
@@ -217,8 +217,9 @@ public class DepartmentSetup extends javax.swing.JPanel implements TreeSelection
         child = new DefaultMutableTreeNode(dep);
         selectedNode.add(child);
         treeModel.insertNodeInto(child, selectedNode, selectedNode.getChildCount() - 1);
-        //treeModel.reload();
+        treeDept.setSelectionRow(selectedNode.getChildCount());
 
+        //treeModel.reload();
     }
 
     private void saveDepartment() {
@@ -316,6 +317,8 @@ public class DepartmentSetup extends javax.swing.JPanel implements TreeSelection
             }
         });
 
+        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.RAISED));
+
         jLabel1.setFont(Global.lableFont        );
         jLabel1.setText("System Code");
 
@@ -349,6 +352,7 @@ public class DepartmentSetup extends javax.swing.JPanel implements TreeSelection
 
         btnSave.setBackground(ColorUtil.mainColor);
         btnSave.setFont(Global.lableFont        );
+        btnSave.setForeground(ColorUtil.foreground);
         btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save-button-white.png"))); // NOI18N
         btnSave.setText("Save");
         btnSave.setEnabled(false);
@@ -364,6 +368,7 @@ public class DepartmentSetup extends javax.swing.JPanel implements TreeSelection
 
         btnClear.setBackground(ColorUtil.btnEdit);
         btnClear.setFont(Global.lableFont        );
+        btnClear.setForeground(ColorUtil.foreground);
         btnClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/clear-button-white.png"))); // NOI18N
         btnClear.setText("Clear");
         btnClear.setEnabled(false);
@@ -391,7 +396,7 @@ public class DepartmentSetup extends javax.swing.JPanel implements TreeSelection
                     .addComponent(txtUserCode)
                     .addComponent(txtSystemCode)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addGap(0, 58, Short.MAX_VALUE)
+                        .addGap(0, 56, Short.MAX_VALUE)
                         .addComponent(btnSave)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnClear))
@@ -437,7 +442,7 @@ public class DepartmentSetup extends javax.swing.JPanel implements TreeSelection
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 247, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 245, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
