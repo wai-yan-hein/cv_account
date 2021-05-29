@@ -11,12 +11,14 @@ import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.TreeTransferHandler;
 import com.cv.accountswing.entity.ChartOfAccount;
+import com.cv.accountswing.entity.Gl;
 import com.cv.accountswing.entity.Menu;
 import com.cv.accountswing.entity.Privilege;
 import com.cv.accountswing.entity.PrivilegeKey;
 import com.cv.accountswing.entity.Trader;
 import com.cv.accountswing.entity.UserRole;
 import com.cv.accountswing.service.COAService;
+import com.cv.accountswing.service.GlService;
 import com.cv.accountswing.service.MenuService;
 import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.service.PrivilegeService;
@@ -24,12 +26,17 @@ import com.cv.accountswing.service.TraderService;
 import com.cv.accountswing.service.UserRoleService;
 import com.cv.accountswing.util.BindingUtil;
 import com.cv.accountswing.util.Util1;
+import java.awt.FileDialog;
 import java.awt.HeadlessException;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.List;
 import javax.swing.DropMode;
@@ -61,7 +68,7 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
         TreeSelectionListener, KeyListener,
         PanelControl {
 
-    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(ChartOfAccountSetup.class);
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(ChartOfAccountSetup.class);
     private DefaultMutableTreeNode selectedNode;
     DefaultTreeModel treeModel;
     private final String parentRootName = "Core Account";
@@ -82,6 +89,8 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
     private ChartOfAccountImportDialog importDialog;
     @Autowired
     private TraderService traderService;
+    @Autowired
+    private GlService glService;
     JPopupMenu popupmenu;
     private LoadingObserver loadingObserver;
     private final HashMap<String, Menu> hmMenu = new HashMap<>();
@@ -100,13 +109,16 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
     private final ActionListener menuListener = (java.awt.event.ActionEvent evt) -> {
         JMenuItem actionMenu = (JMenuItem) evt.getSource();
         String menuName = actionMenu.getText();
-        LOGGER.info("Selected Menu : " + menuName);
+        log.info("Selected Menu : " + menuName);
         switch (menuName) {
             case "New":
                 newCOA();
                 break;
             case "Delete":
                 deleteCOA();
+                break;
+            case "Import":
+                importCOA();
                 break;
             default:
                 break;
@@ -216,17 +228,19 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
                 }
 
             }
-        } catch (Exception e) {
-            LOGGER.error("Delete ChartOfAccount :" + e.getMessage());
+        } catch (HeadlessException e) {
+            log.error("Delete ChartOfAccount :" + e.getMessage());
             JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Delete ChartOfAccount", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private boolean isValidDel(String code) {
-        boolean status = true;
-        List<Trader> search = traderService.search("-", code);
-        if (!search.isEmpty()) {
-            status = false;
+        boolean status;
+        List<Gl> listGl = glService.search("-", "0", "0", code, "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-");
+        status = listGl.isEmpty();
+        if (status) {
+            List<Trader> search = traderService.search("-", code);
+            status = search.isEmpty();
         }
         return status;
     }
@@ -235,11 +249,13 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
         popupmenu = new JPopupMenu("Edit");
         JMenuItem cut = new JMenuItem("New");
         JMenuItem copy = new JMenuItem("Delete");
+        JMenuItem importCOA = new JMenuItem("Import");
         cut.addActionListener(menuListener);
         copy.addActionListener(menuListener);
+        importCOA.addActionListener(menuListener);
         popupmenu.add(cut);
         popupmenu.add(copy);
-
+        popupmenu.add(importCOA);
     }
 
     private void initTree() {
@@ -359,12 +375,57 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
                     }
                 } catch (HeadlessException e) {
                     JOptionPane.showMessageDialog(Global.parentForm, e.getMessage());
-                    LOGGER.info("Save Menu :" + e.getMessage());
+                    log.info("Save Menu :" + e.getMessage());
                 }
 
             }
         }
+    }
 
+    private void importCOA() {
+        ChartOfAccount coa = (ChartOfAccount) selectedNode.getUserObject();
+        Integer cLevel = coa == null ? 0 : coa.getCoaLevel();
+        String cCode = cLevel == 2 ? coa.getCode() : null;
+        if (cCode != null) {
+            FileDialog dialog = new FileDialog(Global.parentForm, "Choose CSV File", FileDialog.LOAD);
+            dialog.setDirectory("D:\\");
+            dialog.setFile(".csv");
+            dialog.setVisible(true);
+            String directory = dialog.getFile();
+            log.info("File Path :" + directory);
+            String path = dialog.getDirectory() != null ? dialog.getDirectory() + "\\" + directory : "";
+            readFile(path, cCode);
+        }
+
+    }
+
+    private void readFile(String path, String parentCode) {
+        String line;
+        int lineCount = 0;
+        try {
+            try ( BufferedReader br = new BufferedReader(new InputStreamReader(
+                    new FileInputStream(path), "UTF8"))) {
+                while ((line = br.readLine()) != null) {
+                    ChartOfAccount coa = new ChartOfAccount();
+                    lineCount++;
+                    coa.setOption("USR");
+                    coa.setCoaLevel(3);
+                    coa.setCoaParent(parentCode);
+                    coa.setCoaNameEng(line);
+                    coa.setCompCode(Global.compCode);
+                    coa.setActive(Boolean.TRUE);
+                    coa.setCreatedDate(Util1.getTodayDate());
+                    coa.setCreatedBy(Global.loginUser.getAppUserCode());
+                    coa.setMacId(Global.machineId);
+                    coaServcie.save(coa);
+                }
+                log.info("Import Sucess : " + lineCount);
+            }
+
+        } catch (IOException e) {
+            log.error("Read CSV File :" + e.getMessage());
+
+        }
     }
 
     /**
@@ -629,7 +690,7 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
         try {
             save();
         } catch (Exception e) {
-            LOGGER.error("Save Account Group :" + e.getMessage());
+            log.error("Save Account Group :" + e.getMessage());
             JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Save Account Group", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnSaveActionPerformed
@@ -650,23 +711,23 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
 
     private void formFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_formFocusLost
         // TODO add your handling code here:
-        LOGGER.info("FOCUS LOST");
+        log.info("FOCUS LOST");
     }//GEN-LAST:event_formFocusLost
 
     private void formComponentRemoved(java.awt.event.ContainerEvent evt) {//GEN-FIRST:event_formComponentRemoved
         // TODO add your handling code here:
-        LOGGER.info("COMPONENT REMOVED");
+        log.info("COMPONENT REMOVED");
     }//GEN-LAST:event_formComponentRemoved
 
     private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
         // TODO add your handling code here:
-        LOGGER.info("COMPONENT RESIZED");
+        log.info("COMPONENT RESIZED");
 
     }//GEN-LAST:event_formComponentResized
 
     private void formComponentMoved(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentMoved
         // TODO add your handling code here:
-        LOGGER.info("COMPONENT MOVED");
+        log.info("COMPONENT MOVED");
 
     }//GEN-LAST:event_formComponentMoved
 
@@ -777,7 +838,7 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
         } else if (sourceObj instanceof JButton) {
             ctrlName = ((JButton) sourceObj).getName();
         }
-        //LOGGER.info("Control Name Key Released:" + ctrlName);
+        //log.info("Control Name Key Released:" + ctrlName);
         switch (ctrlName) {
             case "txtUsrCode":
                 if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_DOWN) {

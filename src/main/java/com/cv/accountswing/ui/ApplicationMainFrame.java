@@ -16,7 +16,6 @@ import com.cv.accountswing.common.ReloadData;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.ChartOfAccount;
 import com.cv.accountswing.entity.Currency;
-import com.cv.accountswing.entity.CurrencyKey;
 import com.cv.accountswing.entity.Department;
 import com.cv.accountswing.entity.SystemProperty;
 import com.cv.accountswing.entity.view.VRoleMenu;
@@ -40,7 +39,6 @@ import com.cv.accountswing.ui.journal.JournalStockOpening;
 import com.cv.accountswing.ui.report.AparGlReport;
 import com.cv.accountswing.ui.report.BalanceSheet;
 import com.cv.accountswing.ui.report.ProtfitAndLost;
-import com.cv.accountswing.ui.report.StockReports;
 import com.cv.accountswing.ui.setup.COAOpeningSetup;
 import com.cv.accountswing.ui.setup.ChartOfAccountSetup;
 import com.cv.accountswing.ui.setup.COASetup;
@@ -60,34 +58,7 @@ import com.cv.accountswing.ui.system.setup.RoleSetup;
 import com.cv.accountswing.ui.system.setup.SystemPropertySetup;
 import com.cv.accountswing.ui.system.setup.RoleSetting;
 import com.cv.accountswing.ui.system.setup.UserSetup;
-import com.cv.inv.entry.Adjustment;
-import com.cv.inv.entry.Damage;
-import com.cv.inv.entry.Issue;
-import com.cv.inv.entry.PurchaseEntry;
-import com.cv.inv.entry.ReturnIn;
-import com.cv.inv.entry.ReturnOut;
-import com.cv.inv.entry.StockReceive;
-import com.cv.inv.entry.Transfer;
-import com.cv.inv.service.LocationService;
-import com.cv.inv.service.SaleManService;
-import com.cv.inv.service.VouStatusService;
 import com.cv.accountswing.util.Util1;
-import com.cv.inv.entity.AccSetting;
-import com.cv.inv.entity.Location;
-import com.cv.inv.entry.CustomerGrid;
-import com.cv.inv.entry.SaleEntry;
-import com.cv.inv.entry.StockInOutEntry;
-import com.cv.inv.service.AccSettingService;
-import com.cv.inv.service.CategoryService;
-import com.cv.inv.service.ChargeTypeService;
-import com.cv.inv.service.MachineInfoService;
-import com.cv.inv.service.RelationService;
-import com.cv.inv.service.StockBrandService;
-import com.cv.inv.service.StockUnitService;
-import com.cv.inv.service.StockService;
-import com.cv.inv.service.StockTypeService;
-import com.cv.inv.setup.OtherSetup;
-import com.cv.inv.setup.StockSetup;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Image;
@@ -98,9 +69,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.DataInputStream;
 import java.io.IOException;
-import java.net.Socket;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
@@ -158,8 +127,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private String pingServer;
     @Autowired
     private MenuService menuService;
-    @Autowired
-    private AccSettingService accSettingService;
+
     @Autowired
     private CustomerSetup customerSetup;
     @Autowired
@@ -230,63 +198,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     @Autowired
     private COAOpeningSetup cOAOpeningSetup;
     @Autowired
-    private OtherSetup otherSetup;
-    //Inventory Setup
-    @Autowired
-    private StockSetup stockSetup;
-    @Autowired
-    private SaleEntry saleEntry;
-    @Autowired
-    private PurchaseEntry purchaseEntry;
-    @Autowired
-    private ReturnIn returnIn;
-    @Autowired
-    private ReturnOut returnOut;
-    @Autowired
-    private Damage damage;
-    @Autowired
-    private Transfer transfer;
-    @Autowired
-    private Adjustment adjustment;
-    @Autowired
-    private Issue issue;
-    @Autowired
-    private StockReceive stockReceive;
-    @Autowired
-    private StockInOutEntry stockInOut;
-    @Autowired
-    private StockReports stockReports;
-    @Autowired
-    private LocationService locationService;
-    @Autowired
-    private VouStatusService vouService;
-    @Autowired
-    private SaleManService saleManService;
-    @Autowired
-    private StockService stockService;
-    @Autowired
     private Default defaultMap;
-
-    @Autowired
-    private StockUnitService stockUnitService;
-    @Autowired
-    private RelationService relationService;
-    @Autowired
-    private ChargeTypeService chargeTypeService;
-    @Autowired
-    private SystemPropertyService systemPropertyService;
-    @Autowired
-    private MachineInfoService machineInfoService;
-    @Autowired
-    private StockTypeService stockTypeService;
-    @Autowired
-    private CategoryService categoryService;
-    @Autowired
-    private StockBrandService stockBrandService;
-    @Autowired
-    private VouStatusService vouStatusService;
-    @Autowired
-    private CustomerGrid customerGrid;
     @Autowired
     private RoleSetting roleSetting;
     @Autowired
@@ -295,6 +207,8 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private StaffSetup staffSetup;
     @Autowired
     private Mapping mapping;
+    @Autowired 
+    private SystemPropertyService systemPropertyService;
     private PanelControl control;
     private FilterObserver filterObserver;
 
@@ -384,15 +298,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                         cOAOpeningSetup.setName(menuName);
                         cOAOpeningSetup.setLoadingObserver(this);
                         return cOAOpeningSetup;
-                    //Inventory Menu
-                    case "Stock":
-                        stockSetup.setName(menuName);
-                        stockSetup.setLoadingObserver(this);
-                        return stockSetup;
-                    case "Other":
-                        otherSetup.setName(menuName);
-                        otherSetup.setLoadingObserver(this);
-                        return otherSetup;
                     default:
                         return null;
                 }
@@ -427,7 +332,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             case "DayBook":
                 switch (menuName) {
                     case "Purchase":
-                        String sourcePur = getSourceAccount("Purchase");
+                        String sourcePur = sourceId;
                         if (!sourcePur.equals("-")) {
                             purchaseBook.setName(menuName);
                             purchaseBook.setLoadingObserver(this);
@@ -437,7 +342,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                             return null;
                         }
                     case "Sale":
-                        String sourceAcc = getSourceAccount("Sale");
+                        String sourceAcc = sourceId;
                         if (!sourceAcc.equals("-")) {
                             saleBook.setName(menuName);
                             saleBook.setLoadingObserver(this);
@@ -472,62 +377,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                         debitVoucher.setName(menuName);
                         debitVoucher.setLoadingObserver(this);
                         return debitVoucher;
-                    default:
-                        return null;
-                }
-            case "Inventory":
-                switch (menuName) {
-                    case "Sale Entry":
-                        saleEntry.setName(menuName);
-                        saleEntry.initMain();
-                        saleEntry.setLoadingObserver(this);
-                        return saleEntry;
-                    case "Purchase Entry":
-                        purchaseEntry.setName(menuName);
-                        purchaseEntry.initMain();
-                        purchaseEntry.setLoadingObserver(this);
-                        return purchaseEntry;
-                    case "Return In":
-                        returnIn.setName(menuName);
-                        returnIn.setLoadingObserver(this);
-                        return returnIn;
-                    case "Return Out":
-                        returnOut.setName(menuName);
-                        returnOut.setLoadingObserver(this);
-                        return returnOut;
-                    case "Damage":
-                        damage.setName(menuName);
-                        damage.setLoadingObserver(this);
-                        return damage;
-                    case "Transfer":
-                        transfer.setName(menuName);
-                        transfer.setLoadingObserver(this);
-                        return transfer;
-                    case "Adjustment":
-                        adjustment.setName(menuName);
-                        adjustment.setLoadingObserver(this);
-                        return adjustment;
-                    case "Issue":
-                        issue.setName(menuName);
-                        issue.setLoadingObserver(this);
-                        return issue;
-                    case "Receive":
-                        stockReceive.setName(menuName);
-                        stockReceive.setLoadingObserver(this);
-                        return stockReceive;
-                    case "Manage Project":
-                        manageProjectSetup.setName(menuName);
-                        manageProjectSetup.setLoadingObserver(this);
-                        return manageProjectSetup;
-                    case "Stock In/Out":
-                        stockInOut.setName(menuName);
-                        stockInOut.initMain();
-                        return stockInOut;
-                    case "Customer List":
-                        customerGrid.setName(menuName);
-                        customerGrid.setObserver(this);
-                        customerGrid.initMain();
-                        return customerGrid;
                     default:
                         return null;
                 }
@@ -582,8 +431,8 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                         balanceSheet.setLoadingObserver(this);
                         return balanceSheet;
                     case "Stock Report":
-                        stockReports.setName(menuName);
-                        return stockReports;
+                        //stockReports.setName(menuName);
+                        //return stockReports;
                     default:
                         return null;
                 }
@@ -763,7 +612,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         lblCompanyName.setText(Global.companyName);
         try {
 
-            Global.listStock = stockService.findAll();
             Global.listAppUser = userService.search("-", "-", "-", "-");
             //coa
             List<ChartOfAccount> roleCOA = mapping.getRoleCOA(Global.roleCode);
@@ -779,19 +627,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             Global.listCustomer = customerService.search("-", "-", "-", "-", Global.compCode);
             Global.listSupplier = supplierService.search("-", "-", "-", "-", Global.compCode);
             Global.listTrader = traderService.searchTrader("-", "-", "-", "-", "-", Global.compCode, "-");
-            //location
-            List<Location> roleLocaiton = mapping.getRoleLocaiton(Global.roleCode);
-            Global.listLocation = roleLocaiton.isEmpty() ? locationService.findAll(Global.compCode) : roleLocaiton;
-            //voucher
 
-            //Global.listVou = vouService.findAll();
-            //Global.listSaleMan = saleManService.findAll();
-            //Global.listStockUnit = stockUnitService.findAll();
-            //Global.listRelation = relationService.findAll();
-            //Global.listMachine = machineInfoService.findAll();
-            //Global.listStockType = stockTypeService.findAll();
-            //Global.listCategory = categoryService.findAll();
-            //Global.listStockBrand = stockBrandService.findAll();
             Global.listRegion = regionService.search("-", "-", Global.compCode, "-");
 
             /*if (Global.listRelation != null) {
@@ -803,7 +639,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
             //Default department
             Global.defaultDepartment = defaultMap.getDepartment(Global.roleCode);
             //Defatult Loction
-            Global.defaultLocation = defaultMap.getLocation(Global.roleCode);
 
             //Default VouStatus
             //Default Customer
@@ -957,35 +792,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         detector.setNetworkObserver(this);
         detector.setIpAddress(pingServer);
         scheduler.scheduleAtFixedRate(detector, Duration.ofSeconds(10));
-        startPhoneService();
-    }
-
-    private void startPhoneService() {
-        String open = Util1.isNull(Global.sysProperties.get("system.phone.service"), "-");
-        if (open.equals("1")) {
-            Thread socketThread = new Thread(() -> {
-                LOGGER.info("Phone Serivce Thread Started.");
-                try {
-                    while (true) {
-                        try ( Socket s = Global.sock.accept()) {
-                            DataInputStream dis = new DataInputStream(s.getInputStream());
-                            String phoneNo = (String) dis.readUTF();
-                            if (!phoneNo.isEmpty()) {
-                                customerGrid.setPhoneNumber(phoneNo);
-                            }
-                        }
-                    }
-                    /*EchoThread echoThread = new EchoThread(socket);
-                        echoThread.setCustomerGrid(customerGrid);
-                        echoThread.start();*/
-                } catch (IOException e) {
-                    LOGGER.error("Sockket Accept Error :" + e.getMessage());
-                }
-                // new thread for a client
-
-            });
-            socketThread.start();
-        }
     }
 
     private void addMargin() {
@@ -996,17 +802,6 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
         }
         revalidate();
         repaint();
-    }
-
-    private String getSourceAccount(String option) {
-        String sourceAcc = "-";
-        AccSetting setting = accSettingService.findByCode(option);
-        if (setting != null) {
-            if (setting.getSoureAccount() != null) {
-                sourceAcc = setting.getSoureAccount().getCode();
-            }
-        }
-        return sourceAcc;
     }
 
     @SuppressWarnings("unchecked")

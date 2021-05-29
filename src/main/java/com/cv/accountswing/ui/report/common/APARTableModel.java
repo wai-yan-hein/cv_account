@@ -111,16 +111,21 @@ public class APARTableModel extends AbstractTableModel {
 
     public void setListAPAR(List<VApar> listAPAR) {
         this.listAPAR = listAPAR;
-        for (VApar apar : this.listAPAR) {
+        this.listAPAR.stream().map(apar -> {
             if (Util1.getDouble(apar.getDrAmt()) >= Util1.getDouble(apar.getCrAmt())) {
                 apar.setDrAmt(Util1.getDouble(apar.getDrAmt() - apar.getCrAmt()));
                 apar.setCrAmt(0.0);
             }
-            if (Util1.getDouble(apar.getCrAmt()) > Util1.getDouble(apar.getDrAmt())) {
-                apar.setCrAmt(Util1.getDouble(apar.getCrAmt()) - Util1.getDouble(apar.getDrAmt()));
-                apar.setDrAmt(0.0);
-            }
-        }
+            return apar;
+        }).filter(apar -> (Util1.getDouble(apar.getCrAmt()) > Util1.getDouble(apar.getDrAmt()))).map(apar -> {
+            apar.setCrAmt(Util1.getDouble(apar.getCrAmt()) - Util1.getDouble(apar.getDrAmt()));
+            return apar;
+        }).forEachOrdered(apar -> {
+            apar.setDrAmt(0.0);
+        });
+        listAPAR.removeIf((t) -> {
+            return t.getDrAmt() + t.getCrAmt() == 0;
+        });
         fireTableDataChanged();
     }
 

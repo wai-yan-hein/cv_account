@@ -17,6 +17,7 @@ import com.cv.accountswing.entity.view.VGl;
 import com.cv.accountswing.entity.view.VRef;
 import com.cv.accountswing.service.GlService;
 import com.cv.accountswing.service.MessagingService;
+import com.cv.accountswing.service.RoleStatusService;
 import com.cv.accountswing.service.TraderService;
 import com.cv.accountswing.util.Util1;
 import com.google.gson.Gson;
@@ -46,7 +47,8 @@ public class AllCashTableModel extends AbstractTableModel {
     private List<VGl> listVGl = new ArrayList();
     private String[] columnNames = {"Date", "Dept:", "Description", "Ref :", "Person", "Account", "Curr", "Cash In / Dr", "Cash Out / Cr"};
     private final Gson gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
-
+    @Autowired
+    private RoleStatusService statusService;
     @Autowired
     private GlService glService;
     @Autowired
@@ -85,13 +87,7 @@ public class AllCashTableModel extends AbstractTableModel {
     @Override
     public boolean isCellEditable(int row, int column) {
         VGl vgl = listVGl.get(row);
-        Integer splidId = vgl.getSplitId();
-        if (splidId != null) {
-            if (splidId == 2 || splidId == 3 || splidId == 5 || splidId == 6) {
-                return false;
-            }
-        }
-        return column != 6;
+        return vgl.getVouNo() == null;
     }
 
     @Override
@@ -289,15 +285,12 @@ public class AllCashTableModel extends AbstractTableModel {
     private void save(VGl vgl, int row, int column) {
         if (isValidEntry(vgl, row, column)) {
             try {
-                vgl.setSourceAcId(sourceAccId);
                 String strVGL = gson.toJson(vgl);
                 Gl gl = gson.fromJson(strVGL, Gl.class);
-                if (gl.getCompCode() == null) {
-                    LOGGER.info("Null");
-                }
-                gl.setMacId(Global.machineId);
-                gl.setCompCode(Global.compCode);
-                if (gl.getGlCode() == null) {
+                gl.setSourceAcId(sourceAccId);
+                if (Util1.isNull(gl.getGlCode())) {
+                    gl.setMacId(Global.machineId);
+                    gl.setCompCode(Global.compCode);
                     gl.setCreatedBy(Global.loginUser.getAppUserCode());
                     gl.setCreatedDate(Util1.getTodayDate());
                 } else {
@@ -307,6 +300,10 @@ public class AllCashTableModel extends AbstractTableModel {
                 if (glSave != null) {
                     VGl saveVGl = listVGl.get(row);
                     saveVGl.setGlCode(glSave.getGlCode());
+                    saveVGl.setCreatedBy(glSave.getCreatedBy());
+                    saveVGl.setModifyBy(glSave.getModifyBy());
+                    saveVGl.setCompCode(glSave.getCompCode());
+                    saveVGl.setMacId(glSave.getMacId());
                     addNewRow();
                     parent.setRowSelectionInterval(row + 1, row + 1);
                     parent.setColumnSelectionInterval(1, 1);
@@ -338,16 +335,21 @@ public class AllCashTableModel extends AbstractTableModel {
             parent.setColumnSelectionInterval(7, 7);
             parent.setRowSelectionInterval(row, row);*/
         }
-        if (vgl.getDeptId() == null) {
+        if (Util1.isNull(vgl.getDeptId())) {
             status = false;
             if (column > 1) {
                 JOptionPane.showMessageDialog(Global.parentForm, "Missing Department.");
                 parent.setColumnSelectionInterval(1, 1);
                 parent.setRowSelectionInterval(row, row);
-
             }
         }
-
+        if (!Util1.isNull(vgl.getGlCode())) {
+            if (statusService.checkPermission(Global.roleCode, Global.CB_DEL_USR_KEY)) {
+                status = vgl.getCreatedBy().equals(Global.loginUser.getAppUserCode());
+            } else {
+                status = statusService.checkPermission(Global.roleCode, Global.CB_DEL_KEY);
+            }
+        }
         return status;
     }
 
@@ -421,11 +423,12 @@ public class AllCashTableModel extends AbstractTableModel {
             VGl vgl = listVGl.get(row);
             try {
                 if (vgl.getGlCode() != null) {
-                    int delete = glService.delete(vgl.getGlCode(), "GL-DELETE");
+                    String userCode = Global.loginUser.getAppUserCode();
+                    int delete = glService.delete(vgl.getGlCode(), "GL-DELETE", userCode, Global.machineId);
                     if (delete == 1) {
                         listVGl.remove(row);
                         if (vgl.getTraderCode() != null) {
-                            trader = traderService.findById(vgl.getTraderCode());
+                            //trader = traderService.findById(vgl.getTraderCode());
                             sendDeletePaymentToInv(trader, vgl.getGlCode());
                         }
                         fireTableRowsDeleted(row, row);

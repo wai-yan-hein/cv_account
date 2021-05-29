@@ -6,6 +6,7 @@
 package com.cv.accountswing.ui.cash;
 
 import com.cv.accountswing.common.ColorUtil;
+import com.cv.accountswing.common.FilterObserver;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
@@ -22,10 +23,9 @@ import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.editor.COACellEditor;
 import com.cv.accountswing.ui.filter.FilterPanel;
 import com.cv.accountswing.util.Util1;
-import com.cv.inv.entry.PurchaseEntry;
-import com.cv.inv.entry.SaleEntry;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -43,6 +43,8 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
+import net.coderazzi.filters.gui.AutoChoices;
+import net.coderazzi.filters.gui.TableFilterHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,17 +56,19 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObserver, PanelControl {
+public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObserver, PanelControl, FilterObserver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SalePurchaseBook.class);
-    String stDate;
-    String enDate;
-    String desp;
-    String accId;
-    String ref;
-    String depCode;
-    String traderName;
-    String currency;
+    private String stDate;
+    private String enDate;
+    private String desp;
+    private String accId;
+    private String ref;
+    private String depCode;
+    private String traderName;
+    private String currency;
+    private String traderCode;
+    private String traderType;
     String debAmt;
     String crdAmt;
     @Autowired
@@ -76,10 +80,6 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
     @Autowired
     private SalePurchaseTableModel spTableModel;
     private SaleEntryDialog saleEntryDialog;
-    @Autowired
-    private SaleEntry saleEntry;
-    @Autowired
-    private PurchaseEntry purchaseEntry;
 
     private TableRowSorter<TableModel> sorter;
     private SelectionObserver selectionObserver;
@@ -88,6 +88,7 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
     private JPopupMenu popupmenu;
     private boolean isShown = false;
     private String panelName;
+    private TableFilterHeader filterHeader;
 
     public void setIsShown(boolean isShown) {
         this.isShown = isShown;
@@ -201,6 +202,10 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
         tblCash.getActionMap().put("ENTER-Action", actionTblCash);*/
         tblCash.getInputMap().put(KeyStroke.getKeyStroke("F8"), "F8-Action");
         tblCash.getActionMap().put("F8-Action", actionItemDeleteExp);
+        filterHeader = new TableFilterHeader(tblCash, AutoChoices.ENABLED);
+        filterHeader.setPosition(TableFilterHeader.Position.TOP);
+        filterHeader.setFont(Global.textFont);
+        filterHeader.setVisible(false);
     }
 
     private void initPopup() {
@@ -309,29 +314,34 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
     }
 
     private void searchCash() {
-        initializeParameter();
-        loadingObserver.load(this.getName(), "Start");
-        if (sourceAccId != null) {
-            taskExecutor.execute(() -> {
-                LOGGER.info(sourceAccId + "----- Searching...");
-                List<VGl> listVGl = vGlService.search(stDate, enDate,
-                        desp, sourceAccId,
-                        accId, currency, "-",
-                        ref, depCode, "-", "-",
-                        "-", "-", "-", "-", "-",
-                        traderName, "-", "-",
-                        debAmt,
-                        crdAmt);
-                swapData(listVGl, sourceAccId);
-                spTableModel.setListVGl(listVGl);
-                spTableModel.addNewRow();
-                requestFoucsTable();
-                calTotalAmt();
-                LOGGER.info(sourceAccId + "----- Finished...");
-            });
-        } else {
-            JOptionPane.showMessageDialog(Global.parentForm, "Source Account Missing.");
-            loadingObserver.load(this.getName(), "Stop");
+        try {
+            initializeParameter();
+            if (sourceAccId != null) {
+                loadingObserver.load(this.getName(), "Start");
+                taskExecutor.execute(() -> {
+                    LOGGER.info(this.getName() + "Start Date  :" + stDate + "-" + "End Date :" + enDate);
+                    List<VGl> listVGl = vGlService.search(stDate, enDate,
+                            desp, sourceAccId,
+                            accId, currency, "-",
+                            ref, depCode, "-", traderCode,
+                            "-", "-", "-", "-", "-",
+                            "-", "-", "-",
+                            traderType,
+                            "-");
+                    LOGGER.info("Search Cash Book End ...");
+                    swapData(listVGl, sourceAccId);
+                    spTableModel.setListVGl(listVGl);
+                    spTableModel.addNewRow();
+                    requestFoucsTable();
+                    calTotalAmt();
+                    loadingObserver.load(this.getName(), "Stop");
+                });
+            } else {
+                JOptionPane.showMessageDialog(Global.parentForm, "Source Account Missing.");
+            }
+        } catch (HeadlessException e) {
+            LOGGER.error("Search Cash :" + e.getMessage());
+            JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Searching Cash", JOptionPane.ERROR_MESSAGE);
         }
 
     }
@@ -344,9 +354,8 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
         currency = Util1.isNull(currency, "-");
         ref = Util1.isNull(ref, "-");
         depCode = Util1.isNull(depCode, "-");
-        traderName = Util1.isNull(traderName, "-");
-        debAmt = Util1.isNull(debAmt, "-");
-        crdAmt = Util1.isNull(crdAmt, "-");
+        traderCode = Util1.isNull(traderCode, "-");
+        traderType = Util1.isNull(traderType, "-");
         clearTextBox();
     }
 
@@ -519,32 +528,17 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
         mainFrame.setControl(this);
-
+        mainFrame.setFilterObserver(this);
         if (!isShown) {
             initMain();
         } else {
-            requestFoucsTable();
+            //requestFoucsTable();
         }
-        searchCash();
-
     }//GEN-LAST:event_formComponentShown
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        saleEntryDialog = new SaleEntryDialog();
-        saleEntryDialog.setLayout(new BorderLayout());
-        if (this.getName().equals("Sale")) {
-            saleEntry.initMain();
-            saleEntryDialog.add(saleEntry, BorderLayout.CENTER);
-            saleEntryDialog.setTitle("Sale Entry");
-        } else {
-            purchaseEntry.initMain();
-            saleEntryDialog.add(purchaseEntry, BorderLayout.CENTER);
-            saleEntryDialog.setName("Purchase Entry");
-        }
-        saleEntryDialog.setSize(Global.width - 100, Global.height - 100);
-        saleEntryDialog.setLocationRelativeTo(null);
-        saleEntryDialog.setVisible(true);
+
     }//GEN-LAST:event_jButton1ActionPerformed
 
 
@@ -560,17 +554,11 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
 
     private void calTotalAmt() {
         List<VGl> listVGl = spTableModel.getListVGl();
-        float ttlAmt = 0.0f;
+        double ttlAmt = 0.0f;
         if (panelName.equals("Sale")) {
-            for (VGl vgl : listVGl) {
-                ttlAmt += Util1.getFloat(vgl.getCrAmt());
-                //cdAmt += Util1.getDouble(vgl.getCrAmt());
-            }
+            ttlAmt = listVGl.stream().map(vgl -> Util1.getDouble(vgl.getCrAmt())).reduce(ttlAmt, (accumulator, _item) -> accumulator + _item); //cdAmt += Util1.getDouble(vgl.getCrAmt());
         } else {
-            for (VGl vgl : listVGl) {
-                ttlAmt += Util1.getFloat(vgl.getDrAmt());
-                //cdAmt += Util1.getDouble(vgl.getCrAmt());
-            }
+            ttlAmt = listVGl.stream().map(vgl -> Util1.getDouble(vgl.getDrAmt())).reduce(ttlAmt, (accumulator, _item) -> accumulator + _item); //cdAmt += Util1.getDouble(vgl.getCrAmt());
         }
         txtFTotalAmt.setValue(ttlAmt);
         loadingObserver.load(this.getName(), "Stop");
@@ -635,7 +623,6 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
     }
 
     private void searchValidation(String str) {
-
         searchCash();
     }
 
@@ -664,6 +651,15 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
 
     @Override
     public void print() {
+    }
+
+    @Override
+    public void sendFilter(String filter) {
+        if (filterHeader.isVisible()) {
+            filterHeader.setVisible(false);
+        } else {
+            filterHeader.setVisible(true);
+        }
     }
 
 }

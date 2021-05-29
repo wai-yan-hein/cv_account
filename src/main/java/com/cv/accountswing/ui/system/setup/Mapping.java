@@ -27,20 +27,8 @@ import com.cv.accountswing.ui.editor.COACellEditor;
 import com.cv.accountswing.ui.editor.CurrencyEditor;
 import com.cv.accountswing.ui.editor.DepartmentCellEditor;
 import com.cv.accountswing.ui.editor.TraderCellEditor;
+import com.cv.accountswing.ui.setup.common.CurrencyTableModel1;
 import com.cv.accountswing.ui.system.setup.common.COARoleTableModel;
-import com.cv.inv.entity.Location;
-import com.cv.inv.entity.SaleMan;
-import com.cv.inv.entity.VouStatus;
-import com.cv.inv.entry.common.CurrencyTableModel;
-import com.cv.inv.entry.common.LocationTableModel;
-import com.cv.inv.entry.editor.LocationCellEditor;
-import com.cv.inv.entry.editor.SaleManCellEditor;
-import com.cv.inv.entry.editor.VouStatusCellEditor;
-import com.cv.inv.service.LocationService;
-import com.cv.inv.service.SaleManService;
-import com.cv.inv.service.VouStatusService;
-import com.cv.inv.setup.dialog.common.SaleManTableModel;
-import com.cv.inv.setup.dialog.common.VouStatusTableModel;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,13 +46,10 @@ import org.springframework.stereotype.Component;
 public class Mapping extends javax.swing.JPanel implements PanelControl {
 
     private DepartmentTableModel departmentTableModel;
-    private LocationTableModel locationTableModel;
-    private CurrencyTableModel currencyTableModel;
     private TraderTableModel supplierTableModel;
     private TraderTableModel customerTableModel;
-    private VouStatusTableModel vouStatusTableModel;
-    private SaleManTableModel saleManTableModel;
     private COARoleTableModel coaTableModel;
+    private CurrencyTableModel1 currencyTabelModel;
     @Autowired
     private UserSettingService userSettingService;
     @Autowired
@@ -72,17 +57,11 @@ public class Mapping extends javax.swing.JPanel implements PanelControl {
     @Autowired
     private DepartmentService departmentService;
     @Autowired
-    private LocationService locationService;
-    @Autowired
     private CurrencyService currencyService;
     @Autowired
     private ApplicationMainFrame mainFrame;
     @Autowired
     private TraderService traderService;
-    @Autowired
-    private VouStatusService vouStatusService;
-    @Autowired
-    private SaleManService saleManService;
     @Autowired
     private COAService cOAService;
     private static final Logger log = LoggerFactory.getLogger(Mapping.class);
@@ -100,8 +79,6 @@ public class Mapping extends javax.swing.JPanel implements PanelControl {
         initTableCurrency();
         initTableCustomer();
         initTableSupplier();
-        initTableVoucher();
-        initTableSaleMan();
         initTableCOA();
     }
 
@@ -119,23 +96,14 @@ public class Mapping extends javax.swing.JPanel implements PanelControl {
     }
 
     private void initTableLocation() {
-        locationTableModel = new LocationTableModel();
-        locationTableModel.addNewRow();
-        locationTableModel.setTable(tblLocation);
-        tblLocation.setModel(locationTableModel);
-        tblLocation.getColumnModel().getColumn(0).setCellEditor(new LocationCellEditor());
-        tblLocation.getColumnModel().getColumn(0).setCellEditor(new LocationCellEditor());
-        tblLocation.getColumnModel().getColumn(0).setPreferredWidth(10);
-        tblLocation.getColumnModel().getColumn(1).setPreferredWidth(100);
-        tblLocation.setDefaultRenderer(Object.class, new TableCellRender());
-        tblLocation.getTableHeader().setFont(Global.tblHeaderFont);
+
     }
 
     private void initTableCurrency() {
-        currencyTableModel = new CurrencyTableModel();
-        currencyTableModel.addNewRow();
-        currencyTableModel.setTable(tblCurrency);
-        tblCurrency.setModel(currencyTableModel);
+        currencyTabelModel = new CurrencyTableModel1();
+        currencyTabelModel.addNewRow();
+        currencyTabelModel.setTable(tblCurrency);
+        tblCurrency.setModel(currencyTabelModel);
         tblCurrency.getColumnModel().getColumn(0).setCellEditor(new CurrencyEditor());
         tblCurrency.getColumnModel().getColumn(0).setCellEditor(new CurrencyEditor());
         tblCurrency.getColumnModel().getColumn(0).setPreferredWidth(10);
@@ -171,28 +139,6 @@ public class Mapping extends javax.swing.JPanel implements PanelControl {
         tblSupplier.getTableHeader().setFont(Global.tblHeaderFont);
     }
 
-    private void initTableVoucher() {
-        vouStatusTableModel = new VouStatusTableModel();
-        vouStatusTableModel.addNewRow();
-        tblVoucher.setModel(vouStatusTableModel);
-        tblVoucher.getColumnModel().getColumn(0).setCellEditor(new VouStatusCellEditor());
-        tblVoucher.getColumnModel().getColumn(0).setCellEditor(new VouStatusCellEditor());
-        tblVoucher.setDefaultRenderer(Object.class, new TableCellRender());
-        tblVoucher.getTableHeader().setFont(Global.tblHeaderFont);
-
-    }
-
-    private void initTableSaleMan() {
-        saleManTableModel = new SaleManTableModel();
-        saleManTableModel.addNewRow();
-        saleManTableModel.setTable(tblSaleMan);
-        tblSaleMan.setModel(saleManTableModel);
-        tblSaleMan.getColumnModel().getColumn(0).setCellEditor(new SaleManCellEditor());
-        tblSaleMan.getColumnModel().getColumn(0).setCellEditor(new SaleManCellEditor());
-        tblSaleMan.setDefaultRenderer(Object.class, new TableCellRender());
-        tblSaleMan.getTableHeader().setFont(Global.tblHeaderFont);
-    }
-
     private void initTableCOA() {
         coaTableModel = new COARoleTableModel();
         coaTableModel.addNewRow();
@@ -213,17 +159,6 @@ public class Mapping extends javax.swing.JPanel implements PanelControl {
             });
         }
         return departments;
-    }
-
-    public List<Location> getRoleLocaiton(String roleCode) {
-        List<Location> locations = new ArrayList<>();
-        List<UserDefault> listLoc = userSettingService.search(roleCode, Global.compCode, Global.LOC_LIST_KEY);
-        if (!listLoc.isEmpty()) {
-            listLoc.stream().map(ud -> locationService.findById(ud.getKey().getValue())).filter(loc -> (loc != null)).forEachOrdered(loc -> {
-                locations.add(loc);
-            });
-        }
-        return locations;
     }
 
     public List<Currency> getRoleCurrency(String roleCode) {
@@ -259,28 +194,6 @@ public class Mapping extends javax.swing.JPanel implements PanelControl {
         return customers;
     }
 
-    public List<VouStatus> getRoleVoucherStatus(String roleCode) {
-        List<VouStatus> vouchers = new ArrayList<>();
-        List<UserDefault> listVOu = userSettingService.search(roleCode, Global.compCode, Global.VOU_LIST_KEY);
-        if (!listVOu.isEmpty()) {
-            listVOu.stream().filter(ud -> (ud.getKey() != null)).map(ud -> vouStatusService.findById(ud.getKey().getValue())).filter(vs -> (vs != null)).forEachOrdered(vs -> {
-                vouchers.add(vs);
-            });
-        }
-        return vouchers;
-    }
-
-    public List<SaleMan> getRoleSaleMan(String roleCode) {
-        List<SaleMan> saleMen = new ArrayList<>();
-        List<UserDefault> listSM = userSettingService.search(roleCode, Global.compCode, Global.SALE_LIST_KEY);
-        if (!listSM.isEmpty()) {
-            listSM.stream().filter(ud -> (ud.getKey() != null)).map(ud -> saleManService.findById(ud.getKey().getValue())).filter(sm -> (sm != null)).forEachOrdered(sm -> {
-                saleMen.add(sm);
-            });
-        }
-        return saleMen;
-    }
-
     public List<ChartOfAccount> getRoleCOA(String roleCode) {
         List<ChartOfAccount> coas = new ArrayList<>();
         List<UserDefault> listSM = userSettingService.search(roleCode, Global.compCode, Global.COA_LIST_KEY);
@@ -298,12 +211,6 @@ public class Mapping extends javax.swing.JPanel implements PanelControl {
             //Department
             departmentTableModel.setListDep(getRoleDepartment(roleCode));
             departmentTableModel.addNewRow();
-            //Location
-            locationTableModel.setListLocation(getRoleLocaiton(roleCode));
-            locationTableModel.addNewRow();
-            //Currency
-            currencyTableModel.setListCurrency(getRoleCurrency(roleCode));
-            currencyTableModel.addNewRow();
             //Supplier
             supplierTableModel.setListTrader(getRoleSupplier(roleCode));
             supplierTableModel.addNewRow();
@@ -311,12 +218,6 @@ public class Mapping extends javax.swing.JPanel implements PanelControl {
             //Customer
             customerTableModel.setListTrader(getRoleCustomer(roleCode));
             customerTableModel.addNewRow();
-            //Voucher Status
-            vouStatusTableModel.setListVou(getRoleVoucherStatus(roleCode));
-            vouStatusTableModel.addNewRow();
-            //Sale Man
-            saleManTableModel.setListSaleMan(getRoleSaleMan(roleCode));
-            saleManTableModel.addNewRow();
             //coa
             coaTableModel.setListCOA(getRoleCOA(roleCode));
             coaTableModel.addNewRow();
@@ -346,26 +247,9 @@ public class Mapping extends javax.swing.JPanel implements PanelControl {
                 });
 
             }
-            //Location
-            List<Location> listLoc = locationTableModel.getListLocation();
-            if (!listLoc.isEmpty()) {
-                userSettingService.delete(roleCode, Global.compCode, Global.LOC_LIST_KEY);
-                listLoc.stream().filter(loc -> (loc.getLocationCode() != null)).map(loc -> {
-                    UserDefault ud = new UserDefault();
-                    UserDefaultKey key = new UserDefaultKey();
-                    key.setCompCode(Global.compCode);
-                    key.setKey(Global.LOC_LIST_KEY);
-                    key.setRoleCode(roleCode);
-                    key.setValue(loc.getLocationCode());
-                    ud.setKey(key);
-                    return ud;
-                }).forEachOrdered(ud -> {
-                    userSettingService.save(ud);
-                });
 
-            }
             //Currency
-            List<Currency> listCur = currencyTableModel.getListCurrency();
+            List<Currency> listCur = currencyTabelModel.getListCurrency();
             if (!listCur.isEmpty()) {
                 userSettingService.delete(roleCode, Global.compCode, Global.CUR_LIST_KEY);
                 listCur.stream().filter(cur -> (cur.getKey() != null)).filter(cur -> (cur.getKey().getCode() != null)).map(cur -> {
@@ -492,15 +376,6 @@ public class Mapping extends javax.swing.JPanel implements PanelControl {
         jPanel4 = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
         tblCurrency = new javax.swing.JTable();
-        jPanel5 = new javax.swing.JPanel();
-        jScrollPane5 = new javax.swing.JScrollPane();
-        tblLocation = new javax.swing.JTable();
-        jPanel6 = new javax.swing.JPanel();
-        jScrollPane6 = new javax.swing.JScrollPane();
-        tblVoucher = new javax.swing.JTable();
-        jPanel7 = new javax.swing.JPanel();
-        jScrollPane7 = new javax.swing.JScrollPane();
-        tblSaleMan = new javax.swing.JTable();
         jPanel8 = new javax.swing.JPanel();
         jScrollPane8 = new javax.swing.JScrollPane();
         tblCOA = new javax.swing.JTable();
@@ -538,14 +413,14 @@ public class Mapping extends javax.swing.JPanel implements PanelControl {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                .addComponent(jScrollPane1)
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                .addComponent(jScrollPane1)
                 .addContainerGap())
         );
 
@@ -576,14 +451,14 @@ public class Mapping extends javax.swing.JPanel implements PanelControl {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                .addComponent(jScrollPane2)
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                .addComponent(jScrollPane2)
                 .addContainerGap())
         );
 
@@ -614,14 +489,14 @@ public class Mapping extends javax.swing.JPanel implements PanelControl {
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE)
+                .addComponent(jScrollPane3)
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 131, Short.MAX_VALUE)
+                .addComponent(jScrollPane3)
                 .addContainerGap())
         );
 
@@ -652,128 +527,14 @@ public class Mapping extends javax.swing.JPanel implements PanelControl {
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                .addComponent(jScrollPane4)
                 .addContainerGap())
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-
-        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Location", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Arial", 0, 12))); // NOI18N
-
-        tblLocation.setFont(Global.textFont);
-        tblLocation.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {},
-                {},
-                {},
-                {}
-            },
-            new String [] {
-
-            }
-        ));
-        tblLocation.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                tblLocationKeyReleased(evt);
-            }
-        });
-        jScrollPane5.setViewportView(tblLocation);
-
-        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
-        jPanel5.setLayout(jPanel5Layout);
-        jPanel5Layout.setHorizontalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 192, Short.MAX_VALUE)
-                .addGap(7, 7, 7))
-        );
-        jPanel5Layout.setVerticalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-
-        jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Voucher Status", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Arial", 0, 12))); // NOI18N
-
-        tblVoucher.setFont(Global.textFont);
-        tblVoucher.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {},
-                {},
-                {},
-                {}
-            },
-            new String [] {
-
-            }
-        ));
-        tblVoucher.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                tblVoucherKeyReleased(evt);
-            }
-        });
-        jScrollPane6.setViewportView(tblVoucher);
-
-        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
-        jPanel6.setLayout(jPanel6Layout);
-        jPanel6Layout.setHorizontalGroup(
-            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel6Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-        jPanel6Layout.setVerticalGroup(
-            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel6Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 131, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-
-        jPanel7.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Sale Man", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Arial", 0, 12))); // NOI18N
-
-        tblSaleMan.setFont(Global.textFont);
-        tblSaleMan.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {},
-                {},
-                {},
-                {}
-            },
-            new String [] {
-
-            }
-        ));
-        tblSaleMan.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                tblSaleManKeyReleased(evt);
-            }
-        });
-        jScrollPane7.setViewportView(tblSaleMan);
-
-        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
-        jPanel7.setLayout(jPanel7Layout);
-        jPanel7Layout.setHorizontalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel7Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 193, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-        jPanel7Layout.setVerticalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel7Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 131, Short.MAX_VALUE)
+                .addComponent(jScrollPane4)
                 .addContainerGap())
         );
 
@@ -804,14 +565,14 @@ public class Mapping extends javax.swing.JPanel implements PanelControl {
             jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel8Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 192, Short.MAX_VALUE)
+                .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                 .addGap(7, 7, 7))
         );
         jPanel8Layout.setVerticalGroup(
             jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel8Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                .addComponent(jScrollPane8)
                 .addContainerGap())
         );
 
@@ -822,18 +583,14 @@ public class Mapping extends javax.swing.JPanel implements PanelControl {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel8, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -846,13 +603,9 @@ public class Mapping extends javax.swing.JPanel implements PanelControl {
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -893,43 +646,13 @@ public class Mapping extends javax.swing.JPanel implements PanelControl {
 
     private void tblCurrencyKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tblCurrencyKeyReleased
         // TODO add your handling code here:
-        if (evt.getKeyCode() == KeyEvent.VK_DELETE) {
-            if (tblCurrency.getSelectedRow() >= 0) {
-                int row = tblCurrency.convertRowIndexToModel(tblCurrency.getSelectedRow());
-                currencyTableModel.delete(row);
-            }
+        /* if (evt.getKeyCode() == KeyEvent.VK_DELETE) {
+        if (tblCurrency.getSelectedRow() >= 0) {
+        int row = tblCurrency.convertRowIndexToModel(tblCurrency.getSelectedRow());
+        currencyTableModel.delete(row);
         }
+        }*/
     }//GEN-LAST:event_tblCurrencyKeyReleased
-
-    private void tblLocationKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tblLocationKeyReleased
-        // TODO add your handling code here:
-        if (evt.getKeyCode() == KeyEvent.VK_DELETE) {
-            if (tblLocation.getSelectedRow() >= 0) {
-                int row = tblLocation.convertRowIndexToModel(tblLocation.getSelectedRow());
-                locationTableModel.delete(row);
-            }
-        }
-    }//GEN-LAST:event_tblLocationKeyReleased
-
-    private void tblVoucherKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tblVoucherKeyReleased
-        // TODO add your handling code here:
-        if (evt.getKeyCode() == KeyEvent.VK_DELETE) {
-            if (tblVoucher.getSelectedRow() >= 0) {
-                int row = tblVoucher.convertRowIndexToModel(tblVoucher.getSelectedRow());
-                vouStatusTableModel.delete(row);
-            }
-        }
-    }//GEN-LAST:event_tblVoucherKeyReleased
-
-    private void tblSaleManKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tblSaleManKeyReleased
-        // TODO add your handling code here:
-        if (evt.getKeyCode() == KeyEvent.VK_DELETE) {
-            if (tblSaleMan.getSelectedRow() >= 0) {
-                int row = tblSaleMan.convertRowIndexToModel(tblSaleMan.getSelectedRow());
-                saleManTableModel.delete(row);
-            }
-        }
-    }//GEN-LAST:event_tblSaleManKeyReleased
 
     private void tblCOAKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tblCOAKeyReleased
         // TODO add your handling code here:
@@ -947,26 +670,17 @@ public class Mapping extends javax.swing.JPanel implements PanelControl {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
-    private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
-    private javax.swing.JScrollPane jScrollPane5;
-    private javax.swing.JScrollPane jScrollPane6;
-    private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JScrollPane jScrollPane8;
     private javax.swing.JTable tblCOA;
     private javax.swing.JTable tblCurrency;
     private javax.swing.JTable tblCustomer;
     private javax.swing.JTable tblDep;
-    private javax.swing.JTable tblLocation;
-    private javax.swing.JTable tblSaleMan;
     private javax.swing.JTable tblSupplier;
-    private javax.swing.JTable tblVoucher;
     // End of variables declaration//GEN-END:variables
 
     @Override

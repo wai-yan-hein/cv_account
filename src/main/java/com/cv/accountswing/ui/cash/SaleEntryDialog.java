@@ -6,10 +6,6 @@
 package com.cv.accountswing.ui.cash;
 
 import com.cv.accountswing.common.Global;
-import com.cv.inv.entry.SaleEntry;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 /**
  *
  * @author Lenovo

@@ -25,6 +25,7 @@ import com.cv.accountswing.util.BindingUtil;
 import com.cv.accountswing.util.Util1;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -97,8 +98,9 @@ public class CustomerSetup extends javax.swing.JPanel implements KeyListener, Pa
     }
 
     private void initCombo() {
-        String strList = Global.sysProperties.get("system.customer.setup.account");
-        List<ChartOfAccount> listCOA = coaService.searchWhereIn(strList, Global.compCode);
+        String coaCode = Global.sysProperties.get("system.customer.setup.account");
+        List<ChartOfAccount> listCOA = new ArrayList<>();
+        listCOA.add(coaService.findById(coaCode));
         BindingUtil.BindComboFilter(cboAccount, listCOA, null, true, false);
         BindingUtil.BindComboFilter(cboPriceType, traderTypeService.findAll(), null, true, false);
         BindingUtil.BindComboFilter(cboRegion, Global.listRegion, null, true, false);

@@ -6,30 +6,28 @@
 package com.cv.accountswing.ui.system.setup;
 
 import com.cv.accountswing.common.Global;
+import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.entity.Currency;
 import com.cv.accountswing.entity.CurrencyKey;
 import com.cv.accountswing.entity.Customer;
 import com.cv.accountswing.entity.Department;
+import com.cv.accountswing.entity.RoleStatus;
+import com.cv.accountswing.entity.RoleStatusKey;
 import com.cv.accountswing.entity.Supplier;
 import com.cv.accountswing.entity.UserDefault;
 import com.cv.accountswing.entity.UserDefaultKey;
 import com.cv.accountswing.service.CurrencyService;
 import com.cv.accountswing.service.CustomerService;
 import com.cv.accountswing.service.DepartmentService;
+import com.cv.accountswing.service.RoleStatusService;
 import com.cv.accountswing.service.SupplierService;
 import com.cv.accountswing.service.TraderService;
 import com.cv.accountswing.service.UserSettingService;
+import com.cv.accountswing.ui.ApplicationMainFrame;
 
 import com.cv.accountswing.ui.editor.CurrencyAutoCompleter;
 import com.cv.accountswing.ui.editor.DepartmentAutoCompleter;
 import com.cv.accountswing.ui.editor.TraderAutoCompleter;
-import com.cv.inv.entity.Location;
-import com.cv.inv.entry.editor.LocationAutoCompleter;
-import com.cv.inv.entry.editor.SaleManAutoCompleter;
-import com.cv.inv.entry.editor.VouStatusAutoCompleter;
-import com.cv.inv.service.LocationService;
-import com.cv.inv.service.SaleManService;
-import com.cv.inv.service.VouStatusService;
 import java.util.List;
 import javax.swing.JOptionPane;
 import org.slf4j.Logger;
@@ -42,7 +40,7 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-public class Default extends javax.swing.JPanel {
+public class Default extends javax.swing.JPanel implements PanelControl {
 
     private static final Logger log = LoggerFactory.getLogger(Default.class);
     @Autowired
@@ -52,10 +50,9 @@ public class Default extends javax.swing.JPanel {
     @Autowired
     private DepartmentService departmentService;
     @Autowired
-    private LocationService locationService;
-    @Autowired
     private CurrencyService currencyService;
-
+    @Autowired
+    private RoleStatusService statusService;
     @Autowired
     private TraderService traderServoce;
     @Autowired
@@ -63,16 +60,11 @@ public class Default extends javax.swing.JPanel {
     @Autowired
     private CustomerService customerService;
     @Autowired
-    private VouStatusService vouStatusService;
-    @Autowired
-    private SaleManService saleManService;
+    private ApplicationMainFrame mainFrame;
     private DepartmentAutoCompleter departmentAutoCompleter;
-    private LocationAutoCompleter locationAutoCompleter;
     private CurrencyAutoCompleter currencyAutoCompleter;
     private TraderAutoCompleter supplierAutoCompleter;
     private TraderAutoCompleter customerAutoCompleter;
-    private VouStatusAutoCompleter vouStatusAutoCompleter;
-    private SaleManAutoCompleter saleManAutoCompleter;
 
     /**
      * Creates new form Default
@@ -87,12 +79,9 @@ public class Default extends javax.swing.JPanel {
 
     private void initAutoCompleter() {
         departmentAutoCompleter = new DepartmentAutoCompleter(txtDep, Global.listDepartment, null, false);
-        locationAutoCompleter = new LocationAutoCompleter(txtLoc, Global.listLocation, null);
         currencyAutoCompleter = new CurrencyAutoCompleter(txtCur, Global.listCurrency, null);
         supplierAutoCompleter = new TraderAutoCompleter(txtSup, Global.listTrader, null, false, 0);
         customerAutoCompleter = new TraderAutoCompleter(txtCus, Global.listTrader, null, false, 0);
-        //vouStatusAutoCompleter = new VouStatusAutoCompleter(txtVou, Global.listVou, null);
-        //saleManAutoCompleter = new SaleManAutoCompleter(txtSaleMan, Global.listSaleMan, null);
     }
 
     public Department getDepartment(String roleCode) {
@@ -102,15 +91,6 @@ public class Default extends javax.swing.JPanel {
             dep = departmentService.findById(listDep.get(0).getKey().getValue());
         }
         return dep;
-    }
-
-    public Location getLocation(String roleCode) {
-        Location loc = null;
-        List<UserDefault> listLoc = userSettingService.search(roleCode, Global.compCode, Global.LOC_KEY);
-        if (!listLoc.isEmpty()) {
-            loc = locationService.findById(listLoc.get(0).getKey().getValue());
-        }
-        return loc;
     }
 
     public Currency getCurrency(String roleCode) {
@@ -148,26 +128,16 @@ public class Default extends javax.swing.JPanel {
         if (roleCode != null) {
             //
             departmentAutoCompleter.setDepartment(getDepartment(roleCode));
-            locationAutoCompleter.setLocation(getLocation(roleCode));
             currencyAutoCompleter.setCurrency(getCurrency(roleCode));
             supplierAutoCompleter.setTrader(getSuppplier(roleCode));
             customerAutoCompleter.setTrader(getCutomer(roleCode));
-            /*List<UserDefault> listVou = userSettingService.search(roleCode, Global.compCode, Global.VOU_KEY);
-            if (!listVou.isEmpty()) {
-            vouStatusAutoCompleter.setVouStatus(vouStatusService.findById(listVou.get(0).getKey().getValue()));
-            } else {
-            vouStatusAutoCompleter.setVouStatus(null);
-            }
-            List<UserDefault> listSaleMan = userSettingService.search(roleCode, Global.compCode, Global.SALE_KEY);
-            if (!listSaleMan.isEmpty()) {
-            saleManAutoCompleter.setSaleMan(saleManService.findById(listSaleMan.get(0).getKey().getValue()));
-            } else {
-            saleManAutoCompleter.setSaleMan(null);
-            }*/
+            chkCBDel.setSelected(statusService.checkPermission(roleCode, Global.CB_DEL_KEY));
+            chkRCBDel.setSelected(statusService.checkPermission(roleCode, Global.CB_DEL_USR_KEY));
+
         }
     }
 
-    private void save() {
+    private void saveDefault() {
         String roleCode = userSetting.getRoleCode();
         if (roleCode != null) {
             if (departmentAutoCompleter.getDepartment() != null) {
@@ -177,17 +147,6 @@ public class Default extends javax.swing.JPanel {
                 key.setRoleCode(roleCode);
                 key.setKey(Global.DEP_KEY);
                 key.setValue(defaultDep);
-                key.setCompCode(Global.compCode);
-                def.setKey(key);
-                userSettingService.save(def);
-            }
-            if (locationAutoCompleter.getLocation() != null) {
-                String defLoc = locationAutoCompleter.getLocation().getLocationCode();
-                UserDefault def = new UserDefault();
-                UserDefaultKey key = new UserDefaultKey();
-                key.setRoleCode(roleCode);
-                key.setKey(Global.LOC_KEY);
-                key.setValue(defLoc);
                 key.setCompCode(Global.compCode);
                 def.setKey(key);
                 userSettingService.save(def);
@@ -225,6 +184,18 @@ public class Default extends javax.swing.JPanel {
                 def.setKey(key);
                 userSettingService.save(def);
             }
+            //Cash Book Delete
+            RoleStatusKey key = new RoleStatusKey(roleCode, Global.CB_DEL_KEY);
+            RoleStatus status = new RoleStatus();
+            status.setRoleKey(key);
+            status.setStatus(chkCBDel.isSelected());
+            statusService.save(status);
+            RoleStatusKey key1 = new RoleStatusKey(roleCode, Global.CB_DEL_USR_KEY);
+            RoleStatus status1 = new RoleStatus();
+            status1.setRoleKey(key1);
+            status1.setStatus(chkRCBDel.isSelected());
+            statusService.save(status1);
+
             /*            if (vouStatusAutoCompleter.getVouStatus() != null) {
             String code = vouStatusAutoCompleter.getVouStatus().getVouStatusCode();
             UserDefault def = new UserDefault();
@@ -247,7 +218,7 @@ public class Default extends javax.swing.JPanel {
             def.setKey(key);
             userSettingService.save(def);
             }*/
-            JOptionPane.showMessageDialog(Global.parentForm, "Saved  Default Setting.");
+            JOptionPane.showMessageDialog(Global.parentForm, "Saved.");
         } else {
             JOptionPane.showMessageDialog(Global.parentForm, "Select User Account");
         }
@@ -265,19 +236,15 @@ public class Default extends javax.swing.JPanel {
 
         jLabel1 = new javax.swing.JLabel();
         txtDep = new javax.swing.JTextField();
-        jLabel2 = new javax.swing.JLabel();
-        txtLoc = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         txtCur = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
         txtCus = new javax.swing.JTextField();
         txtSup = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
-        txtVou = new javax.swing.JTextField();
-        jLabel6 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
-        txtSaleMan = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
+        jPanel1 = new javax.swing.JPanel();
+        chkCBDel = new javax.swing.JCheckBox();
+        chkRCBDel = new javax.swing.JCheckBox();
 
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentShown(java.awt.event.ComponentEvent evt) {
@@ -289,11 +256,6 @@ public class Default extends javax.swing.JPanel {
         jLabel1.setText("Department");
 
         txtDep.setFont(Global.textFont);
-
-        jLabel2.setFont(Global.lableFont);
-        jLabel2.setText("Location");
-
-        txtLoc.setFont(Global.textFont);
 
         jLabel3.setFont(Global.lableFont);
         jLabel3.setText("Currency");
@@ -310,24 +272,30 @@ public class Default extends javax.swing.JPanel {
         jLabel5.setFont(Global.lableFont);
         jLabel5.setText("Supplier");
 
-        txtVou.setEditable(false);
-        txtVou.setFont(Global.textFont);
+        chkCBDel.setText("Cash Book Edit / Delete");
 
-        jLabel6.setFont(Global.lableFont);
-        jLabel6.setText("Voucher Status");
+        chkRCBDel.setText("Cash Book Edit / Delete By User");
 
-        jLabel7.setFont(Global.lableFont);
-        jLabel7.setText("Sale Man");
-
-        txtSaleMan.setEditable(false);
-        txtSaleMan.setFont(Global.textFont);
-
-        jButton1.setText("Save");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(chkCBDel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(chkRCBDel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkCBDel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(chkRCBDel)
+                .addContainerGap(137, Short.MAX_VALUE))
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -335,43 +303,28 @@ public class Default extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jButton1)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                            .addComponent(jLabel1)
-                            .addGap(18, 18, 18)
-                            .addComponent(txtDep, javax.swing.GroupLayout.PREFERRED_SIZE, 261, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGroup(layout.createSequentialGroup()
-                            .addComponent(jLabel4)
-                            .addGap(18, 18, 18)
-                            .addComponent(txtCus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGroup(layout.createSequentialGroup()
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jLabel3)
-                                .addComponent(jLabel2))
-                            .addGap(18, 18, 18)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(txtLoc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(txtCur, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGroup(layout.createSequentialGroup()
-                            .addComponent(jLabel5)
-                            .addGap(18, 18, 18)
-                            .addComponent(txtSup, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGroup(layout.createSequentialGroup()
-                            .addComponent(jLabel6)
-                            .addGap(18, 18, 18)
-                            .addComponent(txtVou, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGroup(layout.createSequentialGroup()
-                            .addComponent(jLabel7)
-                            .addGap(18, 18, 18)
-                            .addComponent(txtSaleMan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE)
+                        .addGap(18, 18, 18)
+                        .addComponent(txtSup, javax.swing.GroupLayout.PREFERRED_SIZE, 273, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addGap(18, 18, 18)
+                        .addComponent(txtDep, javax.swing.GroupLayout.PREFERRED_SIZE, 273, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel4)
+                        .addGap(18, 18, 18)
+                        .addComponent(txtCus, javax.swing.GroupLayout.PREFERRED_SIZE, 273, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addGap(18, 18, 18)
+                        .addComponent(txtCur, javax.swing.GroupLayout.PREFERRED_SIZE, 273, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
         );
 
-        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jLabel1, jLabel2, jLabel3, jLabel4, jLabel5, jLabel6, jLabel7});
-
-        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {txtCur, txtCus, txtDep, txtLoc, txtSaleMan, txtSup, txtVou});
+        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jLabel1, jLabel3, jLabel4, jLabel5});
 
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -380,61 +333,66 @@ public class Default extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(txtDep, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(txtLoc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
                     .addComponent(txtCur, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
                     .addComponent(txtCus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
                     .addComponent(txtSup, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel6)
-                    .addComponent(txtVou, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel7)
-                    .addComponent(txtSaleMan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton1)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
+        mainFrame.setControl(this);
     }//GEN-LAST:event_formComponentShown
-
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-        save();
-    }//GEN-LAST:event_jButton1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
+    private javax.swing.JCheckBox chkCBDel;
+    private javax.swing.JCheckBox chkRCBDel;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JTextField txtCur;
     private javax.swing.JTextField txtCus;
     private javax.swing.JTextField txtDep;
-    private javax.swing.JTextField txtLoc;
-    private javax.swing.JTextField txtSaleMan;
     private javax.swing.JTextField txtSup;
-    private javax.swing.JTextField txtVou;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void delete() {
+    }
+
+    @Override
+    public void newForm() {
+    }
+
+    @Override
+    public void history() {
+    }
+
+    @Override
+    public void print() {
+    }
+
+    @Override
+    public void refresh() {
+    }
+
+    @Override
+    public void save() {
+        saveDefault();
+    }
 }

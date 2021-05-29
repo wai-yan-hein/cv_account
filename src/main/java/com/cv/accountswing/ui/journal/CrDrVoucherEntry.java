@@ -42,7 +42,6 @@ import java.util.Map;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
@@ -64,7 +63,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CrDrVoucherEntry.class);
+    private static final Logger log = LoggerFactory.getLogger(CrDrVoucherEntry.class);
     Gson gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
     private int selectRow = -1;
     @Autowired
@@ -106,7 +105,7 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
      * Creates new form CreditVoucherEntry
      */
     public CrDrVoucherEntry() {
-        super(new JFrame(), false);
+        super(Global.parentForm, false);
         initComponents();
         initKeyListener();
     }
@@ -147,10 +146,10 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
 
     private void setTodayDate() {
         txtFromDate.setDate(Util1.getTodayDate());
-
     }
 
     private void initTable() {
+        txtFTotolAmt.setValue(0.0);
         voucherEntryTableModel.setVouType(voucherType);
         voucherEntryTableModel.setTxtFTotalAmt(txtFTotolAmt);
         tblCredit.setModel(voucherEntryTableModel);
@@ -165,7 +164,7 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
         tblCredit.getColumnModel().getColumn(1).setPreferredWidth(150);
         tblCredit.getColumnModel().getColumn(2).setPreferredWidth(130);
         tblCredit.getColumnModel().getColumn(0).setPreferredWidth(130);
-        tblCredit.getColumnModel().getColumn(0).setPreferredWidth(60);
+        tblCredit.getColumnModel().getColumn(1).setPreferredWidth(60);
         tblCredit.setDefaultRenderer(Double.class, new TableCellRender());
         tblCredit.setDefaultRenderer(Object.class, new TableCellRender());
         voucherEntryTableModel.setParent(tblCredit);
@@ -179,7 +178,7 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
             selectRow = tblCredit.convertRowIndexToModel(tblCredit.getSelectedRow());
             VGl vGl = voucherEntryTableModel.getVGl(selectRow);
             if (vGl != null) {
-                String glID = vGl.getGlCode().toString();
+                String glID = vGl.getGlCode();
                 int showConfirmDialog = JOptionPane.showConfirmDialog(Global.parentForm, "Are you sure to delete");
                 if (showConfirmDialog == 1) {
                     if (deleteIds.equals("-")) {
@@ -187,7 +186,7 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
                     } else {
                         deleteIds = deleteIds + "," + glID;
                     }
-                    LOGGER.info("Delete Ids :" + deleteIds);
+                    log.info("Delete Ids :" + deleteIds);
                     voucherEntryTableModel.remove(selectRow);
                 }
 
@@ -197,8 +196,10 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
 
     private void initCombo() {
         cOAAutoCompleter = new COAAutoCompleter(txtAccount, Global.listCOA, null, false);
-        departmentAutoCompleter = new DepartmentAutoCompleter(txtDep, Global.listDepartment, null,false);
+        departmentAutoCompleter = new DepartmentAutoCompleter(txtDep, Global.listDepartment, null, false);
         currencyAutoCompleter = new CurrencyAutoCompleter(txtCurrency, Global.listCurrency, null);
+        currencyAutoCompleter.setCurrency(Global.defalutCurrency);
+        departmentAutoCompleter.setDepartment(Global.defaultDepartment);
     }
 
     private void initPopup() {
@@ -219,7 +220,6 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
                     popupMenu.show(tblCredit, e.getX(), e.getY());
                 }
             }
-
         });
     }
 
@@ -259,15 +259,12 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
                 parameters.put("p_company_name", ci.getName());
                 parameters.put("p_comp_id", Global.compCode);
                 parameters.put("img_path", imagePath);
-
                 rService.genCreditVoucher(reportPath, filePath, fontPath, parameters);
-
             } catch (Exception ex) {
-                LOGGER.error("creditVoucher : " + ex);
+                log.error("creditVoucher : " + ex);
 
             }
         });
-
     }
 
     private void saveCreditVoucher() {
@@ -279,19 +276,20 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
 
     private boolean isValidVoucher() {
         boolean status;
-        if (accCode.equals("-")) {
+        if (cOAAutoCompleter.getCOA() == null) {
             status = false;
             JOptionPane.showMessageDialog(Global.parentForm, "Invalid Account");
             txtAccount.requestFocus();
-        } else if (depCode.equals("-")) {
+        } else if (departmentAutoCompleter.getDepartment() == null) {
             status = false;
             JOptionPane.showMessageDialog(Global.parentForm, "Invalid Department");
             txtDep.requestFocus();
-        } else if (currency.equals("-")) {
+        } else if (currencyAutoCompleter.getCurrency() == null) {
             status = false;
             JOptionPane.showMessageDialog(Global.parentForm, "Invalid Currency");
             txtCurrency.requestFocus();
         } else {
+            depCode = departmentAutoCompleter.getDepartment().getDeptCode();
             String strVoucher;
             List<VGl> listVGl = voucherEntryTableModel.getListVGl();
             if (!listVGl.isEmpty()) {
@@ -299,13 +297,13 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
                     vgl.setGlDate(txtFromDate.getDate());
                     return vgl;
                 }).map(vgl -> {
-                    vgl.setSourceAcId(accCode);
+                    vgl.setSourceAcId(cOAAutoCompleter.getCOA().getCode());
                     return vgl;
                 }).map(vgl -> {
                     vgl.setDeptId(depCode);
                     return vgl;
                 }).map(vgl -> {
-                    vgl.setFromCurId(currency);
+                    vgl.setFromCurId(currencyAutoCompleter.getCurrency().getKey().getCode());
                     return vgl;
                 }).map(vgl -> {
                     vgl.setRemark(txtRemark.getText());
@@ -321,36 +319,23 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
                 }.getType();
                 List<Gl> listGV = gson.fromJson(strVoucher, listType);
                 String strVouNo = txtVouNo.getText();
-                if (strVouNo.isEmpty()) {
+                if (Util1.isNull(strVouNo)) {
                     strVouNo = getVouNo(Global.machineId, depCode, Util1.toDateStr(txtFromDate.getDate(), "dd/MM/yyyy"),
                             Global.compCode, depCode, voucherType);
                 }
-
-                for (Gl gl : listGV) {
-                    gl.setVouNo(strVouNo);
-                    switch (voucherType) {
-                        case "CR":
-                            gl.setSplitId(8);
-                            break;
-                        case "DR":
-                            gl.setSplitId(9);
-                            break;
-                    }
-                }
-
-                assignGlInfo(listGV);
                 try {
-                    glService.saveBatchGL(listGV);
+                    //save
+                    saveGL(listGV, strVouNo);
                     //Delete row
                     if (!deleteIds.equals("-")) {
+                        String userCode = Global.loginUser.getAppUserCode();
                         String[] ids = deleteIds.split(",");
                         for (String id : ids) {
-                            glService.delete(id, "GL-DELETE");
+                            glService.delete(id, "GL-DELETE", userCode, Global.machineId);
                         }
                     }
                 } catch (Exception ex) {
-                    LOGGER.info("saveVoucher : " + ex);
-
+                    log.info("saveVoucher : " + ex);
                 }
             }
             String vouNo = listVGl.get(0).getVouNo();
@@ -360,29 +345,32 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
         return status;
     }
 
-    private void assignGlInfo(Gl gl) {
-
-        if (gl.getGlCode() == null) {
-            gl.setCompCode(Global.compCode);
-            gl.setCreatedBy(Global.loginUser.getAppUserCode());
-            gl.setCreatedDate(Util1.getTodayDate());
-        } else {
-            gl.setModifyBy(Global.loginUser.getAppUserCode());
-            gl.setModifyDate(Util1.getTodayDate());
+    private void saveGL(List<Gl> listGL, String vouNo) throws Exception {
+        if (!listGL.isEmpty()) {
+            for (Gl gl : listGL) {
+                if (!Util1.isNull(gl.getAccountId())) {
+                    gl.setVouNo(vouNo);
+                    gl.setSplitId(voucherType.equals("CR") ? 8 : 9);
+                    if (gl.getGlCode() == null) {
+                        gl.setCompCode(Global.compCode);
+                        gl.setCreatedBy(Global.loginUser.getAppUserCode());
+                        gl.setCreatedDate(Util1.getTodayDate());
+                        gl.setMacId(Global.machineId);
+                        gl.setTranSource(voucherType + "-Voucher");
+                    } else {
+                        gl.setModifyBy(Global.loginUser.getAppUserCode());
+                    }
+                    glService.save(gl);
+                }
+            }
         }
-    }
-
-    private void assignGlInfo(List<Gl> listGL) {
-        listGL.forEach(gl -> {
-            assignGlInfo(gl);
-        });
     }
 
     public String getVouNo(Integer macId, String deptCodeUser, String strDate, String compCode, String deptCode, String type) {
         String period = Util1.toDateStr(Util1.getTodayDate(), "yyyy");
-        int ttlLength = 4;
+        int ttlLength = 7;
         int seqNo = seqService.getSequence(macId, "CrDrVoucher", period, compCode);
-        String tmpVouNo = deptCodeUser.toUpperCase() + type.toUpperCase() + period
+        String tmpVouNo = type.toUpperCase() + "-" + period
                 + String.format("%0" + ttlLength + "d", seqNo);
         return tmpVouNo;
     }
@@ -396,7 +384,6 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
         txtRemark.setText(null);
         txtVouNo.setText(null);
         voucherEntryTableModel.clear();
-
     }
 
     /**
@@ -502,34 +489,34 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(txtFromDate, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE))
+                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 102, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(txtVouNo, javax.swing.GroupLayout.DEFAULT_SIZE, 84, Short.MAX_VALUE))
+                    .addComponent(txtVouNo, javax.swing.GroupLayout.DEFAULT_SIZE, 95, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(txtAccount, javax.swing.GroupLayout.DEFAULT_SIZE, 84, Short.MAX_VALUE))
+                    .addComponent(txtAccount, javax.swing.GroupLayout.DEFAULT_SIZE, 95, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, 84, Short.MAX_VALUE)
+                    .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, 98, Short.MAX_VALUE)
                     .addComponent(txtDep))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(txtCurrency, javax.swing.GroupLayout.DEFAULT_SIZE, 84, Short.MAX_VALUE))
+                    .addComponent(txtCurrency, javax.swing.GroupLayout.DEFAULT_SIZE, 98, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtFrom, javax.swing.GroupLayout.DEFAULT_SIZE, 84, Short.MAX_VALUE)
+                    .addComponent(txtFrom, javax.swing.GroupLayout.DEFAULT_SIZE, 96, Short.MAX_VALUE)
                     .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(txtNaration, javax.swing.GroupLayout.DEFAULT_SIZE, 84, Short.MAX_VALUE))
+                    .addComponent(txtNaration, javax.swing.GroupLayout.DEFAULT_SIZE, 96, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(txtRemark, javax.swing.GroupLayout.DEFAULT_SIZE, 84, Short.MAX_VALUE)
+                    .addComponent(txtRemark, javax.swing.GroupLayout.DEFAULT_SIZE, 95, Short.MAX_VALUE)
                     .addComponent(jLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -577,7 +564,8 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
         jScrollPane1.setViewportView(tblCredit);
 
         txtFTotolAmt.setEditable(false);
-        txtFTotolAmt.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#,###.00"))));
+        txtFTotolAmt.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#,##0.00"))));
+        txtFTotolAmt.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         txtFTotolAmt.setFont(Global.amtFont);
 
         jLabel9.setFont(Global.lableFont);
@@ -585,6 +573,7 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
 
         btnSave.setBackground(ColorUtil.mainColor);
         btnSave.setFont(Global.textFont);
+        btnSave.setForeground(new java.awt.Color(255, 255, 255));
         btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save-button-white.png"))); // NOI18N
         btnSave.setText("Save");
         btnSave.setName("btnSave"); // NOI18N
@@ -594,7 +583,10 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
             }
         });
 
+        btnSave1.setBackground(ColorUtil.btnEdit);
         btnSave1.setFont(Global.textFont);
+        btnSave1.setForeground(new java.awt.Color(255, 255, 255));
+        btnSave1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/print_18px.png"))); // NOI18N
         btnSave1.setText("Print");
         btnSave1.setName("btnSave"); // NOI18N
         btnSave1.addActionListener(new java.awt.event.ActionListener() {
@@ -612,13 +604,13 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane1)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnSave)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnSave1, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnSave1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 447, Short.MAX_VALUE)
                         .addComponent(jLabel9)
-                        .addGap(18, 18, 18)
-                        .addComponent(txtFTotolAmt, javax.swing.GroupLayout.PREFERRED_SIZE, 302, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(txtFTotolAmt, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -655,7 +647,7 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
         try {
             saveCreditVoucher();
         } catch (Exception e) {
-            LOGGER.error("Save CrDrVoucher :" + e.getMessage());
+            log.error("Save CrDrVoucher :" + e.getMessage());
             JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Save CrDrVoucher", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnSaveActionPerformed

@@ -233,8 +233,6 @@ public class Util1 {
         return date;
     }
 
-   
-
     public static String getFileExtension(String content) {
         String extension = "";
 
@@ -352,6 +350,16 @@ public class Util1 {
         } else {
             return strValue;
         }
+    }
+
+    public static boolean isNull(String value) {
+        boolean status = false;
+        if (value == null) {
+            status = true;
+        } else if (value.isBlank()) {
+            status = true;
+        }
+        return status;
     }
 
     public static String isNullObj(Object obj, String value) {

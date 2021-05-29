@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.cv.inv.entry.common;
+package com.cv.accountswing.ui.setup.common;
 
 import com.cv.accountswing.entity.Currency;
 import java.util.ArrayList;
@@ -17,9 +17,9 @@ import org.slf4j.LoggerFactory;
  *
  * @author Lenovo
  */
-public class CurrencyTableModel extends AbstractTableModel {
+public class CurrencyTableModel1 extends AbstractTableModel {
 
-    private static final Logger log = LoggerFactory.getLogger(CurrencyTableModel.class);
+    private static final Logger log = LoggerFactory.getLogger(CurrencyTableModel1.class);
     private List<Currency> listCurrency = new ArrayList<>();
     private final String[] columnNames = {"Code", "Name"};
     private JTable table;
@@ -32,11 +32,11 @@ public class CurrencyTableModel extends AbstractTableModel {
         this.table = table;
     }
 
-    public CurrencyTableModel(List<Currency> listCurrency) {
+    public CurrencyTableModel1(List<Currency> listCurrency) {
         this.listCurrency = listCurrency;
     }
 
-    public CurrencyTableModel() {
+    public CurrencyTableModel1() {
     }
 
     public List<Currency> getListCurrency() {

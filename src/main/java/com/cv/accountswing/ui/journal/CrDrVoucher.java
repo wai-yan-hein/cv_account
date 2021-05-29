@@ -11,9 +11,6 @@ import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.view.VCrDrVoucher;
-import com.cv.accountswing.service.COAService;
-import com.cv.accountswing.service.CurrencyService;
-import com.cv.accountswing.service.DepartmentService;
 import com.cv.accountswing.service.VCrDrVoucherService;
 import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
@@ -29,6 +26,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -46,6 +44,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CrDrVoucher extends javax.swing.JPanel implements KeyListener, SelectionObserver, PanelControl {
 
+    private final ImageIcon vouIcon = new ImageIcon(this.getClass().getResource("/images/journal.png"));
     private static final Logger LOGGER = LoggerFactory.getLogger(CrDrVoucher.class);
     private int selectRow = -1;
     @Autowired
@@ -55,15 +54,12 @@ public class CrDrVoucher extends javax.swing.JPanel implements KeyListener, Sele
     @Autowired
     private TaskExecutor taskExecutor;
     @Autowired
-    private COAService cOAService;
-    @Autowired
-    private DepartmentService departmentService;
-    @Autowired
-    private CurrencyService currencyService;
-    @Autowired
     private CrDrVoucherEntry creditVoucherEntry;
     @Autowired
     private ApplicationMainFrame mainFrame;
+    private CurrencyAutoCompleter currencyAutoCompleter;
+    private DepartmentAutoCompleter departmentAutoCompleter;
+    private COAAutoCompleter cOAAutoCompleter;
     private LoadingObserver loadingObserver;
     private boolean isShown = false;
 
@@ -108,62 +104,21 @@ public class CrDrVoucher extends javax.swing.JPanel implements KeyListener, Sele
 
     private void initMain() {
         setTodayDate();
-        initPropertyChangeListener();
         initAutoComplete();
         initTable();
         searchCreditVoucher();
         isShown = true;
     }
 
-    private void initPropertyChangeListener() {
-
-        /*txtFromDate.getDateEditor().addPropertyChangeListener(
-        new PropertyChangeListener() {
-        @Override
-        public void propertyChange(PropertyChangeEvent e) {
-        if ("date".equals(e.getPropertyName())) {
-        Date newValue = Util1.toJavaDate(e.getNewValue());
-        Date oldValue = Util1.toJavaDate(e.getOldValue());
-        if (!Util1.isSameDate(newValue, oldValue)) {
-        searchCreditVoucher();
-        }
-        }
-        
-        }
-        });
-        txtToDate.getDateEditor().addPropertyChangeListener(
-        new PropertyChangeListener() {
-        @Override
-        public void propertyChange(PropertyChangeEvent e) {
-        if ("date".equals(e.getPropertyName())) {
-        
-        Date newValue = Util1.toJavaDate(e.getNewValue());
-        Date oldValue = Util1.toJavaDate(e.getOldValue());
-        if (!Util1.isSameDate(newValue, oldValue)) {
-        searchCreditVoucher();
-        }
-        }
-        
-        }
-        });*/
-    }
-
     private void initAutoComplete() {
-        if (Global.listCOA == null) {
-            Global.listCOA = cOAService.search("-", "-", "-", "-", "-", "-", "-");
-        }
-        if (Global.listDepartment == null) {
-            Global.listDepartment = departmentService.search("-", "-", "-", "-", "-");
-        }
-        if (Global.listCurrency == null) {
-            Global.listCurrency = currencyService.search("-", "-", "-");
-        }
-        COAAutoCompleter cOAAutoCompleter = new COAAutoCompleter(txtAccount, Global.listCOA, null, false);
+        cOAAutoCompleter = new COAAutoCompleter(txtAccount, Global.listCOA, null, true);
         cOAAutoCompleter.setSelectionObserver(this);
-        DepartmentAutoCompleter departmentAutoCompleter = new DepartmentAutoCompleter(txtDep, Global.listDepartment, null, false);
+        departmentAutoCompleter = new DepartmentAutoCompleter(txtDep, Global.listDepartment, null, true);
         departmentAutoCompleter.setSelectionObserver(this);
-        CurrencyAutoCompleter currencyAutoCompleter = new CurrencyAutoCompleter();
+        departmentAutoCompleter.setDepartment(Global.defaultDepartment);
+        currencyAutoCompleter = new CurrencyAutoCompleter(txtCurrency, Global.listCurrency, null);
         currencyAutoCompleter.setSelectionObserver(this);
+        currencyAutoCompleter.setCurrency(Global.defalutCurrency);
     }
 
     private void initTable() {
@@ -218,16 +173,9 @@ public class CrDrVoucher extends javax.swing.JPanel implements KeyListener, Sele
         fromDesp = Util1.isNull(txtFrom.getText(), "-");
         naration = Util1.isNull(txtNaration.getText(), "-");
         remark = Util1.isNull(txtRemark.getText(), "-");
-        if (txtCurrency.getText().isEmpty()) {
-            fromCurr = "-";
-        }
-        if (txtAccount.getText().isEmpty()) {
-            sourceAcId = "-";
-        }
-        if (txtDep.getText().isEmpty()) {
-            depId = "-";
-        }
-
+        fromCurr = currencyAutoCompleter.getCurrency() == null ? "-" : currencyAutoCompleter.getCurrency().getKey().getCode();
+        sourceAcId = cOAAutoCompleter.getCOA() == null ? "-" : cOAAutoCompleter.getCOA().getCode();
+        depId = departmentAutoCompleter.getDepartment() == null ? "-" : departmentAutoCompleter.getDepartment().getDeptCode();
         taskExecutor.execute(() -> {
             List<VCrDrVoucher> listCD = crdrService.search(stDate, endDate, sourceAcId, fromCurr, depId, vouNo,
                     Global.compCode, "-", splitId, fromDesp, naration,
@@ -235,7 +183,6 @@ public class CrDrVoucher extends javax.swing.JPanel implements KeyListener, Sele
             voucherTableModel.setListVCD(listCD);
             loadingObserver.load(this.getName(), "Stop");
         });
-
     }
 
     private void openCrdVoucherEntryDialog(String vouId) {
@@ -247,6 +194,7 @@ public class CrDrVoucher extends javax.swing.JPanel implements KeyListener, Sele
             vouType = "DR";
             creditVoucherEntry.setTitle("Debit Voucher Entry");
         }
+        creditVoucherEntry.setIconImage(vouIcon.getImage());
         creditVoucherEntry.clear();
         creditVoucherEntry.setSize(Global.width - 40, Global.height - 200);
         creditVoucherEntry.setVoucherId(vouId);
@@ -392,8 +340,11 @@ public class CrDrVoucher extends javax.swing.JPanel implements KeyListener, Sele
         txtToDate.setMaximumSize(new java.awt.Dimension(400, 400));
         txtToDate.setName("txtDate"); // NOI18N
 
+        jButton1.setBackground(ColorUtil.mainColor);
         jButton1.setFont(Global.lableFont);
-        jButton1.setText("+");
+        jButton1.setForeground(new java.awt.Color(255, 255, 255));
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/new-button.png"))); // NOI18N
+        jButton1.setText("New");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -410,38 +361,38 @@ public class CrDrVoucher extends javax.swing.JPanel implements KeyListener, Sele
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(txtFromDate, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 83, Short.MAX_VALUE))
+                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 78, Short.MAX_VALUE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel9, javax.swing.GroupLayout.DEFAULT_SIZE, 82, Short.MAX_VALUE)
+                    .addComponent(jLabel9, javax.swing.GroupLayout.DEFAULT_SIZE, 72, Short.MAX_VALUE)
                     .addComponent(txtToDate, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(txtVouNo, javax.swing.GroupLayout.DEFAULT_SIZE, 83, Short.MAX_VALUE))
+                    .addComponent(txtVouNo, javax.swing.GroupLayout.DEFAULT_SIZE, 78, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(txtAccount, javax.swing.GroupLayout.DEFAULT_SIZE, 83, Short.MAX_VALUE))
+                    .addComponent(txtAccount, javax.swing.GroupLayout.DEFAULT_SIZE, 78, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, 83, Short.MAX_VALUE)
+                    .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, 78, Short.MAX_VALUE)
                     .addComponent(txtDep))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(txtCurrency, javax.swing.GroupLayout.DEFAULT_SIZE, 83, Short.MAX_VALUE))
+                    .addComponent(txtCurrency, javax.swing.GroupLayout.DEFAULT_SIZE, 78, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtFrom, javax.swing.GroupLayout.DEFAULT_SIZE, 83, Short.MAX_VALUE)
+                    .addComponent(txtFrom, javax.swing.GroupLayout.DEFAULT_SIZE, 78, Short.MAX_VALUE)
                     .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtNaration, javax.swing.GroupLayout.DEFAULT_SIZE, 87, Short.MAX_VALUE)
+                    .addComponent(txtNaration, javax.swing.GroupLayout.DEFAULT_SIZE, 82, Short.MAX_VALUE)
                     .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtRemark, javax.swing.GroupLayout.DEFAULT_SIZE, 70, Short.MAX_VALUE)
+                    .addComponent(txtRemark, javax.swing.GroupLayout.DEFAULT_SIZE, 65, Short.MAX_VALUE)
                     .addComponent(jLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

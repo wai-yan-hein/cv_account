@@ -5,6 +5,7 @@
  */
 package com.cv.accountswing.ui.journal.common;
 
+import com.cv.accountswing.common.Global;
 import com.cv.accountswing.entity.ChartOfAccount;
 import com.cv.accountswing.entity.Trader;
 import com.cv.accountswing.entity.view.VGl;
@@ -13,6 +14,7 @@ import com.cv.accountswing.util.Util1;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JFormattedTextField;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import org.slf4j.Logger;
@@ -120,17 +122,14 @@ public class CrDrVoucherEntryTableModel extends AbstractTableModel {
                     }
                 }
                 parent.setColumnSelectionInterval(2, 2);
-
                 break;
             case 2:
                 vgl.setReference(Util1.getString(value));
                 parent.setColumnSelectionInterval(3, 3);
-
                 break;
             case 3:
                 vgl.setDescription(Util1.getString(value));
                 parent.setColumnSelectionInterval(4, 4);
-
                 break;
             case 4:
                 if (value != null) {
@@ -139,23 +138,36 @@ public class CrDrVoucherEntryTableModel extends AbstractTableModel {
                     } else {
                         vgl.setCrAmt(Util1.getFloat(value));
                     }
-                    addRow();
-                    parent.setRowSelectionInterval(row + 1, row + 1);
-                    parent.setColumnSelectionInterval(0, 0);
                 }
                 break;
         }
+        addNewRow(vgl, row);
     }
 
     public VGl getVGl(int row) {
         return listVGl.get(row);
     }
 
-    private void addRow() {
-        calAmount();
-        VGl vGl = new VGl();
-        listVGl.add(vGl);
-        fireTableRowsInserted(listVGl.size() - 1, listVGl.size() - 1);
+    private void addNewRow(VGl vgl, int row) {
+        if (isValidEntry(vgl)) {
+            VGl vGl = new VGl();
+            listVGl.add(vGl);
+            fireTableRowsInserted(listVGl.size() - 1, listVGl.size() - 1);
+            parent.setRowSelectionInterval(row + 1, row + 1);
+            parent.setColumnSelectionInterval(0, 0);
+            calAmount();
+        }
+    }
+
+    private boolean isValidEntry(VGl vgl) {
+        boolean status = true;
+        if (Util1.isNull(vgl.getAccountId())) {
+            JOptionPane.showMessageDialog(Global.parentForm, "Invalid Account.");
+            status = false;
+        } else if (Util1.getFloat(vgl.getDrAmt()) + Util1.getFloat(vgl.getCrAmt()) == 0) {
+            status = false;
+        }
+        return status;
     }
 
     @Override
@@ -169,7 +181,6 @@ public class CrDrVoucherEntryTableModel extends AbstractTableModel {
     }
 
     public List<VGl> getListVGl() {
-        listVGl.remove(listVGl.size() - 1);
         return listVGl;
     }
 
@@ -254,6 +265,7 @@ public class CrDrVoucherEntryTableModel extends AbstractTableModel {
     public void clear() {
         if (listVGl != null) {
             listVGl.clear();
+            fireTableDataChanged();
         }
     }
 
@@ -261,7 +273,6 @@ public class CrDrVoucherEntryTableModel extends AbstractTableModel {
         if (listVGl != null) {
             double ttlAmt = 0.0;
             if (vouType.equals("CR")) {
-
                 for (VGl vgl : listVGl) {
                     ttlAmt = Util1.getDouble(vgl.getDrAmt());
                 }

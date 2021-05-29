@@ -16,26 +16,12 @@ import com.cv.accountswing.service.RegionService;
 import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.report.common.RegionFilterTableModel;
-import com.cv.accountswing.ui.report.common.StockFilterTableModel;
 import com.cv.accountswing.ui.report.common.StockReportTableModel;
 import com.cv.accountswing.util.BindingUtil;
 import com.cv.accountswing.util.Util1;
-import com.cv.inv.entity.RelationKey;
-import com.cv.inv.entity.Stock;
-import com.cv.inv.entity.StockBalanceTmp;
-import com.cv.inv.entry.editor.BrandAutoCompleter;
-import com.cv.inv.entry.editor.CategoryAutoCompleter;
-import com.cv.inv.entry.editor.LocationAutoCompleter;
-import com.cv.inv.entry.editor.RegionCellEditor;
-import com.cv.inv.entry.editor.StockCellEditor;
-import com.cv.inv.entry.editor.StockTypeAutoCompleter;
-import com.cv.inv.entry.editor.UnitAutoCompleter;
-import com.cv.inv.service.StockReportService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import com.cv.inv.service.SReportService;
-import com.cv.inv.service.StockBalanceTmpService;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.HashMap;
@@ -58,14 +44,6 @@ public class StockReports extends javax.swing.JPanel implements PanelControl {
     @Autowired
     private StockReportTableModel reportTableModel;
     @Autowired
-    private StockFilterTableModel filterTableModel;
-    @Autowired
-    private StockReportService stockReportService;
-    @Autowired
-    private SReportService reportService;
-    @Autowired
-    private StockBalanceTmpService tmpService;
-    @Autowired
     private RegionFilterTableModel regionFilterTableModel;
     @Autowired
     private MenuService menuService;
@@ -75,11 +53,6 @@ public class StockReports extends javax.swing.JPanel implements PanelControl {
     private ApplicationMainFrame mainFrame;
     @Autowired
     private COAOpeningDService coaOpDService;
-    private LocationAutoCompleter locationAutoCompleter;
-    private UnitAutoCompleter unitAutoCompleter;
-    private StockTypeAutoCompleter stockTypeAutoCompleter;
-    private CategoryAutoCompleter categoryAutoCompleter;
-    private BrandAutoCompleter brandAutoCompleter;
     private boolean isShown = false;
     private String locId;
     private String unitCode;
@@ -107,11 +80,7 @@ public class StockReports extends javax.swing.JPanel implements PanelControl {
     }
 
     private void initCombo() {
-        locationAutoCompleter = new LocationAutoCompleter(txtLocation, Global.listLocation, null);
-        unitAutoCompleter = new UnitAutoCompleter(txtUnit, Global.listStockUnit, null);
-        stockTypeAutoCompleter = new StockTypeAutoCompleter(txtStockType, Global.listStockType, null);
-        categoryAutoCompleter = new CategoryAutoCompleter(txtCategory, Global.listCategory, null);
-        brandAutoCompleter = new BrandAutoCompleter(txtBrand, Global.listStockBrand, null);
+
         List<VRoleMenu> listReports = menuService.getReports(Global.roleCode);
         BindingUtil.BindComboFilter(cboReport, listReports, null, false, false);
     }
@@ -131,14 +100,11 @@ public class StockReports extends javax.swing.JPanel implements PanelControl {
     }
 
     private void initTableStockFilter() {
-        filterTableModel.setTable(tblStockFilter);
-        filterTableModel.addNewRow();
-        tblStockFilter.setModel(filterTableModel);
+
         tblStockFilter.getTableHeader().setFont(Global.tblHeaderFont);
         tblStockFilter.getTableHeader().setBackground(ColorUtil.btnEdit);
         tblStockFilter.getTableHeader().setForeground(ColorUtil.foreground);
         tblStockFilter.setDefaultRenderer(Object.class, new TableCellRender());
-        tblStockFilter.getColumnModel().getColumn(0).setCellEditor(new StockCellEditor());
     }
 
     private void initTableRegionFilter() {
@@ -149,7 +115,6 @@ public class StockReports extends javax.swing.JPanel implements PanelControl {
         tblRegion.getTableHeader().setBackground(ColorUtil.btnEdit);
         tblRegion.getTableHeader().setForeground(ColorUtil.foreground);
         tblRegion.setDefaultRenderer(Object.class, new TableCellRender());
-        tblRegion.getColumnModel().getColumn(0).setCellEditor(new RegionCellEditor(regionService));
     }
 
     private void assingDefaultValue() {
@@ -188,72 +153,13 @@ public class StockReports extends javax.swing.JPanel implements PanelControl {
         }
     }
 
-    private Float getChangeWeight(String fromUnit, String toUnit, String pattern, Float weight) {
-        RelationKey key = new RelationKey(fromUnit, toUnit, pattern);
-        Float factor = Global.hmRelation.get(key);
-        if (factor != null) {
-            weight = weight * factor;
-        } else {
-            key = new RelationKey(toUnit, fromUnit, pattern);
-            factor = Global.hmRelation.get(key);
-            if (factor != null) {
-                weight = weight / factor;
-            } else {
-                //JOptionPane.showMessageDialog(Global.parentForm, "Can't see with this unit.");
-                weight = null;
-            }
-        }
-        return weight;
-    }
-
     private void initializeParameters() {
         stockCode = "";
         regionCode = "";
         startDate = Util1.toDateStr(txtFromDate.getDate(), "yyyy-MM-dd");
         endDate = Util1.toDateStr(txtToDate.getDate(), "yyyy-MM-dd");
-        if (locationAutoCompleter.getLocation()
-                != null && !txtLocation.getText().isEmpty()) {
-            locId = locationAutoCompleter.getLocation().getLocationCode();
-        } else {
-            locId = "-";
-        }
 
-        if (unitAutoCompleter.getStockUnit()
-                != null && !txtUnit.getText().isEmpty()) {
-            unitCode = unitAutoCompleter.getStockUnit().getItemUnitCode();
-        } else {
-            unitCode = "-";
-        }
-
-        if (stockTypeAutoCompleter.getStockType()
-                != null && !txtStockType.getText().isEmpty()) {
-            stockTypeCode = stockTypeAutoCompleter.getStockType().getItemTypeCode();
-        } else {
-            stockTypeCode = "-";
-        }
-
-        if (categoryAutoCompleter.getCategory()
-                != null && !txtCategory.getText().isEmpty()) {
-            catCode = categoryAutoCompleter.getCategory().getCatCode();
-        } else {
-            catCode = "-";
-        }
-
-        if (brandAutoCompleter.getBrand()
-                != null && !txtBrand.getText().isEmpty()) {
-            brandCode = brandAutoCompleter.getBrand().getBrandCode();
-        } else {
-            brandCode = "-";
-        }
         //stock code
-        List<Stock> listStock = filterTableModel.getListStock();
-
-        if (!listStock.isEmpty()) {
-            stockCode = listStock.stream().filter(stock -> (stock.getStockCode() != null)).map(stock -> "'" + stock.getStockCode() + "'" + ",").reduce(stockCode, String::concat);
-            if (!stockCode.isEmpty()) {
-                stockCode = stockCode.substring(0, stockCode.length() - 1);
-            }
-        }
         if (stockCode.isEmpty()) {
             stockCode = "-";
         }
@@ -272,30 +178,7 @@ public class StockReports extends javax.swing.JPanel implements PanelControl {
     }
 
     private void reportStockBalance() {
-        reportService.generateStockBalance(stockCode, locId, Global.compCode, Global.machineId.toString());
-        List<StockBalanceTmp> listStockBalance = tmpService.search(Global.machineId.toString());
-        if (!unitCode.equals("-")) {
-            listStockBalance.stream().map(tmp -> {
-                String pattern = tmp.getStock().getPattern().getPatternCode();
-                String smallUnit = tmp.getUnit();
-                Float changeWt = getChangeWeight(smallUnit, unitCode, pattern, tmp.getTotalWt());
-                if (changeWt != null) {
-                    tmp.setChangeWt(changeWt);
-                    tmp.setChangeUnit(unitCode);
-                } else {
 
-                }
-                if (Util1.getFloat(tmp.getChangeWt()) % 1 != 0) {
-                    int num = tmp.getChangeWt().intValue();
-                    float decimal = (num - tmp.getChangeWt()) * -1;
-                    tmp.setChangeWt2(getChangeWeight(unitCode, smallUnit, pattern, decimal));
-                    tmp.setChangeUnit2(smallUnit);
-                }
-                return tmp;
-            }).forEachOrdered(tmp -> {
-                tmpService.save(tmp);
-            });
-        }
         log.info("stock balance report ready.");
         String reportPath = Global.sysProperties.get("system.report.path");
         String fontPath = Global.sysProperties.get("system.font.path");
@@ -307,13 +190,11 @@ public class StockReports extends javax.swing.JPanel implements PanelControl {
         parameters.put("brand_code", brandCode);
         parameters.put("cat_code", catCode);
         parameters.put("stock_type_code", stockTypeCode);
-        reportService.reportViewer(reportPath, reportPath, fontPath, parameters);
 
     }
 
     private void reportSaleByStock(String reportName) {
         log.info("Sale By Stock Start.");
-        reportService.generateSaleByStock(stockCode, regionCode, Global.machineId.toString());
         String regionFilter = "";
         List<Region> listRegion = regionFilterTableModel.getListRegion();
         if (listRegion.size() <= 1) {
@@ -336,7 +217,6 @@ public class StockReports extends javax.swing.JPanel implements PanelControl {
         parameters.put("brand_code", brandCode);
         parameters.put("company_name", Global.sysProperties.get("system.report.company"));
         parameters.put("region_filter", regionFilter);
-        reportService.reportViewer(reportPath, reportPath, fontPath, parameters);
         log.info("Sale By Stock End.");
     }
 
@@ -361,7 +241,6 @@ public class StockReports extends javax.swing.JPanel implements PanelControl {
             parameters.put("p_user_id", Global.loginUser.getAppUserCode());
             parameters.put("p_report_info", "Testing");
             parameters.put("trader_code", "-");
-            reportService.reportViewer(filePath, filePath, fontPath, parameters);
         } catch (Exception ex) {
             log.error("Reporting Customer Balance : " + ex.getMessage());
         }
@@ -380,7 +259,6 @@ public class StockReports extends javax.swing.JPanel implements PanelControl {
     private void deleteStock() {
         if (tblStockFilter.getSelectedRow() >= 0) {
             int row = tblStockFilter.convertRowIndexToModel(tblStockFilter.getSelectedRow());
-            filterTableModel.delete(row);
 
         }
     }

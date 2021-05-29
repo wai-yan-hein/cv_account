@@ -418,7 +418,8 @@ public class AllBankTableModel extends AbstractTableModel {
             VGl vgl = listVGl.get(row);
             try {
                 if (vgl.getGlCode() != null) {
-                    int delete = glService.delete(vgl.getGlCode(), "GL-DELETE");
+                    String userCode = Global.loginUser.getAppUserCode();
+                    int delete = glService.delete(vgl.getGlCode(), "GL-DELETE", userCode, Global.machineId);
                     if (delete == 1) {
                         listVGl.remove(row);
                         if (vgl.getTraderCode() != null) {

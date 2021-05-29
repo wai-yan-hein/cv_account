@@ -24,20 +24,7 @@ import com.cv.accountswing.entity.Trader;
 import com.cv.accountswing.entity.view.VDescription;
 import com.cv.accountswing.entity.view.VMenuClass;
 import com.cv.accountswing.entity.view.VRef;
-import com.cv.inv.entity.Category;
-import com.cv.inv.entity.CharacterNo;
-import com.cv.inv.entity.ChargeType;
-import com.cv.inv.entity.Location;
 import com.cv.inv.entity.MachineInfo;
-import com.cv.inv.entity.RelationKey;
-import com.cv.inv.entity.SaleMan;
-import com.cv.inv.entity.Stock;
-import com.cv.inv.entity.StockBrand;
-import com.cv.inv.entity.StockType;
-import com.cv.inv.entity.StockUnit;
-import com.cv.inv.entity.UnitRelation;
-import com.cv.inv.entity.VouStatus;
-import com.cv.inv.entry.common.StockPriceList;
 import java.util.ArrayList;
 
 /**
@@ -83,44 +70,23 @@ public class Global {
     public static List<DateModel> listDateModel;
     public static List<AppUser> listAppUser;
     public static List<Currency> listCurrency;
-    public static List<Location> listLocation;
-    public static List<StockType> listStockType = new ArrayList<>();
-    public static List<Category> listCategory = new ArrayList<>();
-    public static List<StockBrand> listStockBrand = new ArrayList<>();
-    public static List<StockUnit> listStockUnit = new ArrayList<>();
-    public static List<CharacterNo> listCharNo = new ArrayList<>();
-    public static List<VouStatus> listVou = new ArrayList<>();
-    public static List<Stock> listStock = new ArrayList<>();
-    public static List<Region> listRegion = new ArrayList<>();
-    public static List<SaleMan> listSaleMan;
-    public static List<ChargeType> listChargeType;
-    public static List<UnitRelation> listRelation = new ArrayList<>();
     public static List<MachineInfo> listMachine;
     public static List<VRef> listRef = new ArrayList<>();
     public static List<VDescription> listDesp = new ArrayList<>();
     public static List<VMenuClass> listMenuClass = new ArrayList<>();
+    public static List<Region> listRegion = new ArrayList<>();
     public static HashMap<String, String> sysProperties;
     public static HashMap<String, String> hmCashFilter = new HashMap<>();
-    public static HashMap<RelationKey, Float> hmRelation = new HashMap<>();
-    public static HashMap<String, List<StockPriceList>> hasPrice = new HashMap<>();
-    public static HashMap<String, List<StockUnit>> hasUnit = new HashMap<>();
-
     public static String sourceAcId;
     public static String finicialPeriodFrom;
     public static String finicialPeriodTo;
     public static String dateFormat;
     //active messaging on / off
-    public static boolean useActiveMQ = true;
+    public static boolean useActiveMQ = false;
     //default currency
     public static Currency defalutCurrency;
     //default department
     public static Department defaultDepartment;
-    //defatult location
-    public static Location defaultLocation;
-    //default vouStatus
-    public static VouStatus defaultVouStatus;
-    //default saleMan
-    public static SaleMan defaultSaleMan;
     //default cusotmer
     public static Customer defaultCustomer;
     //defalut supplier
@@ -142,5 +108,6 @@ public class Global {
     public static final String VOU_LIST_KEY = "default-vou-list";
     public static final String SALE_LIST_KEY = "default-sale-man-list";
     public static final String COA_LIST_KEY = "default-coa-list";
-
+    public static final String CB_DEL_KEY = "cash-book-delete";
+    public static final String CB_DEL_USR_KEY = "cash-book-delete-user";
 }

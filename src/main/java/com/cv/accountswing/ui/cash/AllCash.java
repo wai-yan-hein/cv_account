@@ -21,6 +21,7 @@ import com.cv.accountswing.entity.view.VGl;
 import com.cv.accountswing.service.COAOpeningDService;
 import com.cv.accountswing.service.CompanyInfoService;
 import com.cv.accountswing.service.ReportService;
+import com.cv.accountswing.service.RoleStatusService;
 import com.cv.accountswing.service.SystemPropertyService;
 import com.cv.accountswing.service.VDescriptionService;
 import com.cv.accountswing.service.VGlService;
@@ -110,6 +111,8 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
     private VDescriptionService descriptionService;
     @Autowired
     private ApplicationMainFrame mainFrame;
+    @Autowired
+    private RoleStatusService statusService;
     private SelectionObserver selectionObserver;
     private LoadingObserver loadingObserver;
     private ReloadData reloadData;
@@ -197,7 +200,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
         allCashTableModel.setParent(tblCash);
         allCashTableModel.addNewRow();
         tblCash.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        tblCash.getColumnModel().getColumn(0).setPreferredWidth(15);// Date
+        tblCash.getColumnModel().getColumn(0).setPreferredWidth(20);// Date
         tblCash.getColumnModel().getColumn(1).setPreferredWidth(13);// Department
         tblCash.getColumnModel().getColumn(2).setPreferredWidth(195);// Description      
         tblCash.getColumnModel().getColumn(3).setPreferredWidth(195);// Ref  
@@ -210,7 +213,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
         tblCash.getColumnModel().getColumn(1).setCellEditor(new DepartmentCellEditor(false));
         tblCash.getColumnModel().getColumn(2).setCellEditor(new DespEditor(descriptionService));
         tblCash.getColumnModel().getColumn(3).setCellEditor(new RefCellEditor(refService));
-        tblCash.getColumnModel().getColumn(4).setCellEditor(new TraderCellEditor(false,0));
+        tblCash.getColumnModel().getColumn(4).setCellEditor(new TraderCellEditor(false, 0));
         tblCash.getColumnModel().getColumn(5).setCellEditor(new COACellEditor(false));
         tblCash.getColumnModel().getColumn(6).setCellEditor(new CurrencyEditor());
         tblCash.getColumnModel().getColumn(7).setCellEditor(new AutoClearEditor());
@@ -339,29 +342,43 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
         }
     };
 
+    private void closeCellEditor() {
+        if (tblCash.getCellEditor() != null) {
+            tblCash.getCellEditor().stopCellEditing();
+        }
+    }
+
     private void deleteVoucher() {
-        VGl vgl;
+        closeCellEditor();
         int selectRow = tblCash.convertRowIndexToModel(tblCash.getSelectedRow());
-        if (isCellEditable(selectRow, 0)) {
-            int yes_no;
-            if (tblCash.getSelectedRow() >= 0) {
-                vgl = allCashTableModel.getVGl(selectRow);
-                if (vgl.getGlCode() != null) {
-                    yes_no = JOptionPane.showConfirmDialog(Global.parentForm, "Are you sure to delete?",
-                            "Delete", JOptionPane.YES_NO_OPTION);
-                    if (tblCash.getCellEditor() != null) {
-                        tblCash.getCellEditor().stopCellEditing();
-                    }
-                    if (yes_no == 0) {
+        int yes_no;
+        if (tblCash.getSelectedRow() >= 0) {
+            VGl vgl = allCashTableModel.getVGl(selectRow);
+            if (vgl.getGlCode() != null) {
+                yes_no = JOptionPane.showConfirmDialog(Global.parentForm, "Are you sure to delete?",
+                        "Delete", JOptionPane.YES_NO_OPTION);
+                if (yes_no == 0) {
+                    if (statusService.checkPermission(Global.roleCode, Global.CB_DEL_USR_KEY)) {
+                        if (vgl.getCreatedBy().equals(Global.loginUser.getAppUserCode())) {
+                            allCashTableModel.deleteVGl(selectRow);
+                        } else {
+                            pdDailog();
+                        }
+                    } else if (statusService.checkPermission(Global.roleCode, Global.CB_DEL_KEY)) {
                         allCashTableModel.deleteVGl(selectRow);
-                        calDebitCredit();
+                    } else {
+                        pdDailog();
                     }
+                    calDebitCredit();
                 }
             }
-        } else {
-            JOptionPane.showMessageDialog(Global.parentForm, "Can't delete. ");
         }
+    }
 
+    private void pdDailog() {
+        JOptionPane.showMessageDialog(Global.parentForm,
+                "Your have no permission to delete.",
+                "Permission Denied", JOptionPane.WARNING_MESSAGE);
     }
 
     public void printVoucher() {
@@ -763,17 +780,17 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
                 case "Trader":
                     if (selectObj instanceof Trader) {
                         Trader trader = (Trader) selectObj;
-                switch (trader.getTraderName()) {
-                    case "All Customer":
-                        traderType = "CUS";
-                        break;
-                    case "All Supplier":
-                        traderType = "SUP";
-                        break;
-                    default:
-                        traderType = "-";
-                        break;
-                }
+                        switch (trader.getTraderName()) {
+                            case "All Customer":
+                                traderType = "CUS";
+                                break;
+                            case "All Supplier":
+                                traderType = "SUP";
+                                break;
+                            default:
+                                traderType = "-";
+                                break;
+                        }
                         traderCode = trader.getCode();
                     }
                     searchValidation(traderCode);
