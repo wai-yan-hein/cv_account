@@ -121,6 +121,7 @@ public class COASetup extends javax.swing.JPanel implements KeyListener, PanelCo
         tblCoaGroup.setModel(coaGroupTableModel);
         tblCoaGroup.getTableHeader().setFont(Global.textFont);
         coaGroupTableModel.setParent(tblCoaGroup);
+        coaGroupTableModel.setParetnDesp(lblCoaGroup);
         tblCoaGroup.getSelectionModel().addListSelectionListener((ListSelectionEvent e) -> {
             if (e.getValueIsAdjusting()) {
                 if (tblCoaGroup.getSelectedRow() >= 0) {
@@ -156,6 +157,7 @@ public class COASetup extends javax.swing.JPanel implements KeyListener, PanelCo
         tblCOAGroupChild.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
         tblCOAGroupChild.getTableHeader().setForeground(ColorUtil.foreground);
         cOAGroupChildTableModel.setParent(tblCOAGroupChild);
+        cOAGroupChildTableModel.setParentDesp(lblCoaChild);
         tblCOAGroupChild.getColumnModel().getColumn(0).setPreferredWidth(10);// Sys Code
         tblCOAGroupChild.getColumnModel().getColumn(1).setPreferredWidth(20);// Usr Code
         tblCOAGroupChild.getColumnModel().getColumn(2).setPreferredWidth(400);// Name

@@ -226,7 +226,6 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
                         JOptionPane.showMessageDialog(Global.parentForm, "Can't delete this account is already used.");
                     }
                 }
-
             }
         } catch (HeadlessException e) {
             log.error("Delete ChartOfAccount :" + e.getMessage());
@@ -236,7 +235,7 @@ public class ChartOfAccountSetup extends javax.swing.JPanel implements
 
     private boolean isValidDel(String code) {
         boolean status;
-        List<Gl> listGl = glService.search("-", "0", "0", code, "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-");
+        List<Gl> listGl = glService.search("-", "-", "-", code, "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-");
         status = listGl.isEmpty();
         if (status) {
             List<Trader> search = traderService.search("-", code);

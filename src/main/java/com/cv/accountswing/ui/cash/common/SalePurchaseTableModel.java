@@ -84,7 +84,6 @@ public class SalePurchaseTableModel extends AbstractTableModel {
         switch (column) {
             case 7:
                 return Double.class;
-
             default:
                 return String.class;
         }
@@ -102,7 +101,7 @@ public class SalePurchaseTableModel extends AbstractTableModel {
                         return Util1.toDateStr(vgi.getGlDate(), "dd/MM/yyyy");
                     }
                 case 1: //Department
-                    return vgi.getDeptName();
+                    return vgi.getDeptUsrCode();
                 case 2://Desp
                     return vgi.getDescription();
                 case 3://Ref
@@ -151,6 +150,7 @@ public class SalePurchaseTableModel extends AbstractTableModel {
                 if (value != null) {
                     if (value instanceof Department) {
                         Department dep = (Department) value;
+                        vgl.setDeptUsrCode(dep.getUsrCode());
                         vgl.setDeptName(dep.getDeptName());
                         vgl.setDeptId(dep.getDeptCode());
                     }
@@ -210,8 +210,11 @@ public class SalePurchaseTableModel extends AbstractTableModel {
                 break;
             case 7:
                 if (value != null) {
-                    vgl.setCrAmt(Util1.getFloat(value));
-
+                    if (sourceName.equals("Sale")) {
+                        vgl.setCrAmt(Util1.getDouble(value));
+                    } else {
+                        vgl.setDrAmt(Util1.getDouble(value));
+                    }
                 }
                 break;
         }
@@ -222,19 +225,27 @@ public class SalePurchaseTableModel extends AbstractTableModel {
 
     private void save(VGl vgl, int row) {
         if (isValidEntry(vgl, row, row)) {
-            vgl.setSourceAcId(sourceAccId);
-            vgl.setCompCode(Global.compCode);
-            vgl.setCreatedBy(Global.loginUser.getAppUserCode());
             String strVGL = gson.toJson(vgl);
             Gl gl = gson.fromJson(strVGL, Gl.class);
-            gl.setMacId(Global.machineId);
-            gl.setCreatedDate(Util1.getTodayDate());
-
+            gl.setSourceAcId(sourceAccId);
+            if (Util1.isNull(gl.getGlCode())) {
+                gl.setMacId(Global.machineId);
+                gl.setCompCode(Global.compCode);
+                gl.setCreatedBy(Global.loginUser.getAppUserCode());
+                gl.setCreatedDate(Util1.getTodayDate());
+            } else {
+                gl.setModifyBy(Global.loginUser.getAppUserCode());
+            }
             try {
                 Gl glSave = glService.save(gl);
                 if (glSave != null) {
                     VGl saveVGl = listVGl.get(row);
                     saveVGl.setGlCode(glSave.getGlCode());
+                    saveVGl.setCreatedBy(glSave.getCreatedBy());
+                    saveVGl.setModifyBy(glSave.getModifyBy());
+                    saveVGl.setCompCode(glSave.getCompCode());
+                    saveVGl.setMacId(glSave.getMacId());
+                    saveVGl.setCreatedDate(glSave.getCreatedDate());
                     addNewRow();
                     parent.setRowSelectionInterval(row + 1, row + 1);
                     parent.setColumnSelectionInterval(1, 1);
@@ -249,7 +260,7 @@ public class SalePurchaseTableModel extends AbstractTableModel {
 
     private boolean isValidEntry(VGl vgl, int row, int column) {
         boolean status = true;
-        if (vgl.getAccountId() == null) {
+        if (Util1.isNull(vgl.getAccountId())) {
             status = false;
             if (column > 5) {
                 JOptionPane.showMessageDialog(Global.parentForm, "Account missing.");
@@ -312,17 +323,18 @@ public class SalePurchaseTableModel extends AbstractTableModel {
 
     public void deleteVGl(int row) {
         if (!listVGl.isEmpty()) {
-
             VGl vgl = listVGl.get(row);
             try {
-
-                String userCode = Global.loginUser.getAppUserCode();
-                int delete = glService.delete(vgl.getGlCode(), "GL-DELETE", userCode, Global.machineId);
-                if (delete == 1) {
-                    listVGl.remove(row);
-                    fireTableRowsDeleted(0, listVGl.size());
+                if (vgl.getGlCode() != null) {
+                    String userCode = Global.loginUser.getAppUserCode();
+                    int delete = glService.delete(vgl.getGlCode(), "GL-DELETE", userCode, Global.machineId);
+                    if (delete == 1) {
+                        listVGl.remove(row);
+                        fireTableRowsDeleted(row, row);
+                    }
                 }
             } catch (Exception ex) {
+                JOptionPane.showMessageDialog(Global.parentForm, ex.getMessage());
                 LOGGER.error("Delete GL :" + ex.getMessage());
             }
 

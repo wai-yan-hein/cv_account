@@ -93,7 +93,7 @@ public class RefCellEditor extends AbstractCellEditor implements TableCellEditor
         if (value != null) {
             jtf.setText(value.toString());
         }
-        completer = new RefAutoCompleter(jtf, Global.listRef, this, refService);
+        completer = new RefAutoCompleter(jtf, Global.listRef, this, refService, false);
         return component;
     }
 

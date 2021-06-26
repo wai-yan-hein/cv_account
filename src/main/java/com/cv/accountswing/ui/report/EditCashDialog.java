@@ -114,8 +114,8 @@ public class EditCashDialog extends javax.swing.JDialog {
                 vGl.setGlDate(txtDate.getDate());
                 vGl.setDescription(txtDesp.getText());
                 vGl.setReference(txtRef.getText());
-                vGl.setDrAmt(Util1.getFloat(txtCashIn.getValue()));
-                vGl.setCrAmt(Util1.getFloat(txtCashOut.getValue()));
+                vGl.setDrAmt(Util1.getDouble(txtCashIn.getValue()));
+                vGl.setCrAmt(Util1.getDouble(txtCashOut.getValue()));
                 if (traderAutoCompleter.getTrader() != null) {
                     vGl.setTraderCode(traderAutoCompleter.getTrader().getCode());
                 }

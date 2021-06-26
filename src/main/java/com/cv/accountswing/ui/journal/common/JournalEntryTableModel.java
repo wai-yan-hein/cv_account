@@ -33,7 +33,7 @@ public class JournalEntryTableModel extends AbstractTableModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(JournalEntryTableModel.class);
     private List<VGl> listGV = new ArrayList();
     //String  userCode=Global.loginUser.getAppUserCode();
-    String[] columnNames = {"Dept:", "Descripiton", "Cus / Sup", "Account", "Dr-Amt", "Crd-Amt"};
+    String[] columnNames = {"Dept:", "Descripiton", "Cus / Sup", "Account", "Dr-Amt", "Cr-Amt"};
     private JTable parent;
     JFormattedTextField ttlCrdAmt;
     JFormattedTextField ttlDrAmt;
@@ -82,7 +82,7 @@ public class JournalEntryTableModel extends AbstractTableModel {
 
             switch (column) {
                 case 0: //Deapart Id
-                    return gv.getDeptName();
+                    return gv.getDeptUsrCode();
                 case 1: //Des
                     return gv.getDescription();
                 case 2://Cus Id
@@ -112,6 +112,7 @@ public class JournalEntryTableModel extends AbstractTableModel {
                 if (value != null) {
                     if (value instanceof Department) {
                         Department dep = (Department) value;
+                        gv.setDeptUsrCode(dep.getUsrCode());
                         gv.setDeptId(dep.getDeptCode());
                         gv.setDeptName(dep.getDeptName());
                         parent.setColumnSelectionInterval(1, 1);
@@ -155,22 +156,39 @@ public class JournalEntryTableModel extends AbstractTableModel {
 
             case 4:
                 if (value != null) {
-                    gv.setDrAmt(Util1.getFloat(value));
-                    if (gv.getCrAmt() != null) {
-                        gv.setCrAmt(0.0f);
-                        parent.setColumnSelectionInterval(5, 5);
+                    gv.setDrAmt(Util1.getDouble(value));
+                    gv.setCrAmt(0.0);
+                    try {
+                        VGl get = listGV.get(row + 1);
+                        if (!Util1.isNull(get.getDeptId())) {
+                            parent.setColumnSelectionInterval(1, 1);
+                        } else {
+                            parent.setColumnSelectionInterval(0, 0);
+                        }
+                        parent.setRowSelectionInterval(row + 1, row + 1);
+                    } catch (Exception e) {
+                        parent.setColumnSelectionInterval(0, 0);
                         parent.setRowSelectionInterval(row + 1, row + 1);
                     }
                 }
                 break;
             case 5:
                 if (value != null) {
-                    gv.setCrAmt(Util1.getFloat(value));
-                    if (gv.getDrAmt() != null) {
-                        gv.setDrAmt(0.0f);
-                        parent.setColumnSelectionInterval(4, 4);
+                    gv.setCrAmt(Util1.getDouble(value));
+                    gv.setDrAmt(0.0);
+                    try {
+                        VGl get = listGV.get(row + 1);
+                        if (!Util1.isNull(get.getDeptId())) {
+                            parent.setColumnSelectionInterval(1, 1);
+                        } else {
+                            parent.setColumnSelectionInterval(0, 0);
+                        }
+                        parent.setRowSelectionInterval(row + 1, row + 1);
+                    } catch (Exception e) {
+                        parent.setColumnSelectionInterval(0, 0);
                         parent.setRowSelectionInterval(row + 1, row + 1);
                     }
+
                 }
                 break;
         }
@@ -273,9 +291,20 @@ public class JournalEntryTableModel extends AbstractTableModel {
     public void addEmptyRow() {
         if (hasEmptyRow()) {
             if (listGV != null) {
-                VGl record = new VGl();
-                listGV.add(record);
-                fireTableRowsInserted(listGV.size() - 1, listGV.size() - 1);
+                try {
+                    VGl record = new VGl();
+                    if (parent.getSelectedRow() >= 0) {
+                        VGl get = listGV.get(parent.convertRowIndexToModel(parent.getSelectedRow()));
+                        if (!Util1.isNull(get.getDeptId())) {
+                            record.setDeptId(get.getDeptId());
+                            record.setDeptName(get.getDeptName());
+                            record.setDeptUsrCode(get.getDeptUsrCode());
+                        }
+                    }
+                    listGV.add(record);
+                    fireTableRowsInserted(listGV.size() - 1, listGV.size() - 1);
+                } catch (Exception e) {
+                }
             }
         }
 

@@ -27,7 +27,7 @@ import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
-import org.apache.commons.lang.SerializationUtils;
+import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -271,12 +271,12 @@ public class AllBankTableModel extends AbstractTableModel {
                 break;
             case 8:
                 if (value != null) {
-                    vgl.setDrAmt(Util1.getFloat(value));
+                    vgl.setDrAmt(Util1.getDouble(value));
                 }
                 break;
             case 9:
                 if (value != null) {
-                    vgl.setCrAmt(Util1.getFloat(value));
+                    vgl.setCrAmt(Util1.getDouble(value));
                 }
                 break;
         }

@@ -110,13 +110,13 @@ public class COAOpeningTableModel extends AbstractTableModel {
         switch (column) {
             case 6:
                 if (value != null) {
-                    vgl.setDrAmt(Util1.getFloat(value));
+                    vgl.setDrAmt(Util1.getDouble(value));
                     save(vgl, row);
                 }
                 break;
             case 7:
                 if (value != null) {
-                    vgl.setCrAmt(Util1.getFloat(value));
+                    vgl.setCrAmt(Util1.getDouble(value));
                     save(vgl, row);
                 }
                 break;

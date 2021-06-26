@@ -259,7 +259,7 @@ public class CrDrVoucherEntry extends javax.swing.JDialog implements KeyListener
                 parameters.put("p_company_name", ci.getName());
                 parameters.put("p_comp_id", Global.compCode);
                 parameters.put("img_path", imagePath);
-                rService.genCreditVoucher(reportPath, filePath, fontPath, parameters);
+                rService.genReport(reportPath, filePath, fontPath, parameters);
             } catch (Exception ex) {
                 log.error("creditVoucher : " + ex);
 

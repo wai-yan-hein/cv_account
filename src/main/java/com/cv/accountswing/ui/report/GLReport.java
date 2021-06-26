@@ -11,25 +11,24 @@ import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.SelectionObserver;
+import com.cv.accountswing.entity.ChartOfAccount;
 import com.cv.accountswing.entity.Department;
 import com.cv.accountswing.entity.Trader;
 import com.cv.accountswing.entity.temp.TmpOpeningClosing;
-import com.cv.accountswing.entity.view.VApar;
 import com.cv.accountswing.entity.view.VGl;
 import com.cv.accountswing.entity.view.VTriBalance;
 import com.cv.accountswing.service.COAOpeningDService;
+import com.cv.accountswing.service.COAService;
 import com.cv.accountswing.service.DepartmentService;
-import com.cv.accountswing.service.FirebaseService;
 import com.cv.accountswing.service.ReportService;
-import com.cv.accountswing.service.VAParService;
 import com.cv.accountswing.service.VGlService;
+import com.cv.accountswing.service.VTriBalanceService;
 import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
+import com.cv.accountswing.ui.editor.COAAutoCompleter;
 import com.cv.accountswing.ui.editor.CurrencyAutoCompleter;
 import com.cv.accountswing.ui.editor.DateAutoCompleter;
 import com.cv.accountswing.ui.editor.DepartmentAutoCompleter;
-import com.cv.accountswing.ui.editor.TraderAutoCompleter;
-import com.cv.accountswing.ui.report.common.APARTableModel;
 import com.cv.accountswing.ui.report.common.GLListingTableModel;
 import com.cv.accountswing.util.Util1;
 import java.awt.event.KeyEvent;
@@ -51,6 +50,7 @@ import net.coderazzi.filters.gui.AutoChoices;
 import net.coderazzi.filters.gui.IFilterEditor;
 import net.coderazzi.filters.gui.IFilterHeaderObserver;
 import net.coderazzi.filters.gui.TableFilterHeader;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
@@ -61,22 +61,18 @@ import org.springframework.stereotype.Component;
  * @author Lenovo
  */
 @Component
-public class AparGlReport extends javax.swing.JPanel implements SelectionObserver,
+public class GLReport extends javax.swing.JPanel implements SelectionObserver,
         PanelControl, FilterObserver, KeyListener {
 
     private int selectRow = -1;
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(AparGlReport.class);
+    private static final Logger log = LoggerFactory.getLogger(GLReport.class);
     private final ImageIcon account = new ImageIcon(getClass().getResource("/images/accountant.png"));
 
     /**
      * Creates new form AparGlReport
      */
     @Autowired
-    private APARTableModel aPARTableModel;
-    @Autowired
     private GLListingTableModel glListingTableModel;
-    @Autowired
-    private VAParService aParService;
     @Autowired
     private COAOpeningDService coaOpDService;
     @Autowired
@@ -86,13 +82,16 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
     @Autowired
     private VGlService vGlService;
     @Autowired
+    private VTriBalanceService vTriBalanceService;
+    @Autowired
     private TrialBalanceDetailDialog trialBalanceDetailDialog;
     @Autowired
     private ApplicationMainFrame mainFrame;
     @Autowired
-    private FirebaseService firebaseService;
-    @Autowired
     private DepartmentService departmentService;
+    @Autowired
+    private COAService coaService;
+    private COAAutoCompleter cOAAutoCompleter;
     private boolean isShown = false;
     private LoadingObserver loadingObserver;
     private JPopupMenu popup;
@@ -104,9 +103,8 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
     private String currency;
     private String userCode;
     private String traderType;
-    private String panelName;
+    private String coaCode;
     private TableFilterHeader filterHeader;
-    private boolean isApPrCal = false;
     private boolean isGLCal = false;
 
     public void setIsShown(boolean isShown) {
@@ -118,28 +116,22 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         this.loadingObserver = loadingObserver;
     }
 
-    public AparGlReport() {
+    public GLReport() {
         initComponents();
         initKeyListener();
-        intitTFListener();
     }
 
     private void initKeyListener() {
         txtDep.addKeyListener(this);
-        txtPerson.addKeyListener(this);
+        txtCOA.addKeyListener(this);
     }
 
     private void initMain() {
-        panelName = this.getName();
         assingDefaultValue();
         initCombo();
         initTable();
         search();
         isShown = true;
-    }
-
-    private void intitTFListener() {
-
     }
 
     private void assingDefaultValue() {
@@ -149,50 +141,39 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
     }
 
     private void initTable() {
-        if (panelName.equals("AR/AP")) {
-            tblAPAR.setModel(aPARTableModel);
-        } else if (panelName.equals("G/L Listing")) {
-            tblAPAR.setModel(glListingTableModel);
-        }
-        tblAPAR.getTableHeader().setFont(Global.lableFont);
-        tblAPAR.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
-        tblAPAR.getTableHeader().setForeground(ColorUtil.foreground);
-        tblAPAR.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        tblAPAR.getColumnModel().getColumn(0).setPreferredWidth(20);
-        tblAPAR.getColumnModel().getColumn(1).setPreferredWidth(400);
-        tblAPAR.getColumnModel().getColumn(2).setPreferredWidth(1);
-        tblAPAR.getColumnModel().getColumn(3).setPreferredWidth(50);
-        tblAPAR.setDefaultRenderer(Double.class, new TableCellRender());
-        tblAPAR.setDefaultRenderer(Object.class, new TableCellRender());
+        tblGL.setModel(glListingTableModel);
+        tblGL.getTableHeader().setFont(Global.lableFont);
+        tblGL.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
+        tblGL.getTableHeader().setForeground(ColorUtil.foreground);
+        tblGL.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tblGL.getColumnModel().getColumn(0).setPreferredWidth(20);
+        tblGL.getColumnModel().getColumn(1).setPreferredWidth(400);
+        tblGL.getColumnModel().getColumn(2).setPreferredWidth(1);
+        tblGL.getColumnModel().getColumn(3).setPreferredWidth(50);
+        tblGL.getColumnModel().getColumn(4).setPreferredWidth(50);
+        tblGL.getColumnModel().getColumn(5).setPreferredWidth(50);
+        tblGL.setDefaultRenderer(Double.class, new TableCellRender());
+        tblGL.setDefaultRenderer(Object.class, new TableCellRender());
 
-        tblAPAR.addMouseListener(new MouseAdapter() {
+        tblGL.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 if (SwingUtilities.isRightMouseButton(e)) {
-                    popup.show(tblAPAR, e.getX(), e.getY());
+                    popup.show(tblGL, e.getX(), e.getY());
                 }
                 if (e.getClickCount() == 2) {
-                    if (tblAPAR.getSelectedRow() >= 0) {
-                        selectRow = tblAPAR.convertRowIndexToModel(tblAPAR.getSelectedRow());
-                        if (panelName.equals("AR/AP")) {
-                            VApar apar = aPARTableModel.getAPAR(selectRow);
-                            String traderCode = apar.getKey().getTraderCode();
-                            String desp = apar.getTraderName();
-                            searchTriBalDetail(traderCode, "-", desp);
-                        } else if (panelName.equals("G/L Listing")) {
-                            VTriBalance vtb = glListingTableModel.getTBAL(selectRow);
-                            String coaId = vtb.getKey().getCoaId();
-                            String coaName = vtb.getCoaName();
-                            searchTriBalDetail("-", coaId, coaName);
-
-                        }
-
+                    if (tblGL.getSelectedRow() >= 0) {
+                        selectRow = tblGL.convertRowIndexToModel(tblGL.getSelectedRow());
+                        VTriBalance vtb = glListingTableModel.getTBAL(selectRow);
+                        String coaId = vtb.getKey().getCoaId();
+                        String coaName = vtb.getCoaName();
+                        searchTriBalDetail(coaId, coaName);
                     }
                 }
             }
 
         });
-        filterHeader = new TableFilterHeader(tblAPAR, AutoChoices.ENABLED);
+        filterHeader = new TableFilterHeader(tblGL, AutoChoices.ENABLED);
         filterHeader.setPosition(TableFilterHeader.Position.TOP);
         filterHeader.setFont(Global.textFont);
         filterHeader.setVisible(false);
@@ -212,14 +193,15 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                 calAmount();
             }
         });
+
     }
 
     private void calAmount() {
-        double drAmt = 0;
-        double crAmt = 0;
-        for (int row = 0; row < tblAPAR.getRowCount(); row++) {
-            drAmt += Util1.getDouble(tblAPAR.getValueAt(row, 3));
-            crAmt += Util1.getDouble(tblAPAR.getValueAt(row, 4));
+        double drAmt = 0.0;
+        double crAmt = 0.0;
+        for (int row = 0; row < tblGL.getRowCount(); row++) {
+            drAmt += Util1.getDouble(tblGL.getValueAt(row, 3));
+            crAmt += Util1.getDouble(tblGL.getValueAt(row, 4));
         }
         txtFTotalDrAmt.setValue(drAmt);
         txtFTotalCrAmt.setValue(crAmt);
@@ -227,90 +209,39 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
 
     private String getTarget() {
         String targetId = "-";
-        if (panelName.equals("AR/AP")) {
-            VApar apar = aPARTableModel.getAPAR(selectRow);
-            targetId = apar.getAccountCode();
-        } else if (panelName.equals("G/L Listing")) {
-            VTriBalance tbal = glListingTableModel.getTBAL(selectRow);
-            targetId = tbal.getKey().getCoaId();
-        }
+        VTriBalance tbal = glListingTableModel.getTBAL(selectRow);
+        targetId = tbal.getKey().getCoaId();
         return targetId;
     }
 
-    private void searchAPAR() {
-        if (!isApPrCal) {
-            log.info("AP/PR Calculating Start.");
-            isApPrCal = true;
+    private void searchGLListing() {
+        loadingObserver.load(this.getName(), "Start");
+        if (!isGLCal) {
+            log.info("G/L Calculation Start.");
+            isGLCal = true;
             clearTable();
             initializeParameter();
-            loadingObserver.load(this.getName(), "Start");
             taskExecutor.execute(() -> {
                 try {
-                    coaOpDService.genArAp1(Global.compCode,
-                            Util1.toDateStrMYSQL(stDate, "dd/MM/yyyy"), Global.finicialPeriodFrom,
-                            Util1.toDateStrMYSQL(enDate, "dd/MM/yyyy"), "-",
-                            currency, dept, traderCode,
-                            Global.machineId.toString());
-                    List<VApar> listApar = aParService.getApAr(Global.machineId.toString(),
-                            Global.compCode, traderType);
-                    if (!listApar.isEmpty()) {
-                        aPARTableModel.setListAPAR(listApar);
-                        calAPARTotalAmount(listApar);
-                    }
-                    log.info("AP/PR Calculating End.");
-                    isApPrCal = false;
+                    coaOpDService.genTriBalance1(Global.compCode, Global.finicialPeriodFrom, Util1.toDateStrMYSQL(enDate, "dd/MM/yyyy"),
+                            "-", currency, dept, traderCode, userCode, Global.machineId.toString());
+                    List<VTriBalance> listVTB = vTriBalanceService.getTriBalance(Global.machineId.toString(), coaCode);
+                    glListingTableModel.setListTBAL(listVTB);
+                    calGLTotlaAmount(listVTB);
+                    isGLCal = false;
+                    log.info("G/L Calculation End.");
                     loadingObserver.load(this.getName(), "Stop");
                 } catch (Exception ex) {
-                    isApPrCal = false;
-                    log.error("SEARCH APAR -----" + ex.getMessage());
+                    isGLCal = false;
+                    log.error("searchGLListing : " + ex.getMessage());
                     loadingObserver.load(this.getName(), "Stop");
                 }
             });
-            //uploadToFirebase();
         }
 
     }
 
-    private void uploadToFirebase() {
-        taskExecutor.execute(() -> {
-            try {
-                firebaseService.uploadCustomerBalance(aPARTableModel.getListAPAR());
-            } catch (Exception e) {
-                log.info("User Offline...");
-            }
-        });
-    }
-
-    /*
-    private void searchGLListing() {
-    loadingObserver.load(this.getName(), "Start");
-    if (!isGLCal) {
-    log.info("G/L Calculation Start.");
-    isGLCal = true;
-    clearTable();
-    initializeParameter();
-    taskExecutor.execute(() -> {
-    try {
-    coaOpDService.genTriBalance1(Global.compCode,
-    Util1.toDateStrMYSQL(stDate, "dd/MM/yyyy"),
-    Global.finicialPeriodFrom, Util1.toDateStrMYSQL(enDate, "dd/MM/yyyy"),
-    "-", currency, dept, traderCode, userCode, Global.machineId.toString());
-    List<VTriBalance> listVTB = vTriBalanceService.getTriBalance(Global.machineId.toString());
-    glListingTableModel.setListTBAL(listVTB);
-    calGLTotlaAmount(listVTB);
-    isGLCal = false;
-    log.info("G/L Calculation End.");
-    loadingObserver.load(this.getName(), "Stop");
-    } catch (Exception ex) {
-    isGLCal = false;
-    log.error("searchGLListing -----" + ex.getMessage());
-    loadingObserver.load(this.getName(), "Stop");
-    }
-    });
-    }
-    
-    }*/
-    private void searchTriBalDetail(String traderCode, String coaId, String desp) {
+    private void searchTriBalDetail(String coaId, String desp) {
         try {
             List<VGl> listVGL = vGlService.searchGlDrCr(Util1.isNull(stDate, "-"),
                     Util1.isNull(enDate, "-"), coaId, currency, dept,
@@ -393,7 +324,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         listVGL.forEach(vgl -> {
             String sourceAcId = Util1.isNull(vgl.getSourceAcId(), "-");
             if (!sourceAcId.equals(targetId)) {
-                double tmpDrAmt = 0.0;
+                double tmpDrAmt = 0.0f;
                 if (vgl.getDrAmt() != null) {
                     tmpDrAmt = vgl.getDrAmt();
                 }
@@ -410,16 +341,19 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         });
     }
 
-    private void calAPARTotalAmount(List<VApar> listApar) {
+    private void calGLTotlaAmount(List<VTriBalance> listTB) {
         double ttlDrAmt = 0.0;
         double ttlCrAmt = 0.0;
-        double outBal;
-        for (VApar apar : listApar) {
-            ttlDrAmt += Util1.getDouble(apar.getDrAmt());
-            ttlCrAmt += Util1.getDouble(apar.getCrAmt());
+        double ttlNet = 0.0;
+        double outBal = 0.0;
+        for (VTriBalance tb : listTB) {
+            ttlDrAmt += Util1.getDouble(tb.getDrAmt());
+            ttlCrAmt += Util1.getDouble(tb.getCrAmt());
+            ttlNet += Util1.getDouble(tb.getClosing());
         }
-        txtFTotalCrAmt.setValue(ttlCrAmt);
-        txtFTotalDrAmt.setValue(ttlDrAmt);
+        txtFTotalCrAmt.setValue(Util1.toFormatPattern(ttlCrAmt));
+        txtFTotalDrAmt.setValue(Util1.toFormatPattern(ttlDrAmt));
+        txtFNetChange.setValue(Util1.toFormatPattern(ttlNet));
         if (ttlDrAmt > ttlCrAmt) {
             outBal = ttlDrAmt - ttlCrAmt;
         } else {
@@ -436,18 +370,29 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         enDate = Util1.isNull(enDate, Util1.toDateStr(Util1.getTodayDate(), "dd/MM/yyyy"));
         userCode = Global.loginUser.getAppUserCode();
         traderType = Util1.isNull(traderType, "-");
+        ChartOfAccount coa = cOAAutoCompleter.getCOA();
+        coaCode = getCOACode(coa.getCode(), Global.compCode);
+    }
 
+    public String getCOACode(String code, String compCode) {
+        String tmp = "-";
+        List<ChartOfAccount> listCoA = coaService.getAllChild(code, Global.compCode);
+        if (!listCoA.isEmpty()) {
+            tmp = "";
+            tmp = listCoA.stream().map(coa -> String.format("'%s',", coa.getCode())).reduce(tmp, String::concat);
+        }
+        tmp = tmp.substring(0, tmp.length() - 1);
+        return tmp;
     }
 
     private void initCombo() {
         DateAutoCompleter dateAutoCompleter = new DateAutoCompleter(txtDate,
                 Global.listDateModel, null);
         dateAutoCompleter.setSelectionObserver(this);
-
-        TraderAutoCompleter traderAutoCompleter = new TraderAutoCompleter(txtPerson,
-                Global.listTrader, null, true, 1);
-        traderAutoCompleter.setSelectionObserver(this);
-        traderAutoCompleter.setTrader(new Trader("-", "All"));
+        List<ChartOfAccount> listCOALv2 = coaService.getLevelOneTwo(Global.compCode);
+        cOAAutoCompleter = new COAAutoCompleter(txtCOA, listCOALv2, null, true);
+        cOAAutoCompleter.setSelectionObserver(this);
+        cOAAutoCompleter.setCoa(new ChartOfAccount("-", "All"));
         departmentAutoCompleter = new DepartmentAutoCompleter(txtDep,
                 Global.listDepartment, null, true);
         departmentAutoCompleter.setSelectionObserver(this);
@@ -456,31 +401,6 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                 Global.listCurrency, null);
         currencyAutoCompleter.setSelectionObserver(this);
         currencyAutoCompleter.setCurrency(Global.defalutCurrency);
-    }
-
-    public void printApar() {
-        loadingObserver.load(this.getName(), "Start");
-        taskExecutor.execute(() -> {
-            try {
-                String depName = "-".equals(dept) ? "All" : departmentService.findById(dept).getDeptName();
-                String name = txtDate.getText();
-                String compName = Global.sysProperties.get("system.report.company");
-                String reportPath = Global.sysProperties.get("system.report.path");
-                String fontPath = Global.sysProperties.get("system.font.path");
-                String filePath = reportPath + File.separator + "APAR";
-                Map<String, Object> parameters = new HashMap();
-                parameters.put("p_company_name", compName);
-                parameters.put("p_comp_id", Global.compCode);
-                parameters.put("p_user_id", Global.loginUser.getAppUserCode());
-                parameters.put("p_report_info", name);
-                parameters.put("trader_code", traderCode);
-                parameters.put("p_dept_name", "Dept : " + depName);
-                rService.genReport(filePath, filePath, fontPath, parameters);
-                loadingObserver.load(this.getName(), "Stop");
-            } catch (Exception ex) {
-                log.error("PRINT APAR REPORT :::" + ex.getMessage());
-            }
-        });
     }
 
     private void printGLListing() {
@@ -509,23 +429,15 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         txtCurrency.setText(null);
         txtDate.setText(null);
         txtDep.setText(null);
-        txtPerson.setText(null);
+        txtCOA.setText(null);
     }
 
     private void search() {
-        if (panelName.equals("AR/AP")) {
-            searchAPAR();
-        } else if (panelName.equals("G/L Listing")) {
-            //searchGLListing();
-        }
+        searchGLListing();
     }
 
     private void clearTable() {
-        if (this.getName().equals("AR/AP")) {
-            aPARTableModel.clear();
-        } else if (this.getName().equals("G/L Listing")) {
-            glListingTableModel.clear();
-        }
+        glListingTableModel.clear();
     }
 
     /**
@@ -542,15 +454,16 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         txtDate = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         txtDep = new javax.swing.JTextField();
-        txtPerson = new javax.swing.JTextField();
+        txtCOA = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         txtCurrency = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        tblAPAR = new javax.swing.JTable();
+        tblGL = new javax.swing.JTable();
         jPanel2 = new javax.swing.JPanel();
         txtFTotalDrAmt = new javax.swing.JFormattedTextField();
         txtFTotalCrAmt = new javax.swing.JFormattedTextField();
+        txtFNetChange = new javax.swing.JFormattedTextField();
         txtFOFB = new javax.swing.JFormattedTextField();
         jLabel5 = new javax.swing.JLabel();
 
@@ -584,21 +497,21 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
             }
         });
 
-        txtPerson.setFont(Global.textFont);
-        txtPerson.setName("txtPerson"); // NOI18N
-        txtPerson.addFocusListener(new java.awt.event.FocusAdapter() {
+        txtCOA.setFont(Global.textFont);
+        txtCOA.setName("txtCOA"); // NOI18N
+        txtCOA.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
-                txtPersonFocusGained(evt);
+                txtCOAFocusGained(evt);
             }
         });
-        txtPerson.addActionListener(new java.awt.event.ActionListener() {
+        txtCOA.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtPersonActionPerformed(evt);
+                txtCOAActionPerformed(evt);
             }
         });
 
         jLabel3.setFont(Global.lableFont);
-        jLabel3.setText("Person");
+        jLabel3.setText("COA");
 
         txtCurrency.setFont(Global.lableFont);
         txtCurrency.setToolTipText("");
@@ -622,19 +535,19 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                 .addContainerGap()
                 .addComponent(jLabel1)
                 .addGap(18, 18, 18)
-                .addComponent(txtDate, javax.swing.GroupLayout.DEFAULT_SIZE, 130, Short.MAX_VALUE)
+                .addComponent(txtDate, javax.swing.GroupLayout.DEFAULT_SIZE, 132, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel2)
                 .addGap(18, 18, 18)
-                .addComponent(txtDep, javax.swing.GroupLayout.DEFAULT_SIZE, 130, Short.MAX_VALUE)
+                .addComponent(txtDep, javax.swing.GroupLayout.DEFAULT_SIZE, 132, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel3)
                 .addGap(18, 18, 18)
-                .addComponent(txtPerson, javax.swing.GroupLayout.DEFAULT_SIZE, 130, Short.MAX_VALUE)
+                .addComponent(txtCOA, javax.swing.GroupLayout.DEFAULT_SIZE, 135, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel4)
                 .addGap(18, 18, 18)
-                .addComponent(txtCurrency, javax.swing.GroupLayout.DEFAULT_SIZE, 133, Short.MAX_VALUE)
+                .addComponent(txtCurrency, javax.swing.GroupLayout.DEFAULT_SIZE, 135, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -646,15 +559,15 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                     .addComponent(txtDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2)
                     .addComponent(txtDep, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtPerson, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtCOA, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel3)
                     .addComponent(txtCurrency, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel4))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        tblAPAR.setFont(Global.textFont);
-        tblAPAR.setModel(new javax.swing.table.DefaultTableModel(
+        tblGL.setFont(Global.textFont);
+        tblGL.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -665,13 +578,13 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        tblAPAR.setRowHeight(Global.tblRowHeight);
-        tblAPAR.addKeyListener(new java.awt.event.KeyAdapter() {
+        tblGL.setRowHeight(Global.tblRowHeight);
+        tblGL.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
-                tblAPARKeyReleased(evt);
+                tblGLKeyReleased(evt);
             }
         });
-        jScrollPane1.setViewportView(tblAPAR);
+        jScrollPane1.setViewportView(tblGL);
 
         jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder(null, java.awt.Color.lightGray));
 
@@ -682,6 +595,10 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         txtFTotalCrAmt.setEditable(false);
         txtFTotalCrAmt.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         txtFTotalCrAmt.setFont(Global.amtFont);
+
+        txtFNetChange.setEditable(false);
+        txtFNetChange.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        txtFNetChange.setFont(Global.amtFont);
 
         txtFOFB.setEditable(false);
         txtFOFB.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
@@ -696,23 +613,27 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(txtFTotalDrAmt, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(txtFTotalDrAmt, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(txtFTotalCrAmt, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel5))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtFOFB, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtFTotalCrAmt, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(txtFNetChange, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
+                    .addComponent(txtFOFB))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtFTotalDrAmt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtFTotalCrAmt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtFTotalDrAmt, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(txtFNetChange, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtFOFB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel5))
@@ -737,7 +658,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 385, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 379, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -759,10 +680,10 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         search();
     }//GEN-LAST:event_txtDepActionPerformed
 
-    private void txtPersonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPersonActionPerformed
+    private void txtCOAActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCOAActionPerformed
         // TODO add your handling code here:
         search();
-    }//GEN-LAST:event_txtPersonActionPerformed
+    }//GEN-LAST:event_txtCOAActionPerformed
 
     private void txtCurrencyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCurrencyActionPerformed
         // TODO add your handling code here:
@@ -774,14 +695,14 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
         txtDep.selectAll();
     }//GEN-LAST:event_txtDepFocusGained
 
-    private void txtPersonFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtPersonFocusGained
+    private void txtCOAFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtCOAFocusGained
         // TODO add your handling code here:
-        txtPerson.selectAll();
-    }//GEN-LAST:event_txtPersonFocusGained
+        txtCOA.selectAll();
+    }//GEN-LAST:event_txtCOAFocusGained
 
-    private void tblAPARKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tblAPARKeyReleased
+    private void tblGLKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tblGLKeyReleased
 
-    }//GEN-LAST:event_tblAPARKeyReleased
+    }//GEN-LAST:event_tblGLKeyReleased
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -793,14 +714,15 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable tblAPAR;
+    private javax.swing.JTable tblGL;
+    private javax.swing.JTextField txtCOA;
     private javax.swing.JTextField txtCurrency;
     private javax.swing.JTextField txtDate;
     private javax.swing.JTextField txtDep;
+    private javax.swing.JFormattedTextField txtFNetChange;
     private javax.swing.JFormattedTextField txtFOFB;
     private javax.swing.JFormattedTextField txtFTotalCrAmt;
     private javax.swing.JFormattedTextField txtFTotalDrAmt;
-    private javax.swing.JTextField txtPerson;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -813,13 +735,15 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
                     String[] split = selectObj.toString().split("to");
                     stDate = split[0];
                     enDate = split[1];
-
                     break;
                 case "Department":
                     dept = selectObj.toString();
                     break;
                 case "Currency":
                     currency = selectObj.toString();
+                    break;
+                case "COA":
+                    searchGLListing();
                     break;
                 case "Trader":
                     if (selectObj instanceof Trader) {
@@ -867,11 +791,7 @@ public class AparGlReport extends javax.swing.JPanel implements SelectionObserve
 
     @Override
     public void print() {
-        if (panelName.equals("AR/AP")) {
-            printApar();
-        } else if (panelName.equals("G/L Listing")) {
-            printGLListing();
-        }
+        printGLListing();
     }
 
     @Override

@@ -12,17 +12,15 @@ import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.ReloadData;
 import com.cv.accountswing.common.SelectionObserver;
-import com.cv.accountswing.entity.CompanyInfo;
-import com.cv.accountswing.entity.SystemProperty;
-import com.cv.accountswing.entity.SystemPropertyKey;
+import com.cv.accountswing.entity.ChartOfAccount;
 import com.cv.accountswing.entity.Trader;
 import com.cv.accountswing.entity.temp.TmpOpeningClosing;
 import com.cv.accountswing.entity.view.VGl;
 import com.cv.accountswing.service.COAOpeningDService;
-import com.cv.accountswing.service.CompanyInfoService;
+import com.cv.accountswing.service.COAService;
+import com.cv.accountswing.service.DepartmentService;
 import com.cv.accountswing.service.ReportService;
 import com.cv.accountswing.service.RoleStatusService;
-import com.cv.accountswing.service.SystemPropertyService;
 import com.cv.accountswing.service.VDescriptionService;
 import com.cv.accountswing.service.VGlService;
 import com.cv.accountswing.service.VRefService;
@@ -47,6 +45,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,7 +58,10 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
+import javax.swing.table.TableColumn;
 import net.coderazzi.filters.gui.AutoChoices;
+import net.coderazzi.filters.gui.IFilterEditor;
+import net.coderazzi.filters.gui.IFilterHeaderObserver;
 import net.coderazzi.filters.gui.TableFilterHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,12 +78,12 @@ import org.springframework.stereotype.Component;
 public class AllCash extends javax.swing.JPanel implements SelectionObserver,
         PanelControl, FilterObserver {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AllCash.class);
+    private static final Logger log = LoggerFactory.getLogger(AllCash.class);
     private String stDate;
     private String enDate;
-    private String desp;
-    private String accId;
-    private String ref;
+    private String desp = "";
+    private String accCode;
+    private String ref = "";
     private String depId;
     private String traderCode;
     private String currency;
@@ -98,11 +100,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
     @Autowired
     private COAOpeningDService coaOpDService;
     @Autowired
-    private CompanyInfoService ciService;
-    @Autowired
-    private SystemPropertyService spService;
-    @Autowired
-    ReportService rService;
+    private ReportService rService;
     @Autowired
     private ApplicationContext applicationContext;
     @Autowired
@@ -113,6 +111,10 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
     private ApplicationMainFrame mainFrame;
     @Autowired
     private RoleStatusService statusService;
+    @Autowired
+    private DepartmentService departmentService;
+    @Autowired
+    private COAService coaService;
     private SelectionObserver selectionObserver;
     private LoadingObserver loadingObserver;
     private ReloadData reloadData;
@@ -121,6 +123,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
     private final JLabel lblMessage = new JLabel();
     private boolean isShown = false;
     private TableFilterHeader filterHeader;
+    private boolean isSearch = false;
 
     public void setIsShown(boolean isShown) {
         this.isShown = isShown;
@@ -137,7 +140,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
 
     public void setSourceAccId(String sourceAccId) {
         this.sourceAccId = sourceAccId;
-        LOGGER.info("Source Id :" + sourceAccId);
+        log.info("Source Id :" + sourceAccId);
 
     }
 
@@ -156,7 +159,6 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
     public AllCash() {
         initComponents();
         initPopup();
-        initKeyListener();
         initMouseLisener();
     }
 
@@ -179,15 +181,19 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
     }
 
     private void requestFoucsTable() {
-        int row = allCashTableModel.getListSize() - 1;
-        //tblCash.setCellSelectionEnabled(true);
-        if (row >= 0) {
-            tblCash.changeSelection(row, 0, false, false);
-            tblCash.requestFocus();
+        try {
+            int row = allCashTableModel.getListSize() - 1;
+            if (row >= 0) {
+                tblCash.changeSelection(row, 0, false, false);
+                tblCash.requestFocus();
+            }
+        } catch (Exception e) {
         }
     }
 
     private void initTable() {
+        allCashTableModel.setTxtDate(filterPanel.getTxtDate());
+        allCashTableModel.setDateAutoCompleter(filterPanel.getDateAutoCompleter());
         allCashTableModel.setSelectionObserver(this);
         allCashTableModel.setReloadData(reloadData);
         tblCash.setModel(allCashTableModel);
@@ -202,22 +208,24 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
         tblCash.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblCash.getColumnModel().getColumn(0).setPreferredWidth(20);// Date
         tblCash.getColumnModel().getColumn(1).setPreferredWidth(13);// Department
-        tblCash.getColumnModel().getColumn(2).setPreferredWidth(195);// Description      
-        tblCash.getColumnModel().getColumn(3).setPreferredWidth(195);// Ref  
-        tblCash.getColumnModel().getColumn(4).setPreferredWidth(90);// Person
-        tblCash.getColumnModel().getColumn(5).setPreferredWidth(150);// Account
-        tblCash.getColumnModel().getColumn(6).setPreferredWidth(1);// Curr      
-        tblCash.getColumnModel().getColumn(7).setPreferredWidth(90);// Dr-Amt   
-        tblCash.getColumnModel().getColumn(8).setPreferredWidth(90);// Cr-Amt  
+        tblCash.getColumnModel().getColumn(2).setPreferredWidth(180);// Description      
+        tblCash.getColumnModel().getColumn(3).setPreferredWidth(180);// Ref  
+        tblCash.getColumnModel().getColumn(4).setPreferredWidth(90);// Ref  
+        tblCash.getColumnModel().getColumn(5).setPreferredWidth(90);// Person
+        tblCash.getColumnModel().getColumn(6).setPreferredWidth(150);// Account
+        tblCash.getColumnModel().getColumn(7).setPreferredWidth(1);// Curr      
+        tblCash.getColumnModel().getColumn(8).setPreferredWidth(90);// Dr-Amt   
+        tblCash.getColumnModel().getColumn(9).setPreferredWidth(90);// Cr-Amt  
         tblCash.getColumnModel().getColumn(0).setCellEditor(new AutoClearEditor());
         tblCash.getColumnModel().getColumn(1).setCellEditor(new DepartmentCellEditor(false));
         tblCash.getColumnModel().getColumn(2).setCellEditor(new DespEditor(descriptionService));
         tblCash.getColumnModel().getColumn(3).setCellEditor(new RefCellEditor(refService));
-        tblCash.getColumnModel().getColumn(4).setCellEditor(new TraderCellEditor(false, 0));
-        tblCash.getColumnModel().getColumn(5).setCellEditor(new COACellEditor(false));
-        tblCash.getColumnModel().getColumn(6).setCellEditor(new CurrencyEditor());
-        tblCash.getColumnModel().getColumn(7).setCellEditor(new AutoClearEditor());
+        tblCash.getColumnModel().getColumn(4).setCellEditor(new AutoClearEditor());
+        tblCash.getColumnModel().getColumn(5).setCellEditor(new TraderCellEditor(false, 2));
+        tblCash.getColumnModel().getColumn(6).setCellEditor(new COACellEditor(false));
+        tblCash.getColumnModel().getColumn(7).setCellEditor(new CurrencyEditor());
         tblCash.getColumnModel().getColumn(8).setCellEditor(new AutoClearEditor());
+        tblCash.getColumnModel().getColumn(9).setCellEditor(new AutoClearEditor());
 
         tblCash.setDefaultRenderer(Double.class, new TableCellRender());
         tblCash.setDefaultRenderer(Object.class, new TableCellRender());
@@ -225,11 +233,8 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
         tblCash.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
-                if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_RIGHT) {
-                    selectionObserver = filterPanel;
-                    if (selectionObserver != null) {
-                        selectionObserver.selected("TABTOTEXTBOX", "");
-                    }
+                if (e.isControlDown() && e.getKeyCode() == 222) {
+                    allCashTableModel.copyRow();
                 }
             }
 
@@ -247,20 +252,35 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
         filterHeader.setPosition(TableFilterHeader.Position.TOP);
         filterHeader.setFont(Global.textFont);
         filterHeader.setVisible(false);
-    }
-
-    private void initKeyListener() {
-        tblCash.addKeyListener(new KeyAdapter() {
+        filterHeader.addHeaderObserver(new IFilterHeaderObserver() {
             @Override
-            public void keyReleased(KeyEvent e) {
-                if (e.isControlDown()) {
-                    if (e.getKeyCode() == KeyEvent.VK_V) {
-                        allCashTableModel.copyRow();
-                    }
-                }
+            public void tableFilterEditorCreated(TableFilterHeader tfh, IFilterEditor ife, TableColumn tc) {
+                log.info("tableFilterEditorCreated");
             }
 
+            @Override
+            public void tableFilterEditorExcluded(TableFilterHeader tfh, IFilterEditor ife, TableColumn tc) {
+                log.info("tableFilterEditorExcluded");
+            }
+
+            @Override
+            public void tableFilterUpdated(TableFilterHeader tfh, IFilterEditor ife, TableColumn tc) {
+                calAmount();
+            }
         });
+    }
+
+    private void calAmount() {
+        double drAmt = 0;
+        double crAmt = 0;
+        for (int row = 0; row < tblCash.getRowCount(); row++) {
+            drAmt += Util1.getDouble(tblCash.getValueAt(row, 8));
+            crAmt += Util1.getDouble(tblCash.getValueAt(row, 9));
+        }
+        double closing = Util1.getDouble(Util1.getDouble(txtFOpening.getValue()) + drAmt - crAmt);
+        txtFCreditAmt.setValue(crAmt);
+        txtFDebitAmt.setValue(drAmt);
+        txtFClosing.setValue(closing);
     }
 
     private void initPopup() {
@@ -358,14 +378,14 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
                 yes_no = JOptionPane.showConfirmDialog(Global.parentForm, "Are you sure to delete?",
                         "Delete", JOptionPane.YES_NO_OPTION);
                 if (yes_no == 0) {
-                    if (statusService.checkPermission(Global.roleCode, Global.CB_DEL_USR_KEY)) {
-                        if (vgl.getCreatedBy().equals(Global.loginUser.getAppUserCode())) {
+                    if (statusService.checkPermission(Global.roleCode, Global.CB_DEL_KEY)) {
+                        allCashTableModel.deleteVGl(selectRow);
+                    } else if (statusService.checkPermission(Global.roleCode, Global.CB_DEL_USR_KEY)) {
+                        if (Util1.isNull(vgl.getCreatedBy(), "-").equals(Global.loginUser.getAppUserCode())) {
                             allCashTableModel.deleteVGl(selectRow);
                         } else {
                             pdDailog();
                         }
-                    } else if (statusService.checkPermission(Global.roleCode, Global.CB_DEL_KEY)) {
-                        allCashTableModel.deleteVGl(selectRow);
                     } else {
                         pdDailog();
                     }
@@ -385,31 +405,18 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
         loadingObserver.load(this.getName(), "Start");
         taskExecutor.execute(() -> {
             try {
-                CompanyInfo ci = ciService.findById(Global.compCode);
-                SystemPropertyKey key = new SystemPropertyKey();
-                key.setCompCode(Global.compCode);
-                key.setPropKey("system.report.path");
-                SystemProperty sp = spService.findById(key);
-                String userCode = Global.loginUser.getAppUserCode();
-                String fileName = userCode + "_Ledger_Report.pdf";
-                String reportPath = sp.getPropValue();
+                String date = filterPanel.getTxtDate().getText();
+                String depName = depId.equals("-") ? "All" : departmentService.findById(depId).getDeptName();
+                String reportPath = Global.sysProperties.get("system.report.path");
                 //String reportPath1 = reportPath;
-                String filePath = reportPath + "/temp/" + fileName;
-
-                reportPath = reportPath + "/LedgerReport";
-                key = new SystemPropertyKey();
-                key.setCompCode(Global.compCode);
-                key.setPropKey("system.font.path");
-                sp = spService.findById(key);
-                String fontPath = sp.getPropValue();
-
+                String fontPath = Global.sysProperties.get("system.font.path");
+                String filePath = reportPath + File.separator + "LedgerReport";
                 Map<String, Object> parameters = new HashMap();
-                parameters.put("p_company_name", ci.getName());
+                parameters.put("p_company_name", Global.companyName);
                 parameters.put("p_comp_id", Global.compCode);
                 parameters.put("p_trg_acc_id", sourceAccId);
-                parameters.put("p_acc_id", Util1.isNull(accId, "-"));
-                parameters.put("p_report_info", stDate
-                        + " to " + enDate);
+                parameters.put("p_acc_id", Util1.isNull(accCode, "-"));
+                parameters.put("p_report_info", date);
                 parameters.put("p_from", Util1.toDateStrMYSQL(stDate, "dd/MM/yyyy"));
                 parameters.put("p_to", Util1.toDateStrMYSQL(enDate, "dd/MM/yyyy"));
                 parameters.put("p_desp", Util1.isNull(desp, "-"));
@@ -418,14 +425,15 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
                 parameters.put("p_ref", Util1.isNull(ref, "-"));
                 parameters.put("p_dept", Util1.isNull(depId, "-"));
                 parameters.put("p_vou_no", "-");
-                parameters.put("p_cv_id", Util1.isNull(accId, "-"));
+                parameters.put("p_cv_id", Util1.isNull(accCode, "-"));
                 parameters.put("p_report_name", this.getName());
                 parameters.put("p_opening", txtFOpening.getValue());
                 parameters.put("p_closing", txtFClosing.getValue());
-                rService.genCreditVoucher(reportPath, filePath, fontPath, parameters);
+                parameters.put("p_dept_name", "Dept : " + depName);
+                rService.genReport(filePath, filePath, fontPath, parameters);
                 loadingObserver.load(this.getName(), "Stop");
             } catch (Exception ex) {
-                LOGGER.error("getLedgerReport : " + ex);
+                log.error("getLedgerReport : " + ex.getMessage());
 
             }
         });
@@ -434,44 +442,59 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
 
     private void searchCash() {
         try {
-            initializeParameter();
-            if (sourceAccId != null) {
-                loadingObserver.load(this.getName(), "Start");
-                taskExecutor.execute(() -> {
-                    LOGGER.info(this.getName() + "Start Date  :" + stDate + "-" + "End Date :" + enDate);
-                    List<VGl> listVGl = vGlService.search(stDate, enDate,
-                            desp, sourceAccId,
-                            accId, currency, "-",
-                            ref, depId, "-", traderCode,
-                            "-", "-", "-", "-", "-",
-                            "-", "-", "-",
-                            traderType,
-                            "-");
-                    LOGGER.info("Search Cash Book End ...");
-                    swapData(listVGl, sourceAccId);
-                    allCashTableModel.setListVGl(listVGl);
-                    allCashTableModel.addNewRow();
-                    requestFoucsTable();
-                    calOpeningClosing();
-                    loadingObserver.load(this.getName(), "Stop");
-                });
-            } else {
-                JOptionPane.showMessageDialog(Global.parentForm, "Source Account Missing.");
+            if (!isSearch) {
+                isSearch = true;
+                initializeParameter();
+                if (sourceAccId != null) {
+                    loadingObserver.load(this.getName(), "Start");
+                    taskExecutor.execute(() -> {
+                        log.info(this.getName() + "Start Date  :" + stDate + "-" + "End Date :" + enDate);
+                        List<VGl> listVGl = vGlService.search(stDate, enDate,
+                                desp, sourceAccId,
+                                getCOACode(accCode, Global.compCode), currency, "-",
+                                ref, depId, "-", traderCode,
+                                "-", "-", "-", "-", "-",
+                                "-", "-", "-",
+                                traderType,
+                                "-");
+                        log.info("Search Cash Book End ...");
+                        swapData(listVGl, sourceAccId);
+                        allCashTableModel.setListVGl(listVGl);
+                        allCashTableModel.addNewRow();
+                        requestFoucsTable();
+                        calOpeningClosing();
+                        isSearch = false;
+                        loadingObserver.load(this.getName(), "Stop");
+                    });
+                } else {
+                    JOptionPane.showMessageDialog(Global.parentForm, "Source Account Missing.");
+                }
             }
         } catch (HeadlessException e) {
-            LOGGER.error("Search Cash :" + e.getMessage());
+            log.error("Search Cash :" + e.getMessage());
             JOptionPane.showMessageDialog(Global.parentForm, e.getMessage(), "Searching Cash", JOptionPane.ERROR_MESSAGE);
         }
 
     }
 
+    public String getCOACode(String code, String compCode) {
+        String tmp = "-";
+        List<ChartOfAccount> listCoA = coaService.getAllChild(code, Global.compCode);
+        if (!listCoA.isEmpty()) {
+            tmp = "";
+            tmp = listCoA.stream().map(coa -> String.format("'%s',", coa.getCode())).reduce(tmp, String::concat);
+        }
+        tmp = tmp.substring(0, tmp.length() - 1);
+        return Util1.isNull(tmp, "-");
+    }
+
     private void initializeParameter() {
         stDate = Util1.isNull(stDate, Util1.toDateStr(Util1.getTodayDate(), "dd/MM/yyyy"));
         enDate = Util1.isNull(enDate, Util1.toDateStr(Util1.getTodayDate(), "dd/MM/yyyy"));
-        desp = Util1.isNull(desp, "-");
-        accId = Util1.isNull(accId, "-");
+        desp = desp.equals("All") ? "-" : Util1.isNull(desp, "-");
+        accCode = Util1.isNull(accCode, "-");
         currency = Util1.isNull(currency, "-");
-        ref = Util1.isNull(ref, "-");
+        ref = ref.equals("All") ? "-" : Util1.isNull(ref, "-");
         depId = Util1.isNull(depId, "-");
         traderCode = Util1.isNull(traderCode, "-");
         traderType = Util1.isNull(traderType, "-");
@@ -481,10 +504,10 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
     public void clearFilter() {
         stDate = null;
         enDate = null;
-        desp = null;
-        accId = null;
+        desp = "";
+        accCode = null;
         currency = null;
-        ref = null;
+        ref = "";
         depId = null;
         traderCode = null;
         txtFClosing.setValue(0.0);
@@ -500,19 +523,10 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
         if (!listVGL.isEmpty()) {
             listVGL.forEach(vgl -> {
                 String sourceAcId = Util1.isNull(vgl.getSourceAcId(), "-");
-                String accId = Util1.isNull(vgl.getAccountId(), "-");
+                String accCode = Util1.isNull(vgl.getAccountId(), "-");
                 if (sourceAcId.equals(targetId)) {
-                    /*if(Util1.isNullZero(vgl.getSplitId()) == 8){ //Credit Voucher
-                Double tmpAmt = vgl.getDrAmt();
-                vgl.setDrAmt(vgl.getCrAmt());
-                vgl.setCrAmt(tmpAmt);
-                } else if(Util1.isNullZero(vgl.getSplitId()) == 9){ //Debit Voucher
-                Double tmpAmt = vgl.getCrAmt();
-                vgl.setCrAmt(vgl.getDrAmt());
-                vgl.setDrAmt(tmpAmt);
-                }*/
-                } else if (accId.equals(targetId)) {
-                    float tmpDrAmt = 0;
+                } else if (accCode.equals(targetId)) {
+                    double tmpDrAmt = 0.0;
                     if (vgl.getDrAmt() != null) {
                         tmpDrAmt = vgl.getDrAmt();
                     }
@@ -523,8 +537,8 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
                     vgl.setAccName(vgl.getSrcAccName());
                     vgl.setSrcAccName(tmpStr);
                 } else {
-                    vgl.setDrAmt(0.0f);
-                    vgl.setCrAmt(0.0f);
+                    vgl.setDrAmt(0.0);
+                    vgl.setCrAmt(0.0);
                 }
             });
         }
@@ -625,24 +639,22 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(txtFClosing, javax.swing.GroupLayout.PREFERRED_SIZE, 268, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtFOpening, javax.swing.GroupLayout.PREFERRED_SIZE, 268, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 315, Short.MAX_VALUE)
-                .addComponent(txtFDebitAmt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(txtFCreditAmt, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 221, Short.MAX_VALUE)
+                .addComponent(txtFDebitAmt, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtFCreditAmt, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
         jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jLabel1, jLabel2});
-
-        jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {txtFCreditAmt, txtFDebitAmt});
 
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtFDebitAmt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtFCreditAmt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtFCreditAmt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtFDebitAmt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap(9, Short.MAX_VALUE)
@@ -713,7 +725,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
 
     private void calDebitCredit() {
         List<VGl> listVGl = allCashTableModel.getListVGl();
-        //LOGGER.info("calDebitCredit Thread Started.");
+        //log.info("calDebitCredit Thread Started.");
         double dbAmt = 0.0;
         double cdAmt = 0.0;
         for (VGl vgl : listVGl) {
@@ -728,7 +740,7 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
     }
 
     private void calOpeningClosing() {
-        LOGGER.info("Start calculate opening.");
+        log.info("Start calculate opening.");
         String opDate = Global.finicialPeriodFrom;
         try {
             if (stDate.equals("-")) {
@@ -737,14 +749,14 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
             List<TmpOpeningClosing> opBalanceGL = coaOpDService.getOpBalanceGL1(sourceAccId, opDate, stDate, 3, "MMK",
                     Global.loginUser.getAppUserCode(),
                     Util1.isNull(depId, "-"), Global.machineId.toString());
-            LOGGER.info("End calculate opening.");
+            log.info("End calculate opening.");
             if (!opBalanceGL.isEmpty()) {
                 TmpOpeningClosing tmpOC = opBalanceGL.get(0);
                 txtFOpening.setValue(tmpOC.getOpening());
             }
             calDebitCredit();
         } catch (Exception ex) {
-            LOGGER.error("TmpOpeningClosing" + ex.getMessage());
+            log.error("TmpOpeningClosing" + ex.getMessage());
         }
     }
 
@@ -770,8 +782,8 @@ public class AllCash extends javax.swing.JPanel implements SelectionObserver,
                     searchValidation(depId);
                     break;
                 case "COA":
-                    accId = selectObj.toString();
-                    searchValidation(accId);
+                    accCode = selectObj.toString();
+                    searchValidation(accCode);
                     break;
                 case "Currency":
                     currency = selectObj.toString();

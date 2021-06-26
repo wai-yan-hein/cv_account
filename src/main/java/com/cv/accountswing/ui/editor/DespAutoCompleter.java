@@ -73,12 +73,15 @@ public class DespAutoCompleter implements KeyListener {
     }
 
     public DespAutoCompleter(JTextComponent comp, List<VDescription> list,
-            AbstractCellEditor editor, VDescriptionService descriptionService) {
+            AbstractCellEditor editor, VDescriptionService descriptionService, boolean filter) {
         this.textComp = comp;
         this.editor = editor;
         this.descriptionService = descriptionService;
         if (Global.listDesp.isEmpty()) {
             Global.listDesp = this.descriptionService.getDescriptions();
+        }
+        if (filter) {
+            Global.listDesp.add(0, new VDescription("All"));
         }
         textComp.putClientProperty(AUTOCOMPLETER, this);
         textComp.setFont(Global.textFont);

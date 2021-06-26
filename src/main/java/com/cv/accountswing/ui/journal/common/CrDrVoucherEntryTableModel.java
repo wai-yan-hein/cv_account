@@ -134,9 +134,9 @@ public class CrDrVoucherEntryTableModel extends AbstractTableModel {
             case 4:
                 if (value != null) {
                     if (vouType.equals("CR")) {
-                        vgl.setDrAmt(Util1.getFloat(value));
+                        vgl.setDrAmt(Util1.getDouble(value));
                     } else {
-                        vgl.setCrAmt(Util1.getFloat(value));
+                        vgl.setCrAmt(Util1.getDouble(value));
                     }
                 }
                 break;

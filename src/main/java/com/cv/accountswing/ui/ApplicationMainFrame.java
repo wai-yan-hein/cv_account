@@ -38,6 +38,7 @@ import com.cv.accountswing.ui.journal.Journal;
 import com.cv.accountswing.ui.journal.JournalStockOpening;
 import com.cv.accountswing.ui.report.AparGlReport;
 import com.cv.accountswing.ui.report.BalanceSheet;
+import com.cv.accountswing.ui.report.GLReport;
 import com.cv.accountswing.ui.report.ProtfitAndLost;
 import com.cv.accountswing.ui.setup.COAOpeningSetup;
 import com.cv.accountswing.ui.setup.ChartOfAccountSetup;
@@ -174,7 +175,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     @Autowired
     private AparGlReport aPARReport;
     @Autowired
-    private AparGlReport glListingReport;
+    private GLReport glListingReport;
     @Autowired
     private UserService userService;
     @Autowired
@@ -207,7 +208,7 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
     private StaffSetup staffSetup;
     @Autowired
     private Mapping mapping;
-    @Autowired 
+    @Autowired
     private SystemPropertyService systemPropertyService;
     private PanelControl control;
     private FilterObserver filterObserver;
@@ -431,8 +432,8 @@ public class ApplicationMainFrame extends javax.swing.JFrame implements ReloadDa
                         balanceSheet.setLoadingObserver(this);
                         return balanceSheet;
                     case "Stock Report":
-                        //stockReports.setName(menuName);
-                        //return stockReports;
+                    //stockReports.setName(menuName);
+                    //return stockReports;
                     default:
                         return null;
                 }

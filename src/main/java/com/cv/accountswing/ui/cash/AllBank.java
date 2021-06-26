@@ -208,7 +208,7 @@ public class AllBank extends javax.swing.JPanel implements SelectionObserver,
         tblCash.getColumnModel().getColumn(1).setCellEditor(new DepartmentCellEditor(false));
         tblCash.getColumnModel().getColumn(2).setCellEditor(new DespEditor(descriptionService));
         tblCash.getColumnModel().getColumn(3).setCellEditor(new RefCellEditor(refService));
-        tblCash.getColumnModel().getColumn(4).setCellEditor(new TraderCellEditor(false,0));
+        tblCash.getColumnModel().getColumn(4).setCellEditor(new TraderCellEditor(false, 0));
         tblCash.getColumnModel().getColumn(5).setCellEditor(new COACellEditor(false));
         tblCash.getColumnModel().getColumn(6).setCellEditor(new CurrencyEditor());
         tblCash.getColumnModel().getColumn(7).setCellEditor(new AutoClearEditor());
@@ -393,7 +393,7 @@ public class AllBank extends javax.swing.JPanel implements SelectionObserver,
                 parameters.put("p_report_name", this.getName());
                 parameters.put("p_opening", txtFOpening.getValue());
                 parameters.put("p_closing", txtFClosing.getValue());
-                rService.genCreditVoucher(reportPath, filePath, fontPath, parameters);
+                rService.genReport(reportPath, filePath, fontPath, parameters);
                 loadingObserver.load(this.getName(), "Stop");
             } catch (Exception ex) {
                 LOGGER.error("getLedgerReport : " + ex);
@@ -483,7 +483,7 @@ public class AllBank extends javax.swing.JPanel implements SelectionObserver,
                 vgl.setDrAmt(tmpAmt);
                 }*/
                 } else if (accId.equals(targetId)) {
-                    float tmpDrAmt = 0;
+                    double tmpDrAmt = 0.0;
                     if (vgl.getDrAmt() != null) {
                         tmpDrAmt = vgl.getDrAmt();
                     }
@@ -494,8 +494,8 @@ public class AllBank extends javax.swing.JPanel implements SelectionObserver,
                     vgl.setAccName(vgl.getSrcAccName());
                     vgl.setSrcAccName(tmpStr);
                 } else {
-                    vgl.setDrAmt(0.0f);
-                    vgl.setCrAmt(0.0f);
+                    vgl.setDrAmt(0.0);
+                    vgl.setCrAmt(0.0);
                 }
             });
         }
@@ -1106,17 +1106,17 @@ public class AllBank extends javax.swing.JPanel implements SelectionObserver,
                 case "Trader":
                     if (selectObj instanceof Trader) {
                         Trader trader = (Trader) selectObj;
-                switch (trader.getTraderName()) {
-                    case "All Customer":
-                        traderType = "CUS";
-                        break;
-                    case "All Supplier":
-                        traderType = "SUP";
-                        break;
-                    default:
-                        traderType = "-";
-                        break;
-                }
+                        switch (trader.getTraderName()) {
+                            case "All Customer":
+                                traderType = "CUS";
+                                break;
+                            case "All Supplier":
+                                traderType = "SUP";
+                                break;
+                            default:
+                                traderType = "-";
+                                break;
+                        }
                         traderCode = trader.getCode();
                     }
                     searchValidation(traderCode);

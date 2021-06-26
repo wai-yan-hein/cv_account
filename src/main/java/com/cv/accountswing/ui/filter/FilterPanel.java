@@ -7,6 +7,7 @@ package com.cv.accountswing.ui.filter;
 
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.SelectionObserver;
+import com.cv.accountswing.service.COAService;
 import com.cv.accountswing.service.VDescriptionService;
 import com.cv.accountswing.service.VRefService;
 import com.cv.accountswing.ui.editor.COAAutoCompleter;
@@ -20,6 +21,7 @@ import com.cv.accountswing.ui.editor.TraderAutoCompleter;
 import com.cv.accountswing.util.Util1;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import javax.swing.JFormattedTextField;
 import javax.swing.JTextField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +35,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class FilterPanel extends javax.swing.JPanel implements KeyListener, SelectionObserver {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FilterPanel.class);
+    private static final Logger log = LoggerFactory.getLogger(FilterPanel.class);
     private DateAutoCompleter dateAutoCompleter;
     private TraderAutoCompleter traderAutoCompleter;
     private DepartmentAutoCompleter departmentAutoCompleter;
@@ -43,9 +45,27 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
     private DespAutoCompleter despAutoCompleter;
     private RefAutoCompleter refAutoCompleter;
     @Autowired
+    private COAService coaService;
+    @Autowired
     private VRefService refService;
     @Autowired
     private VDescriptionService descriptionService;
+
+    public DateAutoCompleter getDateAutoCompleter() {
+        return dateAutoCompleter;
+    }
+
+    public void setDateAutoCompleter(DateAutoCompleter dateAutoCompleter) {
+        this.dateAutoCompleter = dateAutoCompleter;
+    }
+
+    public JFormattedTextField getTxtDate() {
+        return txtDate;
+    }
+
+    public void setTxtDate(JFormattedTextField txtDate) {
+        this.txtDate = txtDate;
+    }
 
     public void setSelectionObserver(SelectionObserver selectionObserver) {
         this.selectionObserver = selectionObserver;
@@ -74,19 +94,19 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
     }
 
     private void initializeData() {
-        traderAutoCompleter = new TraderAutoCompleter(txtPerson, Global.listTrader, null, true,0);
+        traderAutoCompleter = new TraderAutoCompleter(txtPerson, Global.listTrader, null, true, 0);
         traderAutoCompleter.setSelectionObserver(selectionObserver);
         departmentAutoCompleter = new DepartmentAutoCompleter(txtDepartment, Global.listDepartment, null, true);
         departmentAutoCompleter.setSelectionObserver(selectionObserver);
-        coaAutoCompleter = new COAAutoCompleter(txtAccount, Global.listCOA, null, true);
+        coaAutoCompleter = new COAAutoCompleter(txtAccount, coaService.getCOALevel2Above(Global.compCode), null, true);
         dateAutoCompleter = new DateAutoCompleter(txtDate, Global.listDateModel, null);
         currencyAutoCompleter = new CurrencyAutoCompleter(txtCurrency, Global.listCurrency, null);
         currencyAutoCompleter.setSelectionObserver(selectionObserver);
         dateAutoCompleter.setSelectionObserver(selectionObserver);
         coaAutoCompleter.setSelectionObserver(selectionObserver);
-        despAutoCompleter = new DespAutoCompleter(txtDesp, Global.listDesp, null, descriptionService);
+        despAutoCompleter = new DespAutoCompleter(txtDesp, Global.listDesp, null, descriptionService, true);
         despAutoCompleter.setSelectionObserver(selectionObserver);
-        refAutoCompleter = new RefAutoCompleter(txtRefrence, Global.listRef, null, refService);
+        refAutoCompleter = new RefAutoCompleter(txtRefrence, Global.listRef, null, refService, true);
         refAutoCompleter.setSelectionObserver(selectionObserver);
         defalutFilter();
     }
@@ -96,6 +116,8 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
         txtDepartment.setText("All");
         txtAccount.setText("All");
         txtPerson.setText("All");
+        txtDesp.setText("All");
+        txtRefrence.setText("All");
     }
 
     private void initKeyListener() {
@@ -110,8 +132,6 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
 
     public void clear() {
         defalutFilter();
-        txtDesp.setText(null);
-        txtRefrence.setText(null);
         txtCurrency.setText(null);
         txtDate.requestFocus();
         currencyAutoCompleter.setCurrency(Global.defalutCurrency);
@@ -207,7 +227,7 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
         });
 
         jLabel4.setFont(Global.lableFont);
-        jLabel4.setText("Account");
+        jLabel4.setText("Account Group");
 
         txtAccount.setFont(Global.textFont);
         txtAccount.setName("txtAccount"); // NOI18N
@@ -438,30 +458,30 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
 
     private void txtDepartmentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDepartmentActionPerformed
         // TODO add your handling code here:
-        if (txtDepartment.getText().isEmpty()) {
-            selectionObserver.selected("Department", "-");
-        }
+        /*if (txtDepartment.getText().isEmpty()) {
+        selectionObserver.selected("Department", "-");
+        }*/
     }//GEN-LAST:event_txtDepartmentActionPerformed
 
     private void txtPersonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPersonActionPerformed
         // TODO add your handling code here:
-        if (txtPerson.getText().isEmpty()) {
-            selectionObserver.selected("Trader", "-");
-        }
+        /*if (txtPerson.getText().isEmpty()) {
+        selectionObserver.selected("Trader", "-");
+        }*/
     }//GEN-LAST:event_txtPersonActionPerformed
 
     private void txtAccountActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtAccountActionPerformed
         // TODO add your handling code here:
-        if (txtAccount.getText().isEmpty()) {
-            selectionObserver.selected("COA", "-");
-        }
+        /*if (txtAccount.getText().isEmpty()) {
+        selectionObserver.selected("COA", "-");
+        }*/
     }//GEN-LAST:event_txtAccountActionPerformed
 
     private void txtCurrencyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCurrencyActionPerformed
         // TODO add your handling code here:
-        if (txtCurrency.getText().isEmpty()) {
-            selectionObserver.selected("Currency", "-");
-        }
+        /* if (txtCurrency.getText().isEmpty()) {
+        selectionObserver.selected("Currency", "-");
+        }*/
     }//GEN-LAST:event_txtCurrencyActionPerformed
 
     private void txtDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDateActionPerformed
@@ -562,14 +582,14 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
                         closePopup();
 
                     }
-                    if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE || e.getKeyCode() == KeyEvent.VK_DELETE) {
-                        if (txtDepartment.getText().isEmpty()) {
-                            departmentAutoCompleter.closePopup();
-                            if (selectionObserver != null) {
-                                selectionObserver.selected("Department", "-");
-                            }
-                        }
+                    /*if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE || e.getKeyCode() == KeyEvent.VK_DELETE) {
+                    if (txtDepartment.getText().isEmpty()) {
+                    departmentAutoCompleter.closePopup();
+                    if (selectionObserver != null) {
+                    selectionObserver.selected("Department", "-");
                     }
+                    }
+                    }*/
                     tabToCashTable(e);
                     break;
                 case "txtPerson":
@@ -583,14 +603,14 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
                         closePopup();
 
                     }
-                    if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE || e.getKeyCode() == KeyEvent.VK_DELETE) {
-                        if (txtPerson.getText().isEmpty()) {
-                            traderAutoCompleter.closePopup();
-                            if (selectionObserver != null) {
-                                selectionObserver.selected("Trader", "-");
-                            }
-                        }
+                    /* if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE || e.getKeyCode() == KeyEvent.VK_DELETE) {
+                    if (txtPerson.getText().isEmpty()) {
+                    traderAutoCompleter.closePopup();
+                    if (selectionObserver != null) {
+                    selectionObserver.selected("Trader", "-");
                     }
+                    }
+                    }*/
                     tabToCashTable(e);
                     break;
 
@@ -605,14 +625,14 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
                         closePopup();
 
                     }
-                    if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE || e.getKeyCode() == KeyEvent.VK_DELETE) {
-                        if (txtAccount.getText().isEmpty()) {
-                            coaAutoCompleter.closePopup();
-                            if (selectionObserver != null) {
-                                selectionObserver.selected("COA", "-");
-                            }
-                        }
+                    /*if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE || e.getKeyCode() == KeyEvent.VK_DELETE) {
+                    if (txtAccount.getText().isEmpty()) {
+                    coaAutoCompleter.closePopup();
+                    if (selectionObserver != null) {
+                    selectionObserver.selected("COA", "-");
                     }
+                    }
+                    }*/
                     tabToCashTable(e);
                     break;
 
@@ -627,14 +647,14 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
                         closePopup();
 
                     }
-                    if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE || e.getKeyCode() == KeyEvent.VK_DELETE) {
-                        if (txtDesp.getText().isEmpty()) {
-                            despAutoCompleter.closePopup();
-                            if (selectionObserver != null) {
-                                selectionObserver.selected("Description", "-");
-                            }
-                        }
+                    /* if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE || e.getKeyCode() == KeyEvent.VK_DELETE) {
+                    if (txtDesp.getText().isEmpty()) {
+                    despAutoCompleter.closePopup();
+                    if (selectionObserver != null) {
+                    selectionObserver.selected("Description", "-");
                     }
+                    }
+                    }*/
                     tabToCashTable(e);
                     break;
                 case "txtCurrency":
@@ -660,15 +680,15 @@ public class FilterPanel extends javax.swing.JPanel implements KeyListener, Sele
                         closePopup();
 
                     }
-                    if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE || e.getKeyCode() == KeyEvent.VK_DELETE) {
-                        if (txtRefrence.getText().isEmpty()) {
-                            refAutoCompleter.closePopup();
-                            if (selectionObserver != null) {
-                                selectionObserver.selected("Ref", "-");
-                            }
-                        }
-                        break;
+                    /*if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE || e.getKeyCode() == KeyEvent.VK_DELETE) {
+                    if (txtRefrence.getText().isEmpty()) {
+                    refAutoCompleter.closePopup();
+                    if (selectionObserver != null) {
+                    selectionObserver.selected("Ref", "-");
                     }
+                    }
+                    break;
+                    }*/
                     tabToCashTable(e);
                     break;
 

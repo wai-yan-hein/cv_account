@@ -12,7 +12,6 @@ import javax.annotation.PostConstruct;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JRootPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import org.apache.log4j.Logger;
@@ -61,7 +60,7 @@ public class AccountSwingApplication {
         }
 
         try {
-            Global.sock = new ServerSocket(10004);//Pharmacy
+            Global.sock = new ServerSocket(10003);//Pharmacy
 
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(new JFrame(), "You cannot run two program at the same time in the same machine.",

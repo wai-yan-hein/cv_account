@@ -21,9 +21,12 @@ import com.cv.accountswing.service.StockOpValueService;
 import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
+import com.cv.accountswing.ui.editor.COACellEditor;
 import com.cv.accountswing.ui.editor.CurrencyAutoCompleter;
+import com.cv.accountswing.ui.editor.CurrencyEditor;
 import com.cv.accountswing.ui.editor.DateAutoCompleter;
 import com.cv.accountswing.ui.editor.DepartmentAutoCompleter;
+import com.cv.accountswing.ui.editor.DepartmentCellEditor;
 import com.cv.accountswing.ui.journal.common.JournalStockOpeningTableModel;
 import com.cv.accountswing.ui.setup.ChartOfAccountSetup;
 import com.cv.accountswing.util.Util1;
@@ -62,7 +65,7 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
     @Autowired
     private StockOpValueService sovService;
     @Autowired
-    private JournalStockOpeningTableModel journalStockOpeningTableModel;
+    private JournalStockOpeningTableModel tableModel;
     @Autowired
     private DepartmentService deptService;
     @Autowired
@@ -76,7 +79,8 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
     private String enDate;
     private String coaCode;
     private String currency;
-    private String depId;
+    private String depCode;
+    private DepartmentAutoCompleter departmentAutoCompleter;
 
     public LoadingObserver getLoadingObserver() {
         return loadingObserver;
@@ -84,6 +88,8 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
 
     /**
      * Creates new form JournalStockOpening
+     *
+     * @param loadingObserver
      */
     public void setLoadingObserver(LoadingObserver loadingObserver) {
         this.loadingObserver = loadingObserver;
@@ -102,14 +108,18 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
     }
 
     private void initTable() {
-        tblOpening.setModel(journalStockOpeningTableModel);
-        journalStockOpeningTableModel.setParent(tblOpening);
+        tblOpening.setModel(tableModel);
+        tableModel.setParent(tblOpening);
         tblOpening.getTableHeader().setFont(Global.textFont);
         tblOpening.getTableHeader().setBackground(ColorUtil.tblHeaderColor);
         tblOpening.getTableHeader().setForeground(ColorUtil.foreground);
         tblOpening.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblOpening.setDefaultRenderer(Double.class, new TableCellRender());
         tblOpening.setDefaultRenderer(Object.class, new TableCellRender());
+        tblOpening.getColumnModel().getColumn(0).setCellEditor(new AutoClearEditor());
+        tblOpening.getColumnModel().getColumn(1).setCellEditor(new DepartmentCellEditor(false));
+        tblOpening.getColumnModel().getColumn(2).setCellEditor(new COACellEditor(false));
+        tblOpening.getColumnModel().getColumn(4).setCellEditor(new CurrencyEditor());
         tblOpening.getColumnModel().getColumn(5).setCellEditor(new AutoClearEditor());
         tblOpening.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                 .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
@@ -118,16 +128,13 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
 
     private void searchOpening() {
         loadingObserver.load(this.getName(), "Start");
-        if (txtDepartment.getText().isEmpty()) {
-            depId = "-";
-        }
-        LOGGER.info("Start Date :" + stDate + "," + "End Date :" + enDate + "," + "Department :" + depId);
+        depCode = departmentAutoCompleter.getDepartment() == null ? "-" : departmentAutoCompleter.getDepartment().getDeptCode();
         taskExecutor.execute(() -> {
             List<VStockOpValue> listOp = sovService.search(stDate, enDate,
                     Util1.isNull(coaCode, "-"), Util1.isNull(currency, "-"),
-                    Util1.isNull(depId, "-"), Global.compCode);
-            //List<VStockOpValue> listOPValue = (List<VStockOpValue>) (List<?>) listOp;
-            journalStockOpeningTableModel.setListStockOpening(listOp);
+                    Util1.isNull(depCode, "-"), Global.compCode);
+            tableModel.setListStockOpening(listOp);
+            tableModel.addEmptyRow();
             loadingObserver.load(this.getName(), "Stop");
         });
     }
@@ -141,8 +148,9 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
     private void initCombo() {
         DateAutoCompleter dateAutoCompleter = new DateAutoCompleter(txtDate, Global.listDateModel, null);
         dateAutoCompleter.setSelectionObserver(this);
-        DepartmentAutoCompleter departmentAutoCompleter = new DepartmentAutoCompleter(txtDepartment, Global.listDepartment, null, false);
+        departmentAutoCompleter = new DepartmentAutoCompleter(txtDepartment, Global.listDepartment, null, true);
         departmentAutoCompleter.setSelectionObserver(this);
+        departmentAutoCompleter.setDepartment(new Department("-", "All"));
         CurrencyAutoCompleter currencyAutoCompleter = new CurrencyAutoCompleter(txtCurrency, Global.listCurrency, null);
         currencyAutoCompleter.setSelectionObserver(this);
         currencyAutoCompleter.setCurrency(Global.defalutCurrency);
@@ -154,13 +162,11 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
         txtDate.addKeyListener(this);
         txtDepartment.addKeyListener(this);
         tblOpening.addKeyListener(this);
-        btnNewEntry.addKeyListener(this);
-
     }
 
     private boolean isValidEntry() {
         boolean status = true;
-        if (depId == null) {
+        if (depCode == null) {
             JOptionPane.showMessageDialog(Global.parentForm, "Select Department.");
             txtDepartment.requestFocus();
             status = false;
@@ -179,7 +185,7 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
             CurrencyKey curKey = new CurrencyKey();
             curKey.setCode(currency);
             curKey.setCompCode(Global.compCode);
-            Department oDept = deptService.findById(depId);
+            Department oDept = deptService.findById(depCode);
             List<VStockOpValue> listVSO = new ArrayList();
             for (String tmpId : coaIds) {
                 List<ChartOfAccount> listCOA = coaService.getAllChild(tmpId, Global.compCode);
@@ -188,7 +194,7 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
                     tmpVSOV.getKey().setCoaCode(coa.getCode());
                     tmpVSOV.getKey().setCompCode(Global.compCode);
                     tmpVSOV.getKey().setCurrency(currency);
-                    tmpVSOV.getKey().setDeptCode(depId);
+                    tmpVSOV.getKey().setDeptCode(depCode);
                     tmpVSOV.setCoaCodeUsr(coa.getCoaCodeUsr());
                     tmpVSOV.setCoaNameEng(coa.getCoaNameEng());
                     return tmpVSOV;
@@ -248,7 +254,6 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         txtCurrency = new javax.swing.JTextField();
-        btnNewEntry = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblOpening = new javax.swing.JTable();
 
@@ -257,6 +262,8 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
                 formComponentShown(evt);
             }
         });
+
+        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         jLabel1.setFont(Global.textFont);
         jLabel1.setText("Date");
@@ -278,15 +285,6 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
         txtCurrency.setEnabled(false);
         txtCurrency.setName("txtCurrency"); // NOI18N
 
-        btnNewEntry.setFont(Global.textFont);
-        btnNewEntry.setText("New Entry");
-        btnNewEntry.setName("btnNewEntry"); // NOI18N
-        btnNewEntry.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnNewEntryActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -295,17 +293,15 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
                 .addContainerGap()
                 .addComponent(jLabel1)
                 .addGap(18, 18, 18)
-                .addComponent(txtDate, javax.swing.GroupLayout.DEFAULT_SIZE, 114, Short.MAX_VALUE)
+                .addComponent(txtDate)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel2)
                 .addGap(18, 18, 18)
-                .addComponent(txtDepartment, javax.swing.GroupLayout.DEFAULT_SIZE, 114, Short.MAX_VALUE)
+                .addComponent(txtDepartment)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel3)
                 .addGap(18, 18, 18)
-                .addComponent(txtCurrency, javax.swing.GroupLayout.DEFAULT_SIZE, 114, Short.MAX_VALUE)
-                .addGap(18, 18, 18)
-                .addComponent(btnNewEntry)
+                .addComponent(txtCurrency)
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -318,8 +314,7 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
                     .addComponent(txtDepartment, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2)
                     .addComponent(jLabel3)
-                    .addComponent(txtCurrency, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnNewEntry))
+                    .addComponent(txtCurrency, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -346,7 +341,7 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 662, Short.MAX_VALUE)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -355,7 +350,7 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1)
                 .addContainerGap())
         );
@@ -370,14 +365,8 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
         searchOpening();
     }//GEN-LAST:event_formComponentShown
 
-    private void btnNewEntryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewEntryActionPerformed
-        // TODO add your handling code here:
-        getNewStockOpValue();
-    }//GEN-LAST:event_btnNewEntryActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnNewEntry;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -401,7 +390,7 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
                     searchOpening();
                     break;
                 case "Department":
-                    depId = selectObj.toString();
+                    depCode = selectObj.toString();
                     searchOpening();
                     break;
                 case "Currency":
@@ -444,7 +433,7 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
                     txtDepartment.requestFocus();
                 }
                 if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-                    btnNewEntry.requestFocus();
+                    //btnNewEntry.requestFocus();
                 }
                 tabToTable(e);
                 break;
@@ -459,7 +448,6 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
                 break;
             case "txtCurrency":
                 if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_RIGHT) {
-                    btnNewEntry.requestFocus();
                 }
                 if (e.getKeyCode() == KeyEvent.VK_LEFT) {
                     txtDepartment.requestFocus();
@@ -495,6 +483,7 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
 
     @Override
     public void delete() {
+        deleteOpening();
     }
 
     @Override
@@ -513,5 +502,10 @@ public class JournalStockOpening extends javax.swing.JPanel implements Selection
     @Override
     public void refresh() {
         searchOpening();
+    }
+
+    private void deleteOpening() {
+        int row = tblOpening.convertRowIndexToModel(tblOpening.getSelectedRow());
+        tableModel.delete(row);
     }
 }

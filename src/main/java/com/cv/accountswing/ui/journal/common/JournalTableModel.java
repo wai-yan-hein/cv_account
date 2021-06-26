@@ -22,9 +22,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class JournalTableModel extends AbstractTableModel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JournalTableModel.class);
+    private static final Logger log = LoggerFactory.getLogger(JournalTableModel.class);
     private List<VGeneralVoucher> listGV = new ArrayList();
-    //String  userCode=Global.loginUser.getAppUserCode();
     String[] columnNames = {"Date", "Voucher", "Refrence"};
     private JTable parent;
 
@@ -55,16 +54,15 @@ public class JournalTableModel extends AbstractTableModel {
                 case 0: //Date 
                     return Util1.toDateStr(gv.getGlDate(), "dd/MM/yyyy");
                 case 1: //Vou
-                    return gv.getVouNo();
+                    return gv.getGlVouNo();
                 case 2://Refrence
                     return gv.getReference();
                 default:
                     return null;
             }
         } catch (Exception ex) {
-            LOGGER.error("getValueAt : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
+            log.error("getValueAt : " + ex.getStackTrace()[0].getLineNumber() + " - " + ex.getMessage());
         }
-
         return null;
     }
 
@@ -72,9 +70,6 @@ public class JournalTableModel extends AbstractTableModel {
     public void setValueAt(Object value, int row, int column) {
 
     }
-
-    
-    
 
     public VGeneralVoucher getVGl(int row) {
         return listGV.get(row);
@@ -125,21 +120,10 @@ public class JournalTableModel extends AbstractTableModel {
     }
 
     public void saveGV(VGeneralVoucher gv, String status) {
-        //if (isValidCOA(gv, Global.compCode, Global.loginUser.getAppUserCode(), status)) {
-        // coaService.save(gv);
         if (status.equals("NEW")) {
             listGV.add(new VGeneralVoucher());
             addEmptyRow();
         }
-
-        //}
-    }
-    private void addRow(){
-        if (listGV != null) {
-                VGeneralVoucher record = new VGeneralVoucher();
-                listGV.add(record);
-                fireTableRowsInserted(listGV.size() - 1, listGV.size() - 1);
-            }
     }
 
     public void addEmptyRow() {
@@ -153,13 +137,20 @@ public class JournalTableModel extends AbstractTableModel {
 
     }
 
+    public void remove(int row) {
+        if (!listGV.isEmpty()) {
+            listGV.remove(row);
+            fireTableRowsDeleted(row, row);
+        }
+    }
+
     private boolean hasEmptyRow() {
         boolean status = true;
         if (listGV.isEmpty() || listGV == null) {
             status = true;
         } else {
             VGeneralVoucher vgl = listGV.get(listGV.size() - 1);
-            if (vgl.getGvVouNo() == null) {
+            if (vgl.getGlVouNo() == null) {
                 status = false;
             }
         }

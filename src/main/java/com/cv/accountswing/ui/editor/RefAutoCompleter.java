@@ -8,6 +8,7 @@ package com.cv.accountswing.ui.editor;
 import com.cv.accountswing.common.ColorUtil;
 import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.SelectionObserver;
+import com.cv.accountswing.entity.ChartOfAccount;
 import com.cv.accountswing.entity.view.VRef;
 import com.cv.accountswing.service.VRefService;
 import com.cv.accountswing.ui.cash.common.RefTableModel;
@@ -18,6 +19,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractCellEditor;
@@ -73,12 +75,15 @@ public class RefAutoCompleter implements KeyListener {
     }
 
     public RefAutoCompleter(JTextComponent comp, List<VRef> list,
-            AbstractCellEditor editor, VRefService refService) {
+            AbstractCellEditor editor, VRefService refService, boolean filter) {
         this.textComp = comp;
         this.editor = editor;
         this.refService = refService;
         if (Global.listRef.isEmpty()) {
             Global.listRef = this.refService.getRefrences();
+        }
+        if (filter) {
+            Global.listRef.add(0, new VRef("All"));
         }
         textComp.putClientProperty(AUTOCOMPLETER, this);
         textComp.setFont(Global.textFont);

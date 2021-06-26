@@ -263,7 +263,6 @@ public class DateAutoCompleter implements KeyListener, SelectionObserver {
                     }
 
                     popup.show(textComp, x, textComp.getHeight());
-                    log.info("Show Popup...");
                     popupOpen = false;
 
                 } else {
@@ -347,7 +346,7 @@ public class DateAutoCompleter implements KeyListener, SelectionObserver {
         table.scrollRectToVisible(rect);
     }
 
-    public DateModel getDepartment() {
+    public DateModel getDate() {
         return dateModel;
     }
 
@@ -415,11 +414,7 @@ public class DateAutoCompleter implements KeyListener, SelectionObserver {
             String tmp4 = entry.getStringValue(4).toUpperCase();
             String text = textComp.getText().toUpperCase();
 
-            if (tmp1.startsWith(text) || tmp2.startsWith(text) || tmp3.startsWith(text) || tmp4.startsWith(text)) {
-                return true;
-            } else {
-                return false;
-            }
+            return tmp1.startsWith(text) || tmp2.startsWith(text) || tmp3.startsWith(text) || tmp4.startsWith(text);
         }
     };
 
@@ -480,7 +475,7 @@ public class DateAutoCompleter implements KeyListener, SelectionObserver {
             d.setEndDate(monthEnd.toString());
             listDateModel.add(d);
         }
-        
+
         Global.listDateModel = listDateModel;
         return listDateModel;
     }

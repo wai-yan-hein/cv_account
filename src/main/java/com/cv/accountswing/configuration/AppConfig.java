@@ -9,7 +9,6 @@ import com.cv.accountswing.ui.journal.CrDrVoucher;
 import com.cv.accountswing.ui.journal.CrDrVoucherEntry;
 import com.cv.accountswing.ui.journal.common.CrDrVoucherEntryTableModel;
 import com.cv.accountswing.ui.journal.common.CrDrVoucherTableModel;
-import com.cv.accountswing.ui.report.AparGlReport;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -78,12 +77,6 @@ public class AppConfig {
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public CrDrVoucherEntryTableModel crDrVoucherEntryTableModel() {
         return new CrDrVoucherEntryTableModel();
-    }
-
-    @Bean
-    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    public AparGlReport aparGlReport() {
-        return new AparGlReport();
     }
 
     public AppConfig() {

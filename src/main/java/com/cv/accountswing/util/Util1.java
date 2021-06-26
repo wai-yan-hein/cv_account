@@ -17,6 +17,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -25,6 +26,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import org.slf4j.LoggerFactory;
+import java.time.format.DateTimeFormatter;
 
 /**
  *
@@ -282,6 +284,12 @@ public class Util1 {
         return todayDate;
     }
 
+    public static String getReportDate() {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        LocalDateTime now = LocalDateTime.now();
+        return now.format(dtf);
+    }
+
     public static String getJsonElementValue(JsonElement je) {
         String tmpString = null;
 
@@ -352,11 +360,11 @@ public class Util1 {
         }
     }
 
-    public static boolean isNull(String value) {
+    public static boolean isNull(Object value) {
         boolean status = false;
         if (value == null) {
             status = true;
-        } else if (value.isBlank()) {
+        } else if (value.toString().isBlank()) {
             status = true;
         }
         return status;
@@ -671,6 +679,17 @@ public class Util1 {
         df.applyPattern(pattern);
         return df.format(value);
 
+    }
+
+    public static boolean isNull(String... parameters) {
+        boolean status = false;
+        for (String tmp : parameters) {
+            if (Util1.isNull(tmp)) {
+                status = true;
+                break;
+            }
+        }
+        return status;
     }
 
 }

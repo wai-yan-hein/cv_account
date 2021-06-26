@@ -22,7 +22,7 @@ public class DrAmtTableModel extends AbstractTableModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DrAmtTableModel.class);
     private List<VGl> listVGl = new ArrayList();
-    private String[] columnNames = {"Date", "Description", "Ref", "Dr-Amt"};
+    private String[] columnNames = {"Date", "Description", "Ref", "No :", "Dr-Amt"};
 
     @Override
     public String getColumnName(int column) {
@@ -37,7 +37,7 @@ public class DrAmtTableModel extends AbstractTableModel {
     @Override
     public Class getColumnClass(int column) {
         switch (column) {
-            case 3:
+            case 4:
                 return Double.class;
             default:
                 return String.class;
@@ -57,7 +57,9 @@ public class DrAmtTableModel extends AbstractTableModel {
                     return apar.getDescription();
                 case 2://ref
                     return apar.getReference();
-                case 3://dr-amt
+                case 3:
+                    return apar.getRefNo();
+                case 4://dr-amt
                     return apar.getDrAmt();
                 default:
                     return null;

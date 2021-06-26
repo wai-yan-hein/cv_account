@@ -11,6 +11,7 @@ import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.Gl;
 import com.cv.accountswing.entity.view.VGl;
 import com.cv.accountswing.service.GlService;
+import com.cv.accountswing.service.ReportService;
 import com.cv.accountswing.service.SeqTableService;
 import com.cv.accountswing.service.VGlService;
 import com.cv.accountswing.ui.cash.common.AutoClearEditor;
@@ -18,7 +19,7 @@ import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.editor.COACellEditor;
 import com.cv.accountswing.ui.editor.CurrencyAutoCompleter;
 import com.cv.accountswing.ui.editor.DepartmentCellEditor;
-import com.cv.accountswing.ui.editor.SupplierCellEditor;
+import com.cv.accountswing.ui.editor.TraderCellEditor;
 import com.cv.accountswing.ui.journal.common.JournalEntryTableModel;
 import com.cv.accountswing.util.Util1;
 import com.google.gson.Gson;
@@ -27,8 +28,11 @@ import com.google.gson.reflect.TypeToken;
 import com.toedter.calendar.JTextFieldDateEditor;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.File;
 import java.text.DateFormat;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
@@ -62,7 +66,8 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
     private GlService glService;
     @Autowired
     private VGlService vGlService;
-
+    @Autowired
+    private ReportService rService;
     private SelectionObserver selectionObserver;
     private TableRowSorter<TableModel> sorter;
     private String glVouId = null;
@@ -113,7 +118,7 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
 
         tblJournal.getColumnModel().getColumn(0).setCellEditor(new DepartmentCellEditor(false));
         tblJournal.getColumnModel().getColumn(1).setCellEditor(new AutoClearEditor());
-        tblJournal.getColumnModel().getColumn(2).setCellEditor(new SupplierCellEditor());
+        tblJournal.getColumnModel().getColumn(2).setCellEditor(new TraderCellEditor(false, 0));
         tblJournal.getColumnModel().getColumn(3).setCellEditor(new COACellEditor(false));
         tblJournal.getColumnModel().getColumn(4).setCellEditor(new AutoClearEditor());
         tblJournal.getColumnModel().getColumn(5).setCellEditor(new AutoClearEditor());
@@ -151,7 +156,8 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
 
     }
 
-    private void saveGeneralVoucher() {
+    private boolean saveGeneralVoucher() {
+        boolean status = false;
         String vouNo = Util1.isNull(txtVouNo.getText(), "-");
         String strDate = Util1.toDateStr(txtDate.getDate(), "dd/MM/yyyy");
         String refrence = txtRefrence.getText();
@@ -174,22 +180,22 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
                     }
                     if (!listGl.isEmpty()) {
                         journalTablModel.clear();
-                        JOptionPane.showMessageDialog(Global.parentForm, "Saved");
                         this.dispose();
                         if (selectionObserver != null) {
                             selectionObserver.selected("SEARCHVOUCHER", "-");
                         }
                     }
-
+                    status = true;
                 } catch (NumberFormatException ex) {
                     LOGGER.error("saveGeneralVoucher : " + ex);
                 } catch (Exception ex) {
+                    status = false;
                     JOptionPane.showMessageDialog(Global.parentForm, ex.getMessage(), "Save Journal.", JOptionPane.ERROR_MESSAGE);
                     LOGGER.error("saveGeneralVoucher : " + ex);
                 }
             }
         }
-
+        return status;
     }
 
     private boolean isValidEntry() {
@@ -563,7 +569,11 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
     }//GEN-LAST:event_txtCurrencyActionPerformed
 
     private void btnPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintActionPerformed
-        // TODO add your handling code here:
+        try {
+            printJournal();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(Global.parentForm, ex.getMessage());
+        }
     }//GEN-LAST:event_btnPrintActionPerformed
 
     /**
@@ -669,6 +679,18 @@ public class JournalEntryDialog extends javax.swing.JDialog implements KeyListen
                 tblJournal.setRowSelectionInterval(0, 0);
             }
         }
+    }
+
+    private void printJournal() throws Exception {
+        this.dispose();
+        String reportPath = Global.sysProperties.get("system.report.path");
+        String fontPath = Global.sysProperties.get("system.font.path");
+        String filePath = reportPath + File.separator + "Journal";
+        Map<String, Object> parameters = new HashMap();
+        parameters.put("p_company_name", Global.companyName);
+        parameters.put("p_comp_id", Global.compCode);
+        parameters.put("p_vou_no", glVouId);
+        rService.genReport(filePath, filePath, fontPath, parameters);
     }
 
 }

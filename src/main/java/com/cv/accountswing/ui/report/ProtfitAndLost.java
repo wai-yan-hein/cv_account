@@ -9,14 +9,15 @@ import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.SelectionObserver;
+import com.cv.accountswing.entity.Department;
 import com.cv.accountswing.entity.helper.ProfitAndLostRetObj;
-import com.cv.accountswing.service.CompanyInfoService;
+import com.cv.accountswing.service.COAOpeningDService;
 import com.cv.accountswing.service.ReportService;
-import com.cv.accountswing.service.SystemPropertyService;
 import com.cv.accountswing.ui.editor.CurrencyAutoCompleter;
 import com.cv.accountswing.ui.editor.DateAutoCompleter;
 import com.cv.accountswing.ui.editor.DepartmentAutoCompleter;
 import com.cv.accountswing.util.Util1;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JOptionPane;
@@ -38,18 +39,17 @@ public class ProtfitAndLost extends javax.swing.JPanel implements SelectionObser
     private LoadingObserver loadingObserver;
     private String stDate;
     private String enDate;
-    private String depId;
+    private String depCode;
     private String currency;
     private boolean isShown = false;
     @Autowired
-    private SystemPropertyService spService;
-    @Autowired
     private ReportService rService;
     @Autowired
-    private CompanyInfoService ciService;
+    private COAOpeningDService dService;
     @Autowired
     private TaskExecutor taskExecutor;
     private CurrencyAutoCompleter currencyAutoCompleter;
+    private DepartmentAutoCompleter departmentAutoCompleter;
 
     public void setLoadingObserver(LoadingObserver loadingObserver) {
         this.loadingObserver = loadingObserver;
@@ -72,8 +72,9 @@ public class ProtfitAndLost extends javax.swing.JPanel implements SelectionObser
     private void initCombo() {
         DateAutoCompleter dateAutoCompleter = new DateAutoCompleter(txtDate, Global.listDateModel, null);
         dateAutoCompleter.setSelectionObserver(this);
-        DepartmentAutoCompleter departmentAutoCompleter = new DepartmentAutoCompleter(txtDep, Global.listDepartment, null, false);
+        departmentAutoCompleter = new DepartmentAutoCompleter(txtDep, Global.listDepartment, null, true);
         departmentAutoCompleter.setSelectionObserver(this);
+        departmentAutoCompleter.setDepartment(new Department("-", "All"));
         currencyAutoCompleter = new CurrencyAutoCompleter(txtCurrency, Global.listCurrency, null);
         currencyAutoCompleter.setSelectionObserver(this);
         currencyAutoCompleter.setCurrency(Global.defalutCurrency);
@@ -83,29 +84,39 @@ public class ProtfitAndLost extends javax.swing.JPanel implements SelectionObser
     private void calProfitAndLost() {
         loadingObserver.load(this.getName(), "Start");
         btnCalculate.setEnabled(false);
+        depCode = departmentAutoCompleter.getDepartment() == null
+                ? "-" : departmentAutoCompleter.getDepartment().getDeptCode();
+        currency = currencyAutoCompleter.getCurrency() == null
+                ? "-" : currencyAutoCompleter.getCurrency().getKey().getCode();
+
         taskExecutor.execute(() -> {
-            String process = Global.sysProperties.get("system.profitlost.process");
-            currency = currencyAutoCompleter.getCurrency().getKey().getCode();
-            if (process != null) {
-                if (process.isEmpty() || process.equals("-")) {
-                    JOptionPane.showMessageDialog(Global.parentForm, "Invalid profit & lost process");
-                } else {
-                    try {
-                        rService.getProfitLost(process, stDate, enDate, depId,
-                                currency, Global.compCode, Global.loginUser.getAppUserCode(), Global.machineId.toString());
-                        log.info("Generation Profit And Lost Sucess. ");
-                        btnCalculate.setEnabled(true);
-                        loadingObserver.load(this.getName(), "Stop");
-
-                    } catch (Exception ex) {
-                        btnCalculate.setEnabled(true);
-                        loadingObserver.load(this.getName(), "Stop");
-                        log.error("searchProfitAndList ----" + ex.getMessage());
+            try {
+                dService.genTriBalance1(Global.compCode, Global.finicialPeriodFrom, Util1.toDateStrMYSQL(enDate, "dd/MM/yyyy"),
+                        "-", currency, depCode, "-", "-", Global.machineId.toString());
+                String process = Global.sysProperties.get("system.profitlost.process");
+                String invCOA = Global.sysProperties.get("system.inventory.coa");
+                if (process != null) {
+                    if (process.isEmpty() || process.equals("-")) {
+                        JOptionPane.showMessageDialog(Global.parentForm, "Invalid profit & lost process");
+                    } else {
+                        try {
+                            rService.getProfitLost(process, stDate, enDate, Util1.isNull(depCode, "-"),
+                                    currency, Global.compCode, Global.loginUser.getAppUserCode(),
+                                    Global.machineId.toString(), invCOA);
+                            log.info("Generation Profit And Lost Sucess. ");
+                            btnCalculate.setEnabled(true);
+                            loadingObserver.load(this.getName(), "Stop");
+                        } catch (Exception ex) {
+                            btnCalculate.setEnabled(true);
+                            loadingObserver.load(this.getName(), "Stop");
+                            log.error("searchProfitAndList ----" + ex.getMessage());
+                        }
                     }
+                } else {
+                    JOptionPane.showMessageDialog(Global.parentForm, "Invalid profit & lost process");
                 }
-            } else {
-                JOptionPane.showMessageDialog(Global.parentForm, "Invalid profit & lost process");
-
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(Global.parentForm, ex.getMessage());
             }
 
         });
@@ -116,27 +127,29 @@ public class ProtfitAndLost extends javax.swing.JPanel implements SelectionObser
         taskExecutor.execute(() -> {
             try {
                 loadingObserver.load(this.getName(), "Start");
-
-                String reportPath = Global.sysProperties.get("system.report.path");
-                reportPath = reportPath + "/ProfitAndLost";
+                String reportInfo = txtDate.getText();
+                String rpPath = Global.sysProperties.get("system.report.path") + File.separator;
+                String reportPath = rpPath + "ProfitAndLost";
                 String fontPath = Global.sysProperties.get("system.font.path");
                 //Need to calculate sub todal
-                ProfitAndLostRetObj obj = rService.getPLCalculateValue(Global.loginUser.getAppUserCode(), Global.compCode);
+                ProfitAndLostRetObj obj = rService.getPLCalculateValue(Global.compCode, Global.machineId.toString());
                 log.info("cost of sale : " + obj.getCostOfSale());
+                log.info("Purchase : " + obj.getTtlPurchase());
+                log.info("Opening : " + obj.getTtlOPStock());
+                log.info("Closing : " + obj.getTtlCLStock());
+                log.info("Profit : " + obj.getNetProfit());
                 //==================================================================
-
                 Map<String, Object> parameters = new HashMap();
                 parameters.put("p_company_name", Global.companyName);
                 parameters.put("p_comp_id", Global.compCode);
-                parameters.put("SUBREPORT_DIR", reportPath);
-                parameters.put("p_user_id", Global.loginUser.getAppUserCode());
-                parameters.put("gross_profit", obj.getGrossProfit());
-                parameters.put("net_profit", obj.getNetProfit());
-                parameters.put("p_report_info", Util1.isNull(stDate, "-")
-                        + " to " + Util1.isNull(enDate, "-"));
-                parameters.put("p_cost_of_sale", obj.getCostOfSale());
+                parameters.put("SUBREPORT_DIR", rpPath);
+                parameters.put("p_mac_id", Global.machineId);
+                parameters.put("gross_profit", Util1.getDouble(obj.getGrossProfit()));
+                parameters.put("net_profit", Util1.getDouble(obj.getNetProfit()));
+                parameters.put("p_report_info", reportInfo);
+                parameters.put("p_cost_of_sale", Util1.getDouble(obj.getCostOfSale()));
 
-                rService.genCreditVoucher(reportPath, reportPath, fontPath, parameters);
+                rService.genReport(reportPath, reportPath, fontPath, parameters);
                 loadingObserver.load(this.getName(), "Stop");
             } catch (Exception ex) {
                 log.error("getProfitAndLostReport : " + ex);
@@ -181,6 +194,7 @@ public class ProtfitAndLost extends javax.swing.JPanel implements SelectionObser
         jLabel2.setText("Department");
 
         txtCurrency.setFont(Global.textFont);
+        txtCurrency.setDisabledTextColor(new java.awt.Color(0, 0, 0));
         txtCurrency.setEnabled(false);
 
         jLabel3.setFont(Global.lableFont);
@@ -301,10 +315,10 @@ public class ProtfitAndLost extends javax.swing.JPanel implements SelectionObser
                     enDate = split[1];
                     break;
                 case "Department":
-                    depId = selectObj.toString();
+                    //depCode = selectObj.toString();
                     break;
                 case "Currency":
-                    currency = selectObj.toString();
+                    //currency = selectObj.toString();
                     break;
 
             }
@@ -331,6 +345,7 @@ public class ProtfitAndLost extends javax.swing.JPanel implements SelectionObser
 
     @Override
     public void print() {
+        printPL();
     }
 
     @Override

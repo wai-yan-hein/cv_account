@@ -13,6 +13,7 @@ import com.cv.accountswing.service.SystemPropertyService;
 import com.cv.accountswing.util.Util1;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
@@ -41,6 +42,15 @@ public class COAGroupChildTableModel extends AbstractTableModel {
     @Autowired
     SystemPropertyService spService;
     private String coaGroupCode;
+    private JLabel parentDesp;
+
+    public JLabel getParentDesp() {
+        return parentDesp;
+    }
+
+    public void setParentDesp(JLabel parentDesp) {
+        this.parentDesp = parentDesp;
+    }
 
     public void setCoaGroupCode(String coaGroupCode) {
         this.coaGroupCode = coaGroupCode;
@@ -139,6 +149,7 @@ public class COAGroupChildTableModel extends AbstractTableModel {
     }
 
     private void save(ChartOfAccount coa, int row) {
+        coa.setParentUsrDesp(parentDesp.getText());
         coa.setCoaParent(coaGroupCode);
         coa.setCompCode(Global.compCode);
         coa.setActive(Boolean.TRUE);
@@ -146,7 +157,7 @@ public class COAGroupChildTableModel extends AbstractTableModel {
         if (isValidCOA(coa, Global.compCode, Global.loginUser.getAppUserCode())) {
             ChartOfAccount save = coaService.save(coa);
             if (save.getCode() != null) {
-                Global.listCOA.add(save);
+                Global.listCOA = coaService.search("-", "-", Global.compCode, "3", "-", "-", "-");
                 addEmptyRow();
                 parent.setRowSelectionInterval(row + 1, row + 1);
                 parent.setColumnSelectionInterval(1, 1);

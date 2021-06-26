@@ -13,6 +13,7 @@ import com.cv.accountswing.service.SystemPropertyService;
 import com.cv.accountswing.util.Util1;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
@@ -41,6 +42,15 @@ public class COAGroupTableModel extends AbstractTableModel {
     @Autowired
     SystemPropertyService spService;
     private String coaHeadCode;
+    private JLabel paretnDesp;
+
+    public JLabel getParetnDesp() {
+        return paretnDesp;
+    }
+
+    public void setParetnDesp(JLabel paretnDesp) {
+        this.paretnDesp = paretnDesp;
+    }
 
     public void setCoaHeadCode(String coaHeadCode) {
         this.coaHeadCode = coaHeadCode;
@@ -141,6 +151,7 @@ public class COAGroupTableModel extends AbstractTableModel {
     }
 
     private void save(ChartOfAccount coa, int row) {
+        coa.setParentUsrDesp(paretnDesp.getText());
         coa.setCoaParent(coaHeadCode);
         coa.setCompCode(Global.compCode);
         coa.setActive(Boolean.TRUE);

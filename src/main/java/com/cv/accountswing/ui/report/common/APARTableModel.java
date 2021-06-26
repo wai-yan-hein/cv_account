@@ -22,7 +22,7 @@ public class APARTableModel extends AbstractTableModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(APARTableModel.class);
     private List<VApar> listAPAR = new ArrayList();
-    private String[] columnNames = {"Code", "Trader Name", "Currency", "Dr-Amt", "Cr-Amt", "Net Change"};
+    private String[] columnNames = {"Code", "Trader Name", "Currency", "Dr-Amt", "Cr-Amt"};
 
     @Override
     public String getColumnName(int column) {
@@ -65,8 +65,6 @@ public class APARTableModel extends AbstractTableModel {
                     return apar.getDrAmt();
                 case 4:
                     return apar.getCrAmt();
-                case 5:
-                    return apar.getClosing();
                 /*return apar.getDrAmt() > 0 ? apar.getDrAmt() - apar.getClosing()
                     : apar.getCrAmt() - apar.getClosing();*/
                 default:

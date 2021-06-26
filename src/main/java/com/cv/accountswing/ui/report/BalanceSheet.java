@@ -9,20 +9,19 @@ import com.cv.accountswing.common.Global;
 import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.SelectionObserver;
-import com.cv.accountswing.entity.CompanyInfo;
-import com.cv.accountswing.entity.SystemProperty;
-import com.cv.accountswing.entity.SystemPropertyKey;
-import com.cv.accountswing.entity.helper.ProfitAndLostRetObj;
-import com.cv.accountswing.service.CompanyInfoService;
+import com.cv.accountswing.entity.Department;
+import com.cv.accountswing.entity.helper.BalanceSheetRetObj;
+import com.cv.accountswing.service.COAOpeningDService;
 import com.cv.accountswing.service.ReportService;
-import com.cv.accountswing.service.SystemPropertyService;
 import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.editor.CurrencyAutoCompleter;
 import com.cv.accountswing.ui.editor.DateAutoCompleter;
 import com.cv.accountswing.ui.editor.DepartmentAutoCompleter;
 import com.cv.accountswing.util.Util1;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import javax.swing.JOptionPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,20 +40,18 @@ public class BalanceSheet extends javax.swing.JPanel implements SelectionObserve
     private LoadingObserver loadingObserver;
     private String stDate;
     private String enDate;
-    private String depId;
     private String currency;
     private boolean isShown = false;
     @Autowired
-    private SystemPropertyService spService;
-    @Autowired
     private ReportService rService;
-    @Autowired
-    private CompanyInfoService ciService;
     @Autowired
     private TaskExecutor taskExecutor;
     @Autowired
+    private COAOpeningDService dService;
+    @Autowired
     private ApplicationMainFrame mainFrame;
     private CurrencyAutoCompleter currencyAutoCompleter;
+    private DepartmentAutoCompleter departmentAutoCompleter;
 
     public void setLoadingObserver(LoadingObserver loadingObserver) {
         this.loadingObserver = loadingObserver;
@@ -77,8 +74,9 @@ public class BalanceSheet extends javax.swing.JPanel implements SelectionObserve
     private void initCombo() {
         DateAutoCompleter dateAutoCompleter = new DateAutoCompleter(txtDate, Global.listDateModel, null);
         dateAutoCompleter.setSelectionObserver(this);
-        DepartmentAutoCompleter departmentAutoCompleter = new DepartmentAutoCompleter(txtDep, Global.listDepartment, null, true);
+        departmentAutoCompleter = new DepartmentAutoCompleter(txtDep, Global.listDepartment, null, true);
         departmentAutoCompleter.setSelectionObserver(this);
+        departmentAutoCompleter.setDepartment(new Department("-", "All"));
         currencyAutoCompleter = new CurrencyAutoCompleter(txtCurrency, Global.listCurrency, null);
         currencyAutoCompleter.setSelectionObserver(this);
         currencyAutoCompleter.setCurrency(Global.defalutCurrency);
@@ -87,93 +85,73 @@ public class BalanceSheet extends javax.swing.JPanel implements SelectionObserve
 
     private void calBalanceSheet() {
         loadingObserver.load(this.getName(), "Start");
+        btnCalculate.setEnabled(false);
         currency = currencyAutoCompleter.getCurrency().getKey().getCode();
-        taskExecutor.execute(() -> {
-            try {
-                String userCode = Global.loginUser.getAppUserCode();
-                CompanyInfo ci = ciService.findById(Global.compCode);
-                String from = Global.finicialPeriodFrom;
-                rService.genBalanceSheet(from, enDate, depId, userCode, Global.compCode, currency, Global.machineId.toString());
-                log.info("Balance Sheet Generation Success. ");
-                /*SystemPropertyKey key = new SystemPropertyKey();
-                key.setCompCode(Global.compCode);
-                key.setPropKey("system.report.path");
-                SystemProperty sp = spService.findById(key);
-                String fileName = userCode + "_Ledger_Report.pdf";
-                String reportPath = sp.getPropValue();
-                //String reportPath1 = reportPath;
-                String filePath = reportPath + "/temp/" + fileName;
-                
-                reportPath = reportPath + "LedgerReport";
-                key = new SystemPropertyKey();
-                key.setCompCode(Global.compCode);
-                key.setPropKey("system.font.path");
-                sp = spService.findById(key);
-                String fontPath = sp.getPropValue();
-                
-                Map<String, Object> parameters = new HashMap();
-                parameters.put("p_company_name", ci.getName());
-                parameters.put("p_comp_id", Global.compCode);
-                parameters.put("p_report_info", from
-                + " to " + enDate);
-                parameters.put("p_from", from);
-                parameters.put("p_to", enDate);
-                parameters.put("p_user_id", userCode);
-                rService.genCreditVoucher(reportPath, filePath, fontPath, parameters);*/
-                loadingObserver.load(this.getName(), "Stop");
-            } catch (Exception ex) {
-                log.error("getBalanceSheet : " + ex.getMessage());
-
-            }
-        });
+        String depCode = departmentAutoCompleter.getDepartment().getDeptCode();
+        String bsProcess = Global.sysProperties.get("system.balancesheet.process");
+        String plProcess = Global.sysProperties.get("system.profitlost.process");
+        String invCOA = Global.sysProperties.get("system.inventory.coa");
+        if (Util1.isNull(bsProcess, plProcess, invCOA)) {
+            JOptionPane.showMessageDialog(Global.parentForm, "Calculation Process is not assigned.");
+            btnCalculate.setEnabled(true);
+            loadingObserver.load(this.getName(), "Stop");
+        } else {
+            taskExecutor.execute(() -> {
+                try {
+                    //generating tri
+                    dService.genTriBalance1(Global.compCode, Global.finicialPeriodFrom, Util1.toDateStrMYSQL(enDate, "dd/MM/yyyy"),
+                            "-", currency, depCode, "-", "-", Global.machineId.toString());
+                    log.info("calculate tri");
+                    //genreateing pl
+                    rService.getProfitLost(plProcess, stDate, enDate, Util1.isNull(depCode, "-"),
+                            currency, Global.compCode, Global.loginUser.getAppUserCode(),
+                            Global.machineId.toString(), invCOA);
+                    log.info("calculate pl");
+                    //genereating balance
+                    rService.genBalanceSheet(stDate, enDate, depCode,
+                            Global.compCode, currency, Global.machineId.toString(), bsProcess);
+                    log.info("Balance Sheet Generation Success. ");
+                    btnCalculate.setEnabled(true);
+                    loadingObserver.load(this.getName(), "Stop");
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(Global.parentForm, ex.getMessage());
+                    log.error("getBalanceSheet : " + ex.getMessage());
+                    btnCalculate.setEnabled(true);
+                }
+            });
+        }
 
     }
 
     private void printBalSheet() {
-        loadingObserver.load(this.getName(), "Start");
         taskExecutor.execute(() -> {
-            String userCode = Global.loginUser.getAppUserCode();
             try {
-                CompanyInfo ci = ciService.findById(Global.compCode);
-                SystemPropertyKey key = new SystemPropertyKey();
-                key.setCompCode(Global.compCode);
-                key.setPropKey("system.report.path");
-                SystemProperty sp = spService.findById(key);
-                String fileName = userCode + "_profit_lost.pdf";
-                String reportPath = sp.getPropValue();
-                String reportPath1 = reportPath;
-                String filePath = reportPath + "/temp/" + fileName;
-
-                reportPath = reportPath + "ProfitAndLost";
-                key = new SystemPropertyKey();
-                key.setCompCode(Global.compCode);
-                key.setPropKey("system.font.path");
-                sp = spService.findById(key);
-                String fontPath = sp.getPropValue();
-
-                //Need to calculate sub todal
-                ProfitAndLostRetObj obj = rService.getPLCalculateValue(userCode, Global.compCode);
-                log.info("cost of sale : " + obj.getCostOfSale());
+                loadingObserver.load(this.getName(), "Start");
+                String reportInfo = txtDate.getText();
+                String rpPath = Global.sysProperties.get("system.report.path") + File.separator;
+                String reportPath = rpPath + "BalanceSheetDetail";
+                String fontPath = Global.sysProperties.get("system.font.path");
+                BalanceSheetRetObj bs = rService.getBSCalculateValue(Global.compCode, Global.machineId.toString());
+                log.info("fixed" + bs.getFixedAss());
+                log.info("current" + bs.getCurrentAss());
+                log.info("capital" + bs.getCapital());
+                log.info("liab" + bs.getLiabilitie());
                 //==================================================================
-
                 Map<String, Object> parameters = new HashMap();
-                parameters.put("p_company_name", ci.getName());
+                parameters.put("p_company_name", Global.companyName);
                 parameters.put("p_comp_id", Global.compCode);
-                parameters.put("SUBREPORT_DIR", reportPath1);
-                parameters.put("p_user_id", userCode);
-                parameters.put("gross_profit", obj.getGrossProfit());
-                parameters.put("net_profit", obj.getNetProfit());
-                parameters.put("p_report_info", stDate
-                        + " to " + enDate);
-                parameters.put("p_cost_of_sale", obj.getCostOfSale());
-
-                rService.genCreditVoucher(reportPath, filePath, fontPath, parameters);
+                parameters.put("SUBREPORT_DIR", rpPath);
+                parameters.put("p_mac_id", Global.machineId);
+                parameters.put("p_report_info", reportInfo);
+                parameters.put("p_print_date", Util1.getReportDate());
+                parameters.put("p_total_asset", bs.getFixedAss() + bs.getCurrentAss());
+                parameters.put("p_total", bs.getCapital() + bs.getLiabilitie() + bs.getProfit());
+                rService.genReport(reportPath, reportPath, fontPath, parameters);
                 loadingObserver.load(this.getName(), "Stop");
             } catch (Exception ex) {
-                log.error("getProfitAndLostReport : " + ex);
+                JOptionPane.showMessageDialog(Global.parentForm, ex.getMessage());
             }
         });
-
     }
 
     /**
@@ -334,7 +312,6 @@ public class BalanceSheet extends javax.swing.JPanel implements SelectionObserve
                     enDate = split[1];
                     break;
                 case "Department":
-                    depId = selectObj.toString();
                     break;
                 case "Currency":
                     currency = selectObj.toString();

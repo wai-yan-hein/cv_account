@@ -72,14 +72,19 @@ public class TraderAutoCompleter implements KeyListener {
         this.editor = editor;
         textComp.putClientProperty(AUTOCOMPLETER, this);
         if (filter) {
-            if (max == 1) {
-                list = new ArrayList<>(list);
-                list.add(0, new Trader("-", "All"));
-            } else {
-                list = new ArrayList<>(list);
-                list.add(0, new Trader("-", "All"));
-                list.add(1, new Trader("-", "All Customer"));
-                list.add(2, new Trader("-", "All Supplier"));
+            switch (max) {
+                case 1:
+                    list = new ArrayList<>(list);
+                    list.add(0, new Trader("-", "All"));
+                    break;
+                case 2:
+                    list = new ArrayList<>(list);
+                    list.add(0, new Trader("-", "All"));
+                    list.add(1, new Trader("-", "All Customer"));
+                    list.add(2, new Trader("-", "All Supplier"));
+                    break;
+                default:
+                    break;
             }
         }
         textComp.setFont(Global.textFont);

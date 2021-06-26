@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  */
 public class COACellEditor extends AbstractCellEditor implements TableCellEditor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(COACellEditor.class);
+    private static final Logger log = LoggerFactory.getLogger(COACellEditor.class);
     private JComponent component = null;
     private COAAutoCompleter completer;
     private boolean filter;
@@ -54,7 +54,6 @@ public class COACellEditor extends AbstractCellEditor implements TableCellEditor
     @Override
     public java.awt.Component getTableCellEditorComponent(JTable table, Object value,
             boolean isSelected, int rowIndex, int vColIndex) {
-        LOGGER.info("Value :" + value);
         JTextField jtf = new JTextField();
         jtf.setFont(Global.textFont);
         //jtf.setHighlighter(null);

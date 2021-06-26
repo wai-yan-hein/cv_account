@@ -11,6 +11,7 @@ import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.view.VGeneralVoucher;
+import com.cv.accountswing.service.GlService;
 import com.cv.accountswing.service.VGvService;
 import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
@@ -56,6 +57,8 @@ public class Journal extends javax.swing.JPanel implements KeyListener, Selectio
     private TaskExecutor taskExecutor;
     @Autowired
     private ApplicationMainFrame mainFrame;
+    @Autowired
+    private GlService glService;
     private LoadingObserver loadingObserver;
     private boolean isShown = false;
 
@@ -100,7 +103,7 @@ public class Journal extends javax.swing.JPanel implements KeyListener, Selectio
                     if (tblJournal.getSelectedRow() >= 0) {
                         selectRow = tblJournal.convertRowIndexToModel(tblJournal.getSelectedRow());
                         VGeneralVoucher vGl = journalTableModel.getVGl(selectRow);
-                        openJournalEntryDialog(vGl.getGvVouNo());
+                        openJournalEntryDialog(vGl.getGlVouNo());
                     }
                 }
             }
@@ -110,7 +113,7 @@ public class Journal extends javax.swing.JPanel implements KeyListener, Selectio
     }
 
     private void setTodayDate() {
-        txtFromDate.setDate(Util1.getTodayDate());
+        txtFromDate.setDate(Util1.toDate(Global.finicialPeriodFrom, "yyyy-MM-dd"));
         txtToDate.setDate(Util1.getTodayDate());
     }
 
@@ -155,34 +158,6 @@ public class Journal extends javax.swing.JPanel implements KeyListener, Selectio
 
     }
 
-    /*private void initPropertyChangeListener() {
-    txtFromDate.getDateEditor().addPropertyChangeListener(
-    new PropertyChangeListener() {
-    @Override
-    public void propertyChange(PropertyChangeEvent e) {
-    if ("date".equals(e.getPropertyName())) {
-    Date newValue = Util1.toJavaDate(e.getNewValue());
-    Date oldValue = Util1.toJavaDate(e.getOldValue());
-    if (!Util1.isSameDate(newValue, oldValue)) {
-    searchGV();
-    }
-    }
-    }
-    });
-    txtToDate.getDateEditor().addPropertyChangeListener(
-    new PropertyChangeListener() {
-    @Override
-    public void propertyChange(PropertyChangeEvent e) {
-    if ("date".equals(e.getPropertyName())) {
-    Date newValue = Util1.toJavaDate(e.getNewValue());
-    Date oldValue = Util1.toJavaDate(e.getOldValue());
-    if (!Util1.isSameDate(newValue, oldValue)) {
-    searchGV();
-    }
-    }
-    }
-    });
-    }*/
     private void openJournalEntryDialog(String gvId) {
         journalEntryDialog.setIconImage(jIcon.getImage());
         journalEntryDialog.setSelectionObserver(this);
@@ -192,7 +167,25 @@ public class Journal extends javax.swing.JPanel implements KeyListener, Selectio
         journalEntryDialog.setResizable(false);
         journalEntryDialog.setLocationRelativeTo(null);
         journalEntryDialog.setVisible(true);
+    }
 
+    private void deleteJournal() {
+        int selRow = tblJournal.getSelectedRow();
+        if (selRow >= 0) {
+            int row = tblJournal.convertRowIndexToModel(tblJournal.getSelectedRow());
+            VGeneralVoucher vGl = journalTableModel.getVGl(row);
+            if (vGl.getGlCode() != null) {
+                try {
+                    int status = JOptionPane.showConfirmDialog(Global.parentForm, "Are you sure to delete.");
+                    if (status == JOptionPane.YES_OPTION) {
+                        glService.deleteGV(vGl.getGlVouNo(), "GV-DEL", Global.loginUser.getAppUserCode(), Global.machineId);
+                        journalTableModel.remove(row);
+                    }
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(Global.parentForm, e.getMessage());
+                }
+            }
+        }
     }
 
     public void clear() {
@@ -529,6 +522,7 @@ public class Journal extends javax.swing.JPanel implements KeyListener, Selectio
 
     @Override
     public void delete() {
+        deleteJournal();
     }
 
     @Override

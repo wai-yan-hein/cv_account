@@ -12,6 +12,7 @@ import com.cv.accountswing.common.LoadingObserver;
 import com.cv.accountswing.common.PanelControl;
 import com.cv.accountswing.common.SelectionObserver;
 import com.cv.accountswing.entity.view.VGl;
+import com.cv.accountswing.service.RoleStatusService;
 import com.cv.accountswing.service.VGlService;
 import com.cv.accountswing.ui.ApplicationMainFrame;
 import com.cv.accountswing.ui.editor.CurrencyEditor;
@@ -21,6 +22,7 @@ import com.cv.accountswing.ui.cash.common.AutoClearEditor;
 import com.cv.accountswing.ui.cash.common.SalePurchaseTableModel;
 import com.cv.accountswing.ui.cash.common.TableCellRender;
 import com.cv.accountswing.ui.editor.COACellEditor;
+import com.cv.accountswing.ui.editor.CustomerCellEditor;
 import com.cv.accountswing.ui.filter.FilterPanel;
 import com.cv.accountswing.util.Util1;
 import java.awt.BorderLayout;
@@ -32,8 +34,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
@@ -79,8 +79,8 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
     private TaskExecutor taskExecutor;
     @Autowired
     private SalePurchaseTableModel spTableModel;
-    private SaleEntryDialog saleEntryDialog;
-
+    @Autowired
+    private RoleStatusService statusService;
     private TableRowSorter<TableModel> sorter;
     private SelectionObserver selectionObserver;
     private LoadingObserver loadingObserver;
@@ -173,10 +173,14 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
         tblCash.getColumnModel().getColumn(6).setPreferredWidth(1);// Curr      
         tblCash.getColumnModel().getColumn(7).setPreferredWidth(70);// Dr-Amt   
         tblCash.getColumnModel().getColumn(0).setCellEditor(new AutoClearEditor());
-        tblCash.getColumnModel().getColumn(1).setCellEditor(new DepartmentCellEditor(true));
+        tblCash.getColumnModel().getColumn(1).setCellEditor(new DepartmentCellEditor(false));
         tblCash.getColumnModel().getColumn(2).setCellEditor(new AutoClearEditor());
         tblCash.getColumnModel().getColumn(3).setCellEditor(new AutoClearEditor());
-        tblCash.getColumnModel().getColumn(4).setCellEditor(new SupplierCellEditor());
+        if (panelName.equals("Sale")) {
+            tblCash.getColumnModel().getColumn(4).setCellEditor(new CustomerCellEditor());
+        } else {
+            tblCash.getColumnModel().getColumn(4).setCellEditor(new SupplierCellEditor());
+        }
         tblCash.getColumnModel().getColumn(5).setCellEditor(new COACellEditor(false));
         tblCash.getColumnModel().getColumn(6).setCellEditor(new CurrencyEditor());
         tblCash.getColumnModel().getColumn(7).setCellEditor(new AutoClearEditor());
@@ -198,10 +202,6 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
         });
         tblCash.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                 .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
-        /*tblCash.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "ENTER-Action");
-        tblCash.getActionMap().put("ENTER-Action", actionTblCash);*/
-        tblCash.getInputMap().put(KeyStroke.getKeyStroke("F8"), "F8-Action");
-        tblCash.getActionMap().put("F8-Action", actionItemDeleteExp);
         filterHeader = new TableFilterHeader(tblCash, AutoChoices.ENABLED);
         filterHeader.setPosition(TableFilterHeader.Position.TOP);
         filterHeader.setFont(Global.textFont);
@@ -240,28 +240,44 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
 
     }
 
-    private final Action actionItemDeleteExp = new AbstractAction() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            VGl vgl;
-            int yes_no;
-
-            if (tblCash.getSelectedRow() >= 0) {
-                vgl = spTableModel.getVGl(tblCash.convertRowIndexToModel(tblCash.getSelectedRow()));
-
-                if (vgl.getGlCode() != null) {
-                    yes_no = JOptionPane.showConfirmDialog(Global.parentForm, "Are you sure to delete?",
-                            "Expense item delete", JOptionPane.YES_NO_OPTION);
-
-                    tblCash.getCellEditor().stopCellEditing();
-                    if (yes_no == 0) {
-                        spTableModel.deleteVGl(tblCash.getSelectedRow());
-                        calTotalAmt();
+    private void deleteVoucher() {
+        closeCellEditor();
+        int selectRow = tblCash.convertRowIndexToModel(tblCash.getSelectedRow());
+        int yes_no;
+        if (tblCash.getSelectedRow() >= 0) {
+            VGl vgl = spTableModel.getVGl(selectRow);
+            if (vgl.getGlCode() != null) {
+                yes_no = JOptionPane.showConfirmDialog(Global.parentForm, "Are you sure to delete?",
+                        "Delete", JOptionPane.YES_NO_OPTION);
+                if (yes_no == 0) {
+                    if (statusService.checkPermission(Global.roleCode, Global.CB_DEL_USR_KEY)) {
+                        if (vgl.getCreatedBy().equals(Global.loginUser.getAppUserCode())) {
+                            spTableModel.deleteVGl(selectRow);
+                        } else {
+                            pdDailog();
+                        }
+                    } else if (statusService.checkPermission(Global.roleCode, Global.CB_DEL_KEY)) {
+                        spTableModel.deleteVGl(selectRow);
+                    } else {
+                        pdDailog();
                     }
+                    calTotalAmt();
                 }
             }
         }
-    };
+    }
+
+    private void closeCellEditor() {
+        if (tblCash.getCellEditor() != null) {
+            tblCash.getCellEditor().stopCellEditing();
+        }
+    }
+
+    private void pdDailog() {
+        JOptionPane.showMessageDialog(Global.parentForm,
+                "Your have no permission to delete.",
+                "Permission Denied", JOptionPane.WARNING_MESSAGE);
+    }
 
     public void printSale() {
         /*loadingObserver.load(this.getName(), "Start");
@@ -303,7 +319,7 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
         parameters.put("p_cv_id", Util1.isNull(accId, "-"));
         parameters.put("p_report_name", this.getName());
         
-        rService.genCreditVoucher(reportPath, filePath, fontPath, parameters);
+        rService.genReport(reportPath, filePath, fontPath, parameters);
         loadingObserver.load(this.getName(), "Stop");
         } catch (Exception ex) {
         LOGGER.error("getLedgerReport : " + ex);
@@ -391,7 +407,7 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
                 vgl.setDrAmt(tmpAmt);
                 }*/
             } else if (accId.equals(targetId)) {
-                float tmpDrAmt = 0;
+                double tmpDrAmt = 0;
                 if (vgl.getDrAmt() != null) {
                     tmpDrAmt = vgl.getDrAmt();
                 }
@@ -402,8 +418,8 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
                 vgl.setAccName(vgl.getSrcAccName());
                 vgl.setSrcAccName(tmpStr);
             } else {
-                vgl.setDrAmt(0.0f);
-                vgl.setCrAmt(0.0f);
+                vgl.setDrAmt(0.0);
+                vgl.setCrAmt(0.0);
             }
         });
     }
@@ -632,6 +648,8 @@ public class SalePurchaseBook extends javax.swing.JPanel implements SelectionObs
 
     @Override
     public void delete() {
+        deleteVoucher();
+
     }
 
     @Override

@@ -78,7 +78,7 @@ public class LoginDialog extends javax.swing.JDialog implements KeyListener {
 
     public void checkMachineRegister() {
         try {
-            
+
             Global.machineName = Util1.getComputerName();
             Global.machineId = machineInfoService.getMax(Global.machineName);
             if (Global.machineId == 0) {
@@ -200,8 +200,7 @@ public class LoginDialog extends javax.swing.JDialog implements KeyListener {
         } else {
             try {
                 AppUser user = usrService.login(
-                        txtLoginName.getText(), Arrays.toString(txtPassword.getPassword())
-                );
+                        txtLoginName.getText(), Arrays.toString(txtPassword.getPassword()));
                 if (user == null) {
                     JOptionPane.showMessageDialog(this, "Invalid user name or password.",
                             "Authentication error.", JOptionPane.ERROR_MESSAGE);

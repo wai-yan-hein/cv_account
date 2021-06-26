@@ -6,7 +6,7 @@
 package com.cv.accountswing.ui.editor;
 
 import com.cv.accountswing.common.Global;
-import com.cv.accountswing.entity.Supplier;
+import com.cv.accountswing.entity.Customer;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
@@ -29,7 +29,7 @@ public class CustomerCellEditor extends AbstractCellEditor implements TableCellE
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CustomerCellEditor.class);
     private JComponent component = null;
-    private SupplierAutoCompleter completer;
+    private CustomerAutoCompleter completer;
     private final FocusAdapter fa = new FocusAdapter() {
         @Override
         public void focusLost(FocusEvent e) {
@@ -87,14 +87,14 @@ public class CustomerCellEditor extends AbstractCellEditor implements TableCellE
         if (value != null) {
             jtf.setText(value.toString());
         }
-        completer = new SupplierAutoCompleter(jtf, Global.listSupplier, this);
+        completer = new CustomerAutoCompleter(jtf, Global.listCustomer, this);
         return component;
     }
 
     @Override
     public Object getCellEditorValue() {
         Object obj;
-        Supplier trader = completer.getTrader();
+        Customer trader = completer.getTrader();
 
         if (trader != null) {
             obj = trader;
